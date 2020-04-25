@@ -15,6 +15,9 @@
 						<a href="<?php echo BASE_URL."courses/class/".$class['id']; ?>">
 							Questionnaire
 						</a>
+						<?php if ($class['watched'] > 0): ?>
+							<small class="class_watched">Watched</small>
+						<?php endif; ?>
 					<?php endif; ?>
 				</div>
 			<?php endforeach; ?>

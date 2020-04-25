@@ -42,7 +42,7 @@ class CoursesController extends Controller
         $courses = new Courses($_SESSION['s_login']);
         $classes = new Classes();
         
-        $id_class = $students->getLastClassWatched();
+        $id_class = $students->getLastClassWatched($id_course);
         
         if (!empty($_POST['question'])) {
             $doubts = new Doubts();
@@ -78,7 +78,10 @@ class CoursesController extends Controller
                 $view = "class_video";
             } else {
                 $name = "Questionnaire";
-                $embed = $class['quest'];
+                $embed = array(
+                    'id_class' => $class['id'],
+                    'quest' => $class['quest']
+                );
                 $view = "class_quest";
             }
         }
@@ -140,7 +143,10 @@ class CoursesController extends Controller
                 $view = "class_video";
             } else {
                 $name = "Questionnaire";
-                $embed = $class['quest'];
+                $embed = array(
+                    'id_class' => $class['id'],
+                    'quest' => $class['quest']
+                );
                 $view = "class_quest";
             }
         }

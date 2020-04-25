@@ -106,11 +106,23 @@ class Students extends Model
         return $response;
     }
     
-    public function getLastClassWatched()
+    public function getLastClassWatched($id_course)
     {
         $response = -1;
         
-        $sql = $this->db->query("SELECT id_class FROM historic WHERE id_student = $this->id_user ORDER BY date_watched DESC LIMIT 1");
+        $classes = new Classes();
+        $courseClassIds = $classes->getClassesInCourse($id_course);
+        
+        $sql = $this->db->prepare("
+            SELECT id_class 
+            FROM historic 
+            WHERE 
+                id_student = $this->id_user AND
+                id_class IN (".implode(",",$courseClassIds).")
+            ORDER BY date_watched DESC 
+            LIMIT 1
+        ");
+        $sql->execute(array($id_course));
         
         if ($sql->rowCount() > 0) {
             $response = $sql->fetch()['id_class'];

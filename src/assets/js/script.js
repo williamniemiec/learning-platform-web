@@ -9,6 +9,7 @@ $(function(){
 		var id_quest = $(".questions").attr("data-quest")
 		var selectedQuestion = $(this).attr("data-index")
 		
+		// Shows answers
 		$.ajax({
 			type:"POST",
 			url:BASE_URL+"ajax/quests",
@@ -31,6 +32,13 @@ $(function(){
 				$(".question").unbind()
 			}
 		})
+		
+		// Marks class as watched
+		$.ajax({
+			type:"POST",
+			url:BASE_URL+"ajax/mark_class_watched",
+			data:{id_class:$(".questions").attr("data-class")}
+		})
 	})
 })
 
@@ -52,7 +60,6 @@ function updateScreen()
 
 function markAsWatched(id_class)
 {
-	// ADICIONAR OPÇÃO DE REMOVER AULA VISTA
 	$.ajax({
 		type:"POST",
 		url:BASE_URL+"ajax/mark_class_watched",
@@ -65,7 +72,6 @@ function markAsWatched(id_class)
 
 function removeWatched(id_class)
 {
-	// ADICIONAR OPÇÃO DE REMOVER AULA VISTA
 	$.ajax({
 		type:"POST",
 		url:BASE_URL+"ajax/remove_watched_class",

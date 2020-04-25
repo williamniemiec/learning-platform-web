@@ -163,6 +163,24 @@ class Classes extends Model
         $sql->execute(array($id_student,$id_class));
     }
     
+    public function getClassesInCourse($id_course)
+    {
+        if (empty($id_course) || $id_course <= 0) { return; }
+        
+        $response = array();
+        
+        $sql = $this->db->prepare("SELECT id FROM classes WHERE id_course = ?");
+        $sql->execute(array($id_course));
+        
+        if ($sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $class) {
+                $response[] = $class['id'];
+            }
+        }
+        
+        return $response;
+    }
+    
     private function alreadyMarkedAsWatched($id_class, $id_student)
     {
         if (empty($id_class) || $id_class <= 0)     { return true; }
