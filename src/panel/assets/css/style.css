@@ -1,0 +1,142 @@
+/* GLOBAL */
+body,html {
+	height: 100%;
+}
+
+.nav-item:hover {
+	background-color: #eee;
+}
+
+.nav-item {
+	height:50px;
+	line-height:50px;
+	padding: 0;
+	transition: all 200ms ease-in;
+}
+
+body > nav {
+	background-color: #ccc;
+	padding: 0;
+	height:50px;
+}
+
+.row {
+	max-width: 100%;
+}
+
+/* COURSES */
+.course_logo img {
+	max-width: 100px;
+}
+
+.course_logo {
+	width:100px;
+}
+
+.course_banner {
+	max-height: 150px;
+}
+
+.course_header {
+	display: flex;
+	justify-content: left;
+    background-color: #eee;
+}
+
+.course_info {
+	margin-left: 20px;
+}
+
+.course_left, .course_right {
+	overflow-y: scroll;
+}
+
+.course_left {
+	min-height:300px;
+	background-color:#ddd;
+	padding-left: 30px;
+}
+
+.course_right {
+	min-height:300px;
+	margin-left: 10px;
+}
+
+.module {
+	padding: 20px;
+	border: 1px solid black;
+	border-radius: 5px;
+	margin-top: 20px;
+}
+
+.module_class {
+	transition: all 200ms ease-in;
+	display:flex;
+	justify-content:space-between;
+	margin-top:5px;
+}
+
+.module_class:hover, .module_class:hover a  {
+	background-color: #ddd;
+	color: white;
+	text-decoration:none;
+}
+
+.class_watched {
+	border: 1px solid #aaa;
+	padding:2px;
+	border-radius: 5px;
+	margin-left: 15px;
+	color:#777;
+}
+
+.content_info h1 {
+	display: inline;
+}
+
+.comment {
+	max-width:100px;
+	max-height:100px;
+}
+
+.comment {
+	display: flex;
+	margin-top: 20px;
+}
+
+.comment p {
+	display: inline-block;
+	
+}
+
+.comment_content {
+	display: flex;
+	flex-direction: column;
+	margin-left: 20px;
+}
+
+#class_video {
+	width: 100%;
+}
+
+/* QUESTS */
+.question {
+	border: 2px solid #ddd;
+    padding: 25px;
+    border-radius: 5px;
+    margin-bottom:20px;
+    cursor:pointer;
+    transition: all 200ms ease-in;
+}
+
+.question:hover, .question_selected {
+	background-color:#ddd;
+}
+
+.question_correct {
+	border-color:green;
+}
+
+.question_wrong {
+	border-color:red;
+}
