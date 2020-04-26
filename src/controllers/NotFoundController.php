@@ -1,7 +1,8 @@
 <?php
 namespace controllers;
 
-use \core\Controller;
+use core\Controller;
+use models\Students;
 
 
 /**
@@ -18,9 +19,17 @@ class NotFoundController extends Controller
 	public function index()
 	{
         $params = array(
-            'title' => "Learning platform - Page not found"
+            'title' => "Learning platform - Page not found",
         );
-
-		$this->loadTemplate('404', $params);
+	    
+        if (empty($_SESSION['s_login'])) {
+		  $this->loadTemplate('404_noLogged', $params);
+            
+        }        
+           
+	    $students = new Students($_SESSION['s_login']);
+		$params['studentName'] = $students->getName();
+		
+		$this->loadTemplate('404_logged', $params);
 	}
 }
