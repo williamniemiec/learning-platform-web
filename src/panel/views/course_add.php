@@ -22,7 +22,7 @@
     	
     	<div class="form-group">
     		<label for="logo">Logo</label>
-    		<input id="logo" name="logo" type="file" accept="image/*" class="form-control" />
+    		<input id="logo" name="logo" type="file" accept=".jpeg,.png,.jpg" class="form-control" />
     	</div>
     	
     	<div class="form-group">

@@ -15,7 +15,11 @@
         	<tbody>
         		<?php foreach($courses as $course): ?>
             		<tr>
-            			<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."assets/images/logos/".$course['logo']; ?>" /></td>
+            			<?php if (empty($course['logo'])): ?>
+            				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."assets/images/noImage"; ?>" /></td>
+            			<?php else: ?>
+            				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."assets/images/logos/".$course['logo']; ?>" /></td>
+            			<?php endif; ?>
             			<td><a href="<?php echo BASE_URL."courses/open/".$course['id']; ?>"><?php echo $course['name']; ?></a></td>
             			<td><?php echo $course['description']; ?></td>
             			<td>/<?php echo $course['totalClasses'] ?> classes were watched</td>

@@ -39,6 +39,82 @@ class Courses extends Model
         return $response;
     }
     
+    public function delete($id_course)
+    {
+        // Get all classes from this course
+        $classIds = $this->getAllClasses($id_course);
+        
+        // Delete classes from course
+        $sql = $this->db->prepare("DELETE FROM classes WHERE id_course = ?");
+        $sql->execute(array($id_course));
+        
+        // Delete modules from course
+        $sql = $this->db->prepare("DELETE FROM modules WHERE id_course = ?");
+        $sql->execute(array($id_course));
+        
+        // Delete historic from course
+        if (count($classIds) > 0) {
+            $sql = $this->db->query("DELETE FROM classes WHERE id_class IN (".implode(",",$classIds).")");
+        }
+        
+        // Delete videos from course
+        $this->db->query("DELETE FROM videos WHERE id_class IN (".implode(",",$classIds).")");
+        
+        // Delete questionnaires from course
+        $this->db->query("DELETE FROM classes WHERE id_class IN (".implode(",",$classIds).")");
+        
+        // Delete student-course relationships
+        $sql = $this->db->prepare("DELETE FROM student_course WHERE id_course = ?");
+        $sql->execute(array($id_course));
+        
+        // Delete image, if there is one
+        $imageName = $this->getImage($id_course);
+        
+        if (!empty($imageName)) {
+            unlink("../assets/images/logos/".$imageName);
+        }
+        
+        // Delete course
+        $sql = $this->db->prepare("DELETE FROM courses WHERE id = ?");
+        $sql->execute(array($id_course));
+    }
+    
+    public function getImage($id_course)
+    {
+        if (empty($id_course) || $id_course <= 0) { return ""; }
+        
+        $response = "";
+        
+        $sql = $this->db->prepare("SELECT logo FROM courses WHERE id_course = ?");
+        $sql->execute(array($id_course));
+        
+        if ($sql->rowCount() > 0) {
+            $response = $sql->fetch()['logo'];
+        }
+        
+        return $response;
+    }
+    
+    public function getAllClasses($id_course)
+    {
+        if (empty($id_course) || $id_course <= 0) { return array(); }
+        
+        $response = array();
+        
+        $sql = $this->db->prepare("SELECT id FROM classes WHERE id_course = ?");
+        $sql->execute(array($id_course));
+        
+        if ($sql->rowCount() > 0) {
+            $classes = $sql->fetchAll();
+            
+            foreach ($classes as $class) {
+                $response[] = $class['id'];
+            }
+        }
+        
+        return $response;
+    }
+    
     public function countCourses()
     {
         $sql = $this->db->query("SELECT COUNT(*) as count FROM student_course WHERE id_student = $this->id_user");
@@ -97,14 +173,17 @@ class Courses extends Model
         }
         
         if (!empty($logo['tmp_name']) && $this->isPhoto($logo)) {
-            $data_keys[] = "logo";
-            
-            $filename = md5(rand(1,9999).time());
             $extension = explode("/", $logo['type'])[1];
-            $filename = $filename.".".$extension;
-            move_uploaded_file($logo['tmp_name'], "assets/images/logos/".$filename);
-            $data_values[] = $filename;
-            $data_sql[] = "?";
+            
+            if ($extension == ".jpg" || $extension == ".jpeg" || $extension == ".png") {
+                $data_keys[] = "logo";
+                
+                $filename = md5(rand(1,9999).time().rand(1,9999));
+                $filename = $filename."."."jpg";
+                move_uploaded_file($logo['tmp_name'], "../assets/images/logos/".$filename);
+                $data_values[] = $filename;
+                $data_sql[] = "?";
+            }
         }
         
         $sql = "INSERT INTO courses (".implode(",",$data_keys).") VALUES (".implode(",", $data_sql).")";
