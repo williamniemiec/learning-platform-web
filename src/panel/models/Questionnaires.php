@@ -47,7 +47,7 @@ class Questionnaires extends Model
         $sql->execute(array($id_question));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetch()['answer'];
+            $response = $sql->fetch(\PDO::FETCH_ASSOC)['answer'];
         }
         
         return $response;

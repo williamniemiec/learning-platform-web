@@ -25,6 +25,11 @@ body > nav {
 }
 
 /* COURSES */
+.img_courseEdit {
+	max-width: 250px;
+	max-height:250px;
+}
+
 .course_logo img {
 	max-width: 100px;
 }
@@ -47,96 +52,30 @@ body > nav {
 	margin-left: 20px;
 }
 
-.course_left, .course_right {
-	overflow-y: scroll;
-}
-
-.course_left {
-	min-height:300px;
-	background-color:#ddd;
-	padding-left: 30px;
-}
-
-.course_right {
-	min-height:300px;
-	margin-left: 10px;
-}
-
 .module {
-	padding: 20px;
-	border: 1px solid black;
-	border-radius: 5px;
-	margin-top: 20px;
-}
-
-.module_class {
-	transition: all 200ms ease-in;
-	display:flex;
-	justify-content:space-between;
-	margin-top:5px;
-}
-
-.module_class:hover, .module_class:hover a  {
 	background-color: #ddd;
-	color: white;
-	text-decoration:none;
-}
-
-.class_watched {
-	border: 1px solid #aaa;
-	padding:2px;
+	border: 1px solid #ccc;
 	border-radius: 5px;
-	margin-left: 15px;
-	color:#777;
+	padding: 20px;
 }
 
-.content_info h1 {
-	display: inline;
-}
-
-.comment {
-	max-width:100px;
-	max-height:100px;
-}
-
-.comment {
+.class {
 	display: flex;
-	margin-top: 20px;
-}
-
-.comment p {
-	display: inline-block;
-	
-}
-
-.comment_content {
-	display: flex;
-	flex-direction: column;
-	margin-left: 20px;
-}
-
-#class_video {
-	width: 100%;
-}
-
-/* QUESTS */
-.question {
-	border: 2px solid #ddd;
-    padding: 25px;
-    border-radius: 5px;
-    margin-bottom:20px;
-    cursor:pointer;
+	justify-content: space-between;
+	border: 1px solid #bbb;
+    padding: 5px 10px;
     transition: all 200ms ease-in;
+    align-items: center;
 }
 
-.question:hover, .question_selected {
-	background-color:#ddd;
+.class h5 {
+	margin:0;
 }
 
-.question_correct {
-	border-color:green;
+.class:hover {
+	background-color: #ccc;
 }
 
-.question_wrong {
-	border-color:red;
+.classes {
+	margin-bottom: 20px;
 }

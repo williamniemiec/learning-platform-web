@@ -45,7 +45,7 @@ class Courses extends Model
         $classIds = $this->getAllClasses($id_course);
         
         // Delete classes from course
-        $sql = $this->db->prepare("DELETE FROM classes WHERE id_course = ?");
+        $sql = $this->db->prepare("DELETE FROM classes WHERE id_module = ?");
         $sql->execute(array($id_course));
         
         // Delete modules from course
@@ -54,14 +54,14 @@ class Courses extends Model
         
         // Delete historic from course
         if (count($classIds) > 0) {
-            $sql = $this->db->query("DELETE FROM classes WHERE id_class IN (".implode(",",$classIds).")");
+            $this->db->query("DELETE FROM historic WHERE id_class IN (".implode(",",$classIds).")");
         }
         
         // Delete videos from course
         $this->db->query("DELETE FROM videos WHERE id_class IN (".implode(",",$classIds).")");
         
         // Delete questionnaires from course
-        $this->db->query("DELETE FROM classes WHERE id_class IN (".implode(",",$classIds).")");
+        $this->db->query("DELETE FROM questionnaries WHERE id_class IN (".implode(",",$classIds).")");
         
         // Delete student-course relationships
         $sql = $this->db->prepare("DELETE FROM student_course WHERE id_course = ?");
@@ -188,6 +188,48 @@ class Courses extends Model
         
         $sql = "INSERT INTO courses (".implode(",",$data_keys).") VALUES (".implode(",", $data_sql).")";
         
+        $sql = $this->db->prepare($sql);
+        $sql->execute($data_values);
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    public function edit($id_course, $name, $description = '', $logo = '')
+    {
+        $data_values = array();
+        $data_sql = array();
+        
+        $data_values[] = $name;
+        $data_sql[] = "name = ?";
+        
+        if (!empty($description)) {
+            $data_values[] = $description;
+            $data_sql[] = "description = ?";
+        }
+        
+        if (!empty($logo['tmp_name']) && $this->isPhoto($logo)) {
+            $extension = explode("/", $logo['type'])[1];
+            
+            if ($extension == "jpg" || $extension == "jpeg" || $extension == "png") {
+                
+                $filename = md5(rand(1,9999).time().rand(1,9999));
+                $filename = $filename."."."jpg";
+                move_uploaded_file($logo['tmp_name'], "../assets/images/logos/".$filename);
+                $data_values[] = $filename;
+                $data_sql[] = "logo = ?";
+                
+                // Deletes old image (if there is one)
+                $imageName = $this->getImage($id_course);
+                
+                if (!empty($imageName)) {
+                    unlink("../assets/images/logos/".$imageName);
+                }
+            }
+        }
+
+        $data_values[] = $id_course;
+        
+        $sql = "UPDATE courses SET ".implode(",", $data_sql)." WHERE id = ?";
         $sql = $this->db->prepare($sql);
         $sql->execute($data_values);
         

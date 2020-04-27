@@ -47,7 +47,7 @@ class Classes extends Model
         $sql->execute(array($id_module));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetchAll();
+            $response = $sql->fetchAll(\PDO::FETCH_ASSOC);
             
             foreach ($response as $key => $value) {
                 if ($value['type'] == 'video') {
@@ -70,7 +70,7 @@ class Classes extends Model
         $sql = $this->db->prepare("SELECT id_course FROM classes WHERE id = ?");
         $sql->execute(array($id_class));
         
-        return $sql->fetch()['id_course'];
+        return $sql->fetch(\PDO::FETCH_ASSOC)['id_course'];
     }
     
     public function getFirstClassFromFirstModule($id_course)
@@ -89,7 +89,7 @@ class Classes extends Model
         $sql->execute(array($id_course));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetch();
+            $response = $sql->fetch(\PDO::FETCH_ASSOC);
             
             if ($response['type'] == 'video') {
                 $videos = new Videos();
@@ -119,7 +119,7 @@ class Classes extends Model
         $sql->execute(array($id_class));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetch();
+            $response = $sql->fetch(\PDO::FETCH_ASSOC);
             
             if ($response['type'] == 'video') {
                 $videos = new Videos();
@@ -129,7 +129,6 @@ class Classes extends Model
                 $response['quest'] = $quests->getQuestFromClass($id_class);
             }
         }
-        
         
         return $response; 
         
@@ -179,6 +178,27 @@ class Classes extends Model
         }
         
         return $response;
+    }
+    
+    public function delete($id_class)
+    {
+        if (empty($id_class) || $id_class <= 0) { return; }
+        
+        // Delete class from course
+        $sql = $this->db->prepare("DELETE FROM classes WHERE id = ?");
+        $sql->execute(array($id_class));
+        
+        // Delete historic from course
+        $sql = $this->db->prepare("DELETE FROM historic WHERE id_class = ?");
+        $sql->execute(array($id_class));
+        
+        // Delete videos from course
+        $sql = $this->db->prepare("DELETE FROM videos WHERE id_class = ?");
+        $sql->execute(array($id_class));
+        
+        // Delete questionnaires from course
+        $sql = $this->db->prepare("DELETE FROM questionnaries WHERE id_class = ?");
+        $sql->execute(array($id_class));
     }
     
     private function alreadyMarkedAsWatched($id_class, $id_student)

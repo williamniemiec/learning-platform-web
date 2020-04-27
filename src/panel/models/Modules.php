@@ -43,4 +43,48 @@ class Modules extends Model
         
         return $response;
     }
+    
+    public function delete($id_module)
+    {
+        if (empty($id_module) || $id_module <= 0) { return; }
+        
+        // Get all classes from this module
+        $classIds = $this->getAllClasses($id_module);
+        
+        // Delete classes from course
+        $this->db->query("DELETE FROM classes WHERE id IN (".implode(",", $classIds).")");
+        
+        // Delete module from course
+        $sql = $this->db->prepare("DELETE FROM modules WHERE id = ?");
+        $sql->execute(array($id_module));
+        
+        // Delete historic from course
+        if (count($classIds) > 0) {
+            $this->db->query("DELETE FROM historic WHERE id_class IN (".implode(",",$classIds).")");
+        }
+        
+        // Delete videos from course
+        $this->db->query("DELETE FROM videos WHERE id_class IN (".implode(",",$classIds).")");
+        
+        // Delete questionnaires from course
+        $this->db->query("DELETE FROM questionnaries WHERE id_class IN (".implode(",",$classIds).")");
+    }
+    
+    private function getAllClasses($id_module)
+    {
+        if (empty($id_module) || $id_module <= 0) { return array(); }
+        
+        $response = array();
+        
+        $sql = $this->db->prepare("SELECT id FROM classes WHERE id_module = ?");
+        $sql->execute(array($id_module));
+        
+        if ($sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $class) {
+                $response[] = $class['id'];
+            }
+        }
+        
+        return $response;
+    }
 }

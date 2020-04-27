@@ -78,8 +78,21 @@ class CoursesController extends Controller
             'title' => 'Learning platform - '.$course['name'],
             'adminName' => $admins->getName(),
             'course' => $course,
-            'modules' => $course['modules']
+            'modules' => $course['modules'],
+            'error' => false,
+            'msg' => ''
         );
+        
+        // Checks if the course was edited
+        if (!empty($_POST['name'])) {
+            if ($courses->edit($id_course, $_POST['name'], $_POST['description'], $_FILES['logo'])) {
+                header("Location: ".BASE_URL);
+                exit;
+            }
+            
+            $params['error'] = true;
+            $params['msg'] = "Error while saving editions";
+        }
         
         $this->loadTemplate("course_edit", $params);
     }
