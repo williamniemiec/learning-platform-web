@@ -32,15 +32,6 @@ class CoursesController extends Controller
     public function index ()
     { header("Location: ".BASE_URL); }
     
-    public function edit($id_course)
-    {
-        $params = array(
-            'title' => 'Learning platform - Course'
-        );
-        
-        $this->loadTemplate("course", $params);
-    }
-    
     public function delete($id_course)
     {
         $courses = new Courses();
@@ -73,5 +64,23 @@ class CoursesController extends Controller
         
         
         $this->loadTemplate("course_add", $params);
+    }
+    
+    public function edit($id_course)
+    {
+        if (empty($id_course) || $id_course <= 0) { header("Location: ".BASE_URL); }
+        
+        $courses = new Courses();
+        $course = $courses->getCourse($id_course);
+        $admins = new Admins($_SESSION['a_login']);
+        
+        $params = array(
+            'title' => 'Learning platform - '.$course['name'],
+            'adminName' => $admins->getName(),
+            'course' => $course,
+            'modules' => $course['modules']
+        );
+        
+        $this->loadTemplate("course_edit", $params);
     }
 }
