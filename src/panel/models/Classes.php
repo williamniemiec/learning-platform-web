@@ -201,6 +201,45 @@ class Classes extends Model
         $sql->execute(array($id_class));
     }
     
+    public function add($id_module, $id_course, $type, $order=0)
+    {
+        if (empty($id_module) || $id_module <= 0) { return -1; }
+        if (empty($id_course) || $id_course <= 0) { return -1; }
+        if (empty($type)) { return -1; }
+        if ($order < 0) { return -1; }
+        
+        $response = -1;
+        
+        if ($order == 0) {
+            $lastOrder = $this->getLastOrder($id_module, $id_course);
+            $lastOrder == 0 ? 1 : $lastOrder;
+            $lastOrder++;
+        }
+        
+        $sql = $this->db->prepare("INSERT INTO classes (id_module, id_course, classes.order, classes.type) VALUES (?,?,?,?)");
+        $sql->execute(array($id_module, $id_course, $lastOrder, $type));
+        
+        if ($sql->rowCount() > 0) {
+            $response = $this->db->lastInsertId();
+        }
+
+        return $response;
+    }
+    
+    private function getLastOrder($id_module, $id_course)
+    {
+        $response = 0;
+        
+        $sql = $this->db->prepare("SELECT classes.order FROM classes WHERE id_module = ? AND id_course = ? ORDER BY classes.order DESC LIMIT 1");
+        $sql->execute(array($id_module, $id_course));
+        
+        if ($sql->rowCount() > 0) {
+            $response = $sql->fetch()['order'];
+        }
+
+        return $response;
+    }
+    
     private function alreadyMarkedAsWatched($id_class, $id_student)
     {
         if (empty($id_class) || $id_class <= 0)     { return true; }

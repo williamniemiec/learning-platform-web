@@ -36,4 +36,14 @@ class Videos extends Model
         
         return $response; 
     }
+    
+    public function add($classId, $title, $description, $url)
+    {
+        if (empty($title) || empty($description) || empty($url)) { return false; }
+        
+        $sql = $this->db->prepare("INSERT INTO videos (id_class,title,description,url) VALUES (?,?,?,?)");
+        $sql->execute(array($classId,$title, $description, $url));
+         
+        return $sql->rowCount() > 0;
+    }
 }

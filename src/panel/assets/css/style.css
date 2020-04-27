@@ -79,3 +79,11 @@ body > nav {
 .classes {
 	margin-bottom: 20px;
 }
+
+.classType_content_quest {
+	display: none;
+}
+
+.module {
+	margin-top: 20px;
+}

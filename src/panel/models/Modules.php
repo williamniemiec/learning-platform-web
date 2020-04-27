@@ -70,6 +70,44 @@ class Modules extends Model
         $this->db->query("DELETE FROM questionnaries WHERE id_class IN (".implode(",",$classIds).")");
     }
     
+    public function add($id_course, $name)
+    {
+        if (empty($name)) { return -1; }
+        if ($this->alreadyExist($id_course, $name)) { return -1; }
+        
+        $response = -1;
+        
+        $sql = $this->db->prepare("INSERT INTO modules (id_course, name) VALUES (?,?)");
+        $sql->execute(array($id_course, $name));
+        
+        if ($sql->rowCount() > 0) {
+            $response = $this->db->lastInsertId();
+        }
+        
+        return $response;
+    }
+    
+    public function edit($id_module, $name)
+    {
+        if (empty($id_module) || $id_module <= 0) { return false; }
+        if (empty($name)) { return false; }
+        
+        $sql = $this->db->prepare("UPDATE modules SET name = ? WHERE id = ?");
+        $sql->execute(array($name, $id_module));
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    private function alreadyExist($id_course, $name)
+    {
+        if (empty($name) || empty($id_course) || $id_course <= 0) { return false; }
+        
+        $sql = $this->db->query("SELECT COUNT(*) AS count FROM modules WHERE id_course = ? AND name = ?");
+        $sql->execute(array($id_course, $name));
+        
+        return $sql->fetch()['count'] > 0;
+    }
+    
     private function getAllClasses($id_module)
     {
         if (empty($id_module) || $id_module <= 0) { return array(); }
