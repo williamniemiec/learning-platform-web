@@ -7,7 +7,8 @@ use models\Questionnaires;
 use models\Videos;
 use models\Modules;
 use models\Classes;
-
+use models\Student;
+use models\Courses;
 
 /**
  
@@ -165,5 +166,74 @@ class AjaxController extends Controller
             $_POST['op4'], 
             $_POST['answer']
         );
+    }
+    
+    public function add_student()
+    {
+        if (empty($_POST['email'])) { echo -1; }
+        
+        $students = new Students();
+        $student = new Student($_POST['name'], $_POST['genre'], $_POST['birthdate'], $_POST['email'], $_POST['password']);
+        echo $students->register($student, false);
+    }
+    
+    public function edit_student()
+    {
+        if (empty($_POST['email'])) { echo -1; }
+        
+        $students = new Students();
+        
+        if (empty($_POST['passowrd']))
+            $student = new Student($_POST['name'], $_POST['genre'], $_POST['birthdate'], $_POST['email'], null);
+        else
+            $student = new Student($_POST['name'], $_POST['genre'], $_POST['birthdate'], $_POST['email'], $_POST['password']);
+        echo $students->edit($student);
+    }
+    
+    public function get_student()
+    {
+        if (empty($_POST['id_student'])) { echo json_encode(array()); }
+        
+        $students = new Students();
+        $student = $students->get($_POST['id_student']);
+        $response = array(
+            'name' => $student->getName(),
+            'genre' => $student->getGenre(),
+            'birthdate' => $student->getBirthdate(),
+            'email' => $student->getEmail()
+        );
+        echo json_encode($response);
+    }
+    
+    public function delete_student()
+    {
+        if (empty($_POST['id_student'])) { return false; }
+        
+        $students = new Students();
+        echo $students->delete($_POST['id_student']);
+    }
+    
+    public function get_courses()
+    {
+        if (empty($_POST['id_student'])) { echo false; }
+        
+        $courses = new Courses();
+        echo json_encode($courses->getAll($_POST['id_student']));
+    }
+    
+    public function add_student_course()
+    {
+        if (empty($_POST['id_student']) || empty($_POST['id_course'])) { echo false; }
+        
+        $students = new Students();
+        echo $students->addCourse($_POST['id_student'], $_POST['id_course']);
+    }
+    
+    public function clear_student_course()
+    {
+        if (empty($_POST['id_student']) || empty($_POST['id_course'])) { echo false; }
+        
+        $students = new Students();
+        echo $students->deleteAllCourses($_POST['id_student']);
     }
 }

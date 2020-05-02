@@ -70,4 +70,21 @@ class Student
     {
         $this->id = $id;
     }
+    
+    public function getCourses()
+    {
+        $students = new Students();
+        return $students->getCourses($this->id);
+    }
+    
+    public function getCoursesName()
+    {
+        $response = array();
+        
+        foreach ($this->getCourses() as $course) {
+            $response[] = $course['name'];
+        }
+            
+        return $response;
+    }
 }

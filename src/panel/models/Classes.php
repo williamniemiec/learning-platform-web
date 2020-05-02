@@ -184,19 +184,23 @@ class Classes extends Model
     {
         if (empty($id_class) || $id_class <= 0) { return; }
         
-        // Delete class from course
+        // Deletes class
         $sql = $this->db->prepare("DELETE FROM classes WHERE id = ?");
         $sql->execute(array($id_class));
         
-        // Delete historic from course
+        // Deletes historic
         $sql = $this->db->prepare("DELETE FROM historic WHERE id_class = ?");
         $sql->execute(array($id_class));
         
-        // Delete videos from course
+        // Deletes doubts
+        $sql = $this->db->prepare("DELETE FROM doubts WHERE id_class = ?");
+        $sql->execute(array($id_class));
+        
+        // Deletes videos
         $sql = $this->db->prepare("DELETE FROM videos WHERE id_class = ?");
         $sql->execute(array($id_class));
         
-        // Delete questionnaires from course
+        // Deletes questionnaires
         $sql = $this->db->prepare("DELETE FROM questionnaries WHERE id_class = ?");
         $sql->execute(array($id_class));
     }

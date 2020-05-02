@@ -10,7 +10,7 @@
 		Mark as watched
 	</button>
 	
-	<iframe id="class_video" frameborder="0" src="//player.vimeo.com/video/<?php echo $content_embed['video']['url']; ?>"></iframe>
+	<iframe id="class_video" frameborder="0" src="http://www.youtube.com/embed/<?php echo $content_embed['video']['url']; ?>"></iframe>
 	
 	<div class="content_desc"><?php echo $content_embed['video']['description'] ?></div>
 	

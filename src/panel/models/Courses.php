@@ -236,6 +236,25 @@ class Courses extends Model
         return $sql->rowCount() > 0;
     }
     
+    public function getAll($id_student = -1)
+    {
+        if ($id_student == -1)
+            $sql = $this->db->query("SELECT * FROM courses");
+        else
+            $sql = $this->db->query("
+                SELECT 
+                    *,
+                    (select count(*) from student_course where courses.id = student_course.id_course and student_course.id_student = $id_student) as hasCourse 
+                FROM courses
+            ");
+        
+        if ($sql->rowCount() > 0) {
+            $response = $sql->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        
+        return $response;
+    }
+    
     /**
      * Checks if a submitted photo is really a photo.
      *

@@ -52,9 +52,9 @@ class Students extends Model
         return true;
     }
     
-    public function register($student)
+    public function register(Student $student, $autologin = true)
     {
-        if ($this->existUser($student)) { return false; }
+        if ($this->existUser($student)) { return -1; }
         
         $sql = $this->db->prepare("INSERT INTO students (name,genre,birthdate,email,password) VALUES (?,?,?,?,?)");
         $sql->execute(array(
@@ -65,11 +65,12 @@ class Students extends Model
             md5($student->getPassword())
         ));
 
-        if ($sql->rowCount() == 0) { return false; }
+        if ($sql->rowCount() == 0) { return -1; }
         
-        $_SESSION['s_login'] = $this->db->lastInsertId();
+        if ($autologin)
+            $_SESSION['s_login'] = $this->db->lastInsertId();
         
-        return true;
+        return $this->db->lastInsertId();
     }
     
     public function getName()
@@ -89,9 +90,9 @@ class Students extends Model
     
     public function get($id_user = -1)
     {
-        if ($this->id_user == -1 && $id_user == -1) { return ""; }
+        if ($this->id_user == -1 && $id_user == -1) { return array(); }
         
-        $response = null;
+        $response = array();
         
         $id_user = $id_user == -1 ? $this->id_user : $id_user;
         
@@ -103,6 +104,23 @@ class Students extends Model
             $response = new Student($data['name'], $data['genre'], $data['birthdate'], $data['email']);
         }
         
+        return $response;
+    }
+    
+    public function getAll()
+    {
+        $response = array();
+
+        $sql = $this->db->query("SELECT * FROM students");
+        
+        if ($sql && $sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $student) {
+                $s = new Student($student['name'], $student['genre'], $student['birthdate'], $student['email']);
+                $s->setId($student['id']);
+                $response[] = $s;
+            }
+        }
+
         return $response;
     }
     
@@ -139,6 +157,98 @@ class Students extends Model
         $sql->execute(array($id_student));
         
         return $sql->fetch()['count'] > 0;
+    }
+    
+    public function getCourses($id_student)
+    {
+        if (empty($id_student) || $id_student <= 0) { return array(); }
+        
+        $response = array();
+        
+        $sql = $this->db->prepare("SELECT id_course FROM student_course WHERE id_student = ?");
+        $sql->execute(array($id_student));
+
+        if ($sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $course) {
+                $sql = $this->db->query("SELECT * FROM courses WHERE id = ".$course['id_course']);
+                
+                if ($sql->rowCount() > 0) {
+                    $response[] = $sql->fetch(\PDO::FETCH_ASSOC);
+                }
+            }
+        }
+        
+        return $response;
+    }
+    
+    public function delete($id_student)
+    {
+        if (empty($id_student)) { return false; }
+        
+        $response = false;
+        
+        $sql = $this->db->prepare("DELETE FROM students WHERE id = ?");
+        $sql->execute(array($id_student));
+        
+        if ($sql->rowCount() > 0) {
+            $sql = $this->db->prepare("DELETE FROM historic WHERE id_student = ?");
+            $sql->execute(array($id_student));
+            
+            $sql = $this->db->prepare("DELETE FROM student_course WHERE id_student = ?");
+            $sql->execute(array($id_student));
+            
+            $response = true;
+        }
+        
+        return $response;
+    }
+    
+    public function edit(Student $student)
+    {
+        if (empty($student) || empty($student->getId())) { return false; }
+        
+        if (empty($student->getPassword())) {
+            $sql = $this->db->prepare("UPDATE students SET name = ?, genre = ?, birthdate = ?, email = ? WHERE id = ?");
+            $sql->execute(array(
+                $student->getName(),
+                $student->getGenre(),
+                $student->getBirthdate(),
+                $student->getEmail(),
+                $student->getId()
+            ));
+        } else {
+            $sql = $this->db->prepare("UPDATE students SET name = ?, genre = ?, birthdate = ?, email = ?, password = ? WHERE id = ?");
+            $sql->execute(array(
+                $student->getName(),
+                $student->getGenre(),
+                $student->getBirthdate(),
+                $student->getEmail(),
+                md5($student->getPassword()),
+                $student->getId()
+            ));
+        }
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    public function addCourse($id_student, $id_course)
+    {
+        if (empty($id_student) || empty($id_course)) { return false; }
+        
+        $sql = $this->db->prepare("INSERT INTO student_course SET id_student = ?, id_course = ?");
+        $sql->execute(array($id_student, $id_course));
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    public function deleteAllCourses($id_student)
+    {
+        if (empty($id_student)) { return false; }
+        
+        $sql = $this->db->prepare("DELETE FROM student_course WHERE id_student = ?");
+        $sql->execute(array($id_student));
+        
+        return $sql->rowCount() > 0;
     }
     
     private function existUser($student) 

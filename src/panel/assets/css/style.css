@@ -101,3 +101,12 @@ body > nav {
 .class_actions button {
 	margin-left: 5px;
 }
+
+.actions {
+	max-width: 50px;
+	min-width:50px
+}
+
+.table {
+	margin-top:10px;
+}
