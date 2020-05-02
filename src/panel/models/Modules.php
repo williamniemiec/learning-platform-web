@@ -102,7 +102,7 @@ class Modules extends Model
     {
         if (empty($name) || empty($id_course) || $id_course <= 0) { return false; }
         
-        $sql = $this->db->query("SELECT COUNT(*) AS count FROM modules WHERE id_course = ? AND name = ?");
+        $sql = $this->db->prepare("SELECT COUNT(*) AS count FROM modules WHERE id_course = ? AND name = ?");
         $sql->execute(array($id_course, $name));
         
         return $sql->fetch()['count'] > 0;

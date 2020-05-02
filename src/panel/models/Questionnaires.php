@@ -64,4 +64,20 @@ class Questionnaires extends Model
         
         return $sql->rowCount() > 0;
     }
+    
+    public function get($id_quest)
+    {
+        if (empty($id_quest)) { return array(); }
+        
+        $response = array();
+        
+        $sql = $this->db->prepare("SELECT * FROM questionnaires WHERE id = ?");
+        $sql->execute(array($id_quest));
+        
+        if ($sql->rowCount() > 0) {
+            $response = $sql->fetch(\PDO::FETCH_ASSOC);
+        }
+        
+        return $response;
+    }
 }

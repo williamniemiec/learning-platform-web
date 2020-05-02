@@ -87,3 +87,11 @@ body > nav {
 .module {
 	margin-top: 20px;
 }
+
+.class_actions {
+	display: flex;
+}
+
+.class_actions button {
+	margin-left: 5px;
+}

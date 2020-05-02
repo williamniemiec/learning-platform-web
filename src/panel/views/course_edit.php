@@ -36,12 +36,12 @@
     
     <hr />
     
-    <div class="modules" data-idCourse = "<?php echo $course['id']; ?>">
+    <div class="modules" data-id_course = "<?php echo $course['id']; ?>">
     	<h2>Modules</h2>
     	<button class="btn btn-primary" data-toggle="modal" data-target="#addModule">Add module</button>
     	
     	<?php foreach ($modules as $module): ?>
-    		<div class="module" data-moduleId="<?php echo $module['id']; ?>">
+    		<div class="module" data-id_module="<?php echo $module['id']; ?>">
     			<button class="btn btn-primary" onclick="show_addClass(this,<?php echo $module['id']; ?>)">Add class</button>
     			<button class="btn btn-warning" onclick="show_editModule(this,<?php echo $module['id']; ?>)">Edit Module</button>
     			<button class="btn btn-danger" onclick="deleteModule(this,<?php echo $module['id']; ?>)">Delete module</button>
@@ -50,11 +50,18 @@
         			<?php foreach ($module['classes'] as $class): ?>
             			<div class="class">
             				<?php if ($class['type'] == 'video'): ?>
-                				<h5><?php echo $class['video']['title']; ?></h5>
+                				<h5 class="class_title" data-id_video="<?php echo $class['video']['id']; ?>"><?php echo $class['video']['title']; ?></h5>
+                				<div class="class_actions">
+                					<button class="btn btn-warning" onclick="show_editVideo(this,<?php echo $class['video']['id']; ?>)">Edit</button>
+                					<button class="btn btn-danger" onclick="deleteClass(this,<?php echo $class['id']; ?>)">Delete</button>
+            					</div>
             				<?php else: ?>
-            					<h5><?php echo $class['quest']['question']; ?></h5>
+            					<h5 class="class_title" data-id_quest="<?php echo $class['quest']['id']; ?>"><?php echo $class['quest']['question']; ?></h5>
+            					<div class="class_actions">
+                					<button class="btn btn-warning" onclick="show_editQuest(this,<?php echo $class['quest']['id']; ?>)">Edit</button>
+                					<button class="btn btn-danger" onclick="deleteClass(this,<?php echo $class['id']; ?>)">Delete</button>
+            					</div>
             				<?php endif; ?>
-            				<button class="btn btn-danger" onclick="deleteClass(this,<?php echo $class['id']; ?>)">Delete</button>
             			</div>
         			<?php endforeach; ?>
         		</div>
@@ -66,4 +73,6 @@
 	<?php $this->loadView("modal_addModule"); ?>
 	<?php $this->loadView("modal_editModule"); ?>
 	<?php $this->loadView("modal_addClass"); ?>
+	<?php $this->loadView("modal_editVideo"); ?>
+	<?php $this->loadView("modal_editQuest"); ?>
 </div>

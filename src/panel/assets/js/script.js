@@ -1,3 +1,8 @@
+var current_id_mod = -1
+var current_id_course = -1
+var current_id_video = -1
+var current_id_quest = -1
+
 $(function() {
 	$("input[name='classType']").change(function() {
 		var type = $("input[name='classType']:checked").val()
@@ -35,8 +40,8 @@ function deleteClass(obj,id_class)
 function addModule(obj)
 {
 	var name = $("#modalAdd").val()
-	var id_course = $(obj).closest(".modules").attr("data-idModule")
-	
+	var id_course = $(".modules").attr("data-id_course")
+
 	$.ajax({
 		type:'POST',
 		url:BASE_URL+"ajax/add_module",
@@ -47,20 +52,20 @@ function addModule(obj)
 				return
 			}
 			var newModule = `
-				<div class="module">
+				<div class="module" data-id_module="${id}">
+					<button class="btn btn-primary" onclick="show_addClass(this,${id})">Add class</button>
+    				<button class="btn btn-warning" onclick="show_editModule(this,${id})">Edit Module</button>
 					<button class="btn btn-danger" onclick="deleteModule(this,${id})">Delete module</button>
-					<h3>${name}</h3>
+					<h3 class="moduleName">${name}</h3>
 				</div>
 			`
 				
 			$(obj).closest(".modal").modal("toggle")
-			$(obj).closest(".modules").append(newModule)
+			$(".modules").append(newModule)
 		}
 	})
 }
 
-var current_id_mod;
-var current_id_course;
 
 function addClass_showQuest()
 {
@@ -77,17 +82,58 @@ function addClass_showVideo()
 function show_addClass(obj,id_module)
 {
 	current_id_mod = id_module
-	current_id_course = $(obj).closest(".modules").attr("data-idCourse")
+	current_id_course = $(".modules").attr("data-id_course")
 	$("#addClass").modal("toggle")
 }
 
 function show_editModule(obj, id_module)
 {
 	current_id_mod = id_module
-	var modName = $(`div[data-moduleId=${current_id_mod}]`).find(".moduleName").html()
+	var modName = $(`div[data-id_module=${current_id_mod}]`).find(".moduleName").html()
 	
 	$("#moduleName").val(modName)
 	$("#editModule").modal("toggle")
+}
+
+function show_editVideo(obj, id_video)
+{
+	$.ajax({
+		type:'POST',
+		url:BASE_URL+"ajax/get_video",
+		data:{id_video:id_video},
+		dataType:'json',
+		success: function(json) {
+			$("#modal_editVideo").find("#edit_classType_video_title").val(json.title)
+			$("#modal_editVideo").find("#edit_classType_video_description").val(json.description)
+			$("#modal_editVideo").find("#edit_classType_video_url").val(json.url)
+			
+			$("#modal_editVideo").modal("toggle")
+			
+			current_id_video = id_video
+		}
+	})
+}
+
+function show_editQuest(obj, id_quest)
+{
+	$.ajax({
+		type:'POST',
+		url:BASE_URL+"ajax/get_quest",
+		data:{id_quest:id_quest},
+		dataType:'json',
+		success: function(json) {
+			$("#modal_editQuest").find("#edit_classType_quest_name").val(json.question)
+			$("#modal_editQuest").find("#edit_classType_quest_q1").val(json.op1)
+			$("#modal_editQuest").find("#edit_classType_quest_q2").val(json.op2)
+			$("#modal_editQuest").find("#edit_classType_quest_q3").val(json.op3)
+			$("#modal_editQuest").find("#edit_classType_quest_q4").val(json.op4)
+			$("#modal_editQuest").find("#edit_answer").val(json.answer)
+			
+			$("#modal_editQuest").modal("toggle")
+			
+			current_id_quest = id_quest
+		}
+	})
 }
 
 function editModule(obj)
@@ -102,12 +148,64 @@ function editModule(obj)
 			name: modName
 		},
 		success: function() {
-			$(`div[data-moduleId=${current_id_mod}]`).find(".moduleName").html(modName)
+			$(`div[data-id_module=${current_id_mod}]`).find(".moduleName").html(modName)
 			$("#editModule").modal("toggle")
 		}
 	})
 }
 
+function editVideo(obj)
+{
+	var title = $("#edit_classType_video_title").val()
+	var desc = $("#edit_classType_video_description").val()
+	var url = $("#edit_classType_video_url").val()
+	
+	$.ajax({
+		type:'POST',
+		url:BASE_URL+"ajax/edit_video",
+		data:{
+			id_video:current_id_video,
+			title:title,
+			description:desc,
+			url:url
+		},
+		success: function() {
+			// Updates new class title
+			if ($(".class_title[data-id_video=${current_id_video}]").exists()) {
+				$(".class_title[data-id_video=${current_id_video}]").html(title)
+			}
+			
+			$("#modal_editVideo").modal("toggle")
+		}
+	})
+}
+
+function editQuest(obj)
+{
+	var question = $("#edit_classType_quest_name").val()
+	
+	$.ajax({
+		type:'POST',
+		url:BASE_URL+"ajax/edit_video",
+		data:{
+			id_quest:current_id_quest,
+			question:question,
+			op1:$("#edit_classType_quest_q1").val(),
+			op2:$("#edit_classType_quest_q2").val(),
+			op3:$("#edit_classType_quest_q3").val(),
+			op4:$("#edit_classType_quest_q4").val(),
+			answer:$("#edit_answer").val()
+		},
+		success: function() {
+			// Updates new class title
+			if ($(".class_title[data-id_quest=${current_id_quest}]").exists()) {
+				$(".class_title[data-id_quest=${current_id_quest}]").html(question)
+			}
+			
+			$("#modal_editQuest").modal("toggle")
+		}
+	})
+}
 
 function addClass(obj)
 {
@@ -118,7 +216,7 @@ function addClass(obj)
 		var title = $("#classType_video_title").val()
 		var desc = $("#classType_video_description").val()
 		var video_url = $("#classType_video_url").val()
-		
+
 		$.ajax({
 			type:'POST',
 			url:BASE_URL+"ajax/add_class_video",
@@ -134,12 +232,15 @@ function addClass(obj)
 				
 				var newClass = `
 					<div class="class">
-						<h5>${title}</h5>
-						<button class="btn btn-danger" onclick="deleteClass(this,${id})">Delete</button>
+						<h5 class="class_title" data-id_video="${id}">${title}</h5>
+						<div class="class_actions">
+							<button class="btn btn-warning" onclick="show_editQuest(this,${id})">Edit</button>
+							<button class="btn btn-danger" onclick="deleteClass(this,${id})">Delete</button>
+						</div>
 					</div>
 				` 
 				
-				$(`div[data-moduleId=${current_id_mod}]`).find(".classes").append(newClass)
+				$(`div[data-id_module=${current_id_mod}]`).find(".classes").append(newClass)
 			}
 		})
 	} else {
@@ -168,8 +269,11 @@ function addClass(obj)
 				
 				var newClass = `
 					<div class="class">
-						<h5>${quest_name}</h5>
-						<button class="btn btn-danger" onclick="deleteClass(this,${id})">Delete</button>
+						<h5 class="class_title" data-id_quest="${id}">${quest_name}</h5>
+						<div class="class_actions">
+							<button class="btn btn-warning" onclick="show_editQuest(this,${id})">Edit</button>
+							<button class="btn btn-danger" onclick="deleteClass(this,${id})">Delete</button>
+						</div>
 					</div>
 				` 
 				
@@ -177,5 +281,4 @@ function addClass(obj)
 			}
 		})
 	}
-	
 }

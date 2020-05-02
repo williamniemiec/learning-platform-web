@@ -118,4 +118,44 @@ class AjaxController extends Controller
         $modules = new Modules();
         echo $modules->edit($_POST['id_module'], $_POST['name']);
     }
+    
+    public function get_video()
+    {
+        if (empty($_POST['id_video'])) { echo json_encode(array()); }
+        
+        $videos = new Videos();
+        echo json_encode($videos->get($_POST['id_video']));
+    }
+    
+    public function get_quest()
+    {
+        if (empty($_POST['id_quest'])) { echo json_encode(array()); }
+        
+        $quests = new Questionnaires();
+        echo json_encode($quests->get($_POST['id_quest']));
+    }
+    
+    public function edit_video()
+    {
+        if (empty($_POST['id_video'])) { echo false; }
+        
+        $videos = new Videos();
+        echo $videos->edit($_POST['id_video'], $_POST['title'], $_POST['description'], $_POST['url']);
+    }
+    
+    public function edit_quest()
+    {
+        if (empty($_POST['id_quest'])) { echo false; }
+        
+        $quests = new Questionnaires();
+        echo $quests->edit(
+            $_POST['id_quest'], 
+            $_POST['question'], 
+            $_POST['op1'],
+            $_POST['op2'], 
+            $_POST['op3'], 
+            $_POST['op4'], 
+            $_POST['answer']
+        );
+    }
 }

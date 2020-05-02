@@ -46,4 +46,20 @@ class Videos extends Model
          
         return $sql->rowCount() > 0;
     }
+    
+    public function get($id_video)
+    {
+        if (empty($id_video)) { return array(); }
+        
+        $response = array();
+        
+        $sql = $this->db->prepare("SELECT * FROM videos WHERE id = ?");
+        $sql->execute(array($id_video));
+        
+        if ($sql->rowCount() > 0) {
+            $response = $sql->fetch(\PDO::FETCH_ASSOC);
+        }
+        
+        return $response;
+    }
 }
