@@ -85,7 +85,7 @@ class Courses extends Model
         
         $response = "";
         
-        $sql = $this->db->prepare("SELECT logo FROM courses WHERE id_course = ?");
+        $sql = $this->db->prepare("SELECT logo FROM courses WHERE id = ?");
         $sql->execute(array($id_course));
         
         if ($sql->rowCount() > 0) {
@@ -220,7 +220,7 @@ class Courses extends Model
                 
                 // Deletes old image (if there is one)
                 $imageName = $this->getImage($id_course);
-                
+
                 if (!empty($imageName)) {
                     unlink("../assets/images/logos/".$imageName);
                 }
