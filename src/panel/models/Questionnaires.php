@@ -80,4 +80,22 @@ class Questionnaires extends Model
         
         return $response;
     }
+    
+    public function edit($id_quest, $question, $op1, $op2, $op3, $op4, $answer)
+    {
+        if (empty($id_quest) || empty($question) ||
+            empty($op1) || empty($op2) || empty($op3) ||
+            empty($op4) || empty($answer)) {
+                echo false;
+            }
+            
+            $sql = $this->db->prepare("
+                UPDATE questionnaires 
+                SET question = ?, op1 = ?, op2 = ?, op3 = ?, op4 = ?, answer = ?
+                WHERE id = ?
+            ");
+            $sql->execute(array($question, $op1, $op2, $op3, $op4, $answer, $id_quest));
+            
+            return $sql->rowCount() > 0;
+    }
 }

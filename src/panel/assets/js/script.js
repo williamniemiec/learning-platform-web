@@ -171,9 +171,7 @@ function editVideo(obj)
 		},
 		success: function() {
 			// Updates new class title
-			if ($(".class_title[data-id_video=${current_id_video}]").exists()) {
-				$(".class_title[data-id_video=${current_id_video}]").html(title)
-			}
+			$(`.class_title[data-id_video=${current_id_video}]`).html(title)
 			
 			$("#modal_editVideo").modal("toggle")
 		}
@@ -186,7 +184,7 @@ function editQuest(obj)
 	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/edit_video",
+		url:BASE_URL+"ajax/edit_quest",
 		data:{
 			id_quest:current_id_quest,
 			question:question,
@@ -198,9 +196,7 @@ function editQuest(obj)
 		},
 		success: function() {
 			// Updates new class title
-			if ($(".class_title[data-id_quest=${current_id_quest}]").exists()) {
-				$(".class_title[data-id_quest=${current_id_quest}]").html(question)
-			}
+			$(`.class_title[data-id_quest=${current_id_quest}]`).html(question)
 			
 			$("#modal_editQuest").modal("toggle")
 		}

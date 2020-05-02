@@ -137,7 +137,10 @@ class AjaxController extends Controller
     
     public function edit_video()
     {
-        if (empty($_POST['id_video'])) { echo false; }
+        if (empty($_POST['id_video']) || empty($_POST['title']) ||
+            empty($_POST['description']) || empty($_POST['url'])) {
+            echo false;
+        }
         
         $videos = new Videos();
         echo $videos->edit($_POST['id_video'], $_POST['title'], $_POST['description'], $_POST['url']);
@@ -145,7 +148,12 @@ class AjaxController extends Controller
     
     public function edit_quest()
     {
-        if (empty($_POST['id_quest'])) { echo false; }
+        if (empty($_POST['id_quest']) || empty($_POST['question']) ||
+            empty($_POST['op1']) || empty($_POST['op2']) || 
+            empty($_POST['op3']) || empty($_POST['op4']) || 
+            empty($_POST['answer'])) {
+            echo false; 
+        }
         
         $quests = new Questionnaires();
         echo $quests->edit(

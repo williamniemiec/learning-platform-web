@@ -62,4 +62,17 @@ class Videos extends Model
         
         return $response;
     }
+    
+    public function edit($id_video, $title, $description, $url)
+    {
+        if (empty($id_video) || empty($title) || 
+            empty($description) || empty($url)) { 
+            return false; 
+        }
+        
+        $sql = $this->db->prepare("UPDATE videos SET title = ?, description = ?, url = ? WHERE id = ?");
+        $sql->execute(array($title, $description, $url, $id_video));
+        
+        return $sql->rowCount() > 0;
+    }
 }
