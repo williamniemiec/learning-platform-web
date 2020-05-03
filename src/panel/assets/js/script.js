@@ -376,7 +376,7 @@ function editStudent(obj)
 	var name = $("#edit_student_name").val()
 	var pass = $("#edit_student_pass").val()
 	
-		if (pass == "") {
+	if (pass == "") {
 		$.ajax({
 			type:'POST',
 			url:BASE_URL+"ajax/edit_student",
@@ -440,7 +440,7 @@ function edit_student_success(obj)
 		if (student_courses.html() == "")
 			student_courses.html(student_courses.html() + course.name)
 		else
-			student_courses.html(student_courses.html() + "," + course.name)
+			student_courses.html(student_courses.html() + ", " + course.name)
 	}
 	
 	student_td.find(".student_name").val(name)

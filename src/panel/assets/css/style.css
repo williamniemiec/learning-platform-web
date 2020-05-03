@@ -103,10 +103,19 @@ body > nav {
 }
 
 .actions {
-	max-width: 50px;
-	min-width:50px
+	max-width: 80px;
+	min-width:80px
+}
+
+.student_totalCourses {
+	width:120px;
+	text-align:center;
 }
 
 .table {
 	margin-top:10px;
+}
+
+.student_courses {
+	text-align:center;
 }
