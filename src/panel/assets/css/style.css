@@ -119,3 +119,7 @@ body > nav {
 .student_courses {
 	text-align:center;
 }
+
+.student_name {
+	min-width: 150px;
+}
