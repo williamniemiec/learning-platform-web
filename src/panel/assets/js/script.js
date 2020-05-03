@@ -306,12 +306,20 @@ function addStudent(obj)
 				<tr data-id_student="${id}">
 					<td class="student_name">${name}</td>
 					<td class="student_courses"></td>
+					<td class="student_totalCourses">0</td>
 					<td class="actions">
 						<button class="btn btn-warning" onclick="show_editStudent(this,${id})">Edit</button>
     					<button class="btn btn-danger" onclick="deleteStudent(this,${id})">Delete</button>
 					</td>
 				</tr>
 			`
+			
+			// Clears fields of modal
+			$("#add_student_name").val("")
+			$("input[name='genre']").eq(0).attr("checked", "checked")
+			$("#add_student_birthdate").val("")
+			$("#add_student_email").val("")
+			$("#add_student_pass").val("") 
 			
 			$("tbody").append(newStudent)
 		}
