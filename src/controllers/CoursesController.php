@@ -8,6 +8,7 @@ use models\Courses;
 use models\Modules;
 use models\Classes;
 use models\Doubts;
+use models\Historic;
 
 
 /**
@@ -92,6 +93,8 @@ class CoursesController extends Controller
             'content_embed' => $embed
         );
         
+        $historic = new Historic();
+        
         $params = array(
             'title' => 'Learning platform - '.$course['name'],
             'studentName' => $students->getName(),
@@ -101,7 +104,9 @@ class CoursesController extends Controller
             'logo' => $course['logo'],
             'view' => $view,
             'viewContent' => $viewContent,
-            'id_course' => $id_course
+            'id_course' => $id_course,
+            'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
+            'totalClasses' => $classes->countClasses($id_course)
         );
         
         $this->loadTemplate("course", $params);
@@ -158,6 +163,8 @@ class CoursesController extends Controller
             'content_embed' => $embed
         );
         
+        $historic = new Historic();
+        
         $params = array(
             'title' => 'Learning platform - '.$name,
             'studentName' => $students->getName(),
@@ -168,7 +175,9 @@ class CoursesController extends Controller
             'content_title' => $name,
             'view' => $view,
             'viewContent' => $viewContent,
-            'id_course' => $id_course
+            'id_course' => $id_course,
+            'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
+            'totalClasses' => $classes->countClasses($id_course)
         );
         
         $this->loadTemplate("course", $params);

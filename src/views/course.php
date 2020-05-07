@@ -3,6 +3,14 @@
 	<div class="course_info">
         <h1><a href="<?php echo BASE_URL."courses/open/".$id_course; ?>"><?php echo $name; ?></a></h1>
         <h6><?php echo $description; ?></h6>
+        <?php if ($totalClasses > 0): ?>
+            <div class="course_progress">
+            	<p>Watched classes: <?php echo $totalWatchedClasses; ?> / <?php echo $totalClasses; ?></p>
+            	<div class="progress">
+            		<div class="progress-bar bg-success" style="width:<?php echo floor($totalWatchedClasses/$totalClasses * 100); ?>%"><?php echo floor($totalWatchedClasses/$totalClasses *100); ?>%</div>
+            	</div>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
