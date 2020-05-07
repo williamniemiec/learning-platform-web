@@ -22,7 +22,7 @@
             			<?php endif; ?>
             			<td><a href="<?php echo BASE_URL."courses/open/".$course['id']; ?>"><?php echo $course['name']; ?></a></td>
             			<td><?php echo $course['description']; ?></td>
-            			<td>/<?php echo $course['totalClasses'] ?> classes were watched</td>
+            			<td><?php echo $course['totalWatchedClasses']; ?>/<?php echo $course['totalClasses'] ?> classes were watched</td>
             		</tr>
         		<?php endforeach; ?>
         	</tbody>

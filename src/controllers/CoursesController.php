@@ -100,7 +100,8 @@ class CoursesController extends Controller
             'modules' => $course['modules'],
             'logo' => $course['logo'],
             'view' => $view,
-            'viewContent' => $viewContent
+            'viewContent' => $viewContent,
+            'id_course' => $id_course
         );
         
         $this->loadTemplate("course", $params);
@@ -166,7 +167,8 @@ class CoursesController extends Controller
             'logo' => $course['logo'],
             'content_title' => $name,
             'view' => $view,
-            'viewContent' => $viewContent
+            'viewContent' => $viewContent,
+            'id_course' => $id_course
         );
         
         $this->loadTemplate("course", $params);

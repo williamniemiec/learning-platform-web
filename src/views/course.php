@@ -1,7 +1,7 @@
 <div class="course_header">
 	<img class="img imr-responsive course_banner" src="<?php echo BASE_URL."assets/images/logos/".$logo; ?>" />
 	<div class="course_info">
-        <h1><?php echo $name; ?></h1>
+        <h1><a href="<?php echo BASE_URL."courses/open/".$id_course; ?>"><?php echo $name; ?></a></h1>
         <h6><?php echo $description; ?></h6>
     </div>
 </div>

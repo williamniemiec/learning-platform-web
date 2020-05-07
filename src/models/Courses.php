@@ -42,7 +42,12 @@ class Courses extends Model
         ");
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetchAll();
+            $historic = new Historic();
+            
+            foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $key => $course) {
+                $response[$key] = $course;
+                $response[$key]['totalWatchedClasses'] = $historic->getWatchedClasses($this->id_user, $course['id_course']);
+            }
         }
         
         return $response;
