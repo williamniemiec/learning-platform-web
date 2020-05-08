@@ -170,10 +170,25 @@ body > nav a {
 	display: flex;
 	flex-direction: column;
 	margin-left: 20px;
+	width: 100%;
+}
+
+.comment_info > button {
+	width: 100px;
+	margin-bottom:5px;
+}
+
+.comment_reply {
+	display: none;
 }
 
 .comment_info p {
 	margin-bottom: 0;
+}
+
+.comment_reply_actions {
+	float: right;
+	margin-top:5px;
 }
 
 #class_video {

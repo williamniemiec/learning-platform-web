@@ -93,3 +93,66 @@ function deleteComment(obj, id_comment)
 		}
 	})
 }
+
+function open_reply(obj)
+{
+	$(obj).closest(".comment_info").find(".comment_reply").fadeIn("fast")
+}
+
+function close_reply(obj)
+{
+	$(obj).closest(".comment_reply").fadeOut("fast")
+}
+
+function send_reply(obj, id_doubt, id_user)
+{
+	var text = $(obj).closest(".comment_info").find("textarea").val()
+	
+	$.ajax({
+		type:"POST",
+		url:BASE_URL+"ajax/add_reply",
+		data:{
+			id_doubt:id_doubt,
+			id_user:id_user,
+			text:text
+		},
+		success: function(id_reply) {
+			$.ajax({
+				type:"POST",
+				url:BASE_URL+"ajax/get_student_name",
+				data:{id_student:id_user},
+				success:function (studentName) {
+					var name = studentName
+					
+					var html_comment = `
+						<div class="comment comment_reply_content">
+								<img class="img img-thumbnail" src="https://media.gettyimages.com/photos/colorful-powder-explosion-in-all-directions-in-a-nice-composition-picture-id890147976?s=612x612" />
+								<div class="comment_content">
+		        					<div class="comment_info">
+		            					<h5>${name}</h5>
+		            					<p>${text}</p>
+		        					</div>
+		            					<div class="comment_action">
+		            						<button class="btn btn-danger" onclick="delete_reply(this,${id_reply})">&times;</button>
+		            					</div>
+		        				</div>
+							</div>
+					`
+					$(obj).closest(".comment_info").find(".comment_replies").fadeOut("fast").prepend(html_comment).fadeIn("fast")
+				}
+			})
+		}
+	})
+}
+
+function delete_reply(obj, id_reply)
+{
+	$.ajax({
+		type:"POST",
+		url:BASE_URL+"ajax/remove_reply",
+		data:{id_reply:id_reply},
+		success:function() {
+			$(obj).closest(".comment_reply_content").hide("slow")
+		}
+	})
+}

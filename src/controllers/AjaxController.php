@@ -64,4 +64,30 @@ class AjaxController extends Controller
         $doubts = new Doubts();
         $doubts->delete($_POST['id_comment']);
     }
+    
+    public function add_reply()
+    {
+        if (empty($_POST['id_doubt']) || $_POST['id_doubt'] <= 0) { return; }
+        if (empty($_POST['id_user']) || $_POST['id_user'] <= 0) { return; }
+        if (empty($_POST['text'])) { return; }
+        
+        $doubts = new Doubts();
+        echo $doubts->addReply($_POST['id_doubt'], $_POST['id_user'], $_POST['text']);
+    }
+    
+    public function get_student_name()
+    {
+        if (empty($_POST['id_student']) || $_POST['id_student'] <= 0) { echo ""; }
+        
+        $students = new Students();
+        echo $students->get($_POST['id_student'])->getName();
+    }
+    
+    public function remove_reply()
+    {
+        if (empty($_POST['id_reply']) || $_POST['id_reply'] <= 0) { return; }
+        
+        $doubts = new Doubts();
+        $doubts->deleteReply($_POST['id_reply']);
+    }
 }
