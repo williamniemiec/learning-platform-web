@@ -31,8 +31,16 @@
     			<div class="comment">
     				<img class="img img-thumbnail" src="https://media.gettyimages.com/photos/colorful-powder-explosion-in-all-directions-in-a-nice-composition-picture-id890147976?s=612x612" />
     				<div class="comment_content">
-    					<h5><?php echo $doubt['name']; ?></h5>
-    					<p><?php echo $doubt['text']; ?></p>
+    					<div class="comment_info">
+        					<h5><?php echo $doubt['name']; ?></h5>
+        					<p><?php echo $doubt['text']; ?></p>
+        					<button class="btn btn-small">Answer</button>
+    					</div>
+    					<?php if ($doubt['id_user'] == $_SESSION['s_login']): ?>
+        					<div class="comment_action">
+        						<button class="btn btn-danger" onclick="deleteComment(this,<?php echo $doubt['id']; ?>)">&times;</button>
+        					</div>
+    					<?php endif; ?>
     				</div>
     			</div>
 			<?php endforeach; ?>

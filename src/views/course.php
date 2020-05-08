@@ -23,3 +23,6 @@
 		<?php $this->loadView($view, $viewContent); ?>
 	</div>
 </div>
+
+<!-- Scripts -->
+<script src='<?php echo BASE_URL; ?>assets/js/course.js'></script>

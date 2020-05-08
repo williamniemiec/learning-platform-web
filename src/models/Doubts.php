@@ -46,17 +46,26 @@ class Doubts extends Model
         $sql = $this->db->prepare("
             SELECT 
                 *,
-                (select students.name from students where students.id = doubts.id_user) as name,
-                (select students.name from students where students.id = doubts.id_user) as id_user 
+                (select students.name from students where students.id = doubts.id_user) as name 
             FROM doubts 
             WHERE id_class = ?
         ");
         $sql->execute(array($id_class));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetchAll();
+            $response = $sql->fetchAll(\PDO::FETCH_ASSOC);
         }
         
         return $response;
+    }
+    
+    public function delete($id_comment)
+    {
+        if (empty($id_comment) && $id_comment <= 0) { return false; }
+        
+        $sql = $this->db->prepare("DELETE FROM doubts WHERE id = ?");
+        $sql->execute(array($id_comment));
+        
+        return $sql->rowCount() > 0;
     }
 }

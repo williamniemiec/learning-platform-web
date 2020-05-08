@@ -45,7 +45,7 @@ class LoginController extends Controller
     public function register()
     {
         $params = array(
-            'title' => 'Learning platform - Login',
+            'title' => 'Learning platform - Register',
             'error' => false,
             'msg' => ''
         );

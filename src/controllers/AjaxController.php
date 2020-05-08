@@ -7,6 +7,7 @@ use models\Admins;
 use models\Courses;
 use models\Questionnaires;
 use models\Classes;
+use models\Doubts;
 
 
 /**
@@ -54,5 +55,13 @@ class AjaxController extends Controller
         
         $classes = new Classes();
         $classes->removeWatched($_SESSION['s_login'], $_POST['id_class']);
+    }
+    
+    public function remove_comment()
+    {
+        if (empty($_POST['id_comment'])) { return; }
+        
+        $doubts = new Doubts();
+        $doubts->delete($_POST['id_comment']);
     }
 }

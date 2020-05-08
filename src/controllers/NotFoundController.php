@@ -23,13 +23,13 @@ class NotFoundController extends Controller
         );
 	    
         if (empty($_SESSION['s_login'])) {
-		  $this->loadTemplate('404_noLogged', $params);
+		  $this->loadTemplate('404/404_noLogged', $params);
             
         }        
            
 	    $students = new Students($_SESSION['s_login']);
 		$params['studentName'] = $students->getName();
 		
-		$this->loadTemplate('404_logged', $params);
+		$this->loadTemplate('404/404_logged', $params);
 	}
 }

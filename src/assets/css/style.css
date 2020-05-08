@@ -1,11 +1,43 @@
 /* GLOBAL */
 body,html {
 	height: 100%;
+	background-color: #d387ab;
+background-image: linear-gradient(315deg, #d387ab 0%, #b279a7 74%);
+/*	background-color: #861657;
+background-image: linear-gradient(315deg, #861657 0%, #aa4465 74%);
+*/
+/*
+	background-color: #f39f86;
+background-image: linear-gradient(315deg, #f39f86 0%, #f9d976 74%);
+*/
+}
+
+table, .row, .registration, .login {
+	background-color: rgba(238,238,238,0.7);
+}
+
+table, .row {
+	background-color: rgba(238,238,238,1);
+}
+
+.home, .error_404, .registration {
+	margin-top: 20px;
+}
+
+.error_404 {
+	text-align: center;
+	padding: 100px;
+	background-color: rgba(238,238,238,0.7);
+}
+
+.registration {
+	padding: 20px;
 }
 
 .nav-item:hover {
 	background-color: #eee;
 }
+
 
 .nav-item {
 	height:50px;
@@ -14,14 +46,33 @@ body,html {
 	transition: all 200ms ease-in;
 }
 
+body > nav, .thead-dark th {
+	background-color: #3e4041!important;
+}
+
 body > nav {
-	background-color: #ccc;
+	color:white;
 	padding: 0;
 	height:50px;
 }
 
+body > nav a {
+	color:white;
+}
+
 .row {
 	max-width: 100%;
+	margin-left: 0;
+}
+
+/* LOGIN */
+.login {
+	margin:auto;
+	margin-top:100px;
+	max-width: 400px;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	padding: 20px;
 }
 
 /* COURSES */
@@ -94,7 +145,7 @@ body > nav {
 	display: inline;
 }
 
-.comment {
+.comment img {
 	max-width:100px;
 	max-height:100px;
 }
@@ -111,8 +162,18 @@ body > nav {
 
 .comment_content {
 	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.comment_info {
+	display: flex;
 	flex-direction: column;
 	margin-left: 20px;
+}
+
+.comment_info p {
+	margin-bottom: 0;
 }
 
 #class_video {
