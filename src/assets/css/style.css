@@ -1,8 +1,14 @@
 /* GLOBAL */
 body,html {
 	height: 100%;
+	/* #0D324D -> #7F5A83  */
+	background-color: #7f5a83;
+background-image: linear-gradient(315deg, #7f5a83 0%, #0d324d 74%);
+	
+	/*
 	background-color: #d387ab;
 background-image: linear-gradient(315deg, #d387ab 0%, #b279a7 74%);
+*/
 /*	background-color: #861657;
 background-image: linear-gradient(315deg, #861657 0%, #aa4465 74%);
 */
@@ -12,26 +18,39 @@ background-image: linear-gradient(315deg, #f39f86 0%, #f9d976 74%);
 */
 }
 
+a:hover {
+	color: #9881aa;
+}
+
+.home,.registration, .login {
+	color: white;
+}
+
 table, .row, .registration, .login {
-	background-color: rgba(238,238,238,0.7);
+	background-color: rgba(238,238,238,0.3);
 }
 
 table, .row {
 	background-color: rgba(238,238,238,1);
 }
 
-.home, .error_404, .registration {
+.home, .error_msg, .registration {
 	margin-top: 20px;
 }
 
-.error_404 {
+.error_msg {
 	text-align: center;
 	padding: 100px;
-	background-color: rgba(238,238,238,0.7);
+	background-color: rgba(238,238,238,0.3);
 }
 
 .registration {
 	padding: 20px;
+}
+
+.error_msg, .registration, .login {
+	border-radius: 5px;
+	border: 1px solid #ccc;
 }
 
 .nav-item:hover {
@@ -70,8 +89,6 @@ body > nav a {
 	margin:auto;
 	margin-top:100px;
 	max-width: 400px;
-	border-radius: 5px;
-	border: 1px solid #ccc;
 	padding: 20px;
 }
 

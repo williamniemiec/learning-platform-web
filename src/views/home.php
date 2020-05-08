@@ -1,8 +1,10 @@
 <div class="container">
 	<div class="home">
-        <h1>Courses</h1>
+        <h1>My Courses</h1>
         <?php if ($totalCourses == 0): ?>
-        	<h2>There are not registered courses for this account :/</h2>
+            <div class="error_msg">
+    			<h2>There are not registered courses for this account :/</h2>
+    		</div>
         <?php else: ?>
             <table class="table table-hover table-stripped table-bordered">
             	<thead class="thead-dark">
