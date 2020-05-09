@@ -84,6 +84,28 @@ body > nav a {
 	margin-left: 0;
 }
 
+textarea:focus, 
+textarea.form-control:focus, 
+input.form-control:focus, 
+input[type=text]:focus, 
+input[type=password]:focus, 
+input[type=email]:focus, 
+input[type=number]:focus, 
+[type=text].form-control:focus, 
+[type=password].form-control:focus, 
+[type=email].form-control:focus, 
+[type=tel].form-control:focus, 
+[contenteditable].form-control:focus {
+  box-shadow: 0 0 5px #711757;
+  border-color: #711757;
+}
+
+/*
+input:focus {
+	outline: 0!important;
+	box-shadow: 0 0 5px #711757 !important;
+}*/
+
 /* LOGIN */
 .login {
 	margin:auto;
@@ -173,12 +195,40 @@ body > nav a {
 	margin:auto;
 }
 
-.settings button {
+.btn_theme, a.btn_theme {
 	margin: 10px 0;
+	background-image: linear-gradient(315deg, #823b8a 0%, #5d0d6b 74%);
+	border: 1px solid #7f5a83;
+	outline: 0!important;
+	padding: .375rem .75rem;
+	color: white;
+	border-radius: 5px;
+	text-decoration: none;
+	display: block;
+}
+
+a.btn_theme, a.btn_theme:hover {
+	color: white;
+	text-decoration: none!important;
+}
+
+.btn_full {
+	width: 100%;
+	text-align: center;
+}
+
+
+
+.btn_theme:hover, a.btn_theme:hover {
+	border-color: #711757;
+	outline-color: #711757!important;
+}
+
+.btn_theme:active, a.btn_theme:active {
+	box-shadow: 0 0 5px #711757;
 }
 
 #btn_photo_update {
-	
 	position: absolute;
 	margin-top: 185px;
 	margin-left: -15px;
@@ -186,15 +236,15 @@ body > nav a {
 	left: 591px;*/
 	border: 0;
 	color: white;
-	background-color:red;
+	background-color:#711757;
 	display: inline-block;
 	font-size: 115%;
-	padding: .25em .4em;
+	padding: .30em .4em;
 	line-height: 1;
 	text-align: center;
 	white-space: nowrap;
 	vertical-align: baseline;
-	border-radius: 20px;
+	border-radius: 15px;
 }
 
 /* COURSES */
