@@ -141,6 +141,82 @@ class Students extends Model
         return $sql->fetch()['count'] > 0;
     }
     
+    public function update($name, $genre, $birthdate)
+    {
+        if (empty($name)) { return false; }
+        
+        $sql = $this->db->prepare("UPDATE students SET name = ?, genre = ?, birthdate = ? WHERE id = ".$this->id_user);
+        $sql->execute(array($name, $genre, $birthdate));
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    public function delete()
+    {
+        $response = false;
+        
+        $sql = $this->db->query("DELETE FROM students WHERE id = ".$this->id_user);
+        
+        if ($sql->rowCount() > 0) {
+            $this->db->query("DELETE FROM historic WHERE id_student = ".$this->id_user);
+            $this->db->query("DELETE FROM student_course WHERE id_student = ".$this->id_user);
+            
+            $response = true;
+        }
+        
+        return $response;
+    }
+    
+    public function updatePhoto($photo)
+    {
+        if (empty($photo)) { return false; }
+        
+        if (!empty($photo['tmp_name']) && $this->isPhoto($photo)) {
+            $extension = explode("/", $photo['type'])[1];
+            
+            if ($extension == "jpg" || $extension == "jpeg" || $extension == "png") {
+                
+                $filename = md5(rand(1,9999).time().rand(1,9999));
+                $filename = $filename."."."jpg";
+                move_uploaded_file($photo['tmp_name'], "../assets/images/profile_photos/".$filename);
+                
+                // Deletes old image (if there is one)
+                $imageName = $this->getPhoto();
+                
+                if (!empty($imageName)) {
+                    unlink("../assets/images/profile_photos/".$imageName);
+                }
+            }
+        }
+        
+        
+        $sql = $this->db->query("UPDATE students SET photo = ".$filename." WHERE id = ".$this->id_user);
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    public function updatePassword($newPassword)
+    {
+        if (empty($newPassword)) { return false; }
+        
+        $sql = $this->db->query("UPDATE students SET password = ".md5($newPassword)." WHERE id = ".$this->id_user);
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    private function getPhoto()
+    {
+        $response = null;
+        
+        $sql = $this->db->query("SELECT photo FROM students WHERE id = ".$this->id_user);
+        
+        if ($sql->rowCount() > 0) {
+            $response = $sql->fetch()['photo'];
+        }
+        
+        return $response;
+    }
+    
     private function existUser($student) 
     {
         $email = $student->getEmail();
@@ -151,5 +227,20 @@ class Students extends Model
         $sql->execute(array($email));
 
         return $sql->fetch()['count'] > 0;
+    }
+    
+    /**
+     * Checks if a submitted photo is really a photo.
+     *
+     * @param array $photo Submitted photo
+     * @return boolean If the photo is really a photo
+     */
+    private function isPhoto($photo)
+    {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $photo['tmp_name']);
+        finfo_close($finfo);
+        
+        return explode("/", $mime)[0] == "image";
     }
 }
