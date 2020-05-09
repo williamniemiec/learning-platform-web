@@ -22,11 +22,11 @@ a:hover {
 	color: #9881aa;
 }
 
-.home,.registration, .login {
+.home,.registration, .login, .settings {
 	color: white;
 }
 
-table, .row, .registration, .login {
+table, .row, .registration, .login, .settings {
 	background-color: rgba(238,238,238,0.3);
 }
 
@@ -34,7 +34,7 @@ table, .row {
 	background-color: rgba(238,238,238,1);
 }
 
-.home, .error_msg, .registration, .alert {
+.home, .error_msg, .registration, .alert, .settings {
 	margin-top: 20px;
 }
 
@@ -44,11 +44,11 @@ table, .row {
 	background-color: rgba(238,238,238,0.3);
 }
 
-.registration {
+.registration, .settings {
 	padding: 20px;
 }
 
-.error_msg, .registration, .login {
+.error_msg, .registration, .login, .settings {
 	border-radius: 5px;
 	border: 1px solid #ccc;
 }
@@ -158,6 +158,18 @@ body > nav a {
 .home .courses a:hover {
 	color: black;
 	
+}
+
+/* SETTINGS */
+.user_info img {
+	width: 200px;
+	height: 200px;
+	display: block;
+	margin: auto;
+}
+
+.settings button {
+	margin: 10px 0;
 }
 
 /* COURSES */

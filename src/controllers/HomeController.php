@@ -53,9 +53,16 @@ class HomeController extends Controller
 	
 	public function settings()
 	{
+	    $students = new Students($_SESSION['s_login']);
+	    $courses = new Courses($_SESSION['s_login']);
+	    $student = $students->get($_SESSION['s_login']);
+	    
 	    $params = array(
 	        'title' => 'Learning platform - home',
-	        'studentName' => $students->getName(),
+	        'studentName' => $student->getName(),
+	        'genre' => $student->getGenre(),
+	        'birthdate' => explode(" ", $student->getBirthdate())[0],
+	        'email' => $student->getEmail(),
 	        'courses' => $courses->getMyCourses(),
 	        'totalCourses' => $courses->countCourses()
 	    );

@@ -6,7 +6,7 @@
 		</button>
 		<div id="navbarMenu" class="navbar-collapse collapse">
 			<div class="navbar-nav ml-auto">
-				<a href="<?php echo BASE_URL; ?>settings" class="nav-item nav-link active"><?php echo $name; ?></a>
+				<a href="<?php echo BASE_URL."settings"; ?>" class="nav-item nav-link active"><?php echo $name; ?></a>
 				<a href="<?php echo BASE_URL; ?>home/logout" class="nav-item nav-link">Logout</a>
 			</div>
 		</div>
