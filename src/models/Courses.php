@@ -35,7 +35,8 @@ class Courses extends Model
         $sql = $this->db->query("
             SELECT 
                 *,
-                (select count(*) from classes where classes.id_course = student_course.id_course) as totalClasses
+                (select count(*) from classes where classes.id_course = student_course.id_course) as totalClasses,
+                (select count(*) from modules where modules.id_course = student_course.id_course) as totalModules
             FROM student_course 
             LEFT JOIN courses ON courses.id = student_course.id_course
             WHERE id_student = $this->id_user

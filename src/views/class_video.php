@@ -34,7 +34,7 @@
     					<div class="comment_info">
         					<h5><?php echo $doubt['name']; ?></h5>
         					<p><?php echo $doubt['text']; ?></p>
-        					<button class="btn btn-small" onclick="open_reply(this)">Reply</button>
+        					<button class="btn btn-small" onclick="open_reply(this)">&ldca; Reply</button>
         					<div class="comment_reply">
         						<textarea class="form-control"></textarea>
         						<div class="comment_reply_actions">

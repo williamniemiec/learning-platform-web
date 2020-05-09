@@ -34,7 +34,7 @@ table, .row {
 	background-color: rgba(238,238,238,1);
 }
 
-.home, .error_msg, .registration {
+.home, .error_msg, .registration, .alert {
 	margin-top: 20px;
 }
 
@@ -90,6 +90,74 @@ body > nav a {
 	margin-top:100px;
 	max-width: 400px;
 	padding: 20px;
+}
+
+
+/* HOME */
+.home .courses {
+	display: flex;
+	color: black;
+	flex-wrap: wrap;
+	margin-top: 30px;
+}
+
+.home .course img {
+	display: block;
+	max-width:250px;
+	margin: auto;
+	border-radius: 5px;
+	height: 140px;
+}
+
+.home .course {
+	text-align: center;
+	margin-right: 20px;
+	background-color: rgba(238,238,238,1);
+	border-radius:5px;
+	border: 1px solid #ddd;
+	width:300px;
+	min-height:300px;
+	padding: 15px 20px;
+	margin-bottom: 30px;
+}
+
+.home .course .course_info {
+	display: flex;
+	justify-content: space-around;
+}
+
+.home .course .progress {
+	margin-top:10px;
+	background-color: #ccc;
+}
+
+.home .course .progress .progress-bar-caption {
+	text-align: center;
+	color: white;
+	width: 100%;
+}
+
+.home .course .progress .bg-success {
+	background-color: #52b86a!important;
+}
+
+.home .courses a {
+	color: black;
+	text-decoration: none;
+}
+
+.home .courses .course {
+	transition: 100ms all ease-in;
+}
+
+.home .courses .course:hover {
+	transform: scale(1.08);
+	/*border: 5px solid red;*/
+}
+
+.home .courses a:hover {
+	color: black;
+	
 }
 
 /* COURSES */

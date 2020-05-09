@@ -50,4 +50,16 @@ class HomeController extends Controller
 	    unset($_SESSION['s_login']);
 	    header("Location: ".BASE_URL."login");
 	}
+	
+	public function settings()
+	{
+	    $params = array(
+	        'title' => 'Learning platform - home',
+	        'studentName' => $students->getName(),
+	        'courses' => $courses->getMyCourses(),
+	        'totalCourses' => $courses->countCourses()
+	    );
+	    
+	    $this->loadTemplate("settings", $params);
+	}
 }
