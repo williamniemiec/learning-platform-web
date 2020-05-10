@@ -18,5 +18,6 @@
 		<main>
         	<?php $this->loadView($viewName, $viewData); ?>
         </main>
+        <footer>...</footer>
     </body>
 </html>

@@ -1,9 +1,28 @@
 /* GLOBAL */
+/** { box-sizing: border-box; border: 1px solid red; line-height: 0;}*/
+
 body,html {
 	min-height: 100%;
+	overflow-y: auto;
+	margin: 0;
+	height: 100%;
+	min-height: 100vh;
+	/*position: relative;*/
+}
+
+main {
+	min-height: 100%;
+}
+
+.row, main, footer {
+	position: relative;
+}
+
+body{
 	/* #0D324D -> #7F5A83  */
 	background-color: #7f5a83;
-background-image: linear-gradient(315deg, #7f5a83 0%, #0d324d 74%);
+	background-image: linear-gradient(315deg, #7f5a83 0%, #0d324d 74%);
+	background-size: cover;
 	
 	/*
 	background-color: #d387ab;
@@ -18,12 +37,24 @@ background-image: linear-gradient(315deg, #f39f86 0%, #f9d976 74%);
 */
 }
 
+footer {
+	bottom: 0;
+	width: 100%;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	color: white;
+	bottom: 0;
+	background-color: #3e4041!important;
+}
+
 a:hover {
 	color: #9881aa;
 }
 
 .home,.registration, .login, .settings {
 	color: white;
+	margin-bottom: 50px;
 }
 
 table, .row, .registration, .login, .settings {
@@ -82,6 +113,7 @@ body > nav a {
 .row {
 	max-width: 100%;
 	margin-left: 0;
+    overflow: hidden;
 }
 
 textarea:focus, 
@@ -96,7 +128,7 @@ input[type=number]:focus,
 [type=email].form-control:focus, 
 [type=tel].form-control:focus, 
 [contenteditable].form-control:focus {
-  box-shadow: 0 0 5px #711757;
+  box-shadow: 0 0 7px #711757;
   border-color: #711757;
 }
 
@@ -121,6 +153,7 @@ input:focus {
 	color: black;
 	flex-wrap: wrap;
 	margin-top: 30px;
+	justify-content: center;
 }
 
 .home .course img {
@@ -179,8 +212,8 @@ input:focus {
 
 .home .courses a:hover {
 	color: black;
-	
 }
+
 
 /* SETTINGS */
 .user_info img {
@@ -198,7 +231,8 @@ input:focus {
 .btn_theme, a.btn_theme {
 	margin: 10px 0;
 	background-image: linear-gradient(315deg, #823b8a 0%, #5d0d6b 74%);
-	border: 1px solid #7f5a83;
+	/*border: 1px solid #7f5a83;*/
+	border:0;
 	outline: 0!important;
 	padding: .375rem .75rem;
 	color: white;
@@ -210,6 +244,7 @@ input:focus {
 a.btn_theme, a.btn_theme:hover {
 	color: white;
 	text-decoration: none!important;
+	border: 1px solid #7f5a83;
 }
 
 .btn_full {

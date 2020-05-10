@@ -1,5 +1,5 @@
 $(function(){
-	updateScreen()
+	updateScreen(true)
 	
 	window.onresize = function() {
 		updateScreen()
@@ -42,10 +42,14 @@ $(function(){
 	})
 })
 
-function updateScreen()
+function updateScreen(firstTime = false)
 {
 	var offset = $(".course_left").offset().top
-	var windowHeight = $(document.body).height()
+	
+	if (firstTime)
+		var windowHeight = $(document.body).height()+50
+	else
+		var windowHeight = $(document.body).height()
 	var newHeight = windowHeight - offset
 	
 	$(".course_left").css("height", newHeight+"px")
