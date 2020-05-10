@@ -99,9 +99,9 @@ class AjaxController extends Controller
     
     public function update_password()
     {
-        if (empty($_POST['password'])) { return; }
+        if (empty($_POST['new_password']) || empty($_POST['current_password'])) { echo false; }
         
         $students = new Students($_SESSION['s_login']);
-        $students->updatePassword($_FILES['password']);
+        echo $students->updatePassword($_POST['current_password'], $_POST['new_password']);
     }
 }

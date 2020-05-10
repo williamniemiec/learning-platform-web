@@ -202,13 +202,20 @@ class Students extends Model
         return $sql->rowCount() > 0;
     }
     
-    public function updatePassword($newPassword)
+    public function updatePassword($currentPassword, $newPassword)
     {
-        if (empty($newPassword)) { return false; }
+        if (empty($currentPassword) || empty($newPassword)) { return false; }
         
-        $sql = $this->db->query("UPDATE students SET password = ".md5($newPassword)." WHERE id = ".$this->id_user);
+        $response = false;
         
-        return $sql->rowCount() > 0;
+        $sql = $this->db->query("SELECT COUNT(*) AS correctPassword FROM students WHERE id = ".$this->id_user." AND password = '".md5($currentPassword)."'");
+        
+        if ($sql->fetch()['correctPassword'] > 0) {
+            $sql = $this->db->query("UPDATE students SET password = '".md5($newPassword)."' WHERE id = ".$this->id_user);
+            $response = $sql->rowCount() > 0;
+        }
+        
+        return $response;
     }
     
     private function getPhoto()
