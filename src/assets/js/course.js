@@ -160,3 +160,25 @@ function delete_reply(obj, id_reply)
 		}
 	})
 }
+
+function update_profilePhoto(obj)
+{
+	var file = $("#profile_photo")[].files
+	
+	if (file.length > 0) {
+		var data = new FormData()
+		data.append("photo", file[0])
+		
+		$.ajax({
+			type:'POST',
+			url:BASE_URL+"ajax/update_profile_photo",
+			data: data,
+			contentType: false,
+			processData: false,
+			success: function() {
+				document.location.reload()
+				$(obj).modal("toggle")
+			}
+		})
+	}
+}

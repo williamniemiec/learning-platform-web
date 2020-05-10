@@ -132,6 +132,10 @@ input[type=number]:focus,
   border-color: #711757;
 }
 
+input[type=file] {
+	padding: 3px;
+}
+
 /*
 input:focus {
 	outline: 0!important;
@@ -241,10 +245,10 @@ input:focus {
 	display: block;
 }
 
-a.btn_theme, a.btn_theme:hover {
+a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 	color: white;
 	text-decoration: none!important;
-	border: 1px solid #7f5a83;
+	/*border: 1px solid #7f5a83;*/
 }
 
 .btn_full {

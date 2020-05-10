@@ -100,7 +100,7 @@ class Students extends Model
         
         if ($sql->rowCount() > 0) {
             $data = $sql->fetch();
-            $response = new Student($data['name'], $data['genre'], $data['birthdate'], $data['email']);
+            $response = new Student($data['name'], $data['genre'], $data['birthdate'], $data['photo'], $data['email']);
         }
         
         return $response;
@@ -169,29 +169,36 @@ class Students extends Model
     
     public function updatePhoto($photo)
     {
-        if (empty($photo)) { return false; }
+        if (empty($photo)) {
+            $imageName = $this->getPhoto();
+            
+            if (!empty($imageName)) {
+                unlink("assets/images/profile_photos/".$imageName);
+            }
+        }
         
-        if (!empty($photo['tmp_name']) && $this->isPhoto($photo)) {
+        else if (!empty($photo['tmp_name']) && $this->isPhoto($photo)) {
             $extension = explode("/", $photo['type'])[1];
             
             if ($extension == "jpg" || $extension == "jpeg" || $extension == "png") {
                 
                 $filename = md5(rand(1,9999).time().rand(1,9999));
                 $filename = $filename."."."jpg";
-                move_uploaded_file($photo['tmp_name'], "../assets/images/profile_photos/".$filename);
                 
+                move_uploaded_file($photo['tmp_name'], "assets/images/profile_photos/".$filename);
+
                 // Deletes old image (if there is one)
                 $imageName = $this->getPhoto();
                 
                 if (!empty($imageName)) {
-                    unlink("../assets/images/profile_photos/".$imageName);
+                    unlink("assets/images/profile_photos/".$imageName);
                 }
             }
         }
         
+        $filename = empty($filename) ? "'".$filename."'" : NULL;
         
         $sql = $this->db->query("UPDATE students SET photo = ".$filename." WHERE id = ".$this->id_user);
-        
         return $sql->rowCount() > 0;
     }
     

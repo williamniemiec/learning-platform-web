@@ -90,4 +90,18 @@ class AjaxController extends Controller
         $doubts = new Doubts();
         $doubts->deleteReply($_POST['id_reply']);
     }
+    
+    public function update_profile_photo()
+    {
+        $students = new Students($_SESSION['s_login']);
+        $students->updatePhoto($_FILES['photo']);
+    }
+    
+    public function update_password()
+    {
+        if (empty($_POST['password'])) { return; }
+        
+        $students = new Students($_SESSION['s_login']);
+        $students->updatePassword($_FILES['password']);
+    }
 }

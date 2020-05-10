@@ -13,18 +13,20 @@ class Student
     private $birthdate;
     private $email;
     private $password;
+    private $photo;
     
 
     //-----------------------------------------------------------------------
     //        Constructor
     //-----------------------------------------------------------------------
-    public function __construct($name, $genre, $birthdate, $email, $password = "")
+    public function __construct($name, $genre, $birthdate, $photo, $email, $password = "")
     {
         $this->name = $name;
         $this->genre = $genre;
         $this->birthdate = $birthdate;
         $this->email = $email;
         $this->password = $password;
+        $this->photo = $photo;
     }
 
     
@@ -69,5 +71,10 @@ class Student
     public function setId($id)
     {
         $this->id = $id;
+    }
+    
+    public function getPhoto()
+    {
+        return $this->photo;
     }
 }

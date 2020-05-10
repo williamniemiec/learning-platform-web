@@ -29,7 +29,7 @@
         	</div>
         	
         	<div class="form-group">
-        		<input type="submit" value="Save" class="form-control" />
+        		<input class="btn_theme btn_full" type="submit" value="Save" class="form-control" />
         	</div>
         </form>
     </div>

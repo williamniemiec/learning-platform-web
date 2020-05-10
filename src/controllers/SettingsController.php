@@ -39,6 +39,7 @@ class SettingsController extends Controller
         $params = array(
             'title' => 'Learning platform - home',
             'studentName' => $student->getName(),
+            'profilePhoto' => $student->getPhoto(),
             'genre' => $student->getGenre(),
             'birthdate' => explode(" ", $student->getBirthdate())[0],
             'email' => $student->getEmail(),

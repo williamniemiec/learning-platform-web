@@ -3,7 +3,7 @@
     	<h1>Settings</h1>
     	<div class="user_info">
     		<div class="user_photo">
-    			<img class="img rounded-circle" src="https://media.gettyimages.com/photos/colorful-powder-explosion-in-all-directions-in-a-nice-composition-picture-id890147976?s=612x612" />
+    			<img class="img rounded-circle" src="<?php echo empty($profilePhoto) ? BASE_URL."assets/images/user.png" : BASE_URL."assets/images/profile_photos/".$profilePhoto; ?>" />
     			<button id="btn_photo_update" class="btn_theme" data-toggle="modal" data-target="#changeProfilePhoto">&#8634;</button>
 			</div>
     		
@@ -55,7 +55,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary btn-block">Save</button>
+				<button class="btn btn-primary btn-block" onclick="update_profilePhoto(this)">Save</button>
 			</div>
 		</div>
 	</div>
@@ -75,8 +75,10 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary btn-block">Save</button>
+				<button class="btn btn-primary btn-block" onclick="update_password(this)">Save</button>
 			</div>
 		</div>
 	</div>
 </div>
+
+<script src="<?php echo BASE_URL; ?>assets/js/settings.js"></script>
