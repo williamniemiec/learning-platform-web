@@ -6,8 +6,20 @@
 		</button>
 		<div id="navbarMenu" class="navbar-collapse collapse">
 			<div class="navbar-nav ml-auto">
-				<a href="<?php echo BASE_URL."settings"; ?>" class="nav-item nav-link active"><?php echo $name; ?></a>
-				<a href="<?php echo BASE_URL; ?>home/logout" class="nav-item nav-link">Logout</a>
+				<li class="dropdown">
+					<a class="btn btn-link dropdown-toggle" data-toggle="dropdown">
+						<?php echo $name; ?>
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li class="dropdown-item"><a href="<?php echo BASE_URL; ?>settings">Profile</a></li>
+						<li class="dropdown-item"><a href="<?php echo BASE_URL; ?>settings/edit">Edit profile</a></li>
+						<li class="dropdown-divider"></li>
+						<li class="dropdown-item"><a href="<?php echo BASE_URL; ?>support">Support</a></li>
+						<li class="dropdown-divider"></li>
+						<li class="dropdown-item"><a href="<?php echo BASE_URL; ?>home/logout">Logout</a></li>						
+					</ul>
+				</li>
 			</div>
 		</div>
 	</div>

@@ -163,7 +163,7 @@ function delete_reply(obj, id_reply)
 
 function update_profilePhoto(obj)
 {
-	var file = $("#profile_photo")[].files
+	var file = $("#profile_photo")[0].files
 	
 	if (file.length > 0) {
 		var data = new FormData()
