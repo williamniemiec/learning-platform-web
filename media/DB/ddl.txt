@@ -1,0 +1,40 @@
+&: unique
+*: optional
+º: primary key
+
+classes(idº, id_module, id_course, order, type)
+	id_module references modules(id)
+	id_course references courses(id)
+
+courses(idº, name, logo*, description*)
+
+course_module(idº, id_course, id_module)
+	id_module references modules(id)
+	id_course references courses(id)	
+
+doubts(idº, id_user, id_class, text, date-publication, answered*)
+	id_user references students(id)
+	id_class references classes(id)
+
+historic(idº, id_student, id_class, date_watched)
+	id_student references students(id)
+	id_class references classes(id)	
+
+modules(idº, id_course, name)
+	id_course references courses(id)	
+
+questionnaires(idº, id_class, question, op1, op2, op3, op4, answer)
+	id_class references classes(id)
+
+replies(idº, id_doubt, id_user, date-publication, text)
+	id_doubt references doubts(id)
+	id_user references students(id)
+
+students(idº, name, genre, birthdate, photo*, email, password)
+
+student_course(idº, id_student, id_course)
+	id_student references students(id)
+	id_course references courses(id)
+
+videos(idº, id_class, title, description*, url)
+	id_class references classes(id)	
