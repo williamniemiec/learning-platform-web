@@ -17,6 +17,7 @@
         			<div class="navbar-nav">
         				<a class="nav-item nav-link" href="<?php echo BASE_URL; ?>">Courses</a>
         				<a class="nav-item nav-link" href="<?php echo BASE_URL; ?>students">Students</a>
+        				<a class="nav-item nav-link" href="<?php echo BASE_URL; ?>support">Support</a>
         			</div>
         			<div class="navbar-nav ml-auto">
         				<a href="<?php echo BASE_URL; ?>settings" class="nav-item nav-link active"><?php echo $adminName; ?></a>

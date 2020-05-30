@@ -52,12 +52,16 @@ a:hover {
 	color: #9881aa;
 }
 
-.home,.registration, .login, .settings {
+.home,.registration, .login, .settings, .messages {
 	color: white;
 	margin-bottom: 50px;
+	padding: 20px;
+	border-radius: 5px;
+	
+	color: white;
 }
 
-table, .row, .registration, .login, .settings {
+table, .row, .registration, .login, .settings, .messages {
 	background-color: rgba(238,238,238,0.3);
 }
 
@@ -79,7 +83,7 @@ table, .row {
 	padding: 20px;
 }
 
-.error_msg, .registration, .login, .settings {
+.error_msg, .registration, .login, .settings, .messages {
 	border-radius: 5px;
 	border: 1px solid #ccc;
 	color: white;
@@ -111,6 +115,48 @@ body > nav a {
 	color:white;
 }
 
+.notifications {
+	margin: auto;
+	cursor: pointer;
+}
+
+.notifications_area {
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	z-index: 99;
+	margin-top: 11px;
+	width: 300px;
+	margin-left: -100px;
+	max-height: 270px;
+	overflow-y: scroll;
+	display: none;
+	background-color: #343a40;
+}
+
+.notification {
+	margin-right: 30px;
+	padding: 10px 15px;
+	border-bottom: 1px solid black;
+	width: 100%;
+	word-break: break-all;
+}
+
+.notification:hover {
+	background-color: #333;
+}
+
+.notification_info {
+	display: flex;
+	justify-content: space-between;
+}
+
+.notification_date {
+    padding: 2px 5px;
+    border-radius: 5px;
+    color: #bbb;
+}
+
 li.dropdown-item a, li.dropdown-item {
 	color: black;
 	transition: 0.2s all ease-in;
@@ -134,6 +180,11 @@ li.dropdown-item a:hover {
 
 .dropdown:hover .dropdown-menu {
 	display: block;
+}
+
+.dropdown {
+    min-width: 110px;
+    margin-left: 15px;
 }
 
 .row {
@@ -456,4 +507,59 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 
 .question_wrong {
 	border-color:red;
+}
+
+
+/* SUPPORT */
+.support_date {
+	width:175px;
+}
+
+.messages {
+	margin-top: 20px;
+}
+
+.message {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	margin-bottom: 20px;
+	padding: 20px;
+	margin-top: 20px;
+}
+
+.message_author {
+	font-weight: bold;
+	line-height: 31px;
+}
+
+.message_date {
+	color: #aaa;
+    border: 1px solid #aaa;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 13px;
+    background-color: #aaa;
+    color: white;
+}
+
+.message_info {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 5px;
+}
+
+.author_admin {
+	margin-left: 10px;
+	font-weight: bold;
+    font-size: 12px;
+    border: 1px solid #7f5a83;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #7f5a83;
+    color: white;
+}
+
+.support_title {
+	margin: 20px 0;
+	color: white;
 }
