@@ -18,23 +18,11 @@ main {
 	position: relative;
 }
 
-body{
+body {
 	/* #0D324D -> #7F5A83  */
 	background-color: #7f5a83;
 	background-image: linear-gradient(315deg, #7f5a83 0%, #0d324d 74%);
 	background-size: cover;
-	
-	/*
-	background-color: #d387ab;
-background-image: linear-gradient(315deg, #d387ab 0%, #b279a7 74%);
-*/
-/*	background-color: #861657;
-background-image: linear-gradient(315deg, #861657 0%, #aa4465 74%);
-*/
-/*
-	background-color: #f39f86;
-background-image: linear-gradient(315deg, #f39f86 0%, #f9d976 74%);
-*/
 }
 
 footer {
@@ -395,8 +383,13 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 
 .course_left {
 	min-height:300px;
-	background-color:#ddd;
-	padding-left: 30px;
+	background-color:#3e4041;
+	padding-left: 10px;
+	color: white;
+}
+
+.course_left a {
+	color: white;
 }
 
 .course_right {
@@ -406,30 +399,53 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 
 .module {
 	padding: 20px;
-	border: 1px solid black;
-	border-radius: 5px;
-	margin-top: 20px;
+	padding-bottom: 0;
+	margin-top: 5px;
 }
 
 .module_class {
+	margin-left: 30px;
 	transition: all 200ms ease-in;
 	display:flex;
 	justify-content:space-between;
-	margin-top:5px;
+}
+
+.module_title {
+	max-width: 140px;
+	word-break: break-word;
+	min-height: 35px;
+	line-height: 35px;
 }
 
 .module_class:hover, .module_class:hover a  {
-	background-color: #ddd;
-	color: white;
 	text-decoration:none;
 }
 
+.module_class:not(:last-child) {
+	border-bottom: 1px solid #ccc;
+}
+
+.module_class {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding-bottom:5px;
+	padding-top:5px;
+}
+
 .class_watched {
-	border: 1px solid #aaa;
-	padding:2px;
+	max-height: 30px;
+	border: 1px solid #999;
+	padding:5px;
 	border-radius: 5px;
 	margin-left: 15px;
-	color:#777;
+	color:#999;	
+}
+
+.content_info {
+	display: flex;
+	align-items: center;
+	
 }
 
 .content_info h1 {
@@ -520,11 +536,13 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 }
 
 .message {
-	border: 1px solid #ccc;
+	border: 1px solid #888;
 	border-radius: 5px;
 	margin-bottom: 20px;
 	padding: 20px;
 	margin-top: 20px;
+	background:		white;
+	color:			black;
 }
 
 .message_author {
@@ -533,12 +551,12 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 }
 
 .message_date {
-	color: #aaa;
+	color: #888;
     border: 1px solid #aaa;
     padding: 5px;
     border-radius: 5px;
     font-size: 13px;
-    background-color: #aaa;
+    background-color: #888;
     color: white;
 }
 
