@@ -1,5 +1,6 @@
 <div class="container">
 	<h1 class="support_title">My support</h1>
+	<a class="btn_theme" href="<?php echo BASE_URL; ?>support/new">New</a>
     <table class="table table-hover table-bordered table-stripped">
     	<thead>
     		<tr class="support_header">

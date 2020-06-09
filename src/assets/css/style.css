@@ -3,7 +3,7 @@
 
 body,html {
 	min-height: 100%;
-	overflow-y: auto;
+	overflow-y: hidden;
 	margin: 0;
 	height: 100%;
 	min-height: 100vh;
@@ -40,7 +40,7 @@ a:hover {
 	color: #9881aa;
 }
 
-.home,.registration, .login, .settings, .messages {
+.home,.registration, .login, .settings, .messages, .theme_light {
 	color: white;
 	margin-bottom: 50px;
 	padding: 20px;
@@ -49,7 +49,7 @@ a:hover {
 	color: white;
 }
 
-table, .row, .registration, .login, .settings, .messages {
+table, .row, .registration, .login, .settings, .messages, .theme_light {
 	background-color: rgba(238,238,238,0.3);
 }
 
@@ -57,7 +57,7 @@ table, .row {
 	background-color: rgba(238,238,238,1);
 }
 
-.home, .error_msg, .registration, .alert, .settings {
+.home, .error_msg, .registration, .alert, .settings, .theme_light {
 	margin-top: 20px;
 }
 
@@ -89,17 +89,17 @@ table, .row {
 	transition: all 200ms ease-in;
 }
 
-body > nav, .thead-dark th {
+body nav, .thead-dark th {
 	background-color: #3e4041!important;
 }
 
-body > nav {
+body nav {
 	color:white;
 	padding: 0;
 	height:50px;
 }
 
-body > nav a {
+body nav a {
 	color:white;
 }
 
@@ -122,12 +122,52 @@ body > nav a {
 	background-color: #343a40;
 }
 
+
+.scrollbar_light {
+	overflow-y: hidden;
+}
+
+.mCustomScrollBox .mCSB_container {
+	margin-right: 0;
+}
+
+.mCustomScrollBox .mCSB_scrollTools_vertical {
+	position: absolute;
+}
+
+main {
+	min-height: 557px;
+}
+
+thead {
+	background-color: #7f5a83!important;
+	color: white!important;
+}
+
+th {
+	border: 1px solid #7f5a83!important;
+	
+}
+
+th:not(:last-child) {
+	border-right: 1px solid #dee2e6!important;
+}
+
 .notification {
 	margin-right: 30px;
 	padding: 10px 15px;
 	border-bottom: 1px solid black;
 	width: 100%;
 	word-break: break-all;
+	padding-right: 5px;
+}
+
+.notification.new {
+	background-color: #7f5a83
+}
+
+#mCSB_2_container {
+	padding-right: 15px;
 }
 
 .notification:hover {
@@ -245,11 +285,6 @@ input:focus {
 	margin-bottom: 30px;
 }
 
-.home .course .course_info {
-	display: flex;
-	justify-content: space-around;
-}
-
 .home .course .progress {
 	margin-top:10px;
 	background-color: #ccc;
@@ -310,7 +345,8 @@ input:focus {
 	color: white;
 	border-radius: 5px;
 	text-decoration: none;
-	display: block;
+	display: inline-block;
+	cursor: pointer;
 }
 
 a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
@@ -371,9 +407,6 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
     background-color: #eee;
 }
 
-.course_info {
-	margin-left: 20px;
-}
 
 /*.course_left, .course_right {
 	overflow-y: scroll;
@@ -385,6 +418,7 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 .course_content {
 	display: flex;
 	background: white;
+	padding-right: 15px;
 }
 
 .course_left {
@@ -395,14 +429,11 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 	position: relative;
 }
 
-.course_banner {
-	max-height: 150px;
-	max-width:293px;
-}
-
-.course_banner_area {
+.course_banner_area, .course_banner {
+	height: 153px;
 	width:293px;
 }
+
 
 .course_left a {
 	color: white;
@@ -420,9 +451,9 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 .course_left_action {
 	height: 50px;
 	width: 50px;
-	position: absolute;
-	margin-top:15px;
-	margin-left:5px;
+	/*position: absolute;*/
+	/*margin-top:15px;*/
+	/*margin-left:5px;*/
 }
 
 #course_left_button {
@@ -525,13 +556,21 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 .content_info {
 	display: flex;
 	align-items: center;
-	margin-left: 50px;
-	
+	margin-left: 10px;
+	margin-bottom: 10px;
 }
 
-.content_embed {
+.content_title {
+	margin: 0;
+	margin-left: 15px;
+	height: 50px;
+	line-height: 45px;
+}
+
+.class_content {
 	max-width: 1000px;
 	margin: auto;
+	margin-top: 30px;
 }
 
 .content_info h1 {
@@ -587,7 +626,26 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 #class_video {
 	width: 100%;
 	margin-top: 10px;
-	
+}
+
+.class_info {
+	/*display: flex;
+	justify-content: space-between;
+	align-items: center;*/
+	height: 50px;
+}
+
+.class_info .progress {
+	width: 150px;
+}
+
+.class_info #class_course__progress {
+	float: right;
+	margin: 17px 0;
+}
+
+.class_info .btn_mark_watch {
+	margin: 6px 0;
 }
 
 /* QUESTS */
@@ -614,6 +672,10 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 
 
 /* SUPPORT */
+#support_msg {
+	min-height: 300px;
+}
+
 .support_date {
 	width:175px;
 }

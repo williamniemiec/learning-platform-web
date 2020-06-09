@@ -7,7 +7,7 @@
 		<div class="module_classes">
 			<?php $id = 0; ?>
 			<?php foreach ($module['classes'] as $class): ?>
-				<div class="module_class">
+				<div class="module_class" data-id="<?php echo $class['id']; ?>">
 					<?php if ($class['type'] == 'video'): ?>
 						<div class="module_title">
     						<a href="<?php echo BASE_URL."courses/class/".$class['id']; ?>">

@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container scrollbar_light">
 	<div class="home">
         <h1>My Courses</h1>
         <?php if ($totalCourses == 0): ?>

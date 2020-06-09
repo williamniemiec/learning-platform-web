@@ -1,14 +1,5 @@
-<div class="content_info">
-	<h1 class="content_title"><?php echo $content_title; ?></h1>
-	<?php if ($content_embed['watched'] > 0): ?>
-		<small class="class_watched">Watched</small>
-	<?php endif; ?>
-</div>
-<div class="content_embed">
-	<button class="btn btn-outline-primary btn_mark_watch" 
-			onclick="<?php echo $content_embed['watched'] == 0 ? "markAsWatched" : "removeWatched"; ?>(<?php echo $content_embed['id_class']; ?>)">
-		Mark as watched
-	</button>
+<div class="class_content">
+	
 	
 	<iframe id="class_video" frameborder="0" src="http://www.youtube.com/embed/<?php echo $content_embed['video']['url']; ?>"></iframe>
 	

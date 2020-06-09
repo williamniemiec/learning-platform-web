@@ -1,7 +1,7 @@
 <div class="container">
-	<div class="messages">
+	<div class="messages theme_light">
 		<h1>Support - {name}</h1>
-		<button class="btn btn-primary">Close</button>
+		<button class="btn_theme">Close</button>
     	<div class="message">
     		<div class="message_info">
         		<div class="message_author">Name</div>
@@ -21,7 +21,7 @@
     			<textarea class="form-control"></textarea>
     		</div>
     		<div class="form-group">
-    			<input class="btn btn-primary btn-block" type="submit" value="Send" />
+    			<input class="btn_theme btn_full" type="submit" value="Send" />
     		</div>
     	</form>
     	</div>

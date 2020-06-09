@@ -81,19 +81,22 @@ class CoursesController extends Controller
                 $name = "Questionnaire";
                 $embed = array(
                     'id_class' => $class['id'],
-                    'quest' => $class['quest']
+                    'quest' => $class['quest'],
+                    'watched' => $class['watched']
                 );
                 $view = "class_quest";
             }
         }
         
+        $historic = new Historic();
         $viewContent = array(
             'content_title' => $name,
             'content_type' => $class['type'],
-            'content_embed' => $embed
+            'content_embed' => $embed,
+            'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
+            'totalClasses' => $classes->countClasses($id_course)
         );
         
-        $historic = new Historic();
         
         $params = array(
             'title' => 'Learning platform - '.$course['name'],
@@ -104,9 +107,7 @@ class CoursesController extends Controller
             'logo' => $course['logo'],
             'view' => $view,
             'viewContent' => $viewContent,
-            'id_course' => $id_course,
-            'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
-            'totalClasses' => $classes->countClasses($id_course)
+            'id_course' => $id_course
         );
         
         $this->loadTemplate("course", $params);
@@ -151,19 +152,22 @@ class CoursesController extends Controller
                 $name = "Questionnaire";
                 $embed = array(
                     'id_class' => $class['id'],
-                    'quest' => $class['quest']
+                    'quest' => $class['quest'],
+                    'watched' => $class['watched']
                 );
                 $view = "class_quest";
             }
         }
+        $historic = new Historic();
         
         $viewContent = array(
             'content_title' => $name,
             'content_type' => $class['type'],
-            'content_embed' => $embed
+            'content_embed' => $embed,
+            'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
+            'totalClasses' => $classes->countClasses($id_course)
         );
         
-        $historic = new Historic();
         
         $params = array(
             'title' => 'Learning platform - '.$name,
@@ -176,8 +180,6 @@ class CoursesController extends Controller
             'view' => $view,
             'viewContent' => $viewContent,
             'id_course' => $id_course,
-            'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
-            'totalClasses' => $classes->countClasses($id_course)
         );
         
         $this->loadTemplate("course", $params);

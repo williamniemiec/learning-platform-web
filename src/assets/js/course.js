@@ -46,10 +46,20 @@ $(function(){
 
 function updateScreen()
 {
-	var h = $(".course_right").height()
-	var padding = $(".course_right").css("padding")
+	var hCourseRight = $(".course_right").height()
+	var hMain = $("main").height()
+	//var padding = $(".course_right").css("padding")
 	
-	$(".course_left").css("height", h+padding+"px")
+	//$(".course_left").css("height", hCourseRight+padding+"px")
+	
+	
+	//$(".course_right").css("height", hMain)		
+	
+	if (hMain > hCourseRight) {
+		$(".course_left").css("height", hMain)
+	} else {
+		$(".course_left").css("height", hCourseRight)
+	}
 	
 	var ratio = 1920/1080
 	var videoWidth = $("#class_video").width()
@@ -67,6 +77,7 @@ function markAsWatched(id_class)
 	})
 	
 	$(".content_info").hide().append(`<small class="class_watched">Watched</small>`).fadeIn("fast")
+	$(`.module_class[data-id='${id_class}']`).hide().append(`<small class="class_watched">Watched</small>`).fadeIn("fast")
 	$(".btn_mark_watch").attr("onclick", "removeWatched("+id_class+")")
 }
 
@@ -78,7 +89,8 @@ function removeWatched(id_class)
 		data:{id_class:id_class}
 	})
 	
-	$(".class_watched").fadeOut("fast")
+	$(".content_info").find(".class_watched").fadeOut("fast")
+	$(`.module_class[data-id='${id_class}']`).find(".class_watched").fadeOut("fast")
 	$(".btn_mark_watch").attr("onclick", "markAsWatched("+id_class+")")
 }
 

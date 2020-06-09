@@ -57,4 +57,18 @@ class SupportController extends Controller
         
         $this->loadTemplate("support_content", $params);
     }
+    
+    public function new()
+    {
+        $students = new Students($_SESSION['s_login']);
+        $courses = new Courses($_SESSION['s_login']);
+        $student = $students->get($_SESSION['s_login']);
+        
+        $params = array(
+            'title' => 'Learning platform - Support - New',
+            'studentName' => $student->getName()
+        );
+        
+        $this->loadTemplate("support_new", $params);
+    }
 }
