@@ -363,9 +363,7 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 	width:100px;
 }
 
-.course_banner {
-	max-height: 150px;
-}
+
 
 .course_header {
 	display: flex;
@@ -377,15 +375,33 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 	margin-left: 20px;
 }
 
-.course_left, .course_right {
+/*.course_left, .course_right {
 	overflow-y: scroll;
+}*/
+.course_left {
+	overflow-y: scroll;
+}
+
+.course_content {
+	display: flex;
+	background: white;
 }
 
 .course_left {
 	min-height:300px;
 	background-color:#3e4041;
-	padding-left: 10px;
+	min-width: 310px;
 	color: white;
+	position: relative;
+}
+
+.course_banner {
+	max-height: 150px;
+	max-width:293px;
+}
+
+.course_banner_area {
+	width:293px;
 }
 
 .course_left a {
@@ -393,9 +409,73 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 }
 
 .course_right {
-	min-height:300px;
-	margin-left: 10px;
+	/*min-height:300px;*/
+	
+	padding: 15px;
+	width: 100%;
+	background-color: white;
 }
+
+/* COURSE LEFT BUTTON  */
+.course_left_action {
+	height: 50px;
+	width: 50px;
+	position: absolute;
+	margin-top:15px;
+	margin-left:5px;
+}
+
+#course_left_button {
+	display: block;
+	position: relative;
+	float: right;
+	cursor: pointer;
+	height: 50px;
+	width: 50px;
+	padding: 0;
+	z-index: 99;
+}
+
+#course_left_button .trace {
+	position: absolute;
+	width: 40px;
+	height: 4px;
+	border-radius: 5px;
+	background-color: #333;
+	transition: 0.3s;
+}
+
+#course_left_button .trace:nth-child(1) {
+	top: 10px;
+	left: 5px;
+}
+
+#course_left_button .trace:nth-child(2) {
+	top: calc(50% - 2px); 
+	left: 5px;
+	display: block;
+}
+
+#course_left_button .trace:nth-child(3) {
+	bottom: 10px;
+	left: 5px;
+}
+
+#course_left_button.active .trace:nth-child(1) {
+	top: calc(50% - 2px);
+	transform: rotate(45deg);
+}
+
+#course_left_button.active .trace:nth-child(2) {
+	display: none;
+}
+
+#course_left_button.active .trace:nth-child(3) {
+	top: calc(50% - 2px);
+	transform: rotate(-45deg);
+}
+
+
 
 .module {
 	padding: 20px;
@@ -445,7 +525,13 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 .content_info {
 	display: flex;
 	align-items: center;
+	margin-left: 50px;
 	
+}
+
+.content_embed {
+	max-width: 1000px;
+	margin: auto;
 }
 
 .content_info h1 {
@@ -501,6 +587,7 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 #class_video {
 	width: 100%;
 	margin-top: 10px;
+	
 }
 
 /* QUESTS */

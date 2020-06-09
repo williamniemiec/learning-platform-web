@@ -1,9 +1,11 @@
 $(function(){
-	updateScreen(true)
+	updateScreen()
+	setInterval(updateScreen, 200)
 	
-	window.onresize = function() {
-		updateScreen()
-	}
+	$("#course_left_button").click(function() {
+		$("#course_left_button").toggleClass("active")
+		$(".course_left").fadeToggle("fast")
+	})
 	
 	$(".question").click(function() {
 		var id_quest = $(".questions").attr("data-quest")
@@ -42,18 +44,12 @@ $(function(){
 	})
 })
 
-function updateScreen(firstTime = false)
+function updateScreen()
 {
-	var offset = $(".course_left").offset().top
+	var h = $(".course_right").height()
+	var padding = $(".course_right").css("padding")
 	
-	if (firstTime)
-		var windowHeight = $(document.body).height()+50
-	else
-		var windowHeight = $(document.body).height()
-	var newHeight = windowHeight - offset
-	
-	$(".course_left").css("height", newHeight+"px")
-	$(".course_right").css("height", newHeight+"px")
+	$(".course_left").css("height", h+padding+"px")
 	
 	var ratio = 1920/1080
 	var videoWidth = $("#class_video").width()
