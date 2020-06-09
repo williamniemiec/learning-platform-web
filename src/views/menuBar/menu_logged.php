@@ -7,6 +7,7 @@
 		<div id="navbarMenu" class="navbar-collapse collapse">
 			<div class="navbar-nav ml-auto">
 				<div class="notifications">
+					<div class="notifications_new"></div>
 					<i style="font-size:24px" class="fa notification_icon">&#xf0f3;</i>
 					<div class="notifications_area scrollbar_light">
 						<div class="notification">
