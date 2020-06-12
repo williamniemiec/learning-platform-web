@@ -220,6 +220,22 @@ input[type=file] {
 	background-image: linear-gradient(315deg, #cc0000 0%, #b20000  74%);
 }
 
+.btn_theme_light {
+	border: 2px solid #ae86b5;
+	color: #ae86b5;
+	background: white;
+	font-weight: bold;
+	/*background-image: linear-gradient(315deg, #ae86b5 0%, #6f42c1  74%);*/
+	transition: all 0.3s ease-in;
+}
+
+a.btn_theme_light:hover, .btn_theme_light:hover, a.btn_theme_light:hover {
+	background-color: #ae86b5;
+	color: white;
+	border: 2px solid #ae86b5!important;
+	outline-color: #711757!important;
+}
+
 a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 	color: white;
 	text-decoration: none!important;
@@ -242,7 +258,13 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 
 /* END */
 
+.table-bordered td, .table thead th {
+	border-color: 1px solid #aaa;
+}
 
+th {
+	text-align: center;
+}
 
 .watermark {
 	font-size: 60px;
