@@ -2,7 +2,7 @@
 	<div class="view_content theme_light">
     	<h1>Students manager</h1>
     	<button class="btn_theme" onclick="show_addStudent(this)">Add student</button>
-    	<table class="table table-hover table-bordered table-sm">
+    	<table class="table table-hover table-sm">
     		<thead>
     			<tr>
     				<th>Name</th>
@@ -18,8 +18,8 @@
         				<td class="student_courses"><?php echo implode(", ", $student->getCoursesName()); ?></td>
         				<td class="student_totalCourses"><?php echo count($student->getCoursesName()); ?></td>
         				<td class="actions">
-        					<button class="btn btn-warning" onclick="show_editStudent(this,<?php echo $student->getId(); ?>)">Edit</button>
-        					<button class="btn btn-danger" onclick="deleteStudent(this,<?php echo $student->getId(); ?>)">Delete</button>
+        					<button class="btn_theme" onclick="show_editStudent(this,<?php echo $student->getId(); ?>)">Edit</button>
+        					<button class="btn_theme btn_theme_danger" onclick="deleteStudent(this,<?php echo $student->getId(); ?>)">Delete</button>
         				</td>
         			</tr>
     			<?php endforeach; ?>

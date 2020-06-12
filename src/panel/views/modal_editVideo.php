@@ -1,4 +1,4 @@
-<div id="modal_editVideo" class="modal fade" role="alert">
+<div id="modal_editVideo" class="modal fade scrollbar_light" role="alert">
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">

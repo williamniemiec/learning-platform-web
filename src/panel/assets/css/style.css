@@ -258,6 +258,15 @@ a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
 
 /* END */
 
+
+.table td, .table th {
+	vertical-align: middle;	
+}
+
+.table td {
+	padding: 0!important;
+}
+
 .table-bordered td, .table thead th {
 	border-color: 1px solid #aaa;
 }
@@ -283,16 +292,20 @@ th {
 
 .modal-content {
 	/*color: black!important;*/
-	/*background-color: rgba(221,221,221,0.9);*/
-	background-color: rgba(93,13,107,0.7);
+	background-color: rgba(221,221,221,0.9);
+	/*background-color: rgba(50,50,50,0.9);*/
+	/*color: #323232;*/
+	color: #172b4d;
 }
 
 .modal-header {
+	color: white;
+	background-color: rgba(93,13,107,0.7);
 	border-bottom: 1px solid #ae86b5;
 }
 
 .modal-footer {
-	border-top: 1px solid #ae86b5;
+	border-top: 0;
 }
 
 .modal-header .close {
@@ -410,7 +423,7 @@ h1 {
 	margin-top:10px;
 }
 
-.student_courses {
+.student_courses, .student_name {
 	text-align:center;
 }
 

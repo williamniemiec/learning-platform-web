@@ -1,11 +1,12 @@
 <div class="container">
+	<div class="view_content">
     <h1>Courses</h1>
     <?php if (count($courses) == 0): ?>
     	<h2>There are not registered courses for this account :/</h2>
     <?php else: ?>
-    	<a class="btn btn-primary" href="<?php BASE_URL; ?>courses/add">Add</a>
+    	<a class="btn_theme" href="<?php BASE_URL; ?>courses/add">Add</a>
         <table class="table table-hover table-stripped table-bordered">
-        	<thead class="thead-dark">
+        	<thead>
         		<tr>
         			<th></th>
             		<th>Name</th>
@@ -34,4 +35,4 @@
         	</tbody>
         </table>
     <?php endif; ?>
-</div>
+</div></div>

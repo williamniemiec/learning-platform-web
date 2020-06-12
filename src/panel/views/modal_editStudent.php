@@ -1,4 +1,4 @@
-<div id="editStudent" class="modal fade" role="alert">
+<div id="editStudent" class="modal fade scrollbar_light" role="alert">
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -44,7 +44,7 @@
             	</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary btn-block" onclick="editStudent(this)">Save</button>
+				<button class="btn_theme btn_full btn_theme_light" onclick="editStudent(this)">Save</button>
 			</div>
 		</div>
 	</div>

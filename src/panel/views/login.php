@@ -14,7 +14,7 @@
         			<span class="navbar-toggler-icon"></span>
         		</button>
         		<div id="navbarMenu" class="navbar-collapse collapse">
-        			<div class="navbar-nav">
+        			<div class="navbar-nav  ml-auto">
         				<a href="<?php echo BASE_URL; ?>login" class="nav-item nav-link active">Login</a>
         			</div>
         		</div>
@@ -32,22 +32,29 @@
     			</div>
     		<?php endif; ?>
     		
-        	<form method="POST">
-            	<div class="form-group">
-            		<label for="email">Email</label>
-            		<input id="email" type="email" name="email" placeholder="Email" class="form-control" />
-            	</div>
-            	
-            	<div class="form-group">
-            		<label for="pass">Password</label>
-            		<input id="pass" type="password" name="password" placeholder="Password" class="form-control" />
-            	</div>
-            	
-            	<div class="form-group">
-            		<input type="submit" value="Login" class="form-control" />
-            	</div>
-            </form>
+    		<div class="login">
+            	<form method="POST">
+                	<div class="form-group">
+                		<label for="email">Email</label>
+                		<input id="email" type="email" name="email" placeholder="Email" class="form-control" />
+                	</div>
+                	
+                	<div class="form-group">
+                		<label for="pass">Password</label>
+                		<input id="pass" type="password" name="password" placeholder="Password" class="form-control" />
+                	</div>
+                	
+                	<div class="form-group">
+                		<input type="submit" value="Login" class="form-control" />
+                	</div>
+                </form>
+            </div>
     	</div>
+    	
+    	<div class="watermark">
+    		Admin area
+    	</div>
+    	
         <!-- Scripts -->
         <script src='<?php echo BASE_URL; ?>assets/js/jquery-3.4.1.min.js'></script>
         <script src='<?php echo BASE_URL; ?>assets/js/bootstrap.bundle.min.js'></script>
