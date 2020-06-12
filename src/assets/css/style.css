@@ -7,7 +7,6 @@ body,html {
 	margin: 0;
 	height: 100%;
 	min-height: 100vh;
-	/*position: relative;*/
 }
 
 main {
@@ -17,7 +16,6 @@ main {
 .row, main, footer {
 	position: relative;
 }
-
 body {
 	/* #0D324D -> #7F5A83  */
 	background-color: #7f5a83;
@@ -163,6 +161,7 @@ th:not(:last-child) {
 	border-right: 1px solid #dee2e6!important;
 }
 
+/* NOTIF */
 .notification {
 	margin-right: 30px;
 	padding: 10px 15px;
@@ -194,6 +193,8 @@ th:not(:last-child) {
     border-radius: 5px;
     color: #bbb;
 }
+
+/* DROPDOWN */
 
 li.dropdown-item a, li.dropdown-item {
 	color: black;
