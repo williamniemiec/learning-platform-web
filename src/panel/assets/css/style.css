@@ -30,7 +30,260 @@ body > nav {
 	max-width: 100%;
 }
 
+/* FROM NORMAL */
+.home,.registration, .login, .settings, .messages, .theme_light {
+	color: white;
+	margin-bottom: 50px;
+	padding: 20px;
+	border-radius: 5px;
+	
+	color: white;
+}
+
+body,html {
+	min-height: 100%;
+	overflow-y: hidden;
+	margin: 0;
+	height: 100%;
+	min-height: 100vh;
+}
+
+main {
+	min-height: 100%;
+}
+
+.row, main, footer {
+	position: relative;
+}
+body {
+	/* #0D324D -> #7F5A83  */
+	background-color: #7f5a83;
+	background-image: linear-gradient(315deg, #7f5a83 0%, #0d324d 74%);
+	background-size: cover;
+}
+
+footer {
+	bottom: 0;
+	width: 100%;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	color: white;
+	bottom: 0;
+	background-color: #3e4041!important;
+}
+
+a:hover {
+	color: #9881aa;
+}
+
+
+table, .row, .registration, .login, .settings, .messages, .theme_light {
+	background-color: rgba(238,238,238,0.3);
+}
+
+table, .row {
+	background-color: rgba(238,238,238,1);
+}
+
+.home, .error_msg, .registration, .alert, .settings, .theme_light {
+	margin-top: 20px;
+}
+
+.error_msg {
+	text-align: center;
+	padding: 100px;
+	background-color: rgba(238,238,238,0.3);
+}
+
+.registration, .settings {
+	padding: 20px;
+}
+
+.error_msg, .registration, .login, .settings, .messages {
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	color: white;
+}
+
+.nav-item:hover {
+	background-color: #eee;
+}
+
+
+.nav-item {
+	height:50px;
+	line-height:50px;
+	padding: 0;
+	transition: all 200ms ease-in;
+}
+
+body nav, .thead-dark th {
+	background-color: #3e4041!important;
+}
+
+body nav {
+	color:white;
+	padding: 0;
+	height:50px;
+}
+
+body nav a {
+	color:white;
+}
+
+
+.scrollbar_light {
+	overflow-y: hidden;
+}
+
+.mCustomScrollBox .mCSB_container {
+	margin-right: 0;
+}
+
+.mCustomScrollBox .mCSB_scrollTools_vertical {
+	position: absolute;
+}
+
+main {
+	min-height: 557px;
+}
+
+thead {
+	background-color: #7f5a83!important;
+	color: white!important;
+}
+
+th {
+	border: 1px solid #7f5a83!important;
+	
+}
+
+th:not(:last-child) {
+	border-right: 1px solid #dee2e6!important;
+}
+
+
+
+
+
+.row {
+	max-width: 100%;
+	margin-left: 0;
+    overflow: hidden;
+}
+
+textarea:focus, 
+textarea.form-control:focus, 
+input.form-control:focus, 
+input[type=text]:focus, 
+input[type=password]:focus, 
+input[type=email]:focus, 
+input[type=number]:focus, 
+[type=text].form-control:focus, 
+[type=password].form-control:focus, 
+[type=email].form-control:focus, 
+[type=tel].form-control:focus, 
+[contenteditable].form-control:focus {
+  box-shadow: 0 0 7px #711757;
+  border-color: #711757;
+}
+
+input[type=file] {
+	padding: 3px;
+}
+
+
+
+.login {
+	margin:auto;
+	margin-top:100px;
+	max-width: 400px;
+	padding: 20px;
+}
+
+.btn_theme, a.btn_theme {
+	margin: 10px 0;
+	background-image: linear-gradient(315deg, #823b8a 0%, #5d0d6b 74%);
+	/*border: 1px solid #7f5a83;*/
+	border:0;
+	outline: 0!important;
+	padding: .375rem .75rem;
+	color: white;
+	border-radius: 5px;
+	text-decoration: none;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.btn_theme_danger {
+	background-image: linear-gradient(315deg, #cc0000 0%, #b20000  74%);
+}
+
+a.btn_theme:hover, .btn_theme:hover, a.btn_theme:hover {
+	color: white;
+	text-decoration: none!important;
+	/*border: 1px solid #7f5a83;*/
+}
+
+.btn_full {
+	width: 100%;
+	text-align: center;
+}
+
+.btn_theme:hover, a.btn_theme:hover {
+	border-color: #711757;
+	outline-color: #711757!important;
+}
+
+.btn_theme:active, a.btn_theme:active {
+	box-shadow: 0 0 5px #711757;
+}
+
+/* END */
+
+
+
+.watermark {
+	font-size: 60px;
+	color: rgba(255,255,255,0.3);
+	position: absolute;
+	bottom: 30px;
+	right: 30px;
+}
+
+
+.view_content {
+	margin-top: 20px;
+	padding: 20px;
+}
+
+
+.modal-content {
+	/*color: black!important;*/
+	/*background-color: rgba(221,221,221,0.9);*/
+	background-color: rgba(93,13,107,0.7);
+}
+
+.modal-header {
+	border-bottom: 1px solid #ae86b5;
+}
+
+.modal-footer {
+	border-top: 1px solid #ae86b5;
+}
+
+.modal-header .close {
+	color: white;
+}
+
 /* COURSES */
+h1 {
+	color: white;
+}
+
+
+
 .img_courseEdit {
 	max-width: 250px;
 	max-height:250px;
@@ -59,10 +312,15 @@ body > nav {
 }
 
 .module {
+	color: black;
 	background-color: #ddd;
 	border: 1px solid #ccc;
 	border-radius: 5px;
 	padding: 20px;
+}
+
+.module_actions {
+	margin: 10px 0;
 }
 
 .class {
