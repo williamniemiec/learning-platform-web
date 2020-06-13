@@ -41,4 +41,17 @@ class SettingsController extends Controller
         
         $this->loadTemplate("settings", $params);
     }
+    
+    
+    public function edit()
+    {
+        $admins = new Admins($_SESSION['a_login']);
+        
+        $params = array(
+            'title' => 'Learning platform - Settings - Edition',
+            'adminName' => $admins->getName()
+        );
+        
+        $this->loadTemplate("settings/settings_edit", $params);
+    }
 }
