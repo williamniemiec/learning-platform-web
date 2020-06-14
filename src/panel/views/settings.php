@@ -1,5 +1,5 @@
 <div class="container">
-	<div class="theme_light">
+	<div class="view_panel">
 		<h1 class="view_header">Settings</h1>
 		<div class="view_content">
 			<div class="user_info">

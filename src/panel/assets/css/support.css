@@ -1,0 +1,53 @@
+/* Support */
+.support_actions {
+	display:						flex;
+	justify-content:				space-around;
+	align-items:					center;
+	margin-bottom:					20px;
+}
+
+.support_actions .form-group {
+	display:						flex;
+	justify-content:				left;
+	align-items:					center;
+	margin-bottom:					0;
+}
+
+.support_actions label {
+	padding-right:					20px;
+	margin-bottom:					0;
+	
+}
+
+
+/* Topic */
+.support_date {
+	width:							175px;
+}
+
+.message {
+	margin-bottom:					20px;
+	padding:						20px;
+	margin-top:						20px;
+}
+
+.message_author {
+	font-weight:					bold;
+	line-height:					31px;
+}
+
+.message_info {
+	display:						flex;
+	justify-content:				space-between;
+	margin-bottom:					5px;
+}
+
+.privilege_admin {
+	margin-left:					10px;
+	color:							var(--privilege-admin);
+	font-weight:					bold;
+    font-size:						12px;
+    border:							1px solid var(--privilege-admin);
+	padding:						5px;
+    border-radius:					5px;
+}

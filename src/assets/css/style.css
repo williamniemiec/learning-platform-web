@@ -1,6 +1,4 @@
 /* GLOBAL */
-/** { box-sizing: border-box; border: 1px solid red; line-height: 0;}*/
-
 body,html {
 	min-height: 100%;
 	overflow-y: hidden;

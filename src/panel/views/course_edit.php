@@ -1,5 +1,5 @@
 <div class="container">
-	<div class="theme_light">
+	<div class="view_panel">
 		<h1 class="view_header">Course editing</h1>
 		<div class="view_content">
             <?php if ($error): ?>
@@ -43,7 +43,7 @@
             	<button class="btn_theme" data-toggle="modal" data-target="#addModule">Add module</button>
             	
             	<?php foreach ($modules as $module): ?>
-            		<div class="module" data-id_module="<?php echo $module['id']; ?>">
+            		<div class="module view_widget" data-id_module="<?php echo $module['id']; ?>">
             			<div class="module_actions">
                 			<button class="btn_theme" onclick="show_addClass(this,<?php echo $module['id']; ?>)">Add class</button>
                 			<button class="btn_theme" onclick="show_editModule(this,<?php echo $module['id']; ?>)">Edit Module</button>

@@ -28,7 +28,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary btn-block" onclick="editQuest(this)">Save</button>
+				<button class="btn_theme btn_full btn_theme_outline" onclick="editQuest(this)">Save</button>
 			</div>
 		</div>
 	</div>

@@ -34,11 +34,13 @@ class HomeController extends Controller
 	{
 	    $admins = new Admins($_SESSION['a_login']);
 	    $courses = new Courses();
+	    $styles = array('style');
 	    
 		$params = array(
 			'title' => 'Learning platform - home',
 		    'adminName' => $admins->getName(),
-		    'courses' => $courses->getCourses()
+		    'courses' => $courses->getCourses(),
+		    'styles' => $styles
 		);
 
 		$this->loadTemplate("home", $params);

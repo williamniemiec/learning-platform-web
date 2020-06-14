@@ -32,11 +32,13 @@ class StudentsController extends Controller
     {
         $admins = new Admins($_SESSION['a_login']);
         $students = new Students();
+        $styles = array('studentsManager', 'style');
         
         $params = array(
             'title' => 'Learning platform - Students manager',
             'adminName' => $admins->getName(),
-            'students' => $students->getAll()
+            'students' => $students->getAll(),
+            'styles' => $styles
         );
         
         $this->loadTemplate("students_manager", $params);

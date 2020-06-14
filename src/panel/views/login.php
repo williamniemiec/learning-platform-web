@@ -32,7 +32,7 @@
     			</div>
     		<?php endif; ?>
     		
-    		<div class="login">
+    		<div class="view_panel login">
             	<form method="POST">
                 	<div class="form-group">
                 		<label for="email">Email</label>

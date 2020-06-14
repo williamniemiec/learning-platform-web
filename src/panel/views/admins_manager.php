@@ -1,5 +1,5 @@
 <div class="container">
-	<div class="theme_light">
+	<div class="view_panel">
 		<h1 class="view_header">Admins manager</h1>
 		<div class="view_content">
 			<button class="btn_theme">New admin</button>

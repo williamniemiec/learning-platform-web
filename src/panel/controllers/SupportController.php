@@ -34,11 +34,13 @@ class SupportController extends Controller
     {
         $admins = new Admins($_SESSION['a_login']);
         $courses = new Courses();
+        $styles = array('support', 'style');
         
         $params = array(
             'title' => 'Learning platform - Support',
             'adminName' => $admins->getName(),
-            'courses' => $courses->getCourses()
+            'courses' => $courses->getCourses(),
+            'styles' => $styles
         );
         
         $this->loadTemplate("support", $params);
@@ -48,11 +50,13 @@ class SupportController extends Controller
     {
         $admins = new Admins($_SESSION['a_login']);
         $courses = new Courses();
+        $styles = array('support', 'style');
         
         $params = array(
             'title' => 'Learning platform - Support',
             'adminName' => $admins->getName(),
-            'courses' => $courses->getCourses()
+            'courses' => $courses->getCourses(),
+            'styles' => $styles
         );
         
         $this->loadTemplate("support_content", $params);

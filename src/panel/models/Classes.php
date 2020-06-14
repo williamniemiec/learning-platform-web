@@ -35,11 +35,10 @@ class Classes extends Model
         if (empty($id_module) || $id_module <= 0) { return array(); }
         
         $response = array();
-        $id_student = $_SESSION['s_login'];
+       // $id_student = $_SESSION['s_login'];
         $sql = $this->db->prepare("
             SELECT 
-                *,
-                (select count(*) from historic where historic.id_class = classes.id and historic.id_student = $id_student) as watched 
+                * 
             FROM classes 
             WHERE id_module = ? 
             ORDER BY classes.order

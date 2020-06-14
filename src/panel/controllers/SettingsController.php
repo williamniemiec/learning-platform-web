@@ -33,10 +33,12 @@ class SettingsController extends Controller
     public function index ()
     {
         $admins = new Admins($_SESSION['a_login']);
+        $styles = array('style');
         
         $params = array(
             'title' => 'Learning platform - Settings',
-            'adminName' => $admins->getName()
+            'adminName' => $admins->getName(),
+            'styles' => $styles
         );
         
         $this->loadTemplate("settings", $params);
@@ -46,10 +48,12 @@ class SettingsController extends Controller
     public function edit()
     {
         $admins = new Admins($_SESSION['a_login']);
+        $styles = array('style');
         
         $params = array(
             'title' => 'Learning platform - Settings - Edition',
-            'adminName' => $admins->getName()
+            'adminName' => $admins->getName(),
+            'styles' => $styles
         );
         
         $this->loadTemplate("settings/settings_edit", $params);

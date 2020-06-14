@@ -51,7 +51,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary btn-block" onclick="addClass(this)">Add</button>
+				<button class="btn_theme btn_full btn_theme_outline" onclick="addClass(this)">Add</button>
 			</div>
 		</div>
 	</div>

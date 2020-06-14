@@ -44,7 +44,7 @@
             	</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn_theme btn_full btn_theme_light" onclick="editStudent(this)">Save</button>
+				<button class="btn_theme btn_full btn_theme_outline" onclick="editStudent(this)">Save</button>
 			</div>
 		</div>
 	</div>

@@ -1,0 +1,16 @@
+/* Login */
+.login {
+	margin:							auto;
+	margin-top:						100px;
+	max-width:						400px;
+	padding:						20px;
+}
+
+/* Watermark */
+.watermark {
+	font-size:						60px;
+	color:							rgba(255,255,255,0.3);
+	position:						absolute;
+	bottom:							30px;
+	right:							30px;
+}

@@ -20,7 +20,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary btn-block" onclick="editVideo(this)">Save</button>
+				<button class="btn_theme btn_full btn_theme_outline" onclick="editVideo(this)">Save</button>
 			</div>
 		</div>
 	</div>

@@ -43,12 +43,14 @@ class CoursesController extends Controller
     {
         $admins = new Admins($_SESSION['a_login']);
         $courses = new Courses();
+        $styles = array('coursesEdition', 'style');
         
         $params = array(
             'title' => 'Learning platform - home',
             'adminName' => $admins->getName(),
             'error' => false,
-            'msg' => ''
+            'msg' => '',
+            'styles' => $styles
         );
         
         if (!empty($_POST['name'])) {
@@ -73,6 +75,7 @@ class CoursesController extends Controller
         $courses = new Courses();
         $course = $courses->getCourse($id_course);
         $admins = new Admins($_SESSION['a_login']);
+        $styles = array('coursesEdition', 'style');
         
         $params = array(
             'title' => 'Learning platform - '.$course['name'],
@@ -80,7 +83,8 @@ class CoursesController extends Controller
             'course' => $course,
             'modules' => $course['modules'],
             'error' => false,
-            'msg' => ''
+            'msg' => '',
+            'styles' => $styles
         );
         
         // Checks if the course was edited

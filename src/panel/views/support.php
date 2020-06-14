@@ -1,5 +1,5 @@
 <div class="container">
-	<div class="theme_light">
+	<div class="view_panel">
 		<h1 class="view_header">
 			Support
 		</h1>
