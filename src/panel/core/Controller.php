@@ -36,7 +36,7 @@ abstract class Controller
 	public function loadTemplate($viewName, $viewData = array())
 	{
 		extract($viewData);				// Transforms array keys into variables
-		require 'views/template.php';
+		require 'views/template/html.php';
 	}
 	
 	public function loadViewInTemplate($viewName, $viewData = array())

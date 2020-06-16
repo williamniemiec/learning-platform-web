@@ -4,7 +4,7 @@
 		<div class="view_content">
 			<div class="user_info">
         		<div class="user_photo">
-        			<img class="img rounded-circle" src="<?php echo empty($profilePhoto) ? BASE_URL."assets/images/user.png" : BASE_URL."assets/images/profile_photos/".$profilePhoto; ?>" />
+        			<img class="img rounded-circle" src="<?php echo empty($profilePhoto) ? BASE_URL."resources/images/user.png" : BASE_URL."resources/images/profile_photos/".$profilePhoto; ?>" />
         			<button id="btn_photo_update" class="btn_theme" data-toggle="modal" data-target="#changeProfilePhoto">&#8634;</button>
     			</div>
         		
@@ -44,8 +44,8 @@
 </div>
 
 <!-- Modals -->
-<?php $this->loadView('modals/modal_updateProfilePhoto'); ?>
-<?php $this->loadView('modals/modal_changePassword'); ?>
+<?php $this->loadView('settings/modal_updateProfilePhoto'); ?>
+<?php $this->loadView('settings/modal_changePassword'); ?>
 
 <!-- Scripts -->
-<script src="<?php echo BASE_URL; ?>assets/js/settings.js"></script>
+<script src="<?php echo BASE_URL; ?>resources/scripts/settings.js"></script>

@@ -57,7 +57,7 @@ class CoursesController extends Controller
             'error' => false,
             'msg' => '',
             'header' => $header,
-            'scripts' => array()
+            'scripts' => array('script')
         );
         
         if (!empty($_POST['name'])) {
@@ -70,7 +70,7 @@ class CoursesController extends Controller
             $params['msg'] = "The course could not be added!";
         }
         
-        $this->loadTemplate("course_add", $params);
+        $this->loadTemplate("coursesManager/course_add", $params);
     }
     
     public function edit($id_course)
@@ -110,6 +110,6 @@ class CoursesController extends Controller
             $params['msg'] = "Error while saving editions";
         }
         
-        $this->loadTemplate("course_edit", $params);
+        $this->loadTemplate("coursesManager/course_edit", $params);
     }
 }

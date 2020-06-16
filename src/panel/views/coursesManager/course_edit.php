@@ -27,7 +27,7 @@
             	
             	<div class="form-group">
             		<label for="logo">Current logo</label><br />
-            		<img class="img img-responsive img-thumbnail img_courseEdit" src="<?php echo BASE_URL."../assets/images/logos/".$course['logo']; ?>" /><br /><br />
+            		<img class="img img-responsive img-thumbnail img_courseEdit" src="<?php echo BASE_URL."../resources/images/logos/".$course['logo']; ?>" /><br /><br />
             		<input id="logo" name="logo" type="file" accept=".jpeg,.png,.jpg" class="form-control" />
             	</div>
             	
@@ -74,11 +74,11 @@
             </div>
             
             <!-- Modals -->
-        	<?php $this->loadView("modal_addModule"); ?>
-        	<?php $this->loadView("modal_editModule"); ?>
-        	<?php $this->loadView("modal_addClass"); ?>
-        	<?php $this->loadView("modal_editVideo"); ?>
-        	<?php $this->loadView("modal_editQuest"); ?>
+        	<?php $this->loadView("coursesManager/modal_addModule"); ?>
+        	<?php $this->loadView("coursesManager/modal_editModule"); ?>
+        	<?php $this->loadView("coursesManager/modal_addClass"); ?>
+        	<?php $this->loadView("coursesManager/modal_editVideo"); ?>
+        	<?php $this->loadView("coursesManager/modal_editQuest"); ?>
     	</div>
 	</div>
 </div>

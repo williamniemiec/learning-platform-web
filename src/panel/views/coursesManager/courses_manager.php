@@ -20,9 +20,9 @@
                 		<?php foreach($courses as $course): ?>
                     		<tr>
                     			<?php if (empty($course['logo'])): ?>
-                    				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/images/noImage"; ?>" /></td>
+                    				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../resources/images/noImage"; ?>" /></td>
                     			<?php else: ?>
-                    				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/images/logos/".$course['logo']; ?>" /></td>
+                    				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../resources/images/logos/".$course['logo']; ?>" /></td>
                     			<?php endif; ?>
                     			<td><a href="<?php echo BASE_URL."courses/edit/".$course['id']; ?>"><?php echo $course['name']; ?></a></td>
                     			<td><?php echo $course['description']; ?></td>

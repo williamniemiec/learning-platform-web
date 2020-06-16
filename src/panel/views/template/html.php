@@ -14,6 +14,10 @@
         <footer>&copy; Learning platform - All rights reserved</footer>
         
         <!-- Scripts -->
-        <?php $this->loadViewInTemplate("template/scripts", $scripts); ?>
+        <?php if (!empty($scripts)): ?>
+        	<?php $this->loadViewInTemplate("template/scripts", $scripts); ?>
+    	<?php else: ?>
+    		<?php $this->loadView("template/scripts"); ?>
+    	<?php endif; ?>
     </body>
 </html>

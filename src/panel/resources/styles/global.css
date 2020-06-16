@@ -84,6 +84,7 @@ body nav a {
 
 .view_content {
 	padding:						20px;
+	color:							var(--text-dark);
 }
 
 .view_content h1, 

@@ -50,7 +50,7 @@ class HomeController extends Controller
 		    'scripts' => array('script')
 		);
 
-		$this->loadTemplate("home", $params);
+		$this->loadTemplate("coursesManager/courses_manager", $params);
 	}
 	
 	public function logout()

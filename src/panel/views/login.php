@@ -31,7 +31,7 @@
                 	</div>
                 	
                 	<div class="form-group">
-                		<input type="submit" value="Login" class="form-control" />
+                		<input type="submit" value="Login" class="form-control btn_theme btn_theme_full" />
                 	</div>
                 </form>
             </div>

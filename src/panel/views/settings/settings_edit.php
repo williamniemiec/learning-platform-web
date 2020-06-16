@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="theme_light">
+    <div class="view_panel">
     	<h1 class="view_header">Settings - Edition</h1>
     	<div class="view_content">
         	<form method="POST">

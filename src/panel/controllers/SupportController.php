@@ -50,7 +50,7 @@ class SupportController extends Controller
             'scripts' => array()
         );
         
-        $this->loadTemplate("support", $params);
+        $this->loadTemplate("support/support", $params);
     }
     
     public function open()
@@ -73,6 +73,6 @@ class SupportController extends Controller
             'scripts' => array()
         );
         
-        $this->loadTemplate("support_content", $params);
+        $this->loadTemplate("supports/support_content", $params);
     }
 }

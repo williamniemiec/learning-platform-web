@@ -47,6 +47,6 @@ class AdminsController extends Controller
             'scripts' => array()
         );
         
-        $this->loadTemplate("admins_manager", $params);
+        $this->loadTemplate("adminsManager/admins_manager", $params);
     }
 }

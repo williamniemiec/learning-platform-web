@@ -47,7 +47,7 @@ class SettingsController extends Controller
             'header' => $header
         );
         
-        $this->loadTemplate("settings", $params);
+        $this->loadTemplate("settings/settings", $params);
     }
     
     
