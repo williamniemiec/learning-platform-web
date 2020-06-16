@@ -39,8 +39,9 @@ abstract class Controller
 		require 'views/template/html.php';
 	}
 	
-	public function loadViewInTemplate($viewName, $viewData = array())
-	{
-	    require 'views/'.$viewName.'.php';
-	}
+// 	public function loadViewInTemplate($viewName, $viewData = array())
+// 	{
+// 	    var_dump($viewData);
+// 	    require 'views/'.$viewName.'.php';
+// 	}
 }

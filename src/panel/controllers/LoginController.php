@@ -2,38 +2,38 @@
 namespace controllers;
 
 use core\Controller;
-use models\Students;
-use models\Student;
 use models\Admins;
 
 
 /**
+ * Responsible for the behavior of the view {@link login.php}.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class LoginController extends Controller
 {      
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     /**
      * @Override
      */
     public function index ()
     {
         $header = array(
-            'title' => 'Learning platform - Login',
-            'styles' => array('login', 'style')
-            //'description' => "A website made using MVC-in-PHP framework",
-            //'keywords' => array('home', 'mvc-in-php'),
-            //'robots' => 'index'
+            'title' => 'Login - Learning platform',
+            'styles' => array('login')
         );
         
-        $params = array(
+        $viewArgs = array(
             'error' => false,
             'msg' => '',
-            'header' => $header,
-            'scripts' => array()
+            'header' => $header
         );
         
+        // Checks whether the admin credentials are correct
         if (!empty($_POST['email'])) {
             $admins = new Admins();
             
@@ -42,61 +42,11 @@ class LoginController extends Controller
                 exit;
             }
             
-            $params['error'] = true;
-            $params['msg'] = "Email and / or password incorrect";
+            // If an error occurred, display it
+            $viewArgs['error'] = true;
+            $viewArgs['msg'] = "Email and / or password incorrect";
         }
         
-        $this->loadView("login", $params);
+        $this->loadView("login", $viewArgs);
     }
-    
-    /*
-    public function register()
-    {
-        $params = array(
-            'title' => 'Learning platform - Login',
-            'error' => false,
-            'msg' => ''
-        );
-        
-        if (!empty($_POST['email'])) {
-            // Checks if all fields are filled
-            if ($this->isAllFieldsFilled()) {
-                $students = new Students();
-                
-                $student = new Student(
-                    $_POST['name'],
-                    $_POST['genre'],
-                    $_POST['birthdate'],
-                    $_POST['email'],
-                    $_POST['password']
-                );
-                
-                if ($students->register($student)) {
-                    header("Location: ".BASE_URL);
-                    exit;
-                }
-                
-                $params['error'] = true;
-                $params['msg'] = "User already registered!";
-            } else {
-                $params['error'] = true;
-                $params['msg'] = "Fill in all fields!";
-            }
-            
-        }
-        
-        $this->loadView("register", $params);
-    }
-    
-    private function isAllFieldsFilled()
-    {
-        return (
-            isset($_POST['name']) &&
-            isset($_POST['genre']) &&
-            isset($_POST['birthdate']) &&
-            isset($_POST['email']) &&
-            isset($_POST['password'])
-        );
-    }
-  	*/
 }

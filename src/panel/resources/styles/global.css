@@ -47,6 +47,11 @@ a:hover {
 	text-align:						center;
 }
 
+.actions {
+	text-align:						center;
+	max-width:						80px!important;
+}
+
 
 /* Navbar */
 body nav {

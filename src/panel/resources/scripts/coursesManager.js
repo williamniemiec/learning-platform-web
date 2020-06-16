@@ -1,23 +1,8 @@
-$(function() {
-	setInterval(function(){
-		var hMain = $("main").height()
-		
-		if ($("#mCSB_1_container").hasClass("mCS_no_scrollbar_y") && $("#mCSB_1").height() > hMain) {
-			var h = $("body").css("height")
-			var x = $("#mCSB_1").height() - 130
-			$("main").css("height", x+"px")
-		}
-	},200)
-})
-
-
-
-
 var current_id_mod = -1
 var current_id_course = -1
 var current_id_video = -1
 var current_id_quest = -1
-var current_id_student = -1
+
 
 $(function() {
 	$("input[name='classType']").change(function() {
@@ -37,7 +22,7 @@ function deleteModule(obj,id_module)
 	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/delete_module",
+		url:BASE_URL+"courses/delete_module",
 		data:{id_module:id_module}
 	})
 }
@@ -48,7 +33,7 @@ function deleteClass(obj,id_class)
 	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/delete_class",
+		url:BASE_URL+"courses/delete_class",
 		data:{id_class:id_class}
 	})
 }
@@ -60,7 +45,7 @@ function addModule(obj)
 
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/add_module",
+		url:BASE_URL+"courses/add_module",
 		data:{id_course:id_course, name:name},
 		success: function(id) {
 			if (id == -1) {
@@ -115,7 +100,7 @@ function show_editVideo(obj, id_video)
 {
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/get_video",
+		url:BASE_URL+"courses/get_video",
 		data:{id_video:id_video},
 		dataType:'json',
 		success: function(json) {
@@ -134,7 +119,7 @@ function show_editQuest(obj, id_quest)
 {
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/get_quest",
+		url:BASE_URL+"courses/get_quest",
 		data:{id_quest:id_quest},
 		dataType:'json',
 		success: function(json) {
@@ -158,7 +143,7 @@ function editModule(obj)
 	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/edit_module",
+		url:BASE_URL+"courses/edit_module",
 		data:{
 			id_module:current_id_mod,
 			name: modName
@@ -178,7 +163,7 @@ function editVideo(obj)
 	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/edit_video",
+		url:BASE_URL+"courses/edit_video",
 		data:{
 			id_video:current_id_video,
 			title:title,
@@ -200,7 +185,7 @@ function editQuest(obj)
 	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"ajax/edit_quest",
+		url:BASE_URL+"courses/edit_quest",
 		data:{
 			id_quest:current_id_quest,
 			question:question,
@@ -231,7 +216,7 @@ function addClass(obj)
 
 		$.ajax({
 			type:'POST',
-			url:BASE_URL+"ajax/add_class_video",
+			url:BASE_URL+"courses/add_class_video",
 			data:{
 				id_module:current_id_mod,
 				id_course:current_id_course,
@@ -265,7 +250,7 @@ function addClass(obj)
 		
 		$.ajax({
 			type:'POST',
-			url:BASE_URL+"ajax/add_class_quest",
+			url:BASE_URL+"courses/add_class_quest",
 			data:{
 				id_module:id_mod,
 				id_course:id_course,
@@ -293,191 +278,4 @@ function addClass(obj)
 			}
 		})
 	}
-}
-
-function show_addStudent(obj)
-{
-	$("#addStudent").modal("toggle")
-}
-
-function addStudent(obj)
-{
-	var name = $("#add_student_name").val()
-	
-	$.ajax({
-		type:"POST",
-		url:BASE_URL+"ajax/add_student",
-		data:{
-			name: name,
-			genre: $("input[name='genre']:checked").val(),
-			birthdate: $("#add_student_birthdate").val(),
-			email: $("#add_student_email").val(),
-			password:$("#add_student_pass").val() 
-		},
-		success: function(id) {
-			$("#addStudent").modal("toggle")
-			
-			var newStudent = `
-				<tr data-id_student="${id}">
-					<td class="student_name">${name}</td>
-					<td class="student_courses"></td>
-					<td class="student_totalCourses">0</td>
-					<td class="actions">
-						<button class="btn btn-warning" onclick="show_editStudent(this,${id})">Edit</button>
-    					<button class="btn btn-danger" onclick="deleteStudent(this,${id})">Delete</button>
-					</td>
-				</tr>
-			`
-			
-			// Clears fields of modal
-			$("#add_student_name").val("")
-			$("input[name='genre']").eq(0).attr("checked", "checked")
-			$("#add_student_birthdate").val("")
-			$("#add_student_email").val("")
-			$("#add_student_pass").val("") 
-			
-			$("tbody").append(newStudent)
-		}
-	})
-}
-
-function show_editStudent(obj, id_student)
-{
-	current_id_student = id_student
-	
-	// Gets student info
-	$.ajax({
-		type:'POST',
-		url:BASE_URL+"ajax/get_student",
-		data:{id_student: current_id_student},
-		dataType:'json',
-		success: function(student) {
-			$("#edit_student_name").val(student.name)
-			if (student.genre == 0)
-				$("#edit_student_male").attr("checked", 'checked')
-			else
-				$("#edit_student_female").attr("checked", 'checked')
-			$("#edit_student_birthdate").val(student.birthdate.split(" ")[0])
-			$("#edit_student_email").val(student.email)
-			$("#edit_student_pass").val("")
-		}
-	})
-	
-	// Gets course info
-	$.ajax({
-		type:'POST',
-		url:BASE_URL+"ajax/get_courses",
-		dataType:'json',
-		data: {id_student: id_student},
-		success: function(courses) {
-			var div_courses = $("#edit_courses")
-			div_courses.html("")
-
-			for (var course of courses) {
-				if (course.hasCourse > 0) {
-					var cbx_course = `
-						<input id="edit_c${course.id}" type="checkbox" name="${course.name}" value="${course.id}" checked />
-	            		<label for="edit_c${course.id}">${course.name}</label><br />
-					`
-				} else {
-					var cbx_course = `
-						<input id="edit_c${course.id}" type="checkbox" name="${course.name}" value="${course.id}" />
-	            		<label for="edit_c${course.id}">${course.name}</label><br />
-					`
-				}
-				
-				div_courses.append(cbx_course)
-			}
-		}
-	})
-	
-	$("#editStudent").modal("toggle")
-}
-
-function editStudent(obj)
-{
-	var name = $("#edit_student_name").val()
-	var pass = $("#edit_student_pass").val()
-	
-	if (pass == "") {
-		$.ajax({
-			type:'POST',
-			url:BASE_URL+"ajax/edit_student",
-			data: {
-				name: name,
-				genre: $(obj).closest(".modal-content").find("input[name='genre']:checked").val(),
-				birthdate: $("#edit_student_birthdate").val(),
-				email: $("#edit_student_email").val()
-			},
-			success: function() {
-				edit_student_success(obj)
-			}
-		})
-	} else {
-		$.ajax({
-			type:'POST',
-			url:BASE_URL+"ajax/edit_student",
-			data: {
-				name: name,
-				genre: $(".modal-body").closest("input[name='genre']:selected").val(),
-				birthdate: $("#edit_student_birthdate").val(),
-				email: $("#edit_student_email").val(),
-				password: $("#edit_student_pass").val()
-			},
-			success: function() {
-				edit_student_success(obj)
-			}
-		})
-	}
-	
-	$("#editStudent").modal("toggle")
-}
-
-function edit_student_success(obj) 
-{
-	var student_td = $(`tr[data-id_student=${current_id_student}]`)
-	var courses = $(obj).closest(".modal-content").find("input[type='checkbox']:checked")
-	var student_courses = $(`tr[data-id_student='${current_id_student}']`).find(".student_courses")
-	student_courses.html("")
-	
-	// Removes all relationships
-	$.ajax({
-		type:'POST',
-		url:BASE_URL+"ajax/clear_student_course",
-		data:{
-			id_student:current_id_student
-		}
-	})
-	
-	for (var course of courses) {
-		// Add course in student_course
-		$.ajax({
-			type:'POST',
-			url:BASE_URL+"ajax/add_student_course",
-			data:{
-				id_student:current_id_student,
-				id_course:course.value
-			}
-		})
-
-		if (student_courses.html() == "")
-			student_courses.html(student_courses.html() + course.name)
-		else
-			student_courses.html(student_courses.html() + ", " + course.name)
-	}
-	
-	student_td.find(".student_name").val(name)
-	student_td.find(".student_courses").val(courses)
-}
-
-function deleteStudent(obj,id)
-{	
-	$.ajax({
-		type:'POST',
-		url:BASE_URL+"ajax/delete_student",
-		data:{id_student:id},
-		success: function() {
-			$(obj).closest("tr").fadeOut("fast");
-		}
-	})
 }

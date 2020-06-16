@@ -41,7 +41,7 @@
 					</div>
 					<div class="form-group">
 						<label for="answer">Answer</label>
-						<select name="answer">
+						<select name="answer" class="form-control">
 							<option value="1">Question 1</option>
 							<option value="2">Question 2</option>
 							<option value="3">Question 3</option>

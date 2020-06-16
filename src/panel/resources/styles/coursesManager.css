@@ -1,12 +1,8 @@
+/* Courses manager */
 .course_logo img {
 	max-width:						100px;
 }
 
 .course_logo {
 	width:							100px;
-}
-
-.actions {
-	text-align:						center;
-	max-width:						80px!important;
 }
