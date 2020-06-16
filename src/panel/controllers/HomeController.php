@@ -2,19 +2,22 @@
 namespace controllers;
 
 use core\Controller;
-use models\Students;
 use models\Admins;
 use models\Courses;
 
 
 /**
- * Main controller. It will be responsible for site's main page behavior.
+ * Main controller. It will be responsible for admin's main page behavior.
  */
 class HomeController extends Controller 
 {
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Constructor
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    /**
+     * It will check if admin is logged; otherwise, redirects him to login 
+     * page.
+     */
     public function __construct()
     {
         if (!Admins::isLogged()) {
@@ -24,9 +27,9 @@ class HomeController extends Controller
     }
     
     
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     /**
      * @Override
      */
@@ -36,23 +39,23 @@ class HomeController extends Controller
 	    $courses = new Courses();
 	    
 	    $header = array(
-	        'title' => 'Learning platform - home',
-	        'styles' => array('style')
-	        //'description' => "A website made using MVC-in-PHP framework",
-	        //'keywords' => array('home', 'mvc-in-php'),
-	        //'robots' => 'index'
+	        'title' => 'Admin area - Learning platform',
+	        'styles' => array('coursesManager'),
+	        'robots' => 'noindex'
 	    );
 	    
-		$params = array(
+		$viewArgs = array(
 		    'adminName' => $admins->getName(),
 		    'courses' => $courses->getCourses(),
-		    'header' => $header,
-		    'scripts' => array('script')
+		    'header' => $header
 		);
 
-		$this->loadTemplate("coursesManager/courses_manager", $params);
+		$this->loadTemplate("coursesManager/courses_manager", $viewArgs);
 	}
 	
+	/**
+	 * Logout current admin and redirects him to login page. 
+	 */
 	public function logout()
 	{
 	    unset($_SESSION['a_login']);
