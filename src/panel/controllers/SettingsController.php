@@ -2,19 +2,25 @@
 namespace controllers;
 
 use core\Controller;
-use models\Students;
 use models\Admins;
-use models\Courses;
 
 
 /**
-
-*/
+ * Responsible for the behavior of the view {@link settings/settings.php}.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
+ */
 class SettingsController extends Controller
 {
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Constructor
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    /**
+     * It will check if admin is logged; otherwise, redirects him to login
+     * page.
+     */
     public function __construct()
     {
         if (!Admins::isLogged()){
@@ -24,9 +30,9 @@ class SettingsController extends Controller
     }
     
     
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     /**
      * @Override
      */
@@ -35,40 +41,33 @@ class SettingsController extends Controller
         $admins = new Admins($_SESSION['a_login']);
         
         $header = array(
-            'title' => 'Learning platform - Settings',
-            'styles' => array('style')
-            //'description' => "A website made using MVC-in-PHP framework",
-            //'keywords' => array('home', 'mvc-in-php'),
-            //'robots' => 'index'
+            'title' => 'Settings - Learning platform'
         );
         
-        $params = array(
+        $varArgs = array(
             'adminName' => $admins->getName(),
             'header' => $header
         );
         
-        $this->loadTemplate("settings/settings", $params);
+        $this->loadTemplate("settings/settings", $varArgs);
     }
     
-    
+    /**
+     * Edits information about current admin.
+     */
     public function edit()
     {
         $admins = new Admins($_SESSION['a_login']);
-        //$styles = array('style');
+        
         $header = array(
-            'title' => 'Learning platform - Settings - Edition',
-            'styles' => array('style')
-            //'description' => "A website made using MVC-in-PHP framework",
-            //'keywords' => array('home', 'mvc-in-php'),
-            //'robots' => 'index'
+            'title' => 'Settings - Learning platform'
         );
         
-        $params = array(
+        $varArgs = array(
             'adminName' => $admins->getName(),
-            'header' => $header,
-            'scripts' => array()
+            'header' => $header
         );
         
-        $this->loadTemplate("settings/settings_edit", $params);
+        $this->loadTemplate("settings/settings_edit", $varArgs);
     }
 }
