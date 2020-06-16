@@ -33,12 +33,18 @@ class AdminsController extends Controller
     public function index ()
     {
         $admins = new Admins($_SESSION['a_login']);
-        $styles = array('style');
+        $header = array(
+            'title' => 'Learning platform - Admins',
+            'styles' => array('style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
+        );
         
         $params = array(
-            'title' => 'Learning platform - Admins',
             'adminName' => $admins->getName(),
-            'styles' => $styles
+            'header' => $header,
+            'scripts' => array()
         );
         
         $this->loadTemplate("admins_manager", $params);

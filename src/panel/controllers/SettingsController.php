@@ -33,12 +33,18 @@ class SettingsController extends Controller
     public function index ()
     {
         $admins = new Admins($_SESSION['a_login']);
-        $styles = array('style');
+        
+        $header = array(
+            'title' => 'Learning platform - Settings',
+            'styles' => array('style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
+        );
         
         $params = array(
-            'title' => 'Learning platform - Settings',
             'adminName' => $admins->getName(),
-            'styles' => $styles
+            'header' => $header
         );
         
         $this->loadTemplate("settings", $params);
@@ -48,12 +54,19 @@ class SettingsController extends Controller
     public function edit()
     {
         $admins = new Admins($_SESSION['a_login']);
-        $styles = array('style');
+        //$styles = array('style');
+        $header = array(
+            'title' => 'Learning platform - Settings - Edition',
+            'styles' => array('style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
+        );
         
         $params = array(
-            'title' => 'Learning platform - Settings - Edition',
             'adminName' => $admins->getName(),
-            'styles' => $styles
+            'header' => $header,
+            'scripts' => array()
         );
         
         $this->loadTemplate("settings/settings_edit", $params);

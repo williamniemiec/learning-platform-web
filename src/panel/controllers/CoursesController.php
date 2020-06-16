@@ -43,14 +43,21 @@ class CoursesController extends Controller
     {
         $admins = new Admins($_SESSION['a_login']);
         $courses = new Courses();
-        $styles = array('coursesEdition', 'style');
+        
+        $header = array(
+            'title' => 'Learning platform - home',
+            'styles' => array('coursesEdition', 'style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
+        );
         
         $params = array(
-            'title' => 'Learning platform - home',
             'adminName' => $admins->getName(),
             'error' => false,
             'msg' => '',
-            'styles' => $styles
+            'header' => $header,
+            'scripts' => array()
         );
         
         if (!empty($_POST['name'])) {
@@ -63,8 +70,6 @@ class CoursesController extends Controller
             $params['msg'] = "The course could not be added!";
         }
         
-        
-        
         $this->loadTemplate("course_add", $params);
     }
     
@@ -75,16 +80,23 @@ class CoursesController extends Controller
         $courses = new Courses();
         $course = $courses->getCourse($id_course);
         $admins = new Admins($_SESSION['a_login']);
-        $styles = array('coursesEdition', 'style');
+
+        $header = array(
+            'title' => 'Learning platform - '.$course['name'],
+            'styles' => array('coursesEdition', 'style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
+        );
         
         $params = array(
-            'title' => 'Learning platform - '.$course['name'],
             'adminName' => $admins->getName(),
             'course' => $course,
             'modules' => $course['modules'],
             'error' => false,
             'msg' => '',
-            'styles' => $styles
+            'header' => $header,
+            'scripts' => array()
         );
         
         // Checks if the course was edited

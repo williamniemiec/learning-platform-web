@@ -21,7 +21,7 @@ abstract class Controller
 	 * @param string $viewName View's name
 	 * @param array $viewData [optional] View's parameters
 	 */
-	public function loadView ($viewName, $viewData = array())
+	public function loadView($viewName, $viewData = array())
 	{
 		extract($viewData);				// Transforms array keys into variables
 		require 'views/'.$viewName.'.php';
@@ -33,9 +33,14 @@ abstract class Controller
 	 * @param string $viewName View's name
 	 * @param array $viewData [optional] View's parameters
 	 */
-	public function loadTemplate ($viewName, $viewData = array())
+	public function loadTemplate($viewName, $viewData = array())
 	{
 		extract($viewData);				// Transforms array keys into variables
 		require 'views/template.php';
+	}
+	
+	public function loadViewInTemplate($viewName, $viewData = array())
+	{
+	    require 'views/'.$viewName.'.php';
 	}
 }

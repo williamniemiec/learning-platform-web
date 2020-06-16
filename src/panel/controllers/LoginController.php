@@ -19,10 +19,19 @@ class LoginController extends Controller
      */
     public function index ()
     {
-        $params = array(
+        $header = array(
             'title' => 'Learning platform - Login',
+            'styles' => array('login', 'style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
+        );
+        
+        $params = array(
             'error' => false,
-            'msg' => ''
+            'msg' => '',
+            'header' => $header,
+            'scripts' => array()
         );
         
         if (!empty($_POST['email'])) {

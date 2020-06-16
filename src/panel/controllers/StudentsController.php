@@ -32,15 +32,22 @@ class StudentsController extends Controller
     {
         $admins = new Admins($_SESSION['a_login']);
         $students = new Students();
-        $styles = array('studentsManager', 'style');
         
-        $params = array(
+        $header = array(
             'title' => 'Learning platform - Students manager',
-            'adminName' => $admins->getName(),
-            'students' => $students->getAll(),
-            'styles' => $styles
+            'styles' => array('studentsManager', 'style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
         );
         
-        $this->loadTemplate("students_manager", $params);
+        $params = array(
+            'adminName' => $admins->getName(),
+            'students' => $students->getAll(),
+            'header' => $header,
+            'scripts' => array()
+        );
+        
+        $this->loadTemplate("studentsManager/students_manager", $params);
     }
 }

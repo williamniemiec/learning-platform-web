@@ -34,13 +34,20 @@ class SupportController extends Controller
     {
         $admins = new Admins($_SESSION['a_login']);
         $courses = new Courses();
-        $styles = array('support', 'style');
+        
+        $header = array(
+            'title' => 'Learning platform - Support',
+            'styles' => array('support', 'style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
+        );
         
         $params = array(
-            'title' => 'Learning platform - Support',
             'adminName' => $admins->getName(),
             'courses' => $courses->getCourses(),
-            'styles' => $styles
+            'header' => $header,
+            'scripts' => array()
         );
         
         $this->loadTemplate("support", $params);
@@ -50,13 +57,20 @@ class SupportController extends Controller
     {
         $admins = new Admins($_SESSION['a_login']);
         $courses = new Courses();
-        $styles = array('support', 'style');
+        
+        $header = array(
+            'title' => 'Learning platform - Support',
+            'styles' => array('support', 'style')
+            //'description' => "A website made using MVC-in-PHP framework",
+            //'keywords' => array('home', 'mvc-in-php'),
+            //'robots' => 'index'
+        );
         
         $params = array(
-            'title' => 'Learning platform - Support',
             'adminName' => $admins->getName(),
             'courses' => $courses->getCourses(),
-            'styles' => $styles
+            'header' => $header,
+            'scripts' => array()
         );
         
         $this->loadTemplate("support_content", $params);

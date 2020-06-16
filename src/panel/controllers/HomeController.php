@@ -34,13 +34,20 @@ class HomeController extends Controller
 	{
 	    $admins = new Admins($_SESSION['a_login']);
 	    $courses = new Courses();
-	    $styles = array('style');
+	    
+	    $header = array(
+	        'title' => 'Learning platform - home',
+	        'styles' => array('style')
+	        //'description' => "A website made using MVC-in-PHP framework",
+	        //'keywords' => array('home', 'mvc-in-php'),
+	        //'robots' => 'index'
+	    );
 	    
 		$params = array(
-			'title' => 'Learning platform - home',
 		    'adminName' => $admins->getName(),
 		    'courses' => $courses->getCourses(),
-		    'styles' => $styles
+		    'header' => $header,
+		    'scripts' => array('script')
 		);
 
 		$this->loadTemplate("home", $params);

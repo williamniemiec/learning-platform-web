@@ -1,25 +1,11 @@
 <!doctype html>
 <html>
     <head>
-        <title><?php echo $title; ?></title>
-        <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/css/bootstrap.min.css' />
-        <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/css/style.css' />
+        <?php $this->loadView("template/head", $header); ?>
     </head>
 
     <body>
-    	<nav class="navbar navbar-expand-lg  bg-dark">
-    		<div class="container">
-        		<a class="navbar-brand" href="">Learning Platform</a>
-        		<button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
-        			<span class="navbar-toggler-icon"></span>
-        		</button>
-        		<div id="navbarMenu" class="navbar-collapse collapse">
-        			<div class="navbar-nav  ml-auto">
-        				<a href="<?php echo BASE_URL; ?>login" class="nav-item nav-link active">Login</a>
-        			</div>
-        		</div>
-    		</div>
-    	</nav>
+    	<?php $this->loadView("navbar/navbar_no_logged"); ?>
     	
     	<div class="container">
     		<?php if ($error): ?>
@@ -56,8 +42,6 @@
     	</div>
     	
         <!-- Scripts -->
-        <script src='<?php echo BASE_URL; ?>assets/js/jquery-3.4.1.min.js'></script>
-        <script src='<?php echo BASE_URL; ?>assets/js/bootstrap.bundle.min.js'></script>
-        <script src='<?php echo BASE_URL; ?>assets/js/script.js'></script>
+        <?php $this->loadView("template/scripts"); ?>
     </body>
 </html>

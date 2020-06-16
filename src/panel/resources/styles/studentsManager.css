@@ -1,0 +1,14 @@
+/* Students manager */
+.student_totalCourses {
+	width:							120px;
+	text-align:						center;
+}
+
+.student_courses, 
+.student_name {
+	text-align:						center;
+}
+
+.student_name {
+	min-width:						150px;
+}

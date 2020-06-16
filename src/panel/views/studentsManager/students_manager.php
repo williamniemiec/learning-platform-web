@@ -28,8 +28,8 @@
         	</table>
         	
         	<!-- Modals -->
-        	<?php $this->loadView("modal_addStudent"); ?>
-        	<?php $this->loadView("modal_editStudent"); ?>
+        	<?php $this->loadView("studentsManager/modal_addStudent"); ?>
+        	<?php $this->loadView("studentsManager/modal_editStudent"); ?>
     	</div>
 	</div>
 </div>

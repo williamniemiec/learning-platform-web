@@ -1,0 +1,28 @@
+/* Purple theme */
+:root {
+	--text-color:					white;
+	--text-light:					white;
+	--text-dark:					#172b4d;
+	--text-danger:					#b20000;
+	--color-accent:					#7d4689;
+	--color-accent-strong:			#711757;
+	--color-light:					rgba(221,221,221,0.9);
+	--color-dark:					#3e4041;
+	--color-danger:					#cc0000;
+	--color-primary:				#7f5a83;
+	--color-secondary:				#0d324d;
+	--color-hover-link:				#9881aa;
+	--color-hover-menu:				#eee;
+	--table-header-text:			white;
+	--table-header-background:		var(--color-accent);
+	--table-content-text:			var(--text-dark);
+	--table-content-background:		#eee;
+	--view-header-text:			white;
+	--view-header-background:		rgba(93,13,107,0.7);
+	--view-header-accent:			#ae86b5;
+	--view-panel-text:				var(--text-dark);
+	--view-widget:					#ddd;
+	--view-widget-accent:			#ccc;
+	--view-widget-info:				#888;
+	--privilege-admin:				var(--color-accent);
+}

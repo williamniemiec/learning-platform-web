@@ -1,3 +1,18 @@
+$(function() {
+	setInterval(function(){
+		var hMain = $("main").css("height")
+		
+		if ($("#mCSB_1_container").hasClass("mCS_no_scrollbar_y") && $("#mCSB_1").height() > hMain) {
+			var h = $("body").css("height")
+			var x = $("#mCSB_1").height() - 100
+			$("main").css("height", x+"px")
+		}
+	},200)
+})
+
+
+
+
 var current_id_mod = -1
 var current_id_course = -1
 var current_id_video = -1

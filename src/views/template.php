@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/css/bootstrap.min.css' />
         <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/css/jquery.mCustomScrollbar.min.css' />
-        <link rel='stylesheet' href='<?php echo BASE_URL; ?>../assets/css/scrollbar_light.css' />
+        <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/css/scrollbar_light.css' />
         <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/css/style.css' />
     </head>
 
