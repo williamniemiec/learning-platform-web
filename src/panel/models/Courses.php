@@ -5,22 +5,31 @@ use core\Model;
 
 
 /**
- *
+ * Responsible for managing courses.
  */
 class Courses extends Model
 {
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Constructor
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    /**
+     * It will check if admin is logged; otherwise, redirects him to login
+     * page.
+     */
     public function __construct()
     {
         parent::__construct();
     }
     
     
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    /**
+     * Gets informations about all registered courses.
+     * 
+     * @return      array Informations about all registered courses
+     */
     public function getCourses()
     {
         $response = array();
@@ -39,6 +48,11 @@ class Courses extends Model
         return $response;
     }
     
+    /**
+     * Deletes a course.
+     * 
+     * @param       int $id_course Course id to be deleted
+     */
     public function delete($id_course)
     {
         // Get all classes from this course
@@ -79,6 +93,12 @@ class Courses extends Model
         $sql->execute(array($id_course));
     }
     
+    /**
+     * Gets course banner.
+     * 
+     * @param       int $id_course Course id
+     * @return      string Course banner filename
+     */
     public function getImage($id_course)
     {
         if (empty($id_course) || $id_course <= 0) { return ""; }
@@ -95,6 +115,12 @@ class Courses extends Model
         return $response;
     }
     
+    /**
+     * Gets informations about all classes from a course.
+     * 
+     * @param       int $id_course Course id
+     * @return      array Informations about all classes from a course
+     */
     public function getAllClasses($id_course)
     {
         if (empty($id_course) || $id_course <= 0) { return array(); }
@@ -115,12 +141,12 @@ class Courses extends Model
         return $response;
     }
     
-    public function countCourses()
-    {
-        $sql = $this->db->query("SELECT COUNT(*) as count FROM student_course WHERE id_student = $this->id_user");
-        return $sql->fetch()['count'];
-    }
-    
+    /**
+     * Gets informations about a course.
+     * 
+     * @param       int $id_course Course id
+     * @return      array Informations about a course
+     */
     public function getCourse($id_course)
     {
         if (empty($id_course) || $id_course <= 0) { return array(); }
@@ -140,21 +166,15 @@ class Courses extends Model
         return $response;
     }
     
-    public function isEnrolled($id_course)
-    {
-        $sql = $this->db->prepare("
-            SELECT COUNT(*) as count 
-            FROM student_course 
-            WHERE 
-                id_course = ? AND 
-                id_student = $this->id_user
-        ");
-        $sql->execute(array($id_course));
-        
-        return $sql->fetch()['count'] > 0;
-    }
-    
-    public function add($name, $description = '', $logo = '')
+    /**
+     * Adds a new course.
+     * 
+     * @param       string $name Course name
+     * @param       string $description [Optional] Course description
+     * @param       string $logo [Optional] Course banner (obtained from POST) 
+     * @return      boolean If course was successfully added
+     */
+    public function add($name, $description = '', $logo = array())
     {
         if (empty($name)) { return false; }
         
@@ -172,7 +192,7 @@ class Courses extends Model
             $data_sql[] = "?";
         }
         
-        if (!empty($logo['tmp_name']) && $this->isPhoto($logo)) {
+        if (!empty($logo) && !empty($logo['tmp_name']) && $this->isPhoto($logo)) {
             $extension = explode("/", $logo['type'])[1];
             
             if ($extension == ".jpg" || $extension == ".jpeg" || $extension == ".png") {
@@ -194,7 +214,15 @@ class Courses extends Model
         return $sql->rowCount() > 0;
     }
     
-    public function edit($id_course, $name, $description = '', $logo = '')
+    /**
+     * Edits a course.
+     *
+     * @param       string $name New course name
+     * @param       string $description [Optional] New course description
+     * @param       string $logo [Optional] New course banner (obtained from POST)
+     * @return      boolean If course was successfully edited
+     */
+    public function edit($id_course, $name, $description = '', $logo = array())
     {
         $data_values = array();
         $data_sql = array();
@@ -207,7 +235,7 @@ class Courses extends Model
             $data_sql[] = "description = ?";
         }
         
-        if (!empty($logo['tmp_name']) && $this->isPhoto($logo)) {
+        if (!empty($logo) && !empty($logo['tmp_name']) && $this->isPhoto($logo)) {
             $extension = explode("/", $logo['type'])[1];
             
             if ($extension == "jpg" || $extension == "jpeg" || $extension == "png") {
@@ -236,6 +264,13 @@ class Courses extends Model
         return $sql->rowCount() > 0;
     }
     
+    /**
+     * Gets informations about all courses.
+     * 
+     * @param       int $id_student [Optional] Gets informations about all
+     * courses that a student has
+     * @return      array Informations about all courses
+     */
     public function getAll($id_student = -1)
     {
         if ($id_student == -1)
