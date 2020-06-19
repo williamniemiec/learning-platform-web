@@ -7,29 +7,35 @@ use models\Students;
 
 /**
  * It will be responsible for site's page not found behavior.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class NotFoundController extends Controller 
 {
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
-    /**
-     * @Override
-     */
+    //-------------------------------------------------------------------------
+	/**
+	 * @Override
+	 */
 	public function index()
 	{
-        $params = array(
-            'title' => "Learning platform - Page not found",
-        );
+	    $header = array(
+	        'title' => 'Learning platform - Page not found'
+	    );
 	    
-        if (empty($_SESSION['s_login'])) {
-		  $this->loadTemplate('404/404_noLogged', $params);
-            
-        }        
-           
-	    $students = new Students($_SESSION['s_login']);
-		$params['studentName'] = $students->getName();
-		
-		$this->loadTemplate('404/404_logged', $params);
+	    $viewArgs = array(
+	        'header' => $header
+	    );
+	    
+	    if (empty($_SESSION['s_login']))
+	        $this->loadTemplate('404/404_no_logged', $viewArgs);
+	        
+        $students = new Students($_SESSION['s_login']);
+        $viewArgs['studentName'] = $students->getName();
+        
+        $this->loadTemplate('404/404_logged', $viewArgs);
 	}
 }

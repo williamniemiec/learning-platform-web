@@ -3,40 +3,55 @@ namespace controllers;
 
 use core\Controller;
 use models\Students;
-use models\Admins;
 use models\Courses;
-use models\Modules;
 use models\Classes;
 use models\Doubts;
 use models\Historic;
 
 
 /**
- 
+ * Responsible for the behavior of the view {@link course.php}.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class CoursesController extends Controller
 {
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Constructor
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    /**
+     * It will check if student is logged; otherwise, redirects him to login
+     * page.
+     */
     public function __construct()
     {
-        if (!Students::isLogged() && !Admins::isLogged()){
+        if (!Students::isLogged()){
             header("Location: ".BASE_URL."login");
             exit;
         }
     }
     
     
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     /**
      * @Override
      */
     public function index ()
-    { header("Location: ".BASE_URL); }
+    { 
+        header("Location: ".BASE_URL); 
+    }
     
+    /**
+     * Opens a course. The class that will be displayed it will be the last
+     * watched by the student. If he never watched one, the first one will be
+     * open.
+     * 
+     * @param       int $id_course Course id
+     */
     public function open($id_course)
     {
         $students = new Students($_SESSION['s_login']);
@@ -113,6 +128,11 @@ class CoursesController extends Controller
         $this->loadTemplate("course", $params);
     }
     
+    /**
+     * Opens a class within a course.
+     *
+     * @param       int $id_class Class id
+     */
     public function class($id_class)
     {
         if (!empty($_POST['question'])) {

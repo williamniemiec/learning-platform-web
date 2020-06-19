@@ -5,19 +5,30 @@ use core\Model;
 
 
 /**
- *
+ * Responsible for managing admins.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class Admins extends Model
 {
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Attributes
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     private $id_user;
     
     
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Constructor
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    /**
+     * Creates admins manager.
+     *
+     * @param       int $id_user [Optional] Student id
+     *
+     * @apiNote     It will connect to the database when it is instantiated
+     */
     public function __construct($id_user = -1)
     {
         parent::__construct();
@@ -25,30 +36,48 @@ class Admins extends Model
     }
     
     
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    /**
+     * Checks whether current user is logged.
+     *
+     * @return      boolean Whether current user is logged
+     */
     public static function isLogged()
     {
-        if (empty($_SESSION['s_login'])) {
-            return false;
-        }
-        
-        return true;
+        return !empty($_SESSION['s_login']);
     }
     
+    /**
+     * Checks whether the supplied credentials are valid.
+     *
+     * @param       string $email Student email
+     * @param       string $pass Student password
+     *
+     * @return      boolean If credentials are correct
+     */
     public function login($email, $pass)
     {
-        if (empty($email) || empty($pass)) { return false; }
+        if (empty($email) || empty($pass))
+            return false;
         
-        $sql = $this->db->prepare("SELECT id FROM admins WHERE email = ? AND password = ?");
+        $response = false;
+        
+        
+        $sql = $this->db->prepare("
+            SELECT id 
+            FROM admins 
+            WHERE email = ? AND password = ?
+        ");
         $sql->execute(array($email, md5($pass)));
         
-        if ($sql->rowCount() == 0) { return false; }
+        if ($sql->rowCount() > 0) {
+            $_SESSION['a_login'] = $sql->fetch()['id'];
+            $this->id_user = $sql->fetch()['id'];
+            $response = true;
+        }
         
-        $_SESSION['a_login'] = $sql->fetch()['id'];
-        $this->id_user = $sql->fetch()['id'];
-        
-        return true;
+        return $response;
     }
 }

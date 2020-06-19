@@ -46,11 +46,7 @@ class Admins extends Model
      */
     public static function isLogged()
     {
-        if (empty($_SESSION['a_login'])) {
-            return false;
-        }
-        
-        return true;
+        return !empty($_SESSION['a_login']);
     }
     
     /**
@@ -63,17 +59,22 @@ class Admins extends Model
      */
     public function login($email, $pass)
     {
-        if (empty($email) || empty($pass))  { return false; }
+        if (empty($email) || empty($pass))
+            return false;
+        
+        $response = false;
+        
         
         $sql = $this->db->prepare("SELECT id FROM admins WHERE email = ? AND password = ?");
         $sql->execute(array($email, md5($pass)));
         
-        if ($sql->rowCount() == 0) { return false; }
+        if ($sql->rowCount() >= 0) {
+            $_SESSION['a_login'] = $sql->fetch()['id'];
+            $this->id_user = $sql->fetch()['id'];
+            $response = true;
+        }
         
-        $_SESSION['a_login'] = $sql->fetch()['id'];
-        $this->id_user = $sql->fetch()['id'];
-        
-        return true;
+        return $response;
     }
     
     /**

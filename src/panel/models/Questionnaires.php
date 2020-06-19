@@ -57,7 +57,6 @@ class Questionnaires extends Model
         return $response;
     }
     
-    
     /**
      * Gets the answer from a quest.
      * 

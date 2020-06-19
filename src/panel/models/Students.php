@@ -80,7 +80,7 @@ class Students extends Model
      * Adds a new student.
      * 
      * @param       Student $student Informations about the student
-     * @param       boolean $autologin If true, after registration is completed
+     * @param       boolean $autologin [Optional] If true, after registration is completed
      * the student will automatically login to the system
      * 
      * @return      int Student id or -1 if the student has not been added
@@ -165,7 +165,7 @@ class Students extends Model
     }
     
     /**
-     * Gets all registere students.
+     * Gets all registered students.
      * 
      * @return      \models\Student[] Information all registered students
      */

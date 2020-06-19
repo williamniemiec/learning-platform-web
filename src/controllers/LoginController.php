@@ -8,6 +8,11 @@ use models\Admins;
 
 
 /**
+ * Responsible for the behavior of the view {@link login.php}.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class LoginController extends Controller
 {      
@@ -42,6 +47,9 @@ class LoginController extends Controller
         $this->loadView("login", $params);
     }
     
+    /**
+     * Registers a new student.
+     */
     public function register()
     {
         $params = array(
@@ -80,6 +88,18 @@ class LoginController extends Controller
         $this->loadView("register", $params);
     }
     
+    /**
+     * Checks if all required fields are filled. The required fields are:
+     * <ul>
+     *  <li>Name</li>
+     *  <li>Genre</li>
+     *  <li>Birthdate</li>
+     *  <li>Email</li>
+     *  <li>Password</li>
+     * </ul>
+     * 
+     * @return      boolean If all required fields are filled
+     */
     private function isAllFieldsFilled()
     {
         return (

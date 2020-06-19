@@ -4,13 +4,15 @@
         <?php $this->loadView("template/head", $header); ?>
     </head>
 
-    <body class="scrollbar_light">
+    <body>
     	<!-- Menu -->
-    	<?php $this->loadView("navbar/navbar_logged", array('adminName' => $adminName)); ?>
+    	<?php $this->loadView("navbar/navbar_no_logged"); ?>
     	
     	<!-- Content -->
 		<main>
-        	<?php $this->loadView($viewName, $viewData); ?>
+        	<div class="container">
+    			<h1>Error! Page not found</h1>
+    		</div>
         </main>
         
         <footer>&copy; Learning platform - All rights reserved</footer>

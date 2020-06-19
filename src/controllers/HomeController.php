@@ -12,21 +12,25 @@ use models\Courses;
  */
 class HomeController extends Controller 
 {
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Constructor
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    /**
+     * It will check if student is logged; otherwise, redirects him to login
+     * page.
+     */
     public function __construct()
     {
-        if (!Students::isLogged() && !Admins::isLogged()){
+        if (!Students::isLogged()){
             header("Location: ".BASE_URL."login");
             exit;
         }
     }
     
     
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     /**
      * @Override
      */
@@ -35,22 +39,37 @@ class HomeController extends Controller
 	    $students = new Students($_SESSION['s_login']);
 	    $courses = new Courses($_SESSION['s_login']);
 	    
+	    $header = array(
+	        'title' => 'Learning platform - home',
+	        'styles' => array('courseManager'),
+	        'description' => "Start learning today",
+	        'keywords' => array('learning platform', 'home'),
+	        'robots' => 'noindex'
+	    );
+	    
 		$params = array(
 			'title' => 'Learning platform - home',
 		    'studentName' => $students->getName(),
 		    'courses' => $courses->getMyCourses(),
-		    'totalCourses' => $courses->countCourses()
+		    'totalCourses' => $courses->countCourses(),
+		    'header' => $header
 		);
 
 		$this->loadTemplate("home", $params);
 	}
 	
+	/**
+	 * Logout current student and redirects him to login page.
+	 */
 	public function logout()
 	{
 	    unset($_SESSION['s_login']);
 	    header("Location: ".BASE_URL."login");
 	}
 	
+	/**
+	 * Opens student settings.
+	 */
 	public function settings()
 	{
 	    $students = new Students($_SESSION['s_login']);

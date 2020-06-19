@@ -1,0 +1,14 @@
+# Ignores MVC files
+User-agent: *
+Disallow: /assets
+Disallow: /controllers
+Disallow: /models
+Disallow: /views
+Disallow: /core
+Disallow: /vendor
+Disallow: /config.php
+Disallow: /environment.php
+
+# Ignores admin area
+User-agent: *
+Disallow: /panel

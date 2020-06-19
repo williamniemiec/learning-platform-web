@@ -31,7 +31,7 @@ class NotFoundController extends Controller
         );
 	    
         if (empty($_SESSION['a_login']))
-            $this->loadTemplate('404/404_noLogged', $viewArgs);
+            $this->loadTemplate('404/404_no_logged', $viewArgs);
            
 	    $admins = new Admins($_SESSION['a_login']);
 	    
