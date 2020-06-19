@@ -6,6 +6,10 @@ use core\Model;
 
 /**
  * Responsible for managing courses.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class Courses extends Model
 {
@@ -13,8 +17,9 @@ class Courses extends Model
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * It will check if admin is logged; otherwise, redirects him to login
-     * page.
+     * Creates courses manager.
+     *
+     * @apiNote     It will connect to the database when it is instantiated
      */
     public function __construct()
     {
@@ -97,6 +102,7 @@ class Courses extends Model
      * Gets course banner.
      * 
      * @param       int $id_course Course id
+     * 
      * @return      string Course banner filename
      */
     public function getImage($id_course)
@@ -119,6 +125,7 @@ class Courses extends Model
      * Gets informations about all classes from a course.
      * 
      * @param       int $id_course Course id
+     * 
      * @return      array Informations about all classes from a course
      */
     public function getAllClasses($id_course)
@@ -145,6 +152,7 @@ class Courses extends Model
      * Gets informations about a course.
      * 
      * @param       int $id_course Course id
+     * 
      * @return      array Informations about a course
      */
     public function getCourse($id_course)
@@ -172,6 +180,7 @@ class Courses extends Model
      * @param       string $name Course name
      * @param       string $description [Optional] Course description
      * @param       string $logo [Optional] Course banner (obtained from POST) 
+     * 
      * @return      boolean If course was successfully added
      */
     public function add($name, $description = '', $logo = array())
@@ -220,6 +229,7 @@ class Courses extends Model
      * @param       string $name New course name
      * @param       string $description [Optional] New course description
      * @param       string $logo [Optional] New course banner (obtained from POST)
+     * 
      * @return      boolean If course was successfully edited
      */
     public function edit($id_course, $name, $description = '', $logo = array())
@@ -269,6 +279,7 @@ class Courses extends Model
      * 
      * @param       int $id_student [Optional] Gets informations about all
      * courses that a student has
+     * 
      * @return      array Informations about all courses
      */
     public function getAll($id_student = -1)
@@ -294,6 +305,7 @@ class Courses extends Model
      * Checks if a submitted photo is really a photo.
      *
      * @param array $photo Submitted photo
+     * 
      * @return boolean If the photo is really a photo
      */
     private function isPhoto($photo)

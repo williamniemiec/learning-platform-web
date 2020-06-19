@@ -278,7 +278,7 @@ class CoursesController extends Controller
     /**
      * Gets quest with the given id.
      * 
-     * * @return      string JSON with quest class information
+     * @return      string JSON with quest class information
      */
     public function get_quest()
     {

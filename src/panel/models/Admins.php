@@ -6,6 +6,10 @@ use core\Model;
 
 /**
  * Responsible for managing admins.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class Admins extends Model
 {
@@ -22,6 +26,7 @@ class Admins extends Model
      * Creates admins manager.
      * 
      * @param       int $id_user [Optional] Admin id
+     * 
      * @apiNote     It will connect to the database when it is instantiated
      */
     public function __construct($id_user = -1)
@@ -53,6 +58,7 @@ class Admins extends Model
      * 
      * @param       string $email Admin email
      * @param       string $pass Admin password
+     * 
      * @return      boolean If credentials are correct
      */
     public function login($email, $pass)

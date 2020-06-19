@@ -6,6 +6,10 @@ use core\Model;
 
 /**
  * Responsible for managing modules from a course.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class Modules extends Model
 {

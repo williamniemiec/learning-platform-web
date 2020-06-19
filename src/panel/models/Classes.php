@@ -6,6 +6,10 @@ use core\Model;
 
 /**
  * Responsible for managing classes.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
  */
 class Classes extends Model
 {
@@ -30,6 +34,7 @@ class Classes extends Model
      * Gets total of classes from a course.
      * 
      * @param       int $id_course Course id
+     * 
      * @return      int Total course classes
      */
     public function countClasses($id_course)
@@ -45,6 +50,7 @@ class Classes extends Model
      * Gets informations about all classes from a module.
      * 
      * @param       int $id_module Module id
+     * 
      * @return      array Informations about all classes from the module
      */
     public function getClassesFromModule($id_module)
@@ -84,6 +90,7 @@ class Classes extends Model
      * Gets course id from a class.
      * 
      * @param       int $id_class
+     * 
      * @return      number Course id of -1 if class id is invalid
      */
     public function getCourseId($id_class)
@@ -101,6 +108,7 @@ class Classes extends Model
      * course.
      * 
      * @param       int $id_course Course id
+     * 
      * @return      array Informations about the first class from the first
      * module from a course
      */
@@ -139,6 +147,7 @@ class Classes extends Model
      * Checks whether there is a class with the given id.
      * 
      * @param       int $id_class Class id
+     * 
      * @return      boolean If there is a class with the given id
      */
     public function exist($id_class)
@@ -155,6 +164,7 @@ class Classes extends Model
      * Gets all classes from a course.
      * 
      * @param       int $id_course Course id
+     * 
      * @return      array Informations about all classes from a course
      */
     public function getClassesInCourse($id_course)
@@ -212,6 +222,7 @@ class Classes extends Model
      * @param       int $id_course Course id
      * @param       int $type Class type ('video' or 'quest')
      * @param       int $order [Optional] Class order within a course module
+     * 
      * @return      int Id of added class or -1 if any argument is invalid
      */
     public function add($id_module, $id_course, $type, $order=0)
@@ -244,6 +255,7 @@ class Classes extends Model
      * 
      * @param       int $id_module Module id
      * @param       int $id_course Course id
+     * 
      * @return      int Class id with higher order or zero if there is no class
      * registered.
      */

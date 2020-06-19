@@ -2,6 +2,13 @@
 namespace models;
 
 
+/**
+ * Stores information about a student.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0
+ * @since		1.0
+ */
 class Student
 {
     //-----------------------------------------------------------------------
