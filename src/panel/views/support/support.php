@@ -1,29 +1,27 @@
 <div class="container">
 	<div class="view_panel">
-		<h1 class="view_header">
-			Support
-		</h1>
+		<h1 class="view_header">Support</h1>
 		<div class="view_content">
 			<div class="support_actions">
-			<div class="form-group">
-					<label for="support_search">Search</label>
-					<input name="support_search" type="text" class="form-control" placeholder="Search" />
-				</div>
-				<div class="form-group">
-					<label for="support_date">Date</label>
-    				<input name="support_date" type="datetime-local" class="form-control" />
-				</div>
-				<div class="form-group">
-    				<label for="support_status">Status</label>
-    				<select id="support_status" class="form-control">
-    					<option value="1" selected>Open</option>
-    					<option value="0">Closed</option>
-    				</select>
-				</div>
+    			<div class="form-group">
+    					<label for="support_search">Search</label>
+    					<input name="support_search" type="text" class="form-control" placeholder="Search" />
+    				</div>
+    				<div class="form-group">
+    					<label for="support_date">Date</label>
+        				<input name="support_date" type="datetime-local" class="form-control" />
+    				</div>
+    				<div class="form-group">
+        				<label for="support_status">Status</label>
+        				<select id="support_status" class="form-control">
+        					<option value="1" selected>Open</option>
+        					<option value="0">Closed</option>
+        				</select>
+    				</div>
 			</div>
             <table class="table table-hover table-stripped">
             	<thead>
-            		<tr">
+            		<tr>
             			<th>Title</th>
             			<th>Category</th>
             			<th class="support_date">Date of publication</th>

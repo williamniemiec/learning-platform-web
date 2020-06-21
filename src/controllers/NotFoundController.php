@@ -31,11 +31,11 @@ class NotFoundController extends Controller
 	    );
 	    
 	    if (empty($_SESSION['s_login']))
-	        $this->loadTemplate('404/404_no_logged', $viewArgs);
+	        $this->loadTemplate('errors/404', $viewArgs, false);
 	        
         $students = new Students($_SESSION['s_login']);
-        $viewArgs['studentName'] = $students->getName();
+        $viewArgs['username'] = $students->getName();
         
-        $this->loadTemplate('404/404_logged', $viewArgs);
+        $this->loadTemplate('errors/404', $viewArgs, true);
 	}
 }

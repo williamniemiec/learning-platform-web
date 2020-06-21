@@ -4,7 +4,6 @@ namespace controllers;
 use core\Controller;
 use models\Students;
 use models\Student;
-use models\Admins;
 
 
 /**
@@ -16,35 +15,42 @@ use models\Admins;
  */
 class LoginController extends Controller
 {      
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     /**
      * @Override
      */
     public function index ()
     {
-        $params = array(
-            'title' => 'Learning platform - Login',
+        $header = array(
+            'title' => 'Login - Learning platform',
+            'styles' => array('login'),
+            'description' => "Start learning today",
+            'keywords' => array('learning platform', 'login'),
+            'robots' => 'index'
+        );
+        
+        $viewArgs = array(
+            'header' => $header,
             'error' => false,
             'msg' => ''
         );
         
+        // Checks if login form has been sent
         if (!empty($_POST['email'])) {
             $students = new Students();
-            $admins = new Admins();
             
-            if ($students->login($_POST['email'], $_POST['password']) || 
-                $admins->login($_POST['email'], $_POST['password'])) {
+            if ($students->login($_POST['email'], $_POST['password'])) {
                 header("Location: ".BASE_URL);
                 exit;
             }
             
-            $params['error'] = true;
-            $params['msg'] = "Email and / or password incorrect";
+            $viewArgs['error'] = true;
+            $viewArgs['msg'] = "Email and / or password incorrect";
         }
         
-        $this->loadView("login", $params);
+        $this->loadTemplate("login", $viewArgs, false);
     }
     
     /**
@@ -52,12 +58,20 @@ class LoginController extends Controller
      */
     public function register()
     {
-        $params = array(
-            'title' => 'Learning platform - Register',
+        $header = array(
+            'title' => 'Register - Learning platform',
+            'description' => "Start learning today",
+            'keywords' => array('learning platform', 'register'),
+            'robots' => 'index'
+        );
+        
+        $viewArgs = array(
+            'header' => $header,
             'error' => false,
             'msg' => ''
         );
         
+        // Checks if registration form has been sent
         if (!empty($_POST['email'])) {
             // Checks if all fields are filled
             if ($this->isAllFieldsFilled()) {
@@ -76,16 +90,16 @@ class LoginController extends Controller
                     exit;
                 }
                 
-                $params['error'] = true;
-                $params['msg'] = "User already registered!";
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = "User already registered!";
             } else {
-                $params['error'] = true;
-                $params['msg'] = "Fill in all fields!";
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = "Fill in all fields!";
             }
             
         }
         
-        $this->loadView("register", $params);
+        $this->loadTemplate("register", $viewArgs, false);
     }
     
     /**

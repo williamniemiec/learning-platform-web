@@ -59,7 +59,7 @@ class SupportController extends Controller
         
         $params = array(
             'title' => 'Learning platform - Support',
-            'studentName' => $student->getName()
+            'username' => $student->getName()
         );
         
         $this->loadTemplate("support_content", $params);
@@ -75,7 +75,7 @@ class SupportController extends Controller
         
         $params = array(
             'title' => 'Learning platform - Support - New',
-            'studentName' => $student->getName()
+            'username' => $student->getName()
         );
         
         $this->loadTemplate("support_new", $params);

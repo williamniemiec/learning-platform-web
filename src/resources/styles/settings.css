@@ -1,0 +1,33 @@
+/* Settings */
+#changePassword_error {
+	display:						none;
+}
+
+.user_photo img {
+	width:							200px;
+	height:							200px;
+	margin:							auto;
+}
+
+.user_photo {
+	width:							200px;
+	height:							200px;
+	margin:							auto;
+}
+
+#btn_photo_update {
+	position:						absolute;
+	margin-top:						185px;
+	margin-left:					-15px;
+	border:							0;
+	color:							var(--text-color);
+	background-color:				var(--color-accent-strong);
+	display:						inline-block;
+	font-size:						115%;
+	padding:						.30em .4em;
+	line-height:					1;
+	text-align:						center;
+	white-space:					nowrap;
+	vertical-align:					baseline;
+	border-radius:					15px;
+}

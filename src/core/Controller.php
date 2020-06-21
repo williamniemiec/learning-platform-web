@@ -33,9 +33,13 @@ abstract class Controller
 	 * @param string $viewName View's name
 	 * @param array $viewData [optional] View's parameters
 	 */
-	public function loadTemplate ($viewName, $viewData = array())
+	public function loadTemplate($viewName, $viewData = array(), $logged = true)
 	{
-		extract($viewData);				// Transforms array keys into variables
-		require 'views/template.php';
+	    extract($viewData);				// Transforms array keys into variables
+	    
+	    if ($logged)
+	        require 'views/template/html_logged.php';
+	        else
+	            require 'views/template/html_no_logged.php';
 	}
 }

@@ -6,6 +6,8 @@
 		</button>
 		<div id="navbarMenu" class="navbar-collapse collapse">
 			<div class="navbar-nav ml-auto">
+				
+				
 				<div class="notifications">
 					<div class="notifications_new"></div>
 					<i style="font-size:24px" class="fa notification_icon">&#xf0f3;</i>
@@ -41,9 +43,12 @@
 						</div>
 					</div>
 				</div>
+				
+				
+				
 				<div class="dropdown">
 					<a class="btn btn-link dropdown-toggle" data-toggle="dropdown">
-						<?php echo $name; ?>
+						<?php echo $username; ?>
 						<span class="caret"></span>
 					</a>
 					<ul class="dropdown-menu dropdown-menu-right">

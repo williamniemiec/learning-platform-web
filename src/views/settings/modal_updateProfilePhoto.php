@@ -12,7 +12,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary btn-block" onclick="update_profilePhoto(this)">Save</button>
+				<button class="btn_theme btn_full" onclick="update_profilePhoto(this)">Save</button>
 			</div>
 		</div>
 	</div>

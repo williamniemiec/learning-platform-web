@@ -1,6 +1,7 @@
 <div class="course_banner_area">
 	<img class="img imr-responsive course_banner" src="<?php echo BASE_URL."assets/images/logos/".$logo; ?>" />
 </div>
+
 <?php foreach ($modules as $module): ?>
 	<div class="module">
 		<h4><?php echo $module['name']; ?></h4>

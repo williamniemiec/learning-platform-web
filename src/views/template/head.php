@@ -21,6 +21,7 @@
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>resources/styles/scrollbar_light.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL."resources/colors/".THEME.".css"; ?>' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>resources/styles/btnTheme.css' />
+<link rel='stylesheet' href='<?php echo BASE_URL; ?>resources/styles/notifications.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>resources/styles/global.css' />
 
 <?php if (!empty($styles)) foreach ($styles as $style): ?>

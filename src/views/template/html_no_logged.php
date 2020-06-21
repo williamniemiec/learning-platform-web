@@ -6,14 +6,17 @@
 
     <body class="scrollbar_light">
     	<!-- Menu -->
-    	<?php $this->loadView("navbar/navbar_logged", array('username' => $adminName)); ?>
+    	<?php $this->loadView("navbar/navbar_no_logged"); ?>
     	
     	<!-- Content -->
 		<main>
         	<?php $this->loadView($viewName, $viewData); ?>
         </main>
         
-        <footer>&copy; Learning platform - All rights reserved</footer>
+        <!-- Footer -->
+        <footer>
+        	<?php $this->loadView("template/footer"); ?>
+    	</footer>
         
         <!-- Scripts -->
         <?php if (!empty($scripts)): ?>

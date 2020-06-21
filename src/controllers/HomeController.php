@@ -39,23 +39,23 @@ class HomeController extends Controller
 	    $students = new Students($_SESSION['s_login']);
 	    $courses = new Courses($_SESSION['s_login']);
 	    
+	    
 	    $header = array(
-	        'title' => 'Learning platform - home',
-	        'styles' => array('courseManager'),
+	        'title' => 'Home - Learning platform',
+	        'styles' => array('home'),
 	        'description' => "Start learning today",
 	        'keywords' => array('learning platform', 'home'),
-	        'robots' => 'noindex'
+	        'robots' => 'index'
 	    );
 	    
-		$params = array(
-			'title' => 'Learning platform - home',
+		$viewArgs = array(
 		    'studentName' => $students->getName(),
 		    'courses' => $courses->getMyCourses(),
 		    'totalCourses' => $courses->countCourses(),
 		    'header' => $header
 		);
 
-		$this->loadTemplate("home", $params);
+		$this->loadTemplate("home", $viewArgs, true);
 	}
 	
 	/**
@@ -76,16 +76,25 @@ class HomeController extends Controller
 	    $courses = new Courses($_SESSION['s_login']);
 	    $student = $students->get($_SESSION['s_login']);
 	    
-	    $params = array(
-	        'title' => 'Learning platform - home',
-	        'studentName' => $student->getName(),
+	    
+	    $header = array(
+	        'title' => 'Home - Learning platform',
+	        'styles' => array('settings'),
+	        'description' => "Start learning today",
+	        'keywords' => array('learning platform', 'home'),
+	        'robots' => 'index'
+	    );
+	    
+	    $viewArgs = array(
+	        'username' => $student->getName(),
 	        'genre' => $student->getGenre(),
 	        'birthdate' => explode(" ", $student->getBirthdate())[0],
 	        'email' => $student->getEmail(),
 	        'courses' => $courses->getMyCourses(),
-	        'totalCourses' => $courses->countCourses()
+	        'totalCourses' => $courses->countCourses(),
+	        'header' => $header
 	    );
 	    
-	    $this->loadTemplate("settings", $params);
+	    $this->loadTemplate("settings", $viewArgs, true);
 	}
 }

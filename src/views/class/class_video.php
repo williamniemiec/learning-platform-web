@@ -1,10 +1,11 @@
 <div class="class_content">
+	<!-- Video frame -->
+	<iframe id="class_video" frameborder="0" src="http://www.youtube.com/embed/<?php echo $video['url']; ?>"></iframe>
 	
+	<!-- Video description -->
+	<div class="content_desc"><?php echo $video['description'] ?></div>
 	
-	<iframe id="class_video" frameborder="0" src="http://www.youtube.com/embed/<?php echo $content_embed['video']['url']; ?>"></iframe>
-	
-	<div class="content_desc"><?php echo $content_embed['video']['description'] ?></div>
-	
+	<!-- Comments -->
 	<div class="content_comments">
     	<h3>Comments</h3>
 		<form method="POST">
@@ -18,7 +19,7 @@
 		</form>
 		<hr />
 		<div class="comments">
-			<?php foreach ($content_embed['doubts'] as $doubt): ?>
+			<?php foreach ($doubts as $doubt): ?>
     			<div class="comment">
     				<img class="img img-thumbnail" src="https://media.gettyimages.com/photos/colorful-powder-explosion-in-all-directions-in-a-nice-composition-picture-id890147976?s=612x612" />
     				<div class="comment_content">
@@ -57,7 +58,6 @@
         						<button class="btn btn-danger" onclick="deleteComment(this,<?php echo $doubt['id']; ?>)">&times;</button>
         					</div>
     					<?php endif; ?>
-    					
     				</div>
     			</div>
 			<?php endforeach; ?>

@@ -43,9 +43,18 @@ class SettingsController extends Controller
         $courses = new Courses($_SESSION['s_login']);
         $student = $students->get($_SESSION['s_login']);
         
-        $params = array(
-            'title' => 'Learning platform - home',
-            'studentName' => $student->getName(),
+        
+        $header = array(
+            'title' => 'Settings - Learning platform',
+            'styles' => array('settings'),
+            'description' => "Start learning today",
+            'robots' => 'noindex'
+        );
+        
+        $viewArgs = array(
+            'header' => $header,
+            'scripts' => array("settings"),
+            'username' => $student->getName(),
             'profilePhoto' => $student->getPhoto(),
             'genre' => $student->getGenre(),
             'birthdate' => explode(" ", $student->getBirthdate())[0],
@@ -54,7 +63,7 @@ class SettingsController extends Controller
             'totalCourses' => $courses->countCourses()
         );
         
-        $this->loadTemplate("settings", $params);
+        $this->loadTemplate("settings/settings", $viewArgs);
     }
     
     /**
@@ -66,15 +75,24 @@ class SettingsController extends Controller
         $courses = new Courses($_SESSION['s_login']);
         $student = $students->get($_SESSION['s_login']);
         
+        
+        $header = array(
+            'title' => 'Settings - Edition - Learning platform',
+            'styles' => array('settings'),
+            'description' => "Start learning today",
+            'robots' => 'noindex'
+        );
+        
+        // Checks if edition form has been sent
         if (!empty($_POST['name'])) {
             $students->update($_POST['name'], $_POST['genre'], $_POST['birthdate']);
             header("Location: ".BASE_URL."settings");
             exit;
         }
         
-        $params = array(
-            'title' => 'Learning platform - Edit',
-            'studentName' => $student->getName(),
+        $viewArgs = array(
+            'header' => $header,
+            'username' => $student->getName(),
             'genre' => $student->getGenre(),
             'birthdate' => explode(" ", $student->getBirthdate())[0],
             'email' => $student->getEmail(),
@@ -82,6 +100,6 @@ class SettingsController extends Controller
             'totalCourses' => $courses->countCourses()
         );
         
-        $this->loadTemplate("settings/settings_edit", $params);
+        $this->loadTemplate("settings/settings_edit", $viewArgs);
     }
 }

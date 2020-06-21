@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg">
 	<div class="container">
-		<a class="navbar-brand" href="">Learning Platform</a>
+		<a class="navbar-brand" href="<?php echo BASE_URL; ?>">Learning Platform</a>
 		<button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>

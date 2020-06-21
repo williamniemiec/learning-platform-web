@@ -4,6 +4,7 @@
 	margin-top:						100px;
 	max-width:						400px;
 	padding:						20px;
+	color:							var(--text-dark);
 }
 
 /* Watermark */

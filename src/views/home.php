@@ -1,5 +1,5 @@
-<div class="container scrollbar_light">
-	<div class="home">
+<div class="container">
+	<div class="view_content home">
         <h1>My Courses</h1>
         <?php if ($totalCourses == 0): ?>
             <div class="error_msg">
