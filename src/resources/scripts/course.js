@@ -1,12 +1,19 @@
+//-----------------------------------------------------------------------------
+//        Methods
+//-----------------------------------------------------------------------------
 $(function(){
 	updateScreen()
-	setInterval(updateScreen, 200)
+	//setInterval(updateScreen, 200)
+	$(window).resize(updateScreen)
 	
+	// Course menu button
 	$("#course_left_button").click(function() {
 		$("#course_left_button").toggleClass("active")
 		$(".course_left").fadeToggle("fast")
 	})
 	
+	// When the student answers a question, informs him if he answered the
+	// question correctly and displays the answer
 	$(".question").click(function() {
 		var id_quest = $(".questions").attr("data-quest")
 		var selectedQuestion = $(this).attr("data-index")
@@ -14,7 +21,7 @@ $(function(){
 		// Shows answers
 		$.ajax({
 			type:"POST",
-			url:BASE_URL+"ajax/quests",
+			url:BASE_URL+"courses/class_getAnswer",
 			data:{id_quest:id_quest},
 			success:function(ans) {
 				if (ans == selectedQuestion) {
@@ -38,41 +45,89 @@ $(function(){
 		// Marks class as watched
 		$.ajax({
 			type:"POST",
-			url:BASE_URL+"ajax/mark_class_watched",
+			url:BASE_URL+"ajax/class_mark_watched",
 			data:{id_class:$(".questions").attr("data-class")}
 		})
 	})
 })
 
+/**
+ * Fixes course menu height along with course content area. 
+ */
 function updateScreen()
 {
-	var hCourseRight = $(".course_right").height()
-	var hMain = $("main").height()
-	//var padding = $(".course_right").css("padding")
+	updateCourseMenu();
+	updateCourseContent()
+}
+
+/**
+ * Updates course content area.
+ */
+function updateCourseContent()
+{
+	// Updates video dimensions
+	const ratio = 1920/1080
+	const videoWidth = $("#class_video").width()
+	const videoHeight = videoWidth/ratio
 	
-	//$(".course_left").css("height", hCourseRight+padding+"px")
 	
+	$("#class_video").css("height", videoHeight+"px")
+}
+
+/**
+ * Updates course menu height.
+ */
+function updateCourseMenu()
+{
+	const hCourseRight = $(".course_right").height()
+	const hMain = $("main").height()
+
 	
-	//$(".course_right").css("height", hMain)		
-	
+	// Updates course menu height
 	if (hMain > hCourseRight) {
 		$(".course_left").css("height", hMain)
 	} else {
 		$(".course_left").css("height", hCourseRight)
 	}
-	
-	var ratio = 1920/1080
-	var videoWidth = $("#class_video").width()
-	var videoHeight = videoWidth/ratio
-	
-	$("#class_video").css("height", videoHeight+"px")
 }
 
+/**
+ * Opens replies from a comment.
+ * 
+ * @param		object obj Show replies button
+ */
+function open_reply(obj)
+{
+	$(obj).closest(".comment_info").find(".comment_reply").fadeIn("fast")
+}
+
+/**
+ * Closes replies from a comment.
+ * 
+ * @param		object obj Show replies button
+ */
+function close_reply(obj)
+{
+	$(obj).closest(".comment_reply").fadeOut("fast")
+}
+
+
+//-----------------------------------------------------------------------------
+//        Ajax
+//-----------------------------------------------------------------------------
+/**
+ * Marks a class as watched.
+ * 
+ * @param       int id_class Class id to be added to logged 
+ * student's watched class historic
+ * 
+ * @implSpec     It will make an ajax request using POST request method
+ */
 function markAsWatched(id_class)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/mark_class_watched",
+		url:BASE_URL+"ajax/class_mark_watched",
 		data:{id_class:id_class}
 	})
 	
@@ -81,11 +136,20 @@ function markAsWatched(id_class)
 	$(".btn_mark_watch").attr("onclick", "removeWatched("+id_class+")")
 }
 
+
+/**
+ * Marks a class as unwatched.
+ * 
+ * @param       int id_class Class id to be removed from logged 
+ * student's watched class historic
+ * 
+ * @implSpec     It will make an ajax request using POST request method
+ */
 function removeWatched(id_class)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/remove_watched_class",
+		url:BASE_URL+"ajax/class_remove_watched",
 		data:{id_class:id_class}
 	})
 	
@@ -94,11 +158,19 @@ function removeWatched(id_class)
 	$(".btn_mark_watch").attr("onclick", "markAsWatched("+id_class+")")
 }
 
+/**
+ * Removes a comment from a class.
+ * 
+ * @param		object obj Delete comment button
+ * @param       int id_comment Comment id to be deleted
+ * 
+ * @apiNote     It will make an ajax request using POST request method
+ */
 function deleteComment(obj, id_comment)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/remove_comment",
+		url:BASE_URL+"ajax/class_remove_comment",
 		data:{id_comment:id_comment},
 		success:function() {
 			$(obj).closest(".comment").hide("slow")
@@ -106,23 +178,22 @@ function deleteComment(obj, id_comment)
 	})
 }
 
-function open_reply(obj)
-{
-	$(obj).closest(".comment_info").find(".comment_reply").fadeIn("fast")
-}
-
-function close_reply(obj)
-{
-	$(obj).closest(".comment_reply").fadeOut("fast")
-}
-
+/**
+ * Adds a reply to a class comment.
+ * 
+ * @param       object obj Send reply button
+ * @param       int id_doubt Doubt id to be replied
+ * @param       int id_user User id that will reply the comment
+ * 
+ * @apiNote     It will make an ajax request using POST request method
+ */
 function send_reply(obj, id_doubt, id_user)
 {
 	var text = $(obj).closest(".comment_info").find("textarea").val()
 	
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/add_reply",
+		url:BASE_URL+"ajax/class_add_reply",
 		data:{
 			id_doubt:id_doubt,
 			id_user:id_user,
@@ -157,36 +228,22 @@ function send_reply(obj, id_doubt, id_user)
 	})
 }
 
+/**
+ * Removes reply from a class comment.
+ * 
+ * @param		object obj Delete comment button
+ * @param       int id_reply Reply id to be deleted
+ * 
+ * @apiNote     It will make an ajax request using POST request method
+ */
 function delete_reply(obj, id_reply)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/remove_reply",
+		url:BASE_URL+"ajax/class_remove_reply",
 		data:{id_reply:id_reply},
 		success:function() {
 			$(obj).closest(".comment_reply_content").hide("slow")
 		}
 	})
-}
-
-function update_profilePhoto(obj)
-{
-	var file = $("#profile_photo")[0].files
-	
-	if (file.length > 0) {
-		var data = new FormData()
-		data.append("photo", file[0])
-		
-		$.ajax({
-			type:'POST',
-			url:BASE_URL+"ajax/update_profile_photo",
-			data: data,
-			contentType: false,
-			processData: false,
-			success: function() {
-				document.location.reload()
-				$(obj).modal("toggle")
-			}
-		})
-	}
 }
