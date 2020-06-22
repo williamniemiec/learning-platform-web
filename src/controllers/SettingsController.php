@@ -102,4 +102,50 @@ class SettingsController extends Controller
         
         $this->loadTemplate("settings/settings_edit", $viewArgs);
     }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Ajax
+    //-------------------------------------------------------------------------
+    /**
+     * Updates student photo.
+     * 
+     * @param       array $_FILES['photo'] Photo information
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function update_profile_photo()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        $students = new Students($_SESSION['s_login']);
+        
+        
+        $students->updatePhoto($_FILES['photo']);
+    }
+    
+    /**
+     * Updates student password.
+     * 
+     * @param       string $_POST['new_password'] New password
+     * @param       string $_POST['current_password'] Current password
+     * 
+     * @return      bool If password was sucessfully updated
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function update_password()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['new_password']) || empty($_POST['current_password']))
+            echo false;
+        
+        $students = new Students($_SESSION['s_login']);
+        
+        
+        echo $students->updatePassword($_POST['current_password'], $_POST['new_password']);
+    }
 }

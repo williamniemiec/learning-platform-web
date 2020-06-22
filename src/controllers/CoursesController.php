@@ -7,6 +7,7 @@ use models\Courses;
 use models\Classes;
 use models\Doubts;
 use models\Historic;
+use models\Questionnaires;
 
 
 /**
@@ -51,6 +52,7 @@ class CoursesController extends Controller
      * open.
      * 
      * @param       int $id_course Course id
+     * @param       int $id_class [Optional] Class id to be opened
      */
     public function open($id_course, $id_class = -1)
     {
@@ -162,5 +164,173 @@ class CoursesController extends Controller
         
         
         $this->open($classes->getCourseId($id_class), $id_class);
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Ajax
+    //-------------------------------------------------------------------------
+    /**
+     * Gets answer from a quest.
+     * 
+     * @param       int $_POST['id_quest'] Quest class id
+     * 
+     * @return      int Correct answer [1;4] or -1 if quest id is invalid
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function class_getAnswer()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['id_quest']))
+            echo -1;
+        
+        $quests = new Questionnaires();
+        
+        
+        echo $quests->getAnswer($_POST['id_quest']);
+    }
+    
+    /**
+     * Marks a class as watched.
+     * 
+     * @param       int $_POST['id_class'] Class id to be added to logged 
+     * student's watched class historic
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function class_mark_watched()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['id_class']))
+            return;
+        
+        $classes = new Classes();
+        
+        
+        $classes->markAsWatched($_SESSION['s_login'], $_POST['id_class']);
+    }
+    
+    /**
+     * Marks a class as unwatched.
+     * 
+     * @param       int $_POST['id_class'] Class id to be removed from logged 
+     * student's watched class historic
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function class_remove_watched()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['id_class']))
+            return;
+        
+        $classes = new Classes();
+        
+        
+        $classes->removeWatched($_SESSION['s_login'], $_POST['id_class']);
+    }
+    
+    /**
+     * Removes a comment from a class.
+     * 
+     * @param       int $_POST['id_comment'] Comment id to be deleted
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function class_remove_comment()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['id_comment']))
+            return;
+        
+        
+        $doubts = new Doubts();
+        $doubts->delete($_POST['id_comment']);
+    }
+    
+    /**
+     * Adds a reply to a class comment.
+     * 
+     * @param       int $_POST['id_doubt'] Doubt id to be replied
+     * @param       int $_POST['id_user'] User id that will reply the comment
+     * @param       int $_POST['text'] Reply text
+     * 
+     * @return      bool If the reply was successfully added
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function class_add_reply()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['id_doubt']) || $_POST['id_doubt'] <= 0)   { return false; }
+        if (empty($_POST['id_user']) || $_POST['id_user'] <= 0)     { return false; }
+        if (empty($_POST['text']))                                  { return false; }
+        
+        $doubts = new Doubts();
+        
+        
+        echo $doubts->addReply($_POST['id_doubt'], $_POST['id_user'], $_POST['text']);
+    }
+    
+    /**
+     * Gets student name.
+     * 
+     * @param       int $_POST['id_student'] Student id
+     * 
+     * @return      string Student name
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function get_student_name()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['id_student']) || $_POST['id_student'] <= 0)
+            echo "";
+        
+        $students = new Students();
+        
+        
+        echo $students->get($_POST['id_student'])->getName();
+    }
+    
+    /**
+     * Removes reply from a class comment.
+     * 
+     * @param       int $_POST['id_reply'] Reply id
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function class_remove_reply()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['id_reply']) || $_POST['id_reply'] <= 0)
+            return;
+        
+        $doubts = new Doubts();
+        
+        
+        $doubts->deleteReply($_POST['id_reply']);
     }
 }

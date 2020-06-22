@@ -23,7 +23,9 @@ class NotFoundController extends Controller
 	public function index()
 	{
 	    $header = array(
-	        'title' => 'Learning platform - Page not found'
+	        'title' => 'Page not found - Learning platform',
+            'description' => "Page not found",
+	        'robots' => 'noindex'
 	    );
 	    
 	    $viewArgs = array(

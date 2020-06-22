@@ -41,12 +41,20 @@ class SupportController extends Controller
         $students = new Students($_SESSION['s_login']);
         $student = $students->get($_SESSION['s_login']);
         
-        $params = array(
-            'title' => 'Learning platform - Support',
-            'studentName' => $student->getName()          
+        
+        $header = array(
+            'title' => 'Support - Learning platform',
+            'styles' => array('support'),
+            'description' => "Support page",
+            'robots' => 'noindex'
         );
         
-        $this->loadTemplate("support", $params);
+        $viewArgs = array(
+            'header' => $header,
+            'username' => $student->getName()          
+        );
+        
+        $this->loadTemplate("support", $viewArgs);
     }
     
     /**
@@ -57,12 +65,20 @@ class SupportController extends Controller
         $students = new Students($_SESSION['s_login']);
         $student = $students->get($_SESSION['s_login']);
         
-        $params = array(
-            'title' => 'Learning platform - Support',
+        
+        $header = array(
+            'title' => 'Support - Learning platform',
+            'styles' => array('support'),
+            'description' => "Support topic",
+            'robots' => 'noindex'
+        );
+        
+        $viewArgs = array(
+            'header' => $header,
             'username' => $student->getName()
         );
         
-        $this->loadTemplate("support_content", $params);
+        $this->loadTemplate("support_content", $viewArgs);
     }
     
     /**
@@ -73,11 +89,19 @@ class SupportController extends Controller
         $students = new Students($_SESSION['s_login']);
         $student = $students->get($_SESSION['s_login']);
         
-        $params = array(
-            'title' => 'Learning platform - Support - New',
+        
+        $header = array(
+            'title' => 'New topic - Support - Learning platform',
+            'styles' => array('support'),
+            'description' => "New support topic",
+            'robots' => 'noindex'
+        );
+        
+        $viewArgs = array(
+            'header' => $header,
             'username' => $student->getName()
         );
         
-        $this->loadTemplate("support_new", $params);
+        $this->loadTemplate("support_new", $viewArgs);
     }
 }

@@ -49,7 +49,7 @@ class HomeController extends Controller
 	    );
 	    
 		$viewArgs = array(
-		    'studentName' => $students->getName(),
+		    'username' => $students->getName(),
 		    'courses' => $courses->getMyCourses(),
 		    'totalCourses' => $courses->countCourses(),
 		    'header' => $header
