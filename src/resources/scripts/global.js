@@ -1,16 +1,24 @@
 $(function() {
-	// Places the footer at the bottom
-	setInterval(function(){
-		var hMain = $("main").height()
-		
-		if ($("#mCSB_1_container").hasClass("mCS_no_scrollbar_y") && $("#mCSB_1").height() > hMain) {
-			var h = $("body").css("height")
-			var x = $("#mCSB_1").height() - 130
-			$("main").css("height", x+"px")
-		}
-	},200)
-	
+	// Fix footer
+	updateFooter()
+	$(window).resize(updateFooter)
 	
 	// Activates bootstrap tooltips
 	$("[data-toggle='tooltip']").tooltip()
 })
+
+/**
+ * Places the footer at the bottom
+ */
+function updateFooter()
+{
+	var hWindow = $("#mCSB_1").height()
+	var hasViewPanel = $("main").find(".view_panel").length
+	var x = hWindow - 50 - 50;
+	
+	
+	if (hasViewPanel)
+		x -= 30		// View panel has 30px margin top
+	
+	$("main").css("min-height", x+"px")
+}
