@@ -3,7 +3,7 @@
 	<?php $this->loadView("class/course_menu", $info_menu); ?>
     
     <div class="class_area">
-        <?php if ($view != "noClasses"): ?>
+        <?php if ($view != "class/noClasses"): ?>
             <!-- Course information -->
         	<?php $this->loadView("class/course_information", $info_course); ?>
 			

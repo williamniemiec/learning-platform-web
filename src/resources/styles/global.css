@@ -64,6 +64,10 @@ main > .container {
 	margin-top:						30px;
 }
 
+.text-dark {
+	color:							var(--text-dark);
+}
+
 
 /* Navbar */
 body nav {
@@ -262,6 +266,8 @@ input[type='file'] {
 	padding:						100px;
 	background-color:				var(--glass);
 }
+
+.error_msg
 
 .alert-danger {
 	background-image:				linear-gradient(315deg, var(--alert-danger) 0%, var(--alert-danger) 74%);

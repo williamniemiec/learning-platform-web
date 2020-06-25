@@ -89,10 +89,14 @@ class CoursesController extends Controller
 
         // Gets class information
         if (empty($class)) {
-            $name = "There are no registered classes";
+            $name = '';
             $class['type'] = "noClasses";
-            $classContent = "";
+            $classContent = array(
+                'message' => 'There are no registered classes'
+            );
             $view = "noClasses";
+            $class['watched'] = false;
+            $class['id'] = -1;
         } 
         else {
             if ($class['type'] == 'video') {

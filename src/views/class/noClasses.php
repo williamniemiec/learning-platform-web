@@ -1,1 +1,1 @@
-<h1 class="content_title"><?php echo $content_title; ?></h1>
+<h1 class="error_msg text-dark"><?php echo $message; ?></h1>
