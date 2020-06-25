@@ -74,7 +74,7 @@ class LoginController extends Controller
         );
         
         // Checks if registration form has been sent
-        if (!empty($_POST['email'])) {
+        if ($this->wasRegistrationFormSent()) {
             // Checks if all fields are filled
             if ($this->isAllFieldsFilled()) {
                 $students = new Students();
@@ -94,7 +94,8 @@ class LoginController extends Controller
                 
                 $viewArgs['error'] = true;
                 $viewArgs['msg'] = "User already registered!";
-            } else {
+            } 
+            else {
                 $viewArgs['error'] = true;
                 $viewArgs['msg'] = "Fill in all fields!";
             }
@@ -124,6 +125,22 @@ class LoginController extends Controller
             isset($_POST['birthdate']) &&
             isset($_POST['email']) &&
             isset($_POST['password'])
+        );
+    }
+    
+    /**
+     * Checks if registration form was sent.
+     * 
+     * @return      boolean If registration form was sent
+     */
+    private function wasRegistrationFormSent()
+    {
+        return (
+            !empty($_POST['name']) ||
+            !empty($_POST['genre']) ||
+            !empty($_POST['birthdate']) ||
+            !empty($_POST['email']) ||
+            !empty($_POST['password'])
         );
     }
 }

@@ -30,4 +30,10 @@
 	--border-light:					#ddd;
 	--color-snow:					#eee;
 	--glass:						rgba(238,238,238,0.3);
+	--alert-danger-close:			white;
+	--alert-danger-text:			white;
+	--alert-danger:					#cc3441;
+	--alert-warning:				#e5c100;
+	--alert-warning-text:			black;
+	--alert-warning-close:			black;
 }
