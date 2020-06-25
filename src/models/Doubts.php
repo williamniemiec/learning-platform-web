@@ -99,7 +99,7 @@ class Doubts extends Model
      * Adds a reply to a doubt.
      * 
      * @param       int $id_doubt Doubt id
-     * @param       int $id_user Student id
+     * @param       int $id_user Student id that will reply the doubt
      * @param       string $text Reply content
      * 
      * @return      boolean If reply was sucessfully added

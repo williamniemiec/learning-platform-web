@@ -54,7 +54,7 @@ class SupportController extends Controller
             'username' => $student->getName()          
         );
         
-        $this->loadTemplate("support", $viewArgs);
+        $this->loadTemplate("support/support", $viewArgs);
     }
     
     /**
@@ -78,7 +78,7 @@ class SupportController extends Controller
             'username' => $student->getName()
         );
         
-        $this->loadTemplate("support_content", $viewArgs);
+        $this->loadTemplate("support/support_content", $viewArgs);
     }
     
     /**
@@ -102,6 +102,6 @@ class SupportController extends Controller
             'username' => $student->getName()
         );
         
-        $this->loadTemplate("support_new", $viewArgs);
+        $this->loadTemplate("support/support_new", $viewArgs);
     }
 }

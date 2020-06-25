@@ -23,7 +23,8 @@ class NotFoundController extends Controller
 	public function index()
 	{
 	    $header = array(
-	        'title' => 'Learning platform - Page not found'
+	        'title' => 'Learning platform - Page not found',
+	        'robots' => 'index'
 	    );
 	    
         $viewArgs = array(
@@ -35,7 +36,7 @@ class NotFoundController extends Controller
            
 	    $admins = new Admins($_SESSION['a_login']);
 	    
-	    $viewArgs['adminName'] = $admins->getName();
+	    $viewArgs['username'] = $admins->getName();
 	    
 	    $this->loadTemplate('404/404_logged', $viewArgs);
 	}

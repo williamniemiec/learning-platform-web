@@ -6,7 +6,7 @@
         		<!-- User name -->
         		<div class="form-group">
             		<label for="name">Name</label>
-            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $studentName; ?>" />
+            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $username; ?>" />
             	</div>
             	
             	<!-- Genre -->

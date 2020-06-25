@@ -9,7 +9,7 @@
     		
     		<div class="form-group">
         		<label for="name">Name</label>
-        		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $studentName; ?>" readonly />
+        		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $username; ?>" readonly />
         	</div>
         	
         	<div class="form-group">

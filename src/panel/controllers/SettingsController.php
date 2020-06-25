@@ -41,11 +41,12 @@ class SettingsController extends Controller
         $admins = new Admins($_SESSION['a_login']);
         
         $header = array(
-            'title' => 'Settings - Learning platform'
+            'title' => 'Settings - Learning platform',
+            'robots' => 'index'
         );
         
         $varArgs = array(
-            'adminName' => $admins->getName(),
+            'username' => $admins->getName(),
             'header' => $header
         );
         
@@ -60,11 +61,12 @@ class SettingsController extends Controller
         $admins = new Admins($_SESSION['a_login']);
         
         $header = array(
-            'title' => 'Settings - Learning platform'
+            'title' => 'Settings - Learning platform',
+            'robots' => 'index'
         );
         
         $varArgs = array(
-            'adminName' => $admins->getName(),
+            'username' => $admins->getName(),
             'header' => $header
         );
         

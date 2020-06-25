@@ -2,6 +2,7 @@
 <script src='<?php echo BASE_URL; ?>resources/scripts/bootstrap.bundle.min.js'></script>
 <script src='<?php echo BASE_URL; ?>resources/scripts/jquery.mCustomScrollbar.concat.min.js'></script>
 <script src='<?php echo BASE_URL; ?>resources/scripts/scrollbar_light.js'></script>
+<script src='<?php echo BASE_URL; ?>resources/scripts/notifications.js'></script>
 <script>var BASE_URL = "<?php echo BASE_URL; ?>"</script>
 <script src='<?php echo BASE_URL; ?>resources/scripts/global.js'></script>
 

@@ -60,6 +60,7 @@ class LoginController extends Controller
     {
         $header = array(
             'title' => 'Register - Learning platform',
+            'styles' => array('ps_style'),
             'description' => "Start learning today",
             'keywords' => array('learning platform', 'register'),
             'robots' => 'index'
@@ -67,6 +68,7 @@ class LoginController extends Controller
         
         $viewArgs = array(
             'header' => $header,
+            'scripts' => array('ps_script'),
             'error' => false,
             'msg' => ''
         );

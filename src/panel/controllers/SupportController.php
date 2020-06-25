@@ -45,16 +45,17 @@ class SupportController extends Controller
         
         $header = array(
             'title' => 'Support - Learning platform',
-            'styles' => array('support')
+            'styles' => array('support'),
+            'robots' => 'index'
         );
         
-        $params = array(
-            'adminName' => $admins->getName(),
+        $viewArgs = array(
+            'username' => $admins->getName(),
             'courses' => $courses->getCourses(),
             'header' => $header
         );
         
-        $this->loadTemplate("support/support", $params);
+        $this->loadTemplate("support/support", $viewArgs);
     }
     
     /**
@@ -67,15 +68,16 @@ class SupportController extends Controller
         
         $header = array(
             'title' => 'Support - Learning platform',
-            'styles' => array('support')
+            'styles' => array('support'),
+            'robots' => 'index'
         );
         
-        $params = array(
-            'adminName' => $admins->getName(),
+        $viewArgs = array(
+            'username' => $admins->getName(),
             'courses' => $courses->getCourses(),
             'header' => $header
         );
         
-        $this->loadTemplate("supports/support_content", $params);
+        $this->loadTemplate("supports/support_content", $viewArgs);
     }
 }

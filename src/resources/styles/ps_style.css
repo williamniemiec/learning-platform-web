@@ -1,0 +1,28 @@
+#pass_strength_box {
+	background-color: #343a40;
+	color: #f8f9fa;
+}
+
+.pass_strength li {
+    transition: background-color 0.3s;
+    color: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pass_strength_fail {
+    background-color: #DC3545;
+}
+
+.pass_strength_success {
+    background-color: #28A745
+}
+
+.pass_strength_warning {
+    background-color: #FFC107
+}
+
+.pass_strength_default {
+    background-color: #343a40
+}

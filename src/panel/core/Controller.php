@@ -42,10 +42,4 @@ abstract class Controller
 		else
 		    require 'views/template/html_no_logged.php';
 	}
-	
-// 	public function loadViewInTemplate($viewName, $viewData = array())
-// 	{
-// 	    var_dump($viewData);
-// 	    require 'views/'.$viewName.'.php';
-// 	}
 }

@@ -24,7 +24,8 @@ class LoginController extends Controller
     {
         $header = array(
             'title' => 'Login - Learning platform',
-            'styles' => array('login')
+            'styles' => array('login'),
+            'robots' => 'index'
         );
         
         $viewArgs = array(

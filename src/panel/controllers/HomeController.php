@@ -45,7 +45,7 @@ class HomeController extends Controller
 	    );
 	    
 		$viewArgs = array(
-		    'adminName' => $admins->getName(),
+		    'username' => $admins->getName(),
 		    'courses' => $courses->getCourses(),
 		    'header' => $header
 		);

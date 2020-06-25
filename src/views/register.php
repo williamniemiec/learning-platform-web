@@ -40,12 +40,36 @@
             	<!-- Password -->
             	<div class="form-group">
             		<label for="register_pass">Password</label>
-            		<input id="register_pass" type="password" name="password" placeholder="Password" class="form-control" />
+            		<input id="register_pass" type="password" name="password" placeholder="Password" class="form-control pass_input" />
+            		<div id="pass_strength_box">
+            			<h5 class='pass_strength_header'>Password strengh</h5>
+            			<div class='progress'>
+                        	<div class='pass_strength_bar'></div>
+                    	</div>
+                        <ul class='pass_strength'>
+                            <li id='pass_length' data-length='8'>
+                                Password length (minimum: 8 characters)
+                                <span class='pass_strength_icon'></span>
+                            </li>
+                            <li id='pass_numCharact'>
+                                Numbers and Characters
+                            <span class='pass_strength_icon'></span>
+                            </li>
+                            <li id='pass_specCharact'>
+                                Special characters
+                                <span class='pass_strength_icon'></span>
+                            </li>
+                            <li id='pass_ulCharact'>
+                                Uppercase and lowercase letters
+                                <span class='pass_strength_icon'></span>
+                            </li>
+                        </ul>
+            		</div>
             	</div>
             	
             	<!-- Register button -->
             	<div class="form-group">
-            		<input type="submit" value="Register" class="form-control btn_theme btn_full" />
+            		<input type="submit" value="Register" class="form-control btn_theme btn_full submit" />
             	</div>
             </form>
         </div>

@@ -52,6 +52,15 @@ a:hover {
 	max-width:						80px!important;
 }
 
+.course_logo img {
+	max-width:						100px;
+}
+
+.course_logo {
+	width:							100px;
+}
+
+
 
 /* Navbar */
 body nav {
@@ -238,4 +247,14 @@ li.dropdown-item a:hover {
 .dropdown {
     min-width:						110px;
     margin-left:					15px;
+}
+
+
+/* Error message */
+.error_msg {
+	color:							var(--text-color);
+	margin-top:						25px;
+	text-align:						center;
+	padding:						100px;
+	background-color:				var(--glass);
 }
