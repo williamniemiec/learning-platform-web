@@ -3,7 +3,7 @@
     	<h1 class="view_header">Settings</h1>
     	<div class="view_content">
     		<div class="user_photo">
-    			<img class="img rounded-circle" src="<?php echo empty($profilePhoto) ? BASE_URL."assets/images/user.png" : BASE_URL."assets/images/profile_photos/".$profilePhoto; ?>" />
+    			<img class="img rounded-circle" src="<?php echo empty($profilePhoto) ? BASE_URL."resources/images/user.png" : BASE_URL."resources/images/profile_photos/".$profilePhoto; ?>" />
     			<button id="btn_photo_update" class="btn_theme" data-toggle="modal" data-target="#changeProfilePhoto">&#8634;</button>
 			</div>
     		
