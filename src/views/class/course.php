@@ -1,11 +1,11 @@
 <div class="course_content">
     <!-- Course menu -->
-    <div class="course_left">
+    <div class="course_menu">
     	<?php $this->loadView("class/course_menu", $info_menu); ?>
     	
     </div>
     
-    <div class="course_right">
+    <div class="class_area">
         <?php if ($view != "noClasses"): ?>
             <!-- Course information -->
         	<?php $this->loadView("class/course_information", $info_course); ?>

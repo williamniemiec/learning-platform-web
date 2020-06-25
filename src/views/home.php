@@ -14,7 +14,7 @@
         			<a href="<?php echo BASE_URL."courses/open/".$course['id']; ?>">
                 		<div class="course">
                 			<!-- Course information -->
-            				<img class="img img-responsive" src="<?php echo empty($course['logo']) ? BASE_URL."assets/images/noImage" : BASE_URL."assets/images/logos/".$course['logo']; ?>" />
+            				<img class="img img-responsive" src="<?php echo empty($course['logo']) ? BASE_URL."resources/images/noImage" : BASE_URL."resources/images/logos/".$course['logo']; ?>" />
                 			<h2><?php echo $course['name']; ?></h2>
                 			<p><?php echo $course['description']; ?></p>                			
                 			

@@ -1,7 +1,7 @@
 <div class="content_info">
 	<!-- Menu button -->
-	<div class="course_left_action">
-    	<div id="course_left_button" class="active">
+	<div class="mobile_menu_button course_menu_action">
+    	<div id="mobile_menu_button" class="active">
     		<div class="trace"></div>
     		<div class="trace"></div>
     		<div class="trace"></div>

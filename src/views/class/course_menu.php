@@ -1,5 +1,5 @@
 <div class="course_banner_area">
-	<img class="img imr-responsive course_banner" src="<?php echo BASE_URL."assets/images/logos/".$logo; ?>" />
+	<img class="img imr-responsive course_banner" src="<?php echo BASE_URL."resources/images/logos/".$logo; ?>" />
 </div>
 
 <?php foreach ($modules as $module): ?>

@@ -1,0 +1,55 @@
+/* Mobile menu button  */
+.mobile_menu_button {
+	height: 50px;
+	width: 50px;
+}
+
+#mobile_menu_button {
+	display: block;
+	position: relative;
+	float: right;
+	cursor: pointer;
+	height: 50px;
+	width: 50px;
+	padding: 0;
+	z-index: 99;
+}
+
+#mobile_menu_button .trace {
+	position: absolute;
+	width: 40px;
+	height: 4px;
+	border-radius: 5px;
+	background-color: #333;
+	transition: 0.3s;
+}
+
+#mobile_menu_button .trace:nth-child(1) {
+	top: 10px;
+	left: 5px;
+}
+
+#mobile_menu_button .trace:nth-child(2) {
+	top: calc(50% - 2px); 
+	left: 5px;
+	display: block;
+}
+
+#mobile_menu_button .trace:nth-child(3) {
+	bottom: 10px;
+	left: 5px;
+}
+
+#mobile_menu_button.active .trace:nth-child(1) {
+	top: calc(50% - 2px);
+	transform: rotate(45deg);
+}
+
+#mobile_menu_button.active .trace:nth-child(2) {
+	display: none;
+}
+
+#mobile_menu_button.active .trace:nth-child(3) {
+	top: calc(50% - 2px);
+	transform: rotate(-45deg);
+}

@@ -1,6 +1,6 @@
 <div class="class_info">
 	<!-- Mark as watched button -->
-    <?php if ($classType != "Questionnaire"): ?>
+    <?php if ($classType != "quest"): ?>
     	<button class="btn btn-outline-primary btn_mark_watch" 
     			onclick="<?php echo $wasWatched ? "markAsWatched" : "removeWatched"; ?>(<?php echo $classId; ?>)">
     		Mark as watched

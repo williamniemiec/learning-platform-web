@@ -7,9 +7,9 @@ $(function(){
 	$(window).resize(updateScreen)
 	
 	// Course menu button
-	$("#course_left_button").click(function() {
-		$("#course_left_button").toggleClass("active")
-		$(".course_left").fadeToggle("fast")
+	$(".course_menu_action").click(function() {
+		$(".course_menu_action #mobile_menu_button").toggleClass("active")
+		$(".course_menu").fadeToggle("fast")
 	})
 	
 	// When the student answers a question, informs him if he answered the
@@ -79,15 +79,15 @@ function updateCourseContent()
  */
 function updateCourseMenu()
 {
-	const hCourseRight = $(".course_right").height()
+	const hCourseRight = $(".class_area").height()
 	const hMain = $("main").height()
 
 	
 	// Updates course menu height
 	if (hMain > hCourseRight) {
-		$(".course_left").css("height", hMain)
+		$(".course_menu").css("height", hMain)
 	} else {
-		$(".course_left").css("height", hCourseRight)
+		$(".course_menu").css("height", hCourseRight)
 	}
 }
 

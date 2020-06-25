@@ -13,18 +13,14 @@
     background-color: #eee;
 }
 
-
-.course_left {
-	overflow-y: scroll;
-}
-
 .course_content {
 	display: flex;
 	background: white;
 	padding-right: 15px;
 }
 
-.course_left {
+.course_menu {
+	overflow-y: scroll;
 	min-height:300px;
 	background-color:#3e4041;
 	min-width: 310px;
@@ -32,84 +28,20 @@
 	position: relative;
 }
 
+.course_menu a {
+	color: white;
+}
+
 .course_banner_area, .course_banner {
 	height: 153px;
 	width:293px;
 }
 
-
-.course_left a {
-	color: white;
-}
-
-.course_right {
-	/*min-height:300px;*/
-	
+.class_area {
 	padding: 15px;
 	width: 100%;
 	background-color: white;
 }
-
-/* COURSE LEFT BUTTON  */
-.course_left_action {
-	height: 50px;
-	width: 50px;
-	/*position: absolute;*/
-	/*margin-top:15px;*/
-	/*margin-left:5px;*/
-}
-
-#course_left_button {
-	display: block;
-	position: relative;
-	float: right;
-	cursor: pointer;
-	height: 50px;
-	width: 50px;
-	padding: 0;
-	z-index: 99;
-}
-
-#course_left_button .trace {
-	position: absolute;
-	width: 40px;
-	height: 4px;
-	border-radius: 5px;
-	background-color: #333;
-	transition: 0.3s;
-}
-
-#course_left_button .trace:nth-child(1) {
-	top: 10px;
-	left: 5px;
-}
-
-#course_left_button .trace:nth-child(2) {
-	top: calc(50% - 2px); 
-	left: 5px;
-	display: block;
-}
-
-#course_left_button .trace:nth-child(3) {
-	bottom: 10px;
-	left: 5px;
-}
-
-#course_left_button.active .trace:nth-child(1) {
-	top: calc(50% - 2px);
-	transform: rotate(45deg);
-}
-
-#course_left_button.active .trace:nth-child(2) {
-	display: none;
-}
-
-#course_left_button.active .trace:nth-child(3) {
-	top: calc(50% - 2px);
-	transform: rotate(-45deg);
-}
-
-
 
 .module {
 	padding: 20px;

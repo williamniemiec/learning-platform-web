@@ -121,7 +121,7 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => $course['name'].' - Learning platform',
-            'styles' => array('courses'),
+            'styles' => array('courses', 'mobile_menu_button'),
             'description' => $name,
             'keywords' => array('learning platform', 'course', $course['name']),
             'robots' => 'index'
