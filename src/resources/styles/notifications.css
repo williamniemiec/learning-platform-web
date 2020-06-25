@@ -23,7 +23,7 @@
 	width:							300px;
 	margin-left:					-100px;
 	max-height:						270px;
-	overflow-y:						scroll;
+	overflow-y:						hidden;
 	display:						none;
 	background-color:				var(--color-dark);
 }

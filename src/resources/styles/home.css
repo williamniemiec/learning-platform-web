@@ -3,7 +3,6 @@
 	color:							var(--text-color);
 }
 
-
 .home .courses {
 	display:						flex;
 	color:							var(--text-dark);

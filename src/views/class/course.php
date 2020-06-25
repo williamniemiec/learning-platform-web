@@ -1,9 +1,6 @@
 <div class="course_content">
     <!-- Course menu -->
-    <div class="course_menu">
-    	<?php $this->loadView("class/course_menu", $info_menu); ?>
-    	
-    </div>
+	<?php $this->loadView("class/course_menu", $info_menu); ?>
     
     <div class="class_area">
         <?php if ($view != "noClasses"): ?>

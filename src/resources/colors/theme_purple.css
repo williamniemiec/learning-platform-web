@@ -36,4 +36,7 @@
 	--alert-warning:				#e5c100;
 	--alert-warning-text:			black;
 	--alert-warning-close:			black;
+	--course-menu-text:				white;
+	--class-area-background:		white;
+	--class-hover:					#ccc;
 }

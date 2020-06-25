@@ -56,8 +56,8 @@ $(function(){
  */
 function updateScreen()
 {
-	updateCourseMenu();
 	updateCourseContent()
+	updateCourseMenu();
 }
 
 /**

@@ -19,6 +19,7 @@ function updateFooter()
 	
 	if (hasViewPanel)
 		x -= 30		// View panel has 30px margin top
+		
 	
 	$("main").css("min-height", x+"px")
 }
