@@ -8,6 +8,7 @@
 	--color-accent-strong:			#711757;
 	--color-light:					rgba(221,221,221,0.9);
 	--color-dark:					#3e4041;
+	--color-dark-light:				#555;
 	--color-danger:					#e50000;
 	--color-success:				#52b86a;
 	--color-primary:				#7f5a83;
@@ -28,4 +29,5 @@
 	--privilege-admin:				var(--color-accent);
 	--border-light:					#ddd;
 	--color-snow:					#eee;
+	--glass:						rgba(238,238,238,0.3);
 }

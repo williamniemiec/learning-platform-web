@@ -56,3 +56,7 @@ a.btn_theme:hover {
 a.btn_theme:active {
 	box-shadow:						0 0 5px var(--color-accent-strong);
 }
+
+.btn_theme:disabled {
+    background-image: 				linear-gradient(315deg, var(--color-dark-light) 0%, var(--color-dark) 74%);
+}
