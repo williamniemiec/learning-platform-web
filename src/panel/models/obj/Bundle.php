@@ -39,7 +39,7 @@ class Bundle
         $this->id_bundle = $id_bundle;
         $this->name = $name;
         $this->price = $price;
-        $this->description = empty($description) ? '' : $description;
+        $this->description = $description;
     }
     
     

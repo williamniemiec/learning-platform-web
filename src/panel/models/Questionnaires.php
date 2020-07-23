@@ -2,6 +2,7 @@
 namespace models;
 
 use core\Model;
+use models\obj\Questionnaire;
 
 
 /**
@@ -37,21 +38,32 @@ class Questionnaires extends Model
      * 
      * @return      array questions from this class
      */
-    public function getQuestFromClass($id_class)
+    public function get($id_module, $class_order)
     {
-        if (empty($id_class) || $id_class <= 0) { return array(); }
-        
-        $response = array();
+        $response = NULL;
         
         $sql = $this->db->prepare("
-            SELECT * 
-            FROM questionnaires 
-            WHERE id_class = ?
+            SELECT  *
+            FROM    questionnaires
+            WHERE   id_module = ? AND
+                    class_order = ?
         ");
-        $sql->execute(array($id_class));
+        
+        $sql->execute(array($id_module, $class_order));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetch(\PDO::FETCH_ASSOC);
+            $class = $sql->fetch(\PDO::FETCH_ASSOC);
+            
+            $response = new Questionnaire(
+                $class['id_module'],
+                $class['class_order'],
+                $class['question'],
+                $class['q1'],
+                $class['q2'],
+                $class['q3'],
+                $class['q4'],
+                $class['answer']
+            );
         }
         
         return $response;
@@ -64,21 +76,20 @@ class Questionnaires extends Model
      * 
      * @return      int Correct answer
      */
-    public function getAnswer($id_question)
+    public function getAnswer($id_module, $class_order)
     {
-        if (empty($id_question) || $id_question <= 0) { return -1; }
-        
         $response = -1;
         
         $sql = $this->db->prepare("
-            SELECT answer 
-            FROM questionnaires
-            WHERE id = ?
+            SELECT  answer
+            FROM    questionnaires
+            WHERE   id_module = ? AND
+                    class_order = ?
         ");
-        $sql->execute(array($id_question));
+        $sql->execute(array($id_module, $class_order));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetch(\PDO::FETCH_ASSOC)['answer'];
+            $response = $sql->fetch()['answer'];
         }
         
         return $response;
@@ -105,39 +116,12 @@ class Questionnaires extends Model
         
         $sql = $this->db->prepare("
             INSERT INTO questionnaires 
-            (id_class, op1, op2, op3, op4, answer) 
-            VALUES (?,?,?,?,?,?)
+            (id_module, class_order, op1, op2, op3, op4, answer) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $sql->execute(array($id_class, $question, $op1, $op2, $op3, $op4, $answer));
         
         return $sql->rowCount() > 0;
-    }
-    
-    /**
-     * Gets a quest class.
-     * 
-     * @param       int $id_quest Class id
-     * 
-     * @return      array Quest class with the given id
-     */
-    public function get($id_quest)
-    {
-        if (empty($id_quest)) { return array(); }
-        
-        $response = array();
-        
-        $sql = $this->db->prepare("
-            SELECT * 
-            FROM questionnaires 
-            WHERE id = ?
-        ");
-        $sql->execute(array($id_quest));
-        
-        if ($sql->rowCount() > 0) {
-            $response = $sql->fetch(\PDO::FETCH_ASSOC);
-        }
-        
-        return $response;
     }
     
     /**
@@ -153,9 +137,9 @@ class Questionnaires extends Model
      * 
      * @return      boolean If class was sucessfully edited
      */
-    public function edit($id_quest, $question, $op1, $op2, $op3, $op4, $answer)
+    public function edit($id_module, $class_order, $question, $op1, $op2, $op3, $op4, $answer)
     {
-        if (empty($id_quest) || empty($question) ||
+        if (empty($id_module) || empty($class_order) || empty($question) ||
             empty($op1) || empty($op2) || empty($op3) ||
             empty($op4) || empty($answer)) {
                 echo false;
@@ -164,10 +148,22 @@ class Questionnaires extends Model
             $sql = $this->db->prepare("
                 UPDATE questionnaires 
                 SET question = ?, op1 = ?, op2 = ?, op3 = ?, op4 = ?, answer = ?
-                WHERE id = ?
+                WHERE id_module = ? AND class_order = ?
             ");
-            $sql->execute(array($question, $op1, $op2, $op3, $op4, $answer, $id_quest));
+            $sql->execute(array($question, $op1, $op2, $op3, $op4, $answer, $id_module, $class_order));
             
             return $sql->rowCount() > 0;
+    }
+    
+    public function delete($id_module, $class_order)
+    {
+        $sql = $this->db->prepare("
+            DELETE FROM questionnaires
+            WHERE id_module = ? AND class_order = ?
+        ");
+        
+        $sql->execute(array($id_module, $class_order));
+        
+        return $sql->rowCount() > 0;
     }
 }

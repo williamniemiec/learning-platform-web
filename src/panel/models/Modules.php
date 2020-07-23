@@ -2,6 +2,7 @@
 namespace models;
 
 use core\Model;
+use models\obj\Module;
 
 
 /**
@@ -44,19 +45,23 @@ class Modules extends Model
         $response = array();
         
         $sql = $this->db->prepare("
-            SELECT * 
-            FROM modules 
-            WHERE id_course = ?
+            SELECT  *
+            FROM    modules
+            WHERE   id_module IN (SELECT    id_module
+                                  FROM      course_modules
+                                  WHERE     id_course = ?)
         ");
+        
         $sql->execute(array($id_course));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetchAll(\PDO::FETCH_ASSOC);
+            $modules = $sql->fetchAll(\PDO::FETCH_ASSOC);
             
-            $classes = new Classes();
-            
-            for ($i=0; $i<count($response); $i++) {
-                $response[$i]['classes'] = $classes->getClassesFromModule($response[$i]['id']);
+            foreach ($modules as $module) {
+                $response[] = new Module(
+                    $module['id_module'],
+                    $module['name']
+                    );
             }
         }
         
@@ -70,43 +75,52 @@ class Modules extends Model
      */
     public function delete($id_module)
     {
-        if (empty($id_module) || $id_module <= 0) { return; }
+//         if (empty($id_module) || $id_module <= 0) { return; }
         
-        // Get all classes from this module
-        $classIds = $this->getAllClasses($id_module);
+//         // Get all classes from this module
+//         $classIds = $this->getAllClasses($id_module);
         
-        // Delete classes from course
-        $this->db->query("
-            DELETE FROM classes 
-            WHERE id IN (".implode(",", $classIds).")
-        ");
+//         // Delete classes from course
+//         $this->db->query("
+//             DELETE FROM classes 
+//             WHERE id IN (".implode(",", $classIds).")
+//         ");
         
-        // Delete module from course
+//         // Delete module from course
+//         $sql = $this->db->prepare("
+//             DELETE FROM modules 
+//             WHERE id = ?
+//         ");
+//         $sql->execute(array($id_module));
+        
+//         // Delete historic from course
+//         if (count($classIds) > 0) {
+//             $this->db->query("
+//                 DELETE FROM historic 
+//                 WHERE id_class IN (".implode(",",$classIds).")
+//             ");
+//         }
+        
+//         // Delete videos from course
+//         $this->db->query("
+//             DELETE FROM videos 
+//             WHERE id_class IN (".implode(",",$classIds).")
+//         ");
+        
+//         // Delete questionnaires from course
+//         $this->db->query("
+//             DELETE FROM questionnaries 
+//             WHERE id_class IN (".implode(",",$classIds).")
+//         ");
+
         $sql = $this->db->prepare("
-            DELETE FROM modules 
-            WHERE id = ?
+            DELETE FROM modules
+            WHERE id_module = ?
         ");
+        
         $sql->execute(array($id_module));
         
-        // Delete historic from course
-        if (count($classIds) > 0) {
-            $this->db->query("
-                DELETE FROM historic 
-                WHERE id_class IN (".implode(",",$classIds).")
-            ");
-        }
-        
-        // Delete videos from course
-        $this->db->query("
-            DELETE FROM videos 
-            WHERE id_class IN (".implode(",",$classIds).")
-        ");
-        
-        // Delete questionnaires from course
-        $this->db->query("
-            DELETE FROM questionnaries 
-            WHERE id_class IN (".implode(",",$classIds).")
-        ");
+        return $sql->rowCount() > 0;
     }
     
     /**
@@ -117,19 +131,16 @@ class Modules extends Model
      * 
      * @return      int Module id added or -1 if the module has not been added
      */
-    public function add($id_course, $name)
+    public function add($name)
     {
-        if (empty($name)) { return -1; }
-        if ($this->alreadyExist($id_course, $name)) { return -1; }
+        $sql = $this->db->prepare("
+            INSERT INTO modules 
+            SET name = ? 
+        ");
         
         $response = -1;
         
-        $sql = $this->db->prepare("
-            INSERT INTO modules 
-            (id_course, name) 
-            VALUES (?,?)
-        ");
-        $sql->execute(array($id_course, $name));
+        $sql->execute(array($name));
         
         if ($sql->rowCount() > 0) {
             $response = $this->db->lastInsertId();
@@ -146,19 +157,45 @@ class Modules extends Model
      * 
      * @return      boolean If the module was successfully edited
      */
-    public function edit($id_module, $name)
+    public function edit($id_module, $newName)
     {
         if (empty($id_module) || $id_module <= 0) { return false; }
-        if (empty($name)) { return false; }
+        if (empty($newName)) { return false; }
         
         $sql = $this->db->prepare("
-            UPDATE modules 
-            SET name = ? 
-            WHERE id = ?
+            UPDATE  modules 
+            SET     name = ? 
+            WHERE   id_module = ?
         ");
-        $sql->execute(array($name, $id_module));
+        $sql->execute(array($newName, $id_module));
         
         return $sql->rowCount() > 0;
+    }
+    
+    /**
+     * Gets informations about all classes from a module.
+     *
+     * @param       int $id_module Module id
+     *
+     * @return      array Informations about all classes from the module
+     */
+    public function getClassesFromModule($id_module)
+    {
+        $videos = new Videos();
+        $questionnaires = new Questionnaires();
+        
+        $class_video = $videos->getFromModule($id_module);
+        $class_questionnaire = $questionnaires->getFromModule($id_module);
+        
+        foreach ($class_video as $class) {
+            $response[$class->getClassOrder()] = $class;
+        }
+        
+        foreach ($class_questionnaire as $class) {
+            $response[$class->getClassOrder()] = $class;
+        }
+        
+        return $response;
     }
     
     /**
@@ -169,20 +206,20 @@ class Modules extends Model
      * 
      * @return      boolean If the module exists in the specified course
      */
-    private function alreadyExist($id_course, $name)
-    {
-        if (empty($name) || empty($id_course) || $id_course <= 0)
-            return false;
+//     private function alreadyExist($id_course, $name)
+//     {
+//         if (empty($name) || empty($id_course) || $id_course <= 0)
+//             return false;
         
-        $sql = $this->db->prepare("
-            SELECT COUNT(*) AS count 
-            FROM modules 
-            WHERE id_course = ? AND name = ?
-        ");
-        $sql->execute(array($id_course, $name));
+//         $sql = $this->db->prepare("
+//             SELECT COUNT(*) AS count 
+//             FROM modules 
+//             WHERE id_course = ? AND name = ?
+//         ");
+//         $sql->execute(array($id_course, $name));
         
-        return $sql->fetch()['count'] > 0;
-    }
+//         return $sql->fetch()['count'] > 0;
+//     }
     
     /**
      * Gets all classes from a module.
@@ -191,25 +228,25 @@ class Modules extends Model
      * 
      * @return      array Classes from this module
      */
-    private function getAllClasses($id_module)
-    {
-        if (empty($id_module) || $id_module <= 0) { return array(); }
+//     private function getAllClasses($id_module)
+//     {
+//         if (empty($id_module) || $id_module <= 0) { return array(); }
         
-        $response = array();
+//         $response = array();
         
-        $sql = $this->db->prepare("
-            SELECT id 
-            FROM classes 
-            WHERE id_module = ?
-        ");
-        $sql->execute(array($id_module));
+//         $sql = $this->db->prepare("
+//             SELECT id 
+//             FROM classes 
+//             WHERE id_module = ?
+//         ");
+//         $sql->execute(array($id_module));
         
-        if ($sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $class) {
-                $response[] = $class['id'];
-            }
-        }
+//         if ($sql->rowCount() > 0) {
+//             foreach ($sql->fetchAll() as $class) {
+//                 $response[] = $class['id'];
+//             }
+//         }
         
-        return $response;
-    }
+//         return $response;
+//     }
 }

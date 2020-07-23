@@ -2,6 +2,8 @@
 namespace models;
 
 use core\Model;
+use models\obj\Student;
+use models\obj\Course;
 
 
 /**
@@ -76,63 +78,23 @@ class Students extends Model
         return true;
     }
     
-    /**
-     * Adds a new student.
-     * 
-     * @param       Student $student Informations about the student
-     * @param       boolean $autologin [Optional] If true, after registration is completed
-     * the student will automatically login to the system
-     * 
-     * @return      int Student id or -1 if the student has not been added
-     */
-    public function register(Student $student, $autologin = true)
+    public function hasCourse($id_student, $id_course)
     {
-        if ($this->existUser($student)) { return -1; }
-        
         $sql = $this->db->prepare("
-            INSERT INTO students 
-            (name,genre,birthdate,email,password) 
-            VALUES (?,?,?,?,?)
+            SELECT  count(*) AS hasCourse
+            FROM    student_course
+            WHERE   id_student = ? AND
+                    id_module IN = (SELECT  id_module
+                                    FROM    course_modules
+                                    WHERE   id_course = ?)
         ");
-        $sql->execute(array(
-            $student->getName(), 
-            $student->getGenre(),
-            $student->getBirthdate(),
-            $student->getEmail(),
-            md5($student->getPassword())
-        ));
-
-        if ($sql->rowCount() == 0) { return -1; }
         
-        if ($autologin)
-            $_SESSION['s_login'] = $this->db->lastInsertId();
+        $sql->execute(array($id_student, $id_course));
         
-        return $this->db->lastInsertId();
+        return $sql->rowCount() > 0;
     }
     
-    /**
-     * Gets student name.
-     * 
-     * @return      string Student's name
-     */
-    public function getName()
-    {
-        if ($this->id_user == -1) { return ""; }
-        
-        $response = "";
-        
-        $sql = $this->db->query("
-            SELECT name 
-            FROM students 
-            WHERE id = $this->id_user
-        ");
-        
-        if ($sql && $sql->rowCount() > 0) {
-            $response = $sql->fetch()['name'];
-        }
-        
-        return $response;
-    }
+    
     
     /**
      * Gets information about a student.
@@ -141,24 +103,27 @@ class Students extends Model
      * 
      * @return      array Informations about the student
      */
-    public function get($id_user = -1)
+    public function get($id_student)
     {
-        if ($this->id_user == -1 && $id_user == -1) { return array(); }
-        
-        $response = array();
-        
-        $id_user = $id_user == -1 ? $this->id_user : $id_user;
+        $response = null;
         
         $sql = $this->db->prepare("
-            SELECT * 
-            FROM students 
-            WHERE id = ?
+            SELECT  *
+            FROM    students
+            WHERE   id_student = ?
         ");
-        $sql->execute(array($id_user));
+        $sql->execute(array($id_student));
         
         if ($sql->rowCount() > 0) {
-            $data = $sql->fetch();
-            $response = new Student($data['name'], $data['genre'], $data['birthdate'], $data['email']);
+            $student = $sql->fetch();
+            
+            $response = new Student(
+                $student['name'],
+                $student['genre'],
+                $student['birthdate'],
+                $student['email'],
+                $student['photo']
+            );
         }
         
         return $response;
@@ -167,80 +132,48 @@ class Students extends Model
     /**
      * Gets all registered students.
      * 
-     * @return      \models\Student[] Information all registered students
+     * @return      \models\obj\Student[] Information all registered students
      */
-    public function getAll()
+    public function getAll($courseName = '')
     {
         $response = array();
 
-        $sql = $this->db->query("
-            SELECT * 
-            FROM students
-        ");
+        $query = "
+            SELECT  * 
+            FROM    students
+        ";
+        
+        if (!empty($courseName)) {
+            $query .= " 
+                WHERE id_student IN (SELECT id_student
+                                     FROM   purchases NATURAL JOIN bundle_courses
+                                            NATURAL JOIN courses
+                                     WHERE  name LIKE ?)
+            ";
+            
+            $sql = $this->db->prepare($query);
+            $sql->execute(array($courseName));
+        }
+        else {
+            $sql = $this->db->query($query);
+        }
         
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $student) {
-                $s = new Student($student['name'], $student['genre'], $student['birthdate'], $student['email']);
-                $s->setId($student['id']);
-                $response[] = $s;
+                $response[] = new Student(
+                    $student['id'],
+                    $student['name'], 
+                    $student['genre'], 
+                    $student['birthdate'], 
+                    $student['email']
+                );
             }
         }
 
         return $response;
     }
     
-    /**
-     * Gets last class watched by the student.
-     * 
-     * @param       int $id_course Course id
-     * 
-     * @return      int Class id or -1 if the student has never watched a class
-     */
-    public function getLastClassWatched($id_course)
-    {
-        $response = -1;
-        
-        $classes = new Classes();
-        $courseClassIds = $classes->getClassesInCourse($id_course);
-        
-        $sql = $this->db->prepare("
-            SELECT id_class 
-            FROM historic 
-            WHERE 
-                id_student = $this->id_user AND
-                id_class IN (".implode(",",$courseClassIds).")
-            ORDER BY date_watched DESC 
-            LIMIT 1
-        ");
-        $sql->execute(array($id_course));
-        
-        if ($sql->rowCount() > 0) {
-            $response = $sql->fetch()['id_class'];
-        }
-        
-        return $response;
-    }
     
-    /**
-     * Checks whether a student exists by its id.
-     * 
-     * @param       int $id_student Student id
-     * 
-     * @return      boolean If the student with the specified id exists
-     */
-    public function exist($id_student)
-    {
-        if (empty($id_student) || $id_student <= 0) { return false; }
-        
-        $sql = $this->db->prepare("
-            SELECT COUNT(*) AS count 
-            FROM students 
-            WHERE id = ?
-        ");
-        $sql->execute(array($id_student));
-        
-        return $sql->fetch()['count'] > 0;
-    }
     
     /**
      * Gets all courses that a student is enrolled.
@@ -255,24 +188,24 @@ class Students extends Model
         
         $response = array();
         
-        $sql = $this->db->prepare("
-            SELECT id_course
-            FROM student_course 
-            WHERE id_student = ?
+        $sql = $this->db->query("
+            SELECT  *
+            FROM    courses
+            WHERE   id_course IN (SELECT id_course
+                                  FROM bundle_courses
+                                  WHERE id_bundle IN (SELECT  id_bundle
+                                                      FROM    purchases
+                                                      WHERE   id_student = ?))
         ");
+        
         $sql->execute(array($id_student));
 
         if ($sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $course) {
-                $sql = $this->db->query("
-                    SELECT * 
-                    FROM courses 
-                    WHERE id = ".$course['id_course']
+                $response[] = new Course(
+                    $course['id_course'], 
+                    $course['name']
                 );
-                
-                if ($sql->rowCount() > 0) {
-                    $response[] = $sql->fetch(\PDO::FETCH_ASSOC);
-                }
             }
         }
         
@@ -294,27 +227,11 @@ class Students extends Model
         
         $sql = $this->db->prepare("
             DELETE FROM students 
-            WHERE id = ?
+            WHERE id_student = ?
         ");
         $sql->execute(array($id_student));
         
-        if ($sql->rowCount() > 0) {
-            $sql = $this->db->prepare("
-                DELETE FROM historic
-                WHERE id_student = ?
-            ");
-            $sql->execute(array($id_student));
-            
-            $sql = $this->db->prepare("
-                DELETE FROM student_course 
-                WHERE id_student = ?
-            ");
-            $sql->execute(array($id_student));
-            
-            $response = true;
-        }
-        
-        return $response;
+        return $sql->rowCount() > 0;
     }
     
     /**
@@ -328,34 +245,32 @@ class Students extends Model
     {
         if (empty($student) || empty($student->getId())) { return false; }
         
-        if (empty($student->getPassword())) {
             $sql = $this->db->prepare("
                 UPDATE students 
-                SET name = ?, genre = ?, birthdate = ?, email = ? 
-                WHERE id = ?
+                (name, genre, birthdate)
+                VALUES (?, ?, ?)
+                WHERE id_student = ?
             ");
+            
             $sql->execute(array(
                 $student->getName(),
                 $student->getGenre(),
                 $student->getBirthdate(),
-                $student->getEmail(),
                 $student->getId()
             ));
-        } else {
-            $sql = $this->db->prepare("
-                UPDATE students 
-                SET name = ?, genre = ?, birthdate = ?, email = ?, password = ? 
-                WHERE id = ?
-            ");
-            $sql->execute(array(
-                $student->getName(),
-                $student->getGenre(),
-                $student->getBirthdate(),
-                $student->getEmail(),
-                md5($student->getPassword()),
-                $student->getId()
-            ));
-        }
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    public function updatePassword($id_student, $newPassword)
+    {
+        $sql = $this->db->query("
+            UPDATE students
+            SET password = MD5(".$newPassword.")
+            WHERE id_student = ?
+        ");
+        
+        $sql->execute(array($id_student));
         
         return $sql->rowCount() > 0;
     }
@@ -368,15 +283,17 @@ class Students extends Model
      * 
      * @return      boolean If the student was sucessfully enrolled
      */
-    public function addCourse($id_student, $id_course)
+    public function addBundle($id_student, $id_bundle)
     {
-        if (empty($id_student) || empty($id_course)) { return false; }
+        if (empty($id_student) || empty($id_bundle)) { return false; }
         
         $sql = $this->db->prepare("
-            INSERT INTO student_course 
-            SET id_student = ?, id_course = ?
+            INSERT INTO purchases 
+            (id_student, id_bundle, date)
+            VALUES (?, ?, NOW())
         ");
-        $sql->execute(array($id_student, $id_course));
+        
+        $sql->execute(array($id_student, $id_bundle));
         
         return $sql->rowCount() > 0;
     }
@@ -388,18 +305,18 @@ class Students extends Model
      * 
      * @return      boolean If the student was sucessfully de-enrolled from all courses
      */
-    public function deleteAllCourses($id_student)
-    {
-        if (empty($id_student)) { return false; }
+//     public function deleteAllBundles($id_student)
+//     {
+//         if (empty($id_student)) { return false; }
         
-        $sql = $this->db->prepare("
-            DELETE FROM student_course 
-            WHERE id_student = ?
-        ");
-        $sql->execute(array($id_student));
+//         $sql = $this->db->prepare("
+//             DELETE FROM purchases 
+//             WHERE id_student = ?
+//         ");
+//         $sql->execute(array($id_student));
         
-        return $sql->rowCount() > 0;
-    }
+//         return $sql->rowCount() > 0;
+//     }
     
     /**
      * Checks whether a student exists by its email.
@@ -408,19 +325,19 @@ class Students extends Model
      *
      * @return      boolean If there is already a student with the email used.
      */
-    private function existUser($student) 
-    {
-        $email = $student->getEmail();
+//     private function existUser($student) 
+//     {
+//         $email = $student->getEmail();
         
-        if (empty($email)) { return false; }
+//         if (empty($email)) { return false; }
         
-        $sql = $this->db->prepare("
-            SELECT COUNT(*) as count 
-            FROM students
-            WHERE email = ?
-        ");
-        $sql->execute(array($email));
+//         $sql = $this->db->prepare("
+//             SELECT COUNT(*) as count 
+//             FROM students
+//             WHERE email = ?
+//         ");
+//         $sql->execute(array($email));
 
-        return $sql->fetch()['count'] > 0;
-    }
+//         return $sql->fetch()['count'] > 0;
+//     }
 }

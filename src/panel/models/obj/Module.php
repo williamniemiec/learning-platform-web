@@ -3,6 +3,7 @@ namespace models\obj;
 
 
 use models\Modules;
+use models\Classes;
 
 /**
  * Responsible for representing courses.
@@ -11,16 +12,14 @@ use models\Modules;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Course
+class Module
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
     private $id_course;
     private $name;
-    private $logo;
-    private $description;
-    private $modules;
+    private $classes;
     
     
     //-------------------------------------------------------------------------
@@ -34,12 +33,10 @@ class Course
      * @param       string $logo [Optional] Name of the course logo file
      * @param       string $description [Optional] Course description
      */
-    public function __construct($id_course, $name, $logo = '', $description = '')
+    public function __construct($id_module, $name)
     {
         $this->id_course = $id_course;
         $this->name = $name;
-        $this->logo = empty($logo) ? "" : $logo;
-        $this->description = empty($description) ? "" : $description;
     }
     
     
@@ -48,7 +45,7 @@ class Course
     //-------------------------------------------------------------------------
     /**
      * Gets course id.
-     * 
+     *
      * @return      int Course id
      */
     public function getCourseId()
@@ -58,7 +55,7 @@ class Course
     
     /**
      * Gets course name.
-     * 
+     *
      * @return      string Course name
      */
     public function getName()
@@ -66,36 +63,12 @@ class Course
         return $this->name;
     }
     
-    /**
-     * Gets the name of the course logo file.
-     * 
-     * @return      string Name of the course logo file or empty string if
-     * course does not have a logo
-     */
-    public function getLogo()
+    public function getClasses()
     {
-        return $this->logo;
-    }
-    
-    /**
-     * Gets course description.
-     *
-     * @return      string Course description or empty string if
-     * course does not have a description
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-    
-    public function getModules()
-    {
-        if (empty($this->modules)) {
-            $modules = new Modules();
-            
-            $this->modules = $modules->getModules($this->id_course);
+        if (empty($this->classes)) {
+            $this->classes = Classes::getClassesFromModule($this->id_module);
         }
         
-        return $this->modules;
+        return $this->classes;
     }
 }

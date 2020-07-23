@@ -2,6 +2,7 @@
 namespace models;
 
 use core\Model;
+use models\obj\Module;
 
 
 /**
@@ -44,20 +45,53 @@ class Modules extends Model
         $response = array();
         
         $sql = $this->db->prepare("
-            SELECT * 
-            FROM modules 
-            WHERE id_course = ?
+            SELECT  *
+            FROM    modules
+            WHERE   id_module IN (SELECT    id_module
+                                  FROM      course_modules
+                                  WHERE     id_course = ?)
         ");
+        
         $sql->execute(array($id_course));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetchAll(\PDO::FETCH_ASSOC);
+            $modules = $sql->fetchAll(\PDO::FETCH_ASSOC);
             
-            $classes = new Classes();
-            
-            for ($i=0; $i<count($response); $i++) {
-                $response[$i]['classes'] = $classes->getClassesFromModule($response[$i]['id']);
+            foreach ($modules as $module) {
+                $response[] = new Module(
+                    $module['id_module'], 
+                    $module['name']
+                );
             }
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Gets  IN formations about all classes FROM a module.
+     *
+     * @param        int $id_module Module id
+     *
+     * @return      array Informations about all classes FROM the module
+     */
+    public function getClassesFromModule($id_module)
+    {
+        if (empty($id_module) || $id_module <= 0) { return array(); }
+        
+        $response = array();
+        $videos = new Videos();
+        $questionnaires = new Questionnaires();
+        
+        $class_video = $videos->getFromModule($id_module);
+        $class_questionnaire = $questionnaires->getFromModule($id_module);
+        
+        foreach ($class_video as $class) {
+            $response[$class->getClassOrder()] = $class;
+        }
+        
+        foreach ($class_questionnaire as $class) {
+            $response[$class->getClassOrder()] = $class;
         }
         
         return $response;

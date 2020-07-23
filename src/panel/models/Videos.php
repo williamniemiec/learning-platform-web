@@ -2,6 +2,7 @@
 namespace models;
 
 use core\Model;
+use models\obj\Video;
 
 
 /**
@@ -37,24 +38,30 @@ class Videos extends Model
      * 
      * @return      array Class video
      */
-    public function getVideoFromClass($id_class)
+    public function get($id_module, $class_order)
     {
-        if (empty($id_class) || $id_class <= 0) { return array(); }
-        
         $response = array();
         
         $sql = $this->db->prepare("
-            SELECT * 
-            FROM videos 
-            WHERE id_class = ?
+            SELECT  *
+            FROM    videos
+            WHERE   id_module = ? AND class_order = ?
         ");
-        $sql->execute(array($id_class));
+        $sql->execute(array($id_module, $class_order));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetch(\PDO::FETCH_ASSOC);
+            $class = $sql->fetch(\PDO::FETCH_ASSOC);
+            
+            $response = new Video(
+                $class['id_module'],
+                $class['class_order'],
+                $class['title'],
+                $class['videoID'],
+                $class['length']
+            );
         }
         
-        return $response; 
+        return $response;
     }
     
     /**
@@ -67,46 +74,20 @@ class Videos extends Model
      * 
      * @return      boolean If class was sucessfully added
      */
-    public function add($classId, $title, $description, $url)
+    public function add($id_module, $class_order, $title, $description, $url)
     {
         if (empty($title) || empty($description) || empty($url)) { return false; }
         
         $sql = $this->db->prepare("
             INSERT INTO videos 
-            (id_class,title,description,url) 
-            VALUES (?,?,?,?)
+            (id_module, class_order, title, description, url, length) 
+            VALUES (?, ?, ?, ?, ?)
         ");
-        $sql->execute(array($classId,$title, $description, $url));
+        $sql->execute(array($id_module, $class_order, $title, $description, $url));
          
         return $sql->rowCount() > 0;
     }
     
-    /**
-     * Gets a video class.
-     * 
-     * @param       int $id_video Class id
-     * 
-     * @return      array Video class
-     */
-    public function get($id_video)
-    {
-        if (empty($id_video)) { return array(); }
-        
-        $response = array();
-        
-        $sql = $this->db->prepare("
-            SELECT * 
-            FROM videos 
-            WHERE id = ?
-        ");
-        $sql->execute(array($id_video));
-        
-        if ($sql->rowCount() > 0) {
-            $response = $sql->fetch(\PDO::FETCH_ASSOC);
-        }
-        
-        return $response;
-    }
     
     /**
      * Edits a video class.
@@ -118,19 +99,19 @@ class Videos extends Model
      * 
      * @return      boolean If class was sucessfully edited
      */
-    public function edit($id_video, $title, $description, $url)
+    public function edit($id_module, $class_order, $title, $description, $url, $length)
     {
-        if (empty($id_video) || empty($title) || 
+        if (empty($id_module) || empty($title) || 
             empty($description) || empty($url)) { 
             return false; 
         }
         
         $sql = $this->db->prepare("
             UPDATE videos 
-            SET title = ?, description = ?, url = ? 
-            WHERE id = ?
+            (title, description, url, length) 
+            WHERE id_module = ? AND class_order = ?
         ");
-        $sql->execute(array($title, $description, $url, $id_video));
+        $sql->execute(array($title, $description, $url, $length, $id_module, $class_order));
         
         return $sql->rowCount() > 0;
     }

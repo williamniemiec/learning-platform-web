@@ -2,6 +2,8 @@
 namespace models;
 
 use core\Model;
+use models\obj\Student;
+use models\obj\_Class;
 
 
 /**
@@ -16,7 +18,7 @@ class Students extends Model
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_user;
+    private $id_student;
     
     
     //-------------------------------------------------------------------------
@@ -32,7 +34,7 @@ class Students extends Model
     public function __construct($id_user = -1)
     {
         parent::__construct();
-        $this->id_user = $id_user;
+        $this->id_student = $id_user;
     }
 
 
@@ -71,7 +73,7 @@ class Students extends Model
         if ($sql->rowCount() == 0) { return false; }
         
         $_SESSION['s_login'] = $sql->fetch()['id'];
-        $this->id_user = $sql->fetch()['id'];
+        $this->id_student = $sql->fetch()['id'];
         
         return true;
     }
@@ -117,11 +119,11 @@ class Students extends Model
      */
     public function getName()
     {
-        if ($this->id_user == -1) { return ""; }
+        if ($this->id_student == -1) { return ""; }
         
         $response = "";
         
-        $sql = $this->db->query("SELECT name FROM students WHERE id = $this->id_user");
+        $sql = $this->db->query("SELECT name FROM students WHERE id = $this->id_student");
         
         if ($sql && $sql->rowCount() > 0) {
             $response = $sql->fetch()['name'];
@@ -137,20 +139,27 @@ class Students extends Model
      *
      * @return      array Informations about the student
      */
-    public function get($id_user = -1)
+    public function get($id_student)
     {
-        if ($this->id_user == -1 && $id_user == -1) { return ""; }
-        
         $response = null;
-        
-        $id_user = $id_user == -1 ? $this->id_user : $id_user;
-        
-        $sql = $this->db->prepare("SELECT * FROM students WHERE id = ?");
-        $sql->execute(array($id_user));
+         
+        $sql = $this->db->prepare("
+            SELECT  * 
+            FROM    students
+            WHERE   id_student = ?
+        ");
+        $sql->execute(array($id_student));
         
         if ($sql->rowCount() > 0) {
-            $data = $sql->fetch();
-            $response = new Student($data['name'], $data['genre'], $data['birthdate'], $data['photo'], $data['email']);
+            $student = $sql->fetch();
+            
+            $response = new Student(
+                $student['name'], 
+                $student['genre'], 
+                $student['birthdate'], 
+                $student['email'],
+                $student['photo'] 
+            );
         }
         
         return $response;
@@ -161,28 +170,48 @@ class Students extends Model
      *
      * @param       int $id_course Course id
      *
-     * @return      int Class id or -1 if the student has never watched a class
+     * @return      _Class ...
      */
     public function getLastClassWatched($id_course)
     {
-        $response = -1;
-        
-        $classes = new Classes();
-        $courseClassIds = $classes->getClassesInCourse($id_course);
+        $response = NULL;
         
         $sql = $this->db->prepare("
-            SELECT id_class 
-            FROM historic 
-            WHERE 
-                id_student = $this->id_user AND
-                id_class IN (".implode(",",$courseClassIds).")
-            ORDER BY date_watched DESC 
+            SELECT      id_module, class_order,
+                        CASE
+                            WHEN class_type = 0 THEN 'video'
+                            ELSE 'questionnaire'
+                        END AS class_type
+            FROM        student_historic
+            WHERE       id_student = ? AND
+                        id_module IN (SELECT    id_module
+                                      FROM      course_modules
+                                      WHERE     id_course = ?)
+            ORDER BY    date DESC
             LIMIT 1
         ");
-        $sql->execute(array($id_course));
+        
+        $sql->execute(array($this->id_student, $id_course));
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetch()['id_class'];
+            $class = $sql->fetch();
+            
+            if ($class['class_type'] == 'video') {
+                $videos = new Videos();
+                
+                $response = $videos->get(
+                    $class['id_module'], 
+                    $class['class_order']
+                ); 
+            }
+            else {
+                $questionnaries = new Questionnaires();
+                
+                $response = $questionnaries->get(
+                    $class['id_module'],
+                    $class['class_order']
+                ); 
+            }
         }
         
         return $response;
@@ -195,15 +224,15 @@ class Students extends Model
      *
      * @return      boolean If the student with the specified id exists
      */
-    public function exist($id_student)
-    {
-        if (empty($id_student) || $id_student <= 0) { return false; }
+//     public function exist($id_student)
+//     {
+//         if (empty($id_student) || $id_student <= 0) { return false; }
         
-        $sql = $this->db->prepare("SELECT COUNT(*) AS count FROM students WHERE id = ?");
-        $sql->execute(array($id_student));
+//         $sql = $this->db->prepare("SELECT COUNT(*) AS count FROM students WHERE id = ?");
+//         $sql->execute(array($id_student));
         
-        return $sql->fetch()['count'] > 0;
-    }
+//         return $sql->fetch()['count'] > 0;
+//     }
     
     /**
      * Updates current student information.
@@ -221,7 +250,7 @@ class Students extends Model
         $sql = $this->db->prepare("
             UPDATE students 
             SET name = ?, genre = ?, birthdate = ? 
-            WHERE id = ".$this->id_user
+            WHERE id = ".$this->id_student
         );
         $sql->execute(array($name, $genre, $birthdate));
         
@@ -238,11 +267,11 @@ class Students extends Model
         $response = false;
         
         
-        $sql = $this->db->query("DELETE FROM students WHERE id = ".$this->id_user);
+        $sql = $this->db->query("DELETE FROM students WHERE id = ".$this->id_student);
         
         if ($sql->rowCount() > 0) {
-            $this->db->query("DELETE FROM historic WHERE id_student = ".$this->id_user);
-            $this->db->query("DELETE FROM student_course WHERE id_student = ".$this->id_user);
+            $this->db->query("DELETE FROM historic WHERE id_student = ".$this->id_student);
+            $this->db->query("DELETE FROM student_course WHERE id_student = ".$this->id_student);
             
             $response = true;
         }
@@ -291,7 +320,7 @@ class Students extends Model
         $sql = $this->db->query("
             UPDATE students 
             SET photo = ".$filename." 
-            WHERE id = ".$this->id_user
+            WHERE id = ".$this->id_student
         );
         return $sql->rowCount() > 0;
     }
@@ -314,19 +343,42 @@ class Students extends Model
         $sql = $this->db->query("
             SELECT COUNT(*) AS correctPassword 
             FROM students 
-            WHERE id = ".$this->id_user." AND password = '".md5($currentPassword)."'
+            WHERE id = ".$this->id_student." AND password = '".md5($currentPassword)."'
         ");
         
         if ($sql->fetch()['correctPassword'] > 0) {
             $sql = $this->db->query("
                 UPDATE students 
                 SET password = '".md5($newPassword)."' 
-                WHERE id = ".$this->id_user
+                WHERE id = ".$this->id_student
             );
             $response = $sql->rowCount() > 0;
         }
         
         return $response;
+    }
+    
+    /**
+     * Gets total watched classes in platform.
+     * @param unknown $id_student
+     * @return mixed
+     */
+    public function getTotalWatchedClasses($id_student)
+    {
+        $sql = $this->db->prepare("
+            SELECT SUM(length) AS total_length
+            FROM student_historic_watched_length
+            WHERE id_student = ?
+            GROUP BY id_module
+            HAVING id_module IN (SELECT    id_module
+            					 FROM      course_modules NATURAL JOIN bundle_courses 
+                                           NATURAL JOIN purchases
+            					 WHERE     id_student = ?)
+        ");
+        
+        $sql->execute(array($id_student, $id_student));
+        
+        return $sql->fetch()['total_length'];
     }
     
     /**
@@ -341,7 +393,7 @@ class Students extends Model
         $sql = $this->db->query("
             SELECT photo 
             FROM students 
-            WHERE id = ".$this->id_user
+            WHERE id = ".$this->id_student
         );
         
         if ($sql->rowCount() > 0) {

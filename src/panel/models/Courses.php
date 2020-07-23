@@ -2,6 +2,7 @@
 namespace models;
 
 use core\Model;
+use models\obj\Course;
 
 
 /**
@@ -30,21 +31,51 @@ class Courses extends Model
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
+    public function getCoursesByBundle($bundleName) 
+    {
+        $sql = $this->db->prepare("
+            SELECT      id_course, courses.name, logo, courses.description,
+                        COUNT(id_student) AS tot_students
+            FROM		courses NATURAL JOIN bundle_courses
+            			NATURAL JOIN purchases
+                        JOIN bundles USING (id_bundle)
+            WHERE       bundles.name LIKE ?
+            GROUP BY    id_course, name, logo, description
+        ");
+        
+        $sql->execute(array($bundleName));
+    }
+    
     /**
      * Gets informations about all registered courses.
      * 
      * @return      array Informations about all registered courses
      */
-    public function getCourses()
+    public function getCourses($name = '', $orderBy='', $orderType='')
     {
         $response = array();
 
-        $sql = $this->db->query("
-            SELECT 
-                *,
-                (select count(*) from student_course where id_course = courses.id) as total_students 
-            FROM courses
-        "); 
+        $query = "
+            SELECT      id_course, name, logo, description, 
+                        COUNT(id_student) AS total_students
+            FROM		courses 
+                        NATURAL JOIN bundle_courses 
+            			NATURAL JOIN purchases
+			GROUP BY    id_course, name, logo, description
+        ";
+        
+        if (!empty($orderBy)) {
+            $query .= "ORDER BY total_students ".$orderType;
+        }
+        
+        if (!empty($name)) {
+            $query .= " HAVING name LIKE ?";
+            $sql = $this->db->prepare($query);
+            $sql->execute(array($name.'%'));
+        }
+        else {
+            $sql = $this->db->query($query);
+        }
         
         if ($sql->rowCount() > 0) {
             $response = $sql->fetchAll();
@@ -60,42 +91,47 @@ class Courses extends Model
      */
     public function delete($id_course)
     {
-        // Get all classes from this course
-        $classIds = $this->getAllClasses($id_course);
         
-        // Delete classes from course
-        $sql = $this->db->prepare("DELETE FROM classes WHERE id_module = ?");
-        $sql->execute(array($id_course));
         
-        // Delete modules from course
-        $sql = $this->db->prepare("DELETE FROM modules WHERE id_course = ?");
-        $sql->execute(array($id_course));
+//         // Get all classes from this course
+//         $classIds = $this->getAllClasses($id_course);
         
-        // Delete historic from course
-        if (count($classIds) > 0) {
-            $this->db->query("DELETE FROM historic WHERE id_class IN (".implode(",",$classIds).")");
-        }
+//         // Delete classes from course
+//         $sql = $this->db->prepare("DELETE FROM classes WHERE id_module = ?");
+//         $sql->execute(array($id_course));
         
-        // Delete videos from course
-        $this->db->query("DELETE FROM videos WHERE id_class IN (".implode(",",$classIds).")");
+//         // Delete modules from course
+//         $sql = $this->db->prepare("DELETE FROM modules WHERE id_course = ?");
+//         $sql->execute(array($id_course));
         
-        // Delete questionnaires from course
-        $this->db->query("DELETE FROM questionnaries WHERE id_class IN (".implode(",",$classIds).")");
+//         // Delete historic from course
+//         if (count($classIds) > 0) {
+//             $this->db->query("DELETE FROM historic WHERE id_class IN (".implode(",",$classIds).")");
+//         }
         
-        // Delete student-course relationships
-        $sql = $this->db->prepare("DELETE FROM student_course WHERE id_course = ?");
-        $sql->execute(array($id_course));
+//         // Delete videos from course
+//         $this->db->query("DELETE FROM videos WHERE id_class IN (".implode(",",$classIds).")");
+        
+//         // Delete questionnaires from course
+//         $this->db->query("DELETE FROM questionnaries WHERE id_class IN (".implode(",",$classIds).")");
+        
+//         // Delete student-course relationships
+//         $sql = $this->db->prepare("DELETE FROM student_course WHERE id_course = ?");
+//         $sql->execute(array($id_course));
         
         // Delete image, if there is one
         $imageName = $this->getImage($id_course);
         
+        $sql = $this->db->prepare("
+            DELETE FROM courses
+            WHERE id_course = ?
+        ");
+        
+        $sql->execute(array($id_course));
+        
         if (!empty($imageName)) {
             unlink("../assets/images/logos/".$imageName);
         }
-        
-        // Delete course
-        $sql = $this->db->prepare("DELETE FROM courses WHERE id = ?");
-        $sql->execute(array($id_course));
     }
     
     /**
@@ -111,7 +147,11 @@ class Courses extends Model
         
         $response = "";
         
-        $sql = $this->db->prepare("SELECT logo FROM courses WHERE id = ?");
+        $sql = $this->db->prepare("
+            SELECT logo 
+            FROM courses 
+            WHERE id_course = ?
+        ");
         $sql->execute(array($id_course));
         
         if ($sql->rowCount() > 0) {
@@ -128,25 +168,27 @@ class Courses extends Model
      * 
      * @return      array Informations about all classes from a course
      */
-    public function getAllClasses($id_course)
-    {
-        if (empty($id_course) || $id_course <= 0) { return array(); }
+//     public function getAllClasses($id_course)
+//     {
+//         if (empty($id_course) || $id_course <= 0) { return array(); }
         
-        $response = array();
+//         $response = array();
         
-        $sql = $this->db->prepare("SELECT id FROM classes WHERE id_course = ?");
-        $sql->execute(array($id_course));
+//         $sql = $this->db->prepare("
+//             SELECT id FROM classes WHERE id_course = ?
+//         ");
+//         $sql->execute(array($id_course));
         
-        if ($sql->rowCount() > 0) {
-            $classes = $sql->fetchAll();
+//         if ($sql->rowCount() > 0) {
+//             $classes = $sql->fetchAll();
             
-            foreach ($classes as $class) {
-                $response[] = $class['id'];
-            }
-        }
+//             foreach ($classes as $class) {
+//                 $response[] = $class['id'];
+//             }
+//         }
         
-        return $response;
-    }
+//         return $response;
+//     }
     
     /**
      * Gets informations about a course.
@@ -161,8 +203,11 @@ class Courses extends Model
         
         $response = array();
         
-        $sql = $this->db->prepare("SELECT * FROM courses WHERE id = ?");
-        $sql->execute(array($id_course));
+        $sql = $this->db->prepare("
+            SELECT  *
+            FROM    courses
+            WHERE   id_course = ?
+        ");
         
         if ($sql->rowCount() > 0) {
             $response = $sql->fetch();
@@ -170,6 +215,7 @@ class Courses extends Model
             $modules = new Modules();
             $response['modules'] = $modules->getModules($id_course);
         }
+        
         
         return $response;
     }
@@ -215,7 +261,10 @@ class Courses extends Model
             }
         }
         
-        $sql = "INSERT INTO courses (".implode(",",$data_keys).") VALUES (".implode(",", $data_sql).")";
+        $sql = "
+            INSERT INTO courses 
+            (".implode(",",$data_keys).") 
+            VALUES (".implode(",", $data_sql).")";
         
         $sql = $this->db->prepare($sql);
         $sql->execute($data_values);
@@ -267,7 +316,12 @@ class Courses extends Model
 
         $data_values[] = $id_course;
         
-        $sql = "UPDATE courses SET ".implode(",", $data_sql)." WHERE id = ?";
+        $sql = "
+            UPDATE courses 
+            SET ".implode(",", $data_sql)." 
+            WHERE id = ?
+        ";
+        
         $sql = $this->db->prepare($sql);
         $sql->execute($data_values);
         
@@ -282,23 +336,52 @@ class Courses extends Model
      * 
      * @return      array Informations about all courses
      */
-    public function getAll($id_student = -1)
+    public function getAll($limit = -1)
     {
-        if ($id_student == -1)
-            $sql = $this->db->query("SELECT * FROM courses");
-        else
-            $sql = $this->db->query("
-                SELECT 
-                    *,
-                    (select count(*) from student_course where courses.id = student_course.id_course and student_course.id_student = $id_student) as hasCourse 
-                FROM courses
-            ");
+        $query = "SELECT * FROM courses";
+        
+        $response = array();
+        
+        if ($limit > 0)
+            $query .= " LIMIT ".$limit;
+        
+        $sql = $this->db->query($query);
         
         if ($sql->rowCount() > 0) {
-            $response = $sql->fetchAll(\PDO::FETCH_ASSOC);
+            $courses = $sql->fetchAll(\PDO::FETCH_ASSOC);
+            
+            foreach ($courses as $course) {
+                $response[] = new Course(
+                    $course['id_course'], $course['name']);
+            }
         }
         
         return $response;
+    }
+    
+    public function addModule($id_course, $id_module, $order)
+    {   
+        $sql = $this->db->prepare("
+            INSERT INTO course_modules
+            (id_module, id_course, order)
+            VALUES (?, ?, ?)
+        ");
+        
+        $sql->execute($id_course, $id_module, $order);
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    public function deleteModuleFromCourse($id_course, $id_module)
+    {
+        $sql = $this->db->prepare("
+            DELETE FROM course_modules
+            WHERE id_course = ? AND id_module = ?
+        ");
+        
+        $sql->execute(array($id_course, $id_module));
+        
+        return $sql->rowCount() > 0;
     }
     
     /**

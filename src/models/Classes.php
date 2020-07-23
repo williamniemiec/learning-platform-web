@@ -2,16 +2,17 @@
 namespace models;
 
 use core\Model;
+use models\obj\Questionnaire;
 
 
 /**
- * Responsible for managing classes.
+ * Responsible for manag IN g classes.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
  * @version		1.0
- * @since		1.0
+ * @s IN ce		1.0
  */
-class Classes extends Model
+abstract class Classes extends Model
 {
     //-------------------------------------------------------------------------
     //        Constructor
@@ -19,7 +20,7 @@ class Classes extends Model
     /**
      * Creates classes manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @apiNote     It will connect to the database when it is  IN stantiated
      */
     public function __construct()
     {
@@ -30,122 +31,72 @@ class Classes extends Model
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
-    /**
-     * Gets total of classes from a course.
-     *
-     * @param       int $id_course Course id
-     *
-     * @return      int Total course classes
-     */
-    public function countClasses($id_course)
-    {
-        if (empty($id_course) || $id_course <= 0) { return 0; }
-        
-        $sql = $this->db->query("
-            SELECT COUNT(*) as count 
-            FROM classes 
-            WHERE id_course = $id_course
-        ");
-        
-        return $sql->fetch()['count'];
-    }
     
-    /**
-     * Gets informations about all classes from a module.
-     *
-     * @param       int $id_module Module id
-     *
-     * @return      array Informations about all classes from the module
-     */
-    public function getClassesFromModule($id_module)
-    {
-        if (empty($id_module) || $id_module <= 0) { return array(); }
-        
-        $response = array();
-        $id_student = $_SESSION['s_login'];
-        $sql = $this->db->prepare("
-            SELECT 
-                *,
-                (   
-                    select count(*) 
-                    from historic 
-                    where historic.id_class = classes.id and historic.id_student = $id_student
-                ) as watched 
-            FROM classes 
-            WHERE id_module = ? 
-            ORDER BY classes.order
-        ");
-        $sql->execute(array($id_module));
-        
-        if ($sql->rowCount() > 0) {
-            $response = $sql->fetchAll();
-            
-            foreach ($response as $key => $value) {
-                if ($value['type'] == 'video') {
-                    $videos = new Videos();
-                    $response[$key]['video'] = $videos->getVideoFromClass($value['id']); 
-                } else if ($value['type'] == 'quest') {
-                    $quests = new Questionnaires();
-                    $response[$key]['quest'] = $quests->getQuestFromClass($value['id']);
-                }
-            }
-        }
-        
-        return $response;
-    }
     
-    /**
-     * Gets course id from a class.
-     *
-     * @param       int $id_class
-     *
-     * @return      number Course id of -1 if class id is invalid
-     */
-    public function getCourseId($id_class)
-    {
-        if (empty($id_class) || $id_class <= 0) { return -1; }
+    
+    
+//     /**
+//      * Gets course id FROM a class.
+//      *
+//      * @param        IN t $id_class
+//      *
+//      * @return      number Course id of -1 if class id is  IN valid
+//      */
+//     public function getCourseId($id_class)
+//     {
+//         if (empty($id_class) || $id_class <= 0) { return -1; }
 
-        $sql = $this->db->prepare("
-            SELECT id_course 
-            FROM classes 
-            WHERE id = ?
-        ");
-        $sql->execute(array($id_class));
+//         $sql = $this->db->prepare("
+//             SELECT id_course 
+//             FROM classes 
+//             WHERE id = ?
+//         ");
+//         $sql->execute(array($id_class));
         
-        return $sql->fetch()['id_course'];
-    }
+//         return $sql->fetch()['id_course'];
+//     }
     
     /**
-     * Gets information about the first class from the first module from a
+     * Gets  IN formation about the first class FROM the first module FROM a
      * course.
      *
-     * @param       int $id_course Course id
+     * @param        IN t $id_course Course id
      *
-     * @return      array Informations about the first class from the first
-     * module from a course
+     * @return      array Informations about the first class FROM the first
+     * module FROM a course
      */
     public function getFirstClassFromFirstModule($id_course)
     {
         $response = array();
         
         $sql = $this->db->prepare("
-            SELECT * 
-            FROM classes 
-            WHERE classes.order = 1 AND id_course = ? 
-            ORDER BY id_module ASC 
-            LIMIT 1
+            SELECT      id_module, class_order, class_type FROM (
+                SELECT    id_module, class_order, 'questionnaire' AS class_type
+                FROM      questionnaires
+                WHERE     questionnaires.class_order = 1 AND questionnaires.id_module  IN  (SELECT  id_module 
+                                                                                            FROM    course_modules 
+                                                                                            WHERE   id_course = ?)
+                union
+                SELECT    id_module, class_order, 'video' AS class_type
+                FROM      videos
+                WHERE     videos.class_order = 1 AND videos.id_module  IN (SELECT  id_module 
+                                                                           FROM    course_modules 
+                                                                           WHERE   id_course = ?)
+            ) AS tmp join course_modules USING (id_module)
+            WHERE       id_course = ?
+            ORDER BY    module_order
         ");
         $sql->execute(array($id_course));
         
         if ($sql->rowCount() > 0) {
             $response = $sql->fetch();
             
-            if ($response['type'] == 'video') {
+            if ($response['class_type'] == 'video') {
                 $videos = new Videos();
-                $response['video'] = $videos->getVideoFromClass($response['id']);
+                $response['video'] = $videos->get($response['id_module'], 1);
             } else {
                 $quests = new Questionnaires();
-                $response['quest'] = $quests->getQuestFromClass($response['id']);
+                $response['questionnaire'] = $quests->get($response['id_module'], 1);
             }
         }
         
@@ -153,148 +104,141 @@ class Classes extends Model
     }
     
     /**
-     * Gets informations about a class and if it was watched by a student.
+     * Gets  IN formations about a class AND if it was watched by a student.
      * 
-     * @param       int $id_class Class id
-     * @param       int $id_student Student id
-     * @return      array Class information
+     * @param        IN t $id_class Class id
+     * @param        IN t $id_student Student id
+     * @return      array Class  IN formation
      */
-    public function getClass($id_class, $id_student)
-    {
-        if (empty($id_class) || $id_class <= 0) { return -1; }
+//     public function getClass($id_class, $id_student)
+//     {
+//         if (empty($id_class) || $id_class <= 0)
+//             return -1;
         
-        $response = array();
+//         $response = array();
         
-        $sql = $this->db->prepare("
-            SELECT 
-                *,
-                (
-                    select count(*)
-                    from historic 
-                    where historic.id_class = classes.id and historic.id_student = $id_student
-                ) as watched
-            FROM classes 
-            WHERE id = ?
-        ");
-        $sql->execute(array($id_class));
+//         $sql = $this->db->prepare("
+//             SELECT 
+//                 *,
+//                 (
+//                     SELECT COUNT(*)
+//                     FROM historic 
+//                     WHERE historic.id_class = classes.id AND historic.id_student = $id_student
+//                 ) AS watched
+//             FROM classes 
+//             WHERE id = ?
+//         ");
+//         $sql->execute(array($id_class));
         
-        if ($sql->rowCount() > 0) {
-            $response = $sql->fetch();
+//         if ($sql->rowCount() > 0) {
+//             $response = $sql->fetch();
             
-            if ($response['type'] == 'video') {
-                $videos = new Videos();
-                $response['video'] = $videos->getVideoFromClass($id_class);
-            } else {
-                $quests = new Questionnaires();
-                $response['quest'] = $quests->getQuestFromClass($id_class);
-            }
-        }
+//             if ($response['type'] == 'video') {
+//                 $videos = new Videos();
+//                 $response['video'] = $videos->getVideoFromClass($id_class);
+//             } else {
+//                 $quests = new Questionnaires();
+//                 $response['quest'] = $quests->getQuestFromClass($id_class);
+//             }
+//         }
         
-        return $response; 
+//         return $response; 
         
-    }
+//     }
     
     /**
      * Checks whether there is a class with the given id.
      *
-     * @param       int $id_class Class id
+     * @param        IN t $id_class Class id
      *
      * @return      boolean If there is a class with the given id
      */
-    public function exist($id_class)
-    {
-        if (empty($id_class) || $id_class <= 0) { return false; }
+//     public function exist($id_class)
+//     {
+//         if (empty($id_class) || $id_class <= 0) { return false; }
         
-        $sql = $this->db->prepare("SELECT COUNT(*) AS count FROM classes WHERE id = ?");
-        $sql->execute(array($id_class));
+//         $sql = $this->db->prepare("SELECT COUNT(*) AS count FROM classes WHERE id = ?");
+//         $sql->execute(array($id_class));
         
-        return $sql->fetch()['count'] > 0;
-    }
+//         return $sql->fetch()['count'] > 0;
+//     }
     
     /**
-     * Marks a class as watched by a student.
+     * Marks a class AS watched by a student.
      * 
-     * @param       int $id_student Student id
-     * @param       int $id_class Class id
      */
-    public function markAsWatched($id_student, $id_class)
+    public abstract function markAsWatched($id_student, $id_module, $class_order);
+    
+    /**
+     * Removes watched class markup FROM a class.
+     * 
+     */
+    public function removeWatched($id_student, $id_module, $class_order)
     {
-        if (empty($id_class) || $id_class <= 0)                     { return; }
-        if ($this->alreadyMarkedAsWatched($id_student, $id_class))   { return; }
+        if (empty($id_student) || $id_student <= 0)
+            return;
+            
+        if (empty($id_module) || $id_module <= 0)
+            return;
+            
+        if ($class_order <= 0)
+            return;
         
         $sql = $this->db->prepare("
-            INSERT INTO historic 
-            (id_student,id_class,date_watched) 
-            VALUES (?,?,NOW())
+            DELETE FROM student_historic 
+            WHERE id_student = ? AND id_module = ? AND class_order = ?
         ");
-        $sql->execute(array($id_student,$id_class));   
+        $sql->execute(array($id_student, $id_module, $class_order));
     }
     
     /**
-     * Removes watched class markup from a class.
-     * 
-     * @param       int $id_student Student id
-     * @param       int $id_class Marked Class id
-     */
-    public function removeWatched($id_student,$id_class)
-    {
-        if (empty($id_class) || $id_class <= 0) { return; }
-        
-        $sql = $this->db->prepare("
-            DELETE FROM historic 
-            WHERE id_student = ? AND id_class = ?
-        ");
-        $sql->execute(array($id_student,$id_class));
-    }
-    
-    /**
-     * Gets all classes from a course.
+     * Gets all classes FROM a course.
      *
-     * @param       int $id_course Course id
+     * @param        IN t $id_course Course id
      *
      * @return      array Informations about all classes from a course
      */
-    public function getClassesInCourse($id_course)
-    {
-        if (empty($id_course) || $id_course <= 0) { return; }
+//     public function getClassesInCourse($id_course)
+//     {
+//         if (empty($id_course) || $id_course <= 0) { return; }
         
-        $response = array();
+//         $response = array();
         
-        $sql = $this->db->prepare("
-            SELECT id 
-            FROM classes 
-            WHERE id_course = ?
-        ");
-        $sql->execute(array($id_course));
+//         $sql = $this->db->prepare("
+//             SELECT id 
+//             FROM classes 
+//             WHERE id_course = ?
+//         ");
+//         $sql->execute(array($id_course));
         
-        if ($sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $class) {
-                $response[] = $class['id'];
-            }
-        }
+//         if ($sql->rowCount() > 0) {
+//             foreach ($sql->fetchAll() AS $class) {
+//                 $response[] = $class['id'];
+//             }
+//         }
         
-        return $response;
-    }
+//         return $response;
+//     }
     
     /**
-     * Checks whether a class is marked as watched.
+     * Checks whether a class is marked AS watched.
      * 
-     * @param       int $id_class Class id
-     * @param       int $id_student Student id
-     * @return      boolean If class is marked as watched
+     * @param        int t $id_class Class id
+     * @param        IN t $id_student Student id
+     * @return      boolean If class is marked AS watched
      */
-    private function alreadyMarkedAsWatched($id_class, $id_student)
-    {
-        if (empty($id_class) || $id_class <= 0)     { return true; }
-        if (empty($id_student) || $id_student <= 0) { return true; }
+//     private function alreadyMarkedAsWatched($id_class, $id_student)
+//     {
+//         if (empty($id_class) || $id_class <= 0)     { return true; }
+//         if (empty($id_student) || $id_student <= 0) { return true; }
         
-        $sql = $this->db->prepare("
-            SELECT COUNT(*) as count 
-            FROM historic 
-            WHERE id_student = ? AND id_class = ?
-        ");
-        $sql->execute(array($id_student,$id_class));
+//         $sql = $this->db->prepare("
+//             SELECT COUNT(*) AS count 
+//             FROM historic 
+//             WHERE id_student = ? AND id_class = ?
+//         ");
+//         $sql->execute(array($id_student,$id_class));
         
-        return $sql->fetch()["count"] > 0;
-    }
+//         return $sql->fetch()["count"] > 0;
+//     }
 }
