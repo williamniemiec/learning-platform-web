@@ -241,23 +241,22 @@ class Students extends Model
      * 
      * @return      boolean If student was sucessfully edited
      */
-    public function edit(Student $student)
+    public function edit($id_student, $newEmail, $newPassword = '')
     {
-        if (empty($student) || empty($student->getId())) { return false; }
+        if ($this->getAuthorization()->getLevel() != 0 && $this->getAuthorization()->getLevel() != 2) {
+            throw new IllegalAccessException("Admin does not have root or manager authorization");
+        }
+
+        if (!empty($newPassword))
+            $this->updatePassword($id_student, $newPassword);
+
+        $sql = $this->db->prepare("
+            UPDATE  students 
+            SET     email = ?
+            WHERE   id_student = ?
+        ");
         
-            $sql = $this->db->prepare("
-                UPDATE students 
-                (name, genre, birthdate)
-                VALUES (?, ?, ?)
-                WHERE id_student = ?
-            ");
-            
-            $sql->execute(array(
-                $student->getName(),
-                $student->getGenre(),
-                $student->getBirthdate(),
-                $student->getId()
-            ));
+        $sql->execute(array($newEmail, $id_student));
         
         return $sql->rowCount() > 0;
     }

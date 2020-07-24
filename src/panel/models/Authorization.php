@@ -53,26 +53,4 @@ class Authorization extends Model
         );
     }
     
-    public function new($name, $level)
-    {
-        $sql = $this->db->prepare("
-            INSERT INOT authorization
-            (name, level)
-            VALUES (?, ?)
-        ");
-        
-        $sql->execute(array($name, $level));
-        
-        return $sql->rowCount() > 0;
-    }
-    
-    public function remove($id_authorization)
-    {
-        $sql = $this->db->prepare("
-            DELETE FROM authorization
-            WHERE id_authorization = ?
-        ");
-        
-        $sql->execute(array($id_authorization));
-    }
 }

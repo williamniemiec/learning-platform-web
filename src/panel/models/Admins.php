@@ -85,6 +85,10 @@ class Admins extends Model
     
     public function new($id_authorization, $name, $genre, $birthdate, $email, $password)
     {
+        if ($this->getAuthorization()->getLevel() != 0) {
+            throw new IllegalAccessException("Admin does not have root authorization");
+        }
+
         $sql = $this->db->prepare("
             INSERT INTO admins
             (id_authorization, name, genre, birthdate, email, password)
@@ -96,6 +100,57 @@ class Admins extends Model
         return $sql->rowCount() > 0;
     }
     
+    public function edit($id_admin, $newId_authorization, $newEmail, $newPassword='')
+    {
+        if ($this->getAuthorization()->getLevel() != 0) {
+            throw new IllegalAccessException("Admin does not have root authorization");
+        }
+
+        if (!empty($newPassword)) {
+            $this->changePassword($id_admin, $newPassword);
+        }
+        $sql = $this->db->prepare("
+            UPDATE  admins
+            (id_authorization, email)
+            VALUES (?, ?)
+            WHERE id_admin = ?
+        ");
+
+        $sql->execute(array($newId_authorization, $newEmail, $id_admin));
+
+        return $sql->rowCount() > 0;
+    }
+
+    public function remove($id_admin)
+    {
+        if ($this->getAuthorization()->getLevel() != 0) {
+            throw new IllegalAccessException("Admin does not have root authorization");
+        }
+    }
+
+    public function editMyself($id_admin, $newName, $newGenre, $newBirthdate)
+    {
+        $sql = $this->db->prepare("
+            UPDATE  admins
+            (id_authorization, name, genre, birthdate)
+            VALUES (?, ?, ?, ?)
+            WHERE id_admin = ?
+        ");
+
+        $sql->execute(array($id_authorization, $name, $genre, $birthdate, $id_admin));
+    }
+
+    public function changePassword($id_admin, $newPassword)
+    {
+        $sql = $this->db->prepare("
+            UPDATE  admins
+            SET     password = ?
+            WHERE   id_admin = ?
+        ");
+
+        $sql->execute(array(md5($newPassword), $id_admin));
+    }
+
     /**
      * Gets admin authorization.
      * 

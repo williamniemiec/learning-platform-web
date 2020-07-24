@@ -380,7 +380,24 @@ class Students extends Model
         
         return $sql->fetch()['total_length'];
     }
-    
+
+    public function getWeeklyHistory($id_student)
+    {
+        $sql = $this->db->prepare("
+            SELECT  date, SUM(*) AS watched_classes
+            FROM    student_historic
+            WHERE   id_student = ?
+            GROUP BY    date
+            ORDER BY date DESC
+            LIMIT 7
+        ");
+
+        $sql->execute(array($id_student))
+
+        return ($sql && $sql->rowCount() > 0) ? 
+            $sql->fetchAll(\PDO::FETCH_ASSOC) : array();
+    }
+
     /**
      * Gets photo from current student.
      * 
