@@ -63,6 +63,7 @@ class SupportTopics extends Model
             $response = new SupportTopics(
                 $supportTopic['id_topic'],
                 $students->get(supportTopic['id_student']), 
+                $supportTopic['title'], 
                 $supportTopic['name'], 
                 $supportTopic['date'], 
                 $supportTopic['message'], 
@@ -73,15 +74,15 @@ class SupportTopics extends Model
         return $response;
     }
     
-    public function new($id_category, $id_student, $date, $message)
+    public function new($id_category, $id_student, $title, $date, $message)
     {
         $sql = $this->db->prepare("
             INSERT INTO support_topic
-            (id_category, id_student, date, message)
+            (id_category, id_student, title, date, message)
             VALUES (?, ?, NOW(), ?)
         ");
         
-        $sql->execute(array($id_category, $id_student, $date, $message));
+        $sql->execute(array($id_category, $id_student, $title, $date, $message));
         
         return $sql->rowCount() > 0;
     }

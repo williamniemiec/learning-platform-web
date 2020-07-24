@@ -19,6 +19,7 @@ class SupportTopic
     //-------------------------------------------------------------------------
     private $id_topic;
     private $student;
+    private $title;
     private $category;
     private $date;
     private $message;
@@ -34,16 +35,18 @@ class SupportTopic
      *
      * @param       int $id_topic Topic id
      * @param       Student $student Student who created the support topic
+     * @param       string $title
      * @param       string $category Support topic category 
      * @param       string $date Support topic creation date
      * @param       string $text Initial Support topic message
      * @param       bool $closed Support topic status
      * @param       Message[] $replies [Optional] Support topic replies
      */
-    public function __construct($id_topic, $student, $category, $date, $message, $closed)
+    public function __construct($id_topic, $student, $title, $category, $date, $message, $closed)
     {
         $this->id_topic = $id_topic;
         $this->student = $student;
+        $this->title = $title;
         $this->category = $category;
         $this->date = $date;
         $this->message = $message;
@@ -74,6 +77,11 @@ class SupportTopic
         return $this->student;
     }
     
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
     /**
      * Gets support topic category.
      * 

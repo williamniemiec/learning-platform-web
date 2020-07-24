@@ -61,6 +61,7 @@ class SupportTopics extends Model
             $response = new SupportTopics(
                 $supportTopic['id_topic'],
                 $students->get(supportTopic['id_student']), 
+                $supportTopic['title'], 
                 $supportTopic['name'], 
                 $supportTopic['date'], 
                 $supportTopic['message'], 
