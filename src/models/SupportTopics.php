@@ -49,7 +49,8 @@ class SupportTopics extends Model
         
         $sql = $this->db->prepare("
             SELECT  *
-            FROM    support_topic NATURAL JOIN support_topic_category
+            FROM    support_topic 
+                    NATURAL JOIN support_topic_category
             WHERE   id_topic = ?
         ");
         
