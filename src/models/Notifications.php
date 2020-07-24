@@ -78,6 +78,21 @@ class Notifications extends Model
         
         return $response;
     }
+
+    public function countUnreadNotification($limit = -1)
+    {
+        $query = "
+            SELECT  COUNT(*) AS total_unread
+            FROM    notifications
+            WHERE   `read` = 0
+        ";
+
+        if ($limit > 0) {
+            $query .= " LIMIT ".$limit;
+        }
+
+        return $this->db->query($query)->fetch()['total_unread'];
+    }
     
     public function delete($id_student, $date)
     {
