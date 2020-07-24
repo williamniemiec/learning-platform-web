@@ -1,17 +1,21 @@
 <?php
+declare (strict_types=1);
+
 namespace models;
+
 
 use core\Model;
 use models\obj\Bundle;
-
+use models\obj\OrderDirectionEnum;
+use models\obj\Bundle\BundleOrderTypeEnum;
 
 
 /**
- * Responsible for managing bundles table.
+ * Responsible for managing 'bundles' table.
  *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class Bundles extends Model
 {
@@ -19,7 +23,7 @@ class Bundles extends Model
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Creates bundles table manager.
+     * Creates 'bundles' table manager.
      *
      * @apiNote     It will connect to the database when it is instantiated
      */
@@ -32,7 +36,15 @@ class Bundles extends Model
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
-    public function get($id_bundle)
+    /**
+     * Gets a bundle
+     * 
+     * @param       int $id_bundle Bundle id or null if there is no bundle with
+     * the given id
+     * 
+     * @return      Bundle Bundle with the given id
+     */
+    public function get(int $id_bundle) : Bundle
     {
         $response = null;
         
@@ -57,84 +69,133 @@ class Bundles extends Model
         return $response;
     }
 
-    public function getAll($id_student, $limit = -1, $name = '', $orderBy = '', $orderType = '')
+    /**
+     * Gets all registered bundles. If a filter option is provided, it gets 
+     * only those bundles that satisfy these filters.
+     * 
+     * @param       int $id_student [Optional] Student id 
+     * @param       int $limit [Optional] Maximum bundles returned
+     * @param       string $name [Optional] Bundle name
+     * @param       BundleOrderTypeEnum $orderBy [Optional] Ordering criteria 
+     * @param       OrderDirectionEnum $orderType [Optional] Order that the 
+     * elements will be returned. Default is ascending.
+     * 
+     * @return      array Bundles with the provided filters or empty array if
+     * no bundles are found. If a student id is provided, also returns, for 
+     * each bundle, if this student has it. The returned array has the 
+     * following keys:
+     * <ul>
+     *  <li><b>bundle</b>: Bundle information</li>
+     *  <li><b>has_bundle</b>: If the student with the given id has this
+     *  bundle</li>
+     * </ul>
+     */
+    public function getAll(int $id_student = -1, int $limit = -1, string $name = '',
+        BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = OrderDirectionEnum::ASCENDING) : array
     {
         $response = array();
 
+        // Query construction
         $query = "
             SELECT      id_bundle, name, price, description,
-                        COUNT(id_course) as total_courses,
+                        COUNT(id_course) AS total_courses,
+        ";
+        
+        // If a student was provided, for each bundle add the information if he
+        // has the bundle or not
+        if ($id_student > 0) {
+            $query .= "
                         CASE
                             WHEN id_student = ? THEN 1
                             ELSE 0
                         END AS has_bundle,
+            ";
+        }
+        
+        $query .= "
                         COUNT(id_student) as total_students
-            FROM        bundles NATURAL JOIN bundle_courses
+            FROM        bundles 
+                        NATURAL JOIN bundle_courses
                         NATURAL JOIN purchases
             GROUP BY    id_bundle, name, price, description
         ";
         
+        // Sets order by criteria (if any)
         if (!empty($orderBy)) {
-            $orderType = empty($orderType) ? '' : $orderType;
             switch ($orderBy) {
-                case 'price':
+                case BundleOrderTypeEnum::PRICE:
                     $query .= " ORDER BY price ".$orderType;
                     break;
-                case 'courses':
+                case BundleOrderTypeEnum::COURSES:
                     $query .= " ORDER BY total_courses ".$orderType;
                     break;
-                case 'sales':
+                case BundleOrderTypeEnum::SALES:
                     $query .= " ORDER BY total_students ".$orderType;
                     break;
             }
         }
         
-        if (!empty($name)) {
+        // Limits the search to a specified name (if a name was specified)
+        if (!empty($name))
             $query .= empty($orderBy) ? " HAVING name LIKE ?" : " HAVING name LIKE ?";
-        }
-        
+
+        // Limits the results (if a limit was given)
         if ($limit > 0)
             $query .= " LIMIT ".$limit;
         
+        // Prepares query
         $sql = $this->db->prepare($query);
         
-        if (!empty($name)) {
+        // Executes query
+        if (!empty($name))
             $sql->execute(array($id_student, $name.'%'));
-        }
-        else {
+        else
             $sql->execute(array($id_student));
-        }
         
+        // Parses results
         if ($sql->rowCount() > 0) {
             $bundles = $sql->fetchAll();
+            $i = 0;
             
             foreach ($bundles as $bundle) {
-                $response[] = new Bundle(
+                $response[$i]['bundle'] = new Bundle(
                     $bundle['id_bundle'],
                     $bundle['name'],
                     $bundle['price'],
                     $bundle['description']
                 );
+                
+                if ($id_student > 0)
+                    $response[$i]['has_bundle'] = $bundle['has_bundle'] > 0;
             }
         }
         
         return $response;
     }
     
-    /** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     * Gets bundles that contain at least all courses that the supplied bundle
-     * has, not including bundles that the student already has. 
+    /**
+     * Gets bundles that contain at least all courses that the bundle with the
+     * given id has, not including bundles that a student already has.
+     * 
+     *  @param      int $id_bundle Bundle id
+     *  @param      int $id_student Student id 
+     *  
+     *  @return     Bundle[] Bundles that are contained in the given bundle 
+     *  disregarding those that the student already has
      */
-    public function extensionBundles($id_bundle, $id_student)
+    public function extensionBundles(int $id_bundle, int $id_student) : array
     {
         $response = array();
+        
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  *
             FROM    bundles b
             WHERE   id_bundle != ? AND
                     NOT EXISTS (
                 SELECT  *
-                FROM    bundle_courses JOIN purchases USING (id_bundle)
+                FROM    bundle_courses 
+                        JOIN purchases USING (id_bundle)
                 WHERE   id_bundle = ? AND
                         id_student != ? AND
                         id_course NOT IN (SELECT    id_course
@@ -143,8 +204,10 @@ class Bundles extends Model
             )
         ");
         
+        // Executes query
         $sql->execute(array($id_bundle, $id_bundle, $id_student));
         
+        // Parses results
         if ($sql->rowCount() > 0) {
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $bundle) {
                 $response[] = new Bundle(
@@ -160,14 +223,21 @@ class Bundles extends Model
     }
     
     
-    /** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     * Gets bundles that do not contain any courses in common with the
-     * supplied bundle. The bundles that he student already has are
-     * disregarded.
+    /**
+     * Gets bundles that do not contain any courses in common with a
+     * supplied bundle, disregarding those that a student already has.
+     * 
+     * @param       int $id_bundle Bundle id
+     * @param       int $id_student Student id
+     * 
+     * @return      Bundle[] Bundles that does not have courses contained in the
+     * given bundle disregarding those that the student already has
      */
-    public function unrelatedBundles($id_bundle, $id_student) 
+    public function unrelatedBundles(int $id_bundle, int $id_student) : array
     {
         $response = array(); 
+        
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  *
             FROM    bundles b
@@ -185,8 +255,10 @@ class Bundles extends Model
             )
         ");
         
+        // Executes query
         $sql->execute(array($id_bundle ,$id_bundle, $id_student));
         
+        // Parses results
         if ($sql->rowCount() > 0) {
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $bundle) {
                 $response[] = new Bundle(
@@ -203,35 +275,49 @@ class Bundles extends Model
     }
     
     /**
-     * Gets total of classes from a bundle along with its duration (in minutes)
+     * Gets the total number of classes that a bundle has along with its 
+     * duration (in minutes).
      * 
-     * @param unknown $id_bundle
-     * @return number
+     * @param       int $id_bundle Bundle id
+     * 
+     * @return      array Total of classes that the bundle has along with its 
+     * duration (in minutes). The returned array has the following keys:
+     * <ul>
+     *  <li><b>total_classes</b>: Total of classes that the bundle has</li>
+     *  <li><b>total_length</b>: Total duration of the classes that the bundle
+     *  has</li>
+     * </ul>
+     * 
+     * @implSpec    It will always return an array with the two keys informed
+     * above, even if both have zero value
      */
-    public function getTotalClasses($id_bundle)
+    public function countTotalClasses(int $id_bundle) : array
     {
         $response = array(
             "total_classes" => 0,
             "total_length" => 0
         );
         
+        // Query construction
         $sql = $this->db->prepare("
-            SELECT      SUM(total_classes) as total_classes, SUM(total_min) as total_length
-            FROM        (SELECT      id_module, COUNT(*) AS total_classes, 5 AS total_min
+            SELECT      COUNT(id_module) AS total_classes, 
+                        SUM(length) AS total_length
+            FROM        (SELECT      id_module, 5 AS length
                          FROM        questionnaires
-                         GROUP BY    id_module
                          UNION ALL
-                         SELECT      id_module, COUNT(*) AS total_classes, SUM(length) AS total_min
-                         FROM        videos
-                         GROUP BY    id_module) AS tmp
+                         SELECT      id_module, length
+                         FROM        videos) AS tmp
             GROUP BY    id_module
             HAVING      id_module IN (SELECT    id_module
-                                      FROM      course_modules NATURAL JOIN bundle_courses
+                                      FROM      course_modules 
+                                                NATURAL JOIN bundle_courses
                                       WHERE     id_bundle = ?)
         ");
         
+        // Executes query
         $sql->execute(array($id_bundle));
         
+        // Parses results
         if ($sql->rowCount() > 0) {
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $result) {
                 $response["total_classes"] += $result["total_classes"];
