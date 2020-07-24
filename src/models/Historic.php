@@ -53,4 +53,14 @@ class Historic extends Model
         
         return $sql->fetch()['watchedClasses'];
     }
+
+    public function clear($id_student)
+    {
+        $sql = $this->db->prepare("
+            DELETE FROM student_historic
+            WHERE id_student = ?
+        ");
+
+        $sql->execute(array($id_student, $id_course))->rowCount() > 0;
+    }
 }
