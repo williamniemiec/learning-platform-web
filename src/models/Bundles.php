@@ -56,38 +56,41 @@ class Bundles extends Model
         
         return $response;
     }
-    
+
     public function getAll($id_student, $limit = -1, $name = '', $orderBy = '', $orderType = '')
     {
         $response = array();
-//         $query = "
-//             SELECT  *
-//             FROM    bundles
-//         ";
-        
+
         $query = "
             SELECT      id_bundle, name, price, description,
                         COUNT(id_course) as total_courses,
-                        COUNT(id_student) as has_bundle
+                        CASE
+                            WHEN id_student = ? THEN 1
+                            ELSE 0
+                        END AS has_bundle,
+                        COUNT(id_student) as total_students
             FROM        bundles NATURAL JOIN bundle_courses
                         NATURAL JOIN purchases
-            WHERE       id_student = ?
             GROUP BY    id_bundle, name, price, description
         ";
         
         if (!empty($orderBy)) {
             $orderType = empty($orderType) ? '' : $orderType;
-            if ($orderBy == 'price') {
-                $query .= " ORDER BY price ".$orderType;
-            }
-            else if ($orderBy == 'courses') {
-                $query .= " ORDER BY total_courses ".$orderType;
+            switch ($orderBy) {
+                case 'price':
+                    $query .= " ORDER BY price ".$orderType;
+                    break;
+                case 'courses':
+                    $query .= " ORDER BY total_courses ".$orderType;
+                    break;
+                case 'sales':
+                    $query .= " ORDER BY total_students ".$orderType;
+                    break;
             }
         }
         
         if (!empty($name)) {
-            
-            $query .= empty($orderBy) ? " WHERE name LIKE ?" : " HAVING name LIKE ?";
+            $query .= empty($orderBy) ? " HAVING name LIKE ?" : " HAVING name LIKE ?";
         }
         
         if ($limit > 0)
