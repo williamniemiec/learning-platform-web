@@ -234,7 +234,8 @@ class Comments extends Model
     /**
      * Deletes a reply.
      * 
-     * @param       int $id_reply Reply id
+     * @param       int $id_comment Comment id that the reply belongs to
+     * @param       int $id_student Student id that made the reply
      * 
      * @return      boolean If reply was sucessfully deleted
      * 
