@@ -51,10 +51,8 @@ class Historic extends Model
         // Query construction
         $sql = $this->db->prepare("
             SELECT  COUNT(*) AS watchedClasses
-            FROM    student_historic 
-                    NATURAL JOIN course_modules
-            WHERE   id_student = ? AND 
-                    id_course = ?
+            FROM    student_historic NATURAL JOIN course_modules
+            WHERE   id_student = ? AND id_course = ?
         ");
         
         // Executes query

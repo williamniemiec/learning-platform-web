@@ -6,7 +6,7 @@ namespace models;
 
 use core\Model;
 use models\obj\Bundle;
-use models\obj\OrderDirectionEnum;
+use models\enum\OrderDirectionEnum;
 use models\obj\Bundle\BundleOrderTypeEnum;
 
 
@@ -43,9 +43,14 @@ class Bundles extends Model
      * the given id
      * 
      * @return      Bundle Bundle with the given id
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
      */
     public function get(int $id_bundle) : Bundle
     {
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Invalid id_bundle");
+        
         $response = null;
         
         $sql = $this->db->prepare("
@@ -56,7 +61,7 @@ class Bundles extends Model
         
         $sql->execute(array($id_bundle));
         
-        if ($sql->rowCount() > 0) {
+        if ($sql && $sql->rowCount() > 0) {
             $bundle = $sql->fetch();
             $response = new Bundle(
                 $bundle['id_bundle'], 
@@ -82,8 +87,8 @@ class Bundles extends Model
      * 
      * @return      array Bundles with the provided filters or empty array if
      * no bundles are found. If a student id is provided, also returns, for 
-     * each bundle, if this student has it. The returned array has the 
-     * following keys:
+     * each bundle, if this student has it. Each position of the returned array
+     * has the following keys:
      * <ul>
      *  <li><b>bundle</b>: Bundle information</li>
      *  <li><b>has_bundle</b>: If the student with the given id has this
@@ -91,10 +96,13 @@ class Bundles extends Model
      * </ul>
      */
     public function getAll(int $id_student = -1, int $limit = -1, string $name = '',
-        BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = OrderDirectionEnum::ASCENDING) : array
+        BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
 
+        if (empty($orderType))
+            $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
+        
         // Query construction
         $query = "
             SELECT      id_bundle, name, price, description,
@@ -124,13 +132,13 @@ class Bundles extends Model
         if (!empty($orderBy)) {
             switch ($orderBy) {
                 case BundleOrderTypeEnum::PRICE:
-                    $query .= " ORDER BY price ".$orderType;
+                    $query .= " ORDER BY price ".$orderType->get();
                     break;
                 case BundleOrderTypeEnum::COURSES:
-                    $query .= " ORDER BY total_courses ".$orderType;
+                    $query .= " ORDER BY total_courses ".$orderType->get();
                     break;
                 case BundleOrderTypeEnum::SALES:
-                    $query .= " ORDER BY total_students ".$orderType;
+                    $query .= " ORDER BY total_students ".$orderType->get();
                     break;
             }
         }
@@ -153,7 +161,7 @@ class Bundles extends Model
             $sql->execute(array($id_student));
         
         // Parses results
-        if ($sql->rowCount() > 0) {
+        if ($sql && $sql->rowCount() > 0) {
             $bundles = $sql->fetchAll();
             $i = 0;
             
@@ -182,9 +190,17 @@ class Bundles extends Model
      *  
      *  @return     Bundle[] Bundles that are contained in the given bundle 
      *  disregarding those that the student already has
+     *  
+     *  @throws      \InvalidArgumentException If any argument is invalid 
      */
     public function extensionBundles(int $id_bundle, int $id_student) : array
     {
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Invalid id_bundle");
+        
+        if (empty($id_student) || $id_student <= 0)
+            throw new \InvalidArgumentException("Invalid id_student");
+            
         $response = array();
         
         // Query construction
@@ -194,8 +210,7 @@ class Bundles extends Model
             WHERE   id_bundle != ? AND
                     NOT EXISTS (
                 SELECT  *
-                FROM    bundle_courses 
-                        JOIN purchases USING (id_bundle)
+                FROM    bundle_courses JOIN purchases USING (id_bundle)
                 WHERE   id_bundle = ? AND
                         id_student != ? AND
                         id_course NOT IN (SELECT    id_course
@@ -208,7 +223,7 @@ class Bundles extends Model
         $sql->execute(array($id_bundle, $id_bundle, $id_student));
         
         // Parses results
-        if ($sql->rowCount() > 0) {
+        if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $bundle) {
                 $response[] = new Bundle(
                     $bundle['id_bundle'],
@@ -232,9 +247,17 @@ class Bundles extends Model
      * 
      * @return      Bundle[] Bundles that does not have courses contained in the
      * given bundle disregarding those that the student already has
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
      */
     public function unrelatedBundles(int $id_bundle, int $id_student) : array
     {
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Invalid id_bundle");
+            
+        if (empty($id_student) || $id_student <= 0)
+            throw new \InvalidArgumentException("Invalid id_student");
+        
         $response = array(); 
         
         // Query construction
@@ -259,7 +282,7 @@ class Bundles extends Model
         $sql->execute(array($id_bundle ,$id_bundle, $id_student));
         
         // Parses results
-        if ($sql->rowCount() > 0) {
+        if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $bundle) {
                 $response[] = new Bundle(
                     $bundle['id_bundle'], 
@@ -288,11 +311,16 @@ class Bundles extends Model
      *  has</li>
      * </ul>
      * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
+     * 
      * @implSpec    It will always return an array with the two keys informed
      * above, even if both have zero value
      */
     public function countTotalClasses(int $id_bundle) : array
     {
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Invalid id_bundle");
+            
         $response = array(
             "total_classes" => 0,
             "total_length" => 0
@@ -309,8 +337,7 @@ class Bundles extends Model
                          FROM        videos) AS tmp
             GROUP BY    id_module
             HAVING      id_module IN (SELECT    id_module
-                                      FROM      course_modules 
-                                                NATURAL JOIN bundle_courses
+                                      FROM      course_modules NATURAL JOIN bundle_courses
                                       WHERE     id_bundle = ?)
         ");
         
@@ -318,7 +345,7 @@ class Bundles extends Model
         $sql->execute(array($id_bundle));
         
         // Parses results
-        if ($sql->rowCount() > 0) {
+        if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $result) {
                 $response["total_classes"] += $result["total_classes"];
                 $response["total_length"] += $result["total_length"];

@@ -5,6 +5,7 @@ namespace models;
 
 
 use core\Model;
+use models\enum\ClassTypeEnum;
 use models\obj\_Class;
 
 
@@ -42,13 +43,11 @@ abstract class Classes extends Model
         $sql = $this->db->prepare("
             SELECT      id_module, class_order, class_type FROM (
                 SELECT    id_module, class_order, 'questionnaire' AS class_type
-                FROM        questionnaires 
-                            NATURAL JOIN course_modules
+                FROM        questionnaires NATURAL JOIN course_modules
                 WHERE       class_order = 1 AND id_course = ?
                 UNION
                 SELECT      id_module, class_order, 'video' AS class_type
-                FROM        videos 
-                            NATURAL JOIN course_module
+                FROM        videos NATURAL JOIN course_module
                 WHERE       class_order = 1 AND id_course = ?
             ) AS tmp JOIN course_modules USING (id_module)
             WHERE       id_course = ?
@@ -77,15 +76,58 @@ abstract class Classes extends Model
     }
 
     /**
+     * Gets all classes from a module.
+     *
+     * @param       int $id_module Module id
+     *
+     * @return      array Classes that belongs to the module
+     *
+     * @throws      \InvalidArgumentException If any argument is invalid
+     */
+    public abstract function getAllFromModule(int $id_module) : array;
+    
+    /**
      * Marks a class as watched by a student.
      * 
      * @param       int $id_student Student id
      * @param       int $id_module Module id
      * @param       int $class_order Class order
+     * @param       ClassTypeEnum $class_type Class type
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public abstract function markAsWatched(int $id_student, int $id_module, int $class_order) : void;
+    public function markAsWatched(int $id_student, int $id_module, int $class_order, 
+        ClassTypeEnum $class_type) : void
+    {
+        if (empty($id_student) || $id_student <= 0)
+            throw new \InvalidArgumentException("Invalid student id");
+            
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Invalid module id");
+                
+        if (empty($class_order) || $class_order <= 0)
+            throw new \InvalidArgumentException("Invalid class order");
+        
+        if (empty($class_type->get()))
+            throw new \InvalidArgumentException("Class type cannot be empty");
+                    
+        // Query construction
+        $sql = $this->db->prepare("
+            INSERT INTO student_historic
+            (id_student, id_module, class_order, ?, date)
+            VALUES (?, ?, ?, ?, NOW())
+        ");
+                    
+        // Executes query
+        $sql->execute(array($id_student, $id_module, $class_order, $class_type->get()));
+    }
+    
+    /**
+     * Gets total duration (in minutes) of all classes.
+     *
+     * @return      int Total duration (in minutes)
+     */
+    public abstract function totalLength() : int;
     
     /**
      * Removes watched class markup from a class.

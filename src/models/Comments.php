@@ -97,8 +97,7 @@ class Comments extends Model
         // Query construction
         $sql = $this->db->prepare("
             SELECT  student_name, student_photo, text, date
-            FROM    comments
-                    NATURAL JOIN students
+            FROM    comments NATURAL JOIN students
             WHERE   id_module = ? AND class_order = ?
         ");
         

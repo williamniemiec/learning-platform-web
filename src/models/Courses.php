@@ -48,7 +48,8 @@ class Courses extends Model
      * @param       string $name [Optional] Course name (searches for this name)
      * 
      * @return      array Courses that a student has along with the progress of
-     * each student on these course. The returned array has the following keys:
+     * each student on these course. Each position of the returned array has 
+     * the following keys:
      * <ul>
      *  <li><b>course</b>: Courses that the student has</li>
      *  <li><b>total_length_watched</b>: Total time of classes watched by the 
@@ -111,7 +112,7 @@ class Courses extends Model
         }
         
         // Parses results
-        if ($sql->rowCount() > 0) {
+        if ($sql && $sql->rowCount() > 0) {
             $i = 0;
             
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $course) {
@@ -157,13 +158,11 @@ class Courses extends Model
             SELECT  SUM(total) AS total_classes, 
                     SUM(length) as total_length
             FROM    (SELECT      COUNT(*) AS total, 5 AS length
-                     FROM        questionnaires
-                                 NATURAL JOIN course_modules
+                     FROM        questionnaires NATURAL JOIN course_modules
                      WHERE       id_course = ?
                      UNION ALL
                      SELECT      COUNT(*) AS total, length
-                     FROM        videos
-                                 NATURAL JOIN course_modules
+                     FROM        videos NATURAL JOIN course_modules
                      WHERE       id_course = ?) AS tmp
         ");
         
@@ -202,7 +201,7 @@ class Courses extends Model
         $sql->execute(array($id_bundle));
         
         // Parses results
-        if ($sql->rowCount() > 0) {
+        if ($sql && $sql->rowCount() > 0) {
             $courses = $sql->fetchAll();
             
             foreach ($courses as $course) {
@@ -245,7 +244,7 @@ class Courses extends Model
         $sql->execute(array($id_course));
         
         // Parses results
-        if ($sql->rowCount() > 0) {
+        if ($sql && $sql->rowCount() > 0) {
             $course = $sql->fetch();
             
             $response = new Course(
@@ -281,8 +280,7 @@ class Courses extends Model
             FROM    courses
             WHERE   id_course = ? AND
                     id_course IN (SELECT    id_course
-                                  FROM      bundle_courses
-                                            NATURAL JOIN purchases
+                                  FROM      bundle_courses NATURAL JOIN purchases
                                   WHERE     id_student = ?)
         ");
         
