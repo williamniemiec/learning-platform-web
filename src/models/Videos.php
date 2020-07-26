@@ -1,16 +1,20 @@
 <?php
+declare (strict_types=1);
+
 namespace models;
 
+
 use core\Model;
+use models\enum\ClassTypeEnum;
 use models\obj\Video;
 
 
 /**
- * Responsible for managing videos table.
+ * Responsible for managing 'videos' table.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class Videos extends Model
 {
@@ -18,7 +22,7 @@ class Videos extends Model
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Creates videos table manager.
+     * Creates 'videos' table manager.
      *
      * @apiNote     It will connect to the database when it is instantiated
      */
@@ -34,21 +38,35 @@ class Videos extends Model
     /**
      * Gets video from a class.
      *
-     * @param       int $id_class Class id
+     * @param       int $id_module Module id that the class belongs to
+     * @param       int $class_order Class order inside the module that it 
+     * belongs to
      *
-     * @return      array Class video
+     * @return      Video Video class or null if class does not exist
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function get($id_module, $class_order)
+    public function get(int $id_module, int $class_order) : Video
     {
-        $response = array();
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Invalid module id");
+            
+        if (empty($class_order) || $class_order <= 0)
+            throw new \InvalidArgumentException("Invalid class order");
+            
+        $response = null;
         
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  * 
             FROM    videos 
             WHERE   id_module = ? AND class_order = ?
         ");
+        
+        // Executes query
         $sql->execute(array($id_module, $class_order));
         
+        // Parses results
         if ($sql->rowCount() > 0) {
             $class = $sql->fetch(\PDO::FETCH_ASSOC);
             
@@ -64,7 +82,18 @@ class Videos extends Model
         return $response; 
     }
     
-    public function getFromModule($id_module)
+    /**
+     * Gets all video classes from a module.
+     * 
+     * @param       int $id_module Module id
+     * 
+     * @return      Video[] Classes that belongs to the module
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid
+     * 
+     * @Override
+     */
+    public function getAllFromModule(int $id_module) : array
     {
         $response = array();
         
@@ -94,26 +123,31 @@ class Videos extends Model
     }
     
     /**
-     * Marks a class as watched by a student.
-     *
+     * {@inheritdoc}
+     * @Override
      */
-    public function markAsWatched($id_student, $id_module, $class_order)
+    public function totalLength() : int
     {
-        if (empty($id_student) || $id_student <= 0)
-            return;
-            
-        if (empty($id_module) || $id_module <= 0)
-            return;
-            
-        if ($class_order <= 0)
-            return;
-                
-        $sql = $this->db->prepare("
-            INSERT INTO student_historic
-            (id_student, id_module, class_order, 0, date)
-            VALUES (?, ?, ?, NOW())
-        ");
-                    
-        $sql->execute(array($id_student, $id_module, $class_order));
+        return $this->db->query("
+            SELECT  SUM(length) AS total_length
+            FROM    videos
+        ")->fetch()['total_length'];
+    }
+    
+    /**
+     * Marks a class as watched by a student.
+     * 
+     * @param       int $id_student Student id
+     * @param       int $id_module Module id
+     * @param       int $class_order Class order
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
+     * 
+     * @Override
+     */
+    public function markAsWatched(int $id_student, int $id_module, int $class_order) : void
+    {
+        $this->markAsWatched($id_student, $id_module, $class_order,
+            new ClassTypeEnum(ClassTypeEnum::VIDEO));
     }
 }
