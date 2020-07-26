@@ -1,8 +1,11 @@
 <?php 
+declare (strict_types=1);
+
 namespace models\obj;
 
 
 use models\Authorization;
+use models\enum\GenreEnum;
 
 /**
  * Responsible for representing admin-type users.
@@ -29,11 +32,12 @@ class Admin extends User
      * @param       Authorization $authorization Authorization that the
      * administrator has
      * @param       string $name Administrator name
-     * @param       int $genre Administrator genre
+     * @param       GenreEnum $genre Administrator genre
      * @param       string $birthdate Administrator birthdate
      * @param       string $email Administrator email
      */
-    public function __construct($id, $authorization, $name, $genre, $birthdate, $email)
+    public function __construct(int $id, Authorization $authorization, string $name, 
+        GenreEnum $genre, string $birthdate, string $email)
     {
         $this->id = $id;
         $this->authorization = $authorization;
@@ -52,7 +56,7 @@ class Admin extends User
      * 
      * @return      Authorization Authorization that the administrator has
      */
-    public function getAuthorization()
+    public function getAuthorization() : Authorization
     {
         return $this->authorization;
     }

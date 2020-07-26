@@ -1,4 +1,6 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
@@ -42,7 +44,8 @@ class SupportTopic
      * @param       bool $closed Support topic status
      * @param       Message[] $replies [Optional] Support topic replies
      */
-    public function __construct($id_topic, $student, $title, $category, $date, $message, $closed)
+    public function __construct(int $id_topic, Student $student, string $title,
+        string $category, string $date, string $message, int $closed)
     {
         $this->id_topic = $id_topic;
         $this->student = $student;
@@ -62,7 +65,7 @@ class SupportTopic
      * 
      * @return      int support topic id
      */
-    public function getSupportTopicId()
+    public function getSupportTopicId() : int
     {
         return $this->id_comment;
     }
@@ -72,12 +75,17 @@ class SupportTopic
      *
      * @return      Student Student who created the support topic
      */
-    public function getCreator()
+    public function getCreator() : string
     {
         return $this->student;
     }
     
-    public function getTitle()
+    /**
+     * Gets support topic title.
+     * 
+     * @return      string Support topic title
+     */
+    public function getTitle() : string
     {
         return $this->title;
     }
@@ -87,7 +95,7 @@ class SupportTopic
      * 
      * @return      string Support topic category
      */
-    public function getCategory()
+    public function getCategory() : string
     {
         return $this->category;
     }
@@ -97,7 +105,7 @@ class SupportTopic
      *
      * @return      string Support topic creation date
      */
-    public function getCreationDate()
+    public function getCreationDate() : string
     {
         return $this->date;
     }
@@ -107,7 +115,7 @@ class SupportTopic
      *
      * @return      string Support topic initial message
      */
-    public function getContent()
+    public function getContent() : string
     {
         return $this->message;
     }
@@ -117,7 +125,7 @@ class SupportTopic
      * 
      * @return      boolean If support topic is closed
      */
-    public function isClosed()
+    public function isClosed() : bool
     {
         return $this->closed;
     }
@@ -127,8 +135,10 @@ class SupportTopic
      *
      * @return      Message[] Support topic replies or empty array if there are no
      * replies
+     * 
+     * @implNote    Lazy initialization
      */
-    public function getReplies()
+    public function getReplies() : array
     {
         if (empty($this->replies)) {
             $comments = new Comments();
@@ -136,10 +146,5 @@ class SupportTopic
         }
         
         return $this->replies;
-    }
-    
-    public function getStudent()
-    {
-        return $this->student;
     }
 }

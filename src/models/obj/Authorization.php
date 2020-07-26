@@ -1,4 +1,6 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
@@ -24,11 +26,10 @@ class Authorization extends User
     /**
      * Creates a representation of a admin-type user.
      *
-     * @param       int $id_authorization Administrator id
-     * @param       string $name Authorization name
-     * @param       int $level Authorization level
+     * @param       string $name Authorization's name
+     * @param       int $level Authorization's level
      */
-    public function __construct($name, $level)
+    public function __construct(string $name, int $level)
     {
         $this->name = $name;
         $this->level = $level;
@@ -43,7 +44,7 @@ class Authorization extends User
      *
      * @return      string Authorization name
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
@@ -53,7 +54,7 @@ class Authorization extends User
      *
      * @return      int Authorization level
      */
-    public function getLevel()
+    public function getLevel() : int
     {
         return $this->level;
     }

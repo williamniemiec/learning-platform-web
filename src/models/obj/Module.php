@@ -1,12 +1,16 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
 use models\Modules;
 use models\Classes;
+use models\Videos;
+use models\Questionnaires;
 
 /**
- * Responsible for representing courses.
+ * Responsible for representing modules.
  *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
  * @version		1.0.0
@@ -17,25 +21,22 @@ class Module
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_course;
+    private $id_module;
     private $name;
-    private $classes;
     
     
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Creates a representation of a course.
+     * Creates a representation of a module.
      *
-     * @param       int $id_course Course id
-     * @param       string $name Course name
-     * @param       string $logo [Optional] Name of the course logo file
-     * @param       string $description [Optional] Course description
+     * @param       int $id_module Module id
+     * @param       string $name Module name
      */
-    public function __construct($id_module, $name)
+    public function __construct(int $id_module, string $name)
     {
-        $this->id_course = $id_course;
+        $this->id_module = $id_module;
         $this->name = $name;
     }
     
@@ -44,29 +45,55 @@ class Module
     //        Getters
     //-------------------------------------------------------------------------
     /**
-     * Gets course id.
+     * Gets Module id.
      *
-     * @return      int Course id
+     * @return      int Module id
      */
-    public function getCourseId()
+    public function getCourseId() : int
     {
-        return $this->id_course;
+        return $this->id_module;
     }
     
     /**
-     * Gets course name.
+     * Gets module name.
      *
-     * @return      string Course name
+     * @return      string Module name
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
     
-    public function getClasses()
+    /**
+     * Gets all classes that belongs to the module.
+     * 
+     * @return      array Classes that belongs to this module. The returned
+     * array is empty if there are no classes; otherwise, it has the following
+     * format:
+     * <ul>
+     *  <li><b>Key</b>: Class order in module</li>
+     *  <li><b>Value</b>: Class</li>
+     * </ul>
+     * 
+     * @implNote    Lazy initialization
+     */
+    public function getClasses() : array
     {
         if (empty($this->classes)) {
-            $this->classes = Classes::getClassesFromModule($this->id_module);
+            $this->classes = array();
+            $videos = new Videos();
+            $questionnaires = new Questionnaires();
+            
+            $classes_video = $videos->getAllFromModule($this->id_module);
+            $classes_questionnaire = $questionnaires->getAllFromModule($this->id_module);
+            
+            foreach ($classes_video as $class) {
+                $this->classes[$class->getClassOrder()] = $class;
+            }
+            
+            foreach ($classes_questionnaire as $class) {
+                $this->classes[$class->getClassOrder()] = $class;
+            }
         }
         
         return $this->classes;

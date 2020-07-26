@@ -1,5 +1,9 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
+
+use models\enum\NotificationTypeEnum;
 
 
 /**
@@ -16,8 +20,9 @@ class Notification
     //-------------------------------------------------------------------------
     private $id_student;
     private $date;
-    private $ref_text;
+    private $id_reference;
     private $type;
+    private $ref_text;
     private $message;
     private $read;
     
@@ -31,20 +36,23 @@ class Notification
      * @param       int $id_student Student id to which the notification
      * belongs
      * @param       string $date Date to which the notification was generated
+     * @param       int $id_reference Comment id or Support topic id to which
+     * the notification refers
+     * @param       NotificationTypeEnum $type $id_reference type
      * @param       string $ref_text Topic message or comment message to which
      * the notification refers
-     * @param       int $type $id_reference type - 0 for comment id or 1 to
-     * comment id.
      * @param       string $message Notification content
      * @param       int $read [Optional] If the notification has not yet been
      * read
      */
-    public function __construct($id_student, $date, $ref_text, $type, $message, $read = 0)
+    public function __construct(int $id_student, string $date, int $id_reference,
+        NotificationTypeEnum $type, string $ref_text, string $message, int $read = 0)
     {
         $this->id_student = $id_student;
         $this->date = $date;
-        $this->$ref_text = $ref_text;
-        $this->description = $type;
+        $this->id_reference = $id_reference;
+        $this->type = $type;
+        $this->ref_text = $ref_text;
         $this->message = $message;
         $this->read = $read == 1;
     }
@@ -53,32 +61,72 @@ class Notification
     //-------------------------------------------------------------------------
     //        Getters
     //-------------------------------------------------------------------------
-    public function getStudentId()
+    /**
+     * Gets student id to which the notification belongs.
+     * 
+     * @return      int Student id
+     */
+    public function getStudentId() : int
     {
         return $this->id_student;
     }
     
-    public function getDate()
+    /**
+     * Gets creation date.
+     * 
+     * @return      string Creation date in the following format:
+     * <code>YYYY-MM-DD HH:MM:SS</code>
+     */
+    public function getDate() : string
     {
         return $this->date;
     }
     
-    public function getRefText()
+    /**
+     * Gets reference id to which the notification refers.
+     * 
+     */
+    public function getReferenceId() : int
+    {
+        return $this->id_reference;
+    }
+    
+    /**
+     * Gets reference id type.
+     * 
+     * @return      NotificationTypeEnum Reference id type
+     */
+    public function getReferenceType() : NotificationTypeEnum
+    {
+        return $this->type;
+    }
+    
+    /**
+     * Gets reference text.
+     * 
+     * @return      string Reference text
+     */
+    public function getRefText() : string
     {
         return $this->ref_text;
     }
     
-    public function getDescription()
-    {
-        return $this->description;
-    }
-    
-    public function getMessage()
+    /**
+     * Gets notification's content.
+     * 
+     * @return      string Notification's content
+     */
+    public function getMessage() : string
     {
         return $this->message;
     }
     
-    public function wasRead()
+    /**
+     * Checks whether the notification was read.
+     * 
+     * @return      bool If notification was read or not
+     */
+    public function wasRead() : bool
     {
         return $this->read;
     }

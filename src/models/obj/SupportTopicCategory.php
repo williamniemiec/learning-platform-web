@@ -1,4 +1,6 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
@@ -17,13 +19,8 @@ class SupportTopicCategory
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_topic;
-    private $student;
-    private $category;
-    private $date;
-    private $message;
-    private $closed;
-    private $replies;
+    private $id_category;
+    private $name;
     
     
     //-------------------------------------------------------------------------
@@ -32,9 +29,10 @@ class SupportTopicCategory
     /**
      * Creates a representation of a support topic category.
      *
-
+     * @param       int $id_category Category id
+     * @param       string $name Category name
      */
-    public function __construct($id_category, $name)
+    public function __construct(int $id_category, string $name)
     {
         $this->id_category = $id_category;
         $this->name = $name;
@@ -44,13 +42,23 @@ class SupportTopicCategory
     //-------------------------------------------------------------------------
     //        Getters
     //-------------------------------------------------------------------------
-    public function getId()
+    /**
+     * Gets category id.
+     * 
+     * @return      int Category id
+     */
+    public function getId() : int
     {
         return $this->id_category;
     }
     
-    public function getName()
-    {
+    /**
+     * Gets category name.
+     * 
+     * @return      string Category name
+     */
+    public function getName() : string
+    { 
         return $this->name;
     }
 }

@@ -1,5 +1,9 @@
 <?php 
+declare (strict_types=1);
+
 namespace models\obj;
+
+use models\enum\GenreEnum;
 
 
 /**
@@ -29,7 +33,7 @@ abstract class User
      * 
      * @return      int User id
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
@@ -39,17 +43,17 @@ abstract class User
      * 
      * @return      string name
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
     
     /**
-     * Gets user genre (0 for man and 1 for woman).
+     * Gets user genre
      * 
-     * @return      int User genre
+     * @return      GenreEnum User genre
      */
-    public function getGenre()
+    public function getGenre() : GenreEnum
     {
         return $this->genre;
     }
@@ -59,7 +63,7 @@ abstract class User
      * 
      * @return      string User birthdate
      */
-    public function getBirthdate()
+    public function getBirthdate() : string
     {
         return $this->birthdate;
     }
@@ -69,7 +73,7 @@ abstract class User
      *
      * @return      string User email
      */
-    public function getEmail()
+    public function getEmail() : string
     {
         return $this->email;
     }
