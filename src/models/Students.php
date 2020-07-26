@@ -7,11 +7,11 @@ use models\obj\_Class;
 
 
 /**
- * Responsible for managing students.
+ * Responsible for managing 'students' table.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class Students extends Model
 {
@@ -25,16 +25,16 @@ class Students extends Model
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Creates students manager.
+     * Creates 'students' table manager.
      *
-     * @param       int $id_user [Optional] Student id
+     * @param       int $id_student [Optional] Student id
      *
      * @apiNote     It will connect to the database when it is instantiated
      */
-    public function __construct($id_user = -1)
+    public function __construct(int $id_student = -1)
     {
         parent::__construct();
-        $this->id_student = $id_user;
+        $this->id_student = $id_student;
     }
 
 
@@ -44,9 +44,9 @@ class Students extends Model
     /**
      * Checks whether a student is logged.
      *
-     * @return      boolean If student is logged
+     * @return      bool If student is logged
      */
-    public static function isLogged()
+    public static function isLogged() : bool
     {
         return !empty($_SESSION['s_login']);
     }
@@ -57,45 +57,67 @@ class Students extends Model
      * @param       string $email Student's email
      * @param       string $pass Student's password
      *
-     * @return      boolean If student credentials are correct
+     * @return      bool If student credentials are correct
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function login($email, $pass)
+    public function login(string $email, string $pass) : bool
     {
-        if (empty($email) || empty($pass)) { return false; }
+        if (empty($email))
+            throw new \InvalidArgumentException("Invalid email");
         
+        if (empty($pass))
+            throw new \InvalidArgumentException("Invalid password");
+        
+        $response = false;
+            
+        // Query construction
         $sql = $this->db->prepare("
-            SELECT id 
-            FROM students 
-            WHERE email = ? AND password = ?
+            SELECT  id 
+            FROM    students 
+            WHERE   email = ? AND password = ?
         ");
+        
+        // Executes query
         $sql->execute(array($email, md5($pass)));
         
-        if ($sql->rowCount() == 0) { return false; }
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
+            $result = $sql->fetch();
+            $_SESSION['s_login'] = $result['id'];
+            $this->id_student = $result['id'];
+            $response = true;
+        }
         
-        $_SESSION['s_login'] = $sql->fetch()['id'];
-        $this->id_student = $sql->fetch()['id'];
-        
-        return true;
+        return $response;
     }
     
     /**
      * Adds a new student.
      *
      * @param       Student $student Informations about the student
-     * @param       boolean $autologin [Optional] If true, after registration is completed
+     * @param       bool $autologin [Optional] If true, after registration is completed
      * the student will automatically login to the system
      *
      * @return      int Student id or -1 if the student has not been added
+     * 
+     * @throws      \InvalidArgumentException If student is empty
      */
-    public function register($student, $autologin = true)
+    public function register(Student $student, bool $autologin = true) : int
     {
-        if ($this->existUser($student)) { return false; }
-        
+        if (empty($student))
+            throw new \InvalidArgumentException("Student cannot be empty");
+            
+        $response = -1;
+            
+        // Query construction
         $sql = $this->db->prepare("
             INSERT INTO students 
             (name,genre,birthdate,email,password) 
             VALUES (?,?,?,?,?)
         ");
+        
+        // Executes query
         $sql->execute(array(
             $student->getName(), 
             $student->getGenre(),
@@ -104,29 +126,12 @@ class Students extends Model
             md5($student->getPassword())
         ));
 
-        if ($sql->rowCount() == 0) { return false; }
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) { 
+            if ($autologin)
+                $_SESSION['s_login'] = $this->db->lastInsertId();
         
-        if ($autologin)
-            $_SESSION['s_login'] = $this->db->lastInsertId();
-        
-        return true;
-    }
-    
-    /**
-     * Gets student name.
-     *
-     * @return      string Student's name
-     */
-    public function getName()
-    {
-        if ($this->id_student == -1) { return ""; }
-        
-        $response = "";
-        
-        $sql = $this->db->query("SELECT name FROM students WHERE id = $this->id_student");
-        
-        if ($sql && $sql->rowCount() > 0) {
-            $response = $sql->fetch()['name'];
+            $response = $this->db->lastInsertId();
         }
         
         return $response;
@@ -135,22 +140,32 @@ class Students extends Model
     /**
      * Gets information about a student.
      *
-     * @param       int $id_user [Optional] Student id
+     * @param       int $id_student Student id
      *
-     * @return      array Informations about the student
+     * @return      Student Informations about the student or null if student 
+     * does not exist
+     * 
+     * @throws      \InvalidArgumentException If student id is invalid
      */
-    public function get($id_student)
+    public function get() : array
     {
-        $response = null;
-         
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Invalid student id");
+        
+        $response = NULL;
+        
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  * 
             FROM    students
             WHERE   id_student = ?
         ");
-        $sql->execute(array($id_student));
         
-        if ($sql->rowCount() > 0) {
+        // Executes query
+        $sql->execute(array($this->id_student));
+        
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
             $student = $sql->fetch();
             
             $response = new Student(
@@ -171,11 +186,21 @@ class Students extends Model
      * @param       int $id_course Course id
      *
      * @return      _Class ...
+     * 
+     * @throws      \InvalidArgumentException If course id or student id are 
+     * invalid 
      */
-    public function getLastClassWatched($id_course)
+    public function getLastClassWatched(int $id_course) : _Class
     {
-        $response = NULL;
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Invalid student id");
         
+        if (empty($id_course) || $id_course <= 0)
+            throw new \InvalidArgumentException("Invalid course id");
+        
+        $response = null;
+        
+        // Query construction
         $sql = $this->db->prepare("
             SELECT      id_module, class_order,
                         CASE
@@ -191,9 +216,11 @@ class Students extends Model
             LIMIT 1
         ");
         
+        // Executes query
         $sql->execute(array($this->id_student, $id_course));
         
-        if ($sql->rowCount() > 0) {
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
             $class = $sql->fetch();
             
             if ($class['class_type'] == 'video') {
@@ -218,23 +245,6 @@ class Students extends Model
     }
     
     /**
-     * Checks whether a student exists by its id.
-     *
-     * @param       int $id_student Student id
-     *
-     * @return      boolean If the student with the specified id exists
-     */
-//     public function exist($id_student)
-//     {
-//         if (empty($id_student) || $id_student <= 0) { return false; }
-        
-//         $sql = $this->db->prepare("SELECT COUNT(*) AS count FROM students WHERE id = ?");
-//         $sql->execute(array($id_student));
-        
-//         return $sql->fetch()['count'] > 0;
-//     }
-    
-    /**
      * Updates current student information.
      * 
      * @param       string $name
@@ -242,41 +252,55 @@ class Students extends Model
      * @param       string $birthdate New birthdate
      * 
      * @return      boolean If student information was sucessfully updated
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function update($name, $genre, $birthdate)
+    public function update(string $name, int $genre, string $birthdate) : bool
     {
-        if (empty($name)) { return false; }
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Invalid student id");
         
+        if (empty($genre) || ($genre != 0 && $genre != 1))
+            throw new \InvalidArgumentException("Invalid genre - must be 0 or 1");
+        
+        if (empty($birthdate))
+            throw new \InvalidArgumentException("Birthdate cannot be empty");
+        
+        // Query construction
         $sql = $this->db->prepare("
             UPDATE students 
             SET name = ?, genre = ?, birthdate = ? 
-            WHERE id = ".$this->id_student
-        );
+            WHERE id = ?
+        ");
+        
+        // Executes query
         $sql->execute(array($name, $genre, $birthdate));
         
-        return $sql->rowCount() > 0;
+        return $sql && $sql->rowCount() > 0;
     }
     
     /**
      * Deletes current student.
      * 
-     * @return      boolean If student was sucessfully deleted
+     * @return      bool If student was sucessfully deleted
+     * 
+     * @throws      \InvalidArgumentException If student id is invalid
      */
-    public function delete()
+    public function delete() : bool
     {
-        $response = false;
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Invalid student id");
         
+        // Query construction
+        $sql = $this->db->query("
+            DELETE FROM students 
+            WHERE id_student = ?
+        ");
         
-        $sql = $this->db->query("DELETE FROM students WHERE id = ".$this->id_student);
+        // Executes query
+        $sql->execute(array($this->id_student));
         
-        if ($sql->rowCount() > 0) {
-            $this->db->query("DELETE FROM historic WHERE id_student = ".$this->id_student);
-            $this->db->query("DELETE FROM student_course WHERE id_student = ".$this->id_student);
-            
-            $response = true;
-        }
-        
-        return $response;
+        return $sql && $sql->rowCount() > 0;
     }
     
     /**
@@ -285,44 +309,51 @@ class Students extends Model
      * @param       array $photo New photo (from $_FILES)
      * 
      * @return      boolean If photo was sucessfully updated
+     * 
+     * @throws      \InvalidArgumentException If photo is invalid
+     * 
+     * @implSpec    If photo is empty, current photo will be removed
      */
-    public function updatePhoto($photo)
+    public function updatePhoto(array $photo) : bool
     {
-        if (empty($photo)) {
-            $imageName = $this->getPhoto();
-            
-            if (!empty($imageName)) {
-                unlink("assets/images/profile_photos/".$imageName);
-            }
-        }
+        // Deletes old image (if there is one)
+        $imageName = $this->getPhoto();
         
-        else if (!empty($photo['tmp_name']) && $this->isPhoto($photo)) {
+        // Deletes photo
+        if (!empty($imageName))
+            unlink("assets/images/profile_photos/".$imageName);
+        
+        if (!empty($photo)) {
+            if (empty($photo['tmp_name']) || $this->isPhoto($photo))
+                throw new \InvalidArgumentException("Invalid photo");
+            
             $extension = explode("/", $photo['type'])[1];
             
-            if ($extension == "jpg" || $extension == "jpeg" || $extension == "png") {
-                
-                $filename = md5(rand(1,9999).time().rand(1,9999));
-                $filename = $filename."."."jpg";
-                
-                move_uploaded_file($photo['tmp_name'], "assets/images/profile_photos/".$filename);
-
-                // Deletes old image (if there is one)
-                $imageName = $this->getPhoto();
-                
-                if (!empty($imageName)) {
-                    unlink("assets/images/profile_photos/".$imageName);
-                }
-            }
+            // Checks if photo extension has an accepted extension or not
+            if ($extension != "jpg" && $extension != "jpeg" && $extension != "png")
+                throw new \InvalidArgumentException("Invalid photo extension - must be .jpg, .jpeg or .png");
+            
+            // Generates photo name
+            $filename = md5(rand(1,9999).time().rand(1,9999));
+            $filename = $filename."."."jpg";
+            
+            // Saves photo
+            move_uploaded_file($photo['tmp_name'], "assets/images/profile_photos/".$filename);
         }
         
         $filename = empty($filename) ? "'".$filename."'" : NULL;
         
-        $sql = $this->db->query("
+        // Query construction
+        $sql = $this->db->prepare("
             UPDATE students 
             SET photo = ".$filename." 
-            WHERE id = ".$this->id_student
-        );
-        return $sql->rowCount() > 0;
+            WHERE id = ?
+        ");
+        
+        // Executes query
+        $sql->execute(array($this->id_student));
+        
+        return $sql && $sql->rowCount() > 0;
     }
     
     /**
@@ -331,116 +362,177 @@ class Students extends Model
      * @param       string $currentPassword Current student password
      * @param       string $newPassword New password
      * 
-     * @return      boolean If password was sucessfully updated
+     * @return      bool If password was sucessfully updated
+     * 
+     * @throws      \InvalidArgumentException If any password is empty 
      */
-    public function updatePassword($currentPassword, $newPassword)
+    public function updatePassword(string $currentPassword, string $newPassword) : bool
     {
-        if (empty($currentPassword) || empty($newPassword)) { return false; }
+        if (empty($currentPassword))
+            throw new \InvalidArgumentException("Current password cannot be empty");
+        
+        if (empty($currentPassword))
+            throw new \InvalidArgumentException("New password cannot be empty");
         
         $response = false;
         
-        
-        $sql = $this->db->query("
-            SELECT COUNT(*) AS correctPassword 
-            FROM students 
-            WHERE id = ".$this->id_student." AND password = '".md5($currentPassword)."'
+        // Query construction
+        $sql = $this->db->prepare("
+            SELECT  COUNT(*) AS correctPassword 
+            FROM    students 
+            WHERE   id_student = ? AND password = '".md5($currentPassword)."'
         ");
         
+        // Executes query
+        $sql->execute(array($this->id_student));
+        
+        // Checks if current password is correct
         if ($sql->fetch()['correctPassword'] > 0) {
+            // Query construction
             $sql = $this->db->query("
-                UPDATE students 
-                SET password = '".md5($newPassword)."' 
-                WHERE id = ".$this->id_student
-            );
-            $response = $sql->rowCount() > 0;
+                UPDATE  students 
+                SET     password = '".md5($newPassword)."' 
+                WHERE   id_student = ?
+            ");
+            
+            // Executes query
+            $sql->execute(array($this->id_student));
+            
+            $response = $sql && $sql->rowCount() > 0;
         }
         
         return $response;
     }
     
     /**
-     * Gets total watched classes in platform.
-     * @param unknown $id_student
-     * @return mixed
-     */
-    public function getTotalWatchedClasses($id_student)
-    {
-        $sql = $this->db->prepare("
-            SELECT SUM(length) AS total_length
-            FROM student_historic_watched_length
-            WHERE id_student = ?
-            GROUP BY id_module
-            HAVING id_module IN (SELECT    id_module
-            					 FROM      course_modules NATURAL JOIN bundle_courses 
-                                           NATURAL JOIN purchases
-            					 WHERE     id_student = ?)
-        ");
-        
-        $sql->execute(array($id_student, $id_student));
-        
-        return $sql->fetch()['total_length'];
-    }
-
-    public function getWeeklyHistory($id_student)
-    {
-        $sql = $this->db->prepare("
-            SELECT  date, SUM(*) AS watched_classes
-            FROM    student_historic
-            WHERE   id_student = ?
-            GROUP BY    date
-            ORDER BY date DESC
-            LIMIT 7
-        ");
-
-        $sql->execute(array($id_student))
-
-        return ($sql && $sql->rowCount() > 0) ? 
-            $sql->fetchAll(\PDO::FETCH_ASSOC) : array();
-    }
-
-    /**
-     * Gets photo from current student.
+     * Gets total classes watched by current student along with its total
+     * duration (in minutes).
      * 
-     * @return      string Photo filename
+     * @return      array Total classes watched by current student along with
+     * its total duration. The returned array has the following keys:
+     * <ul>
+     *  <li><b>total_length</b>: Total time of classes watched by current
+     *  student/li>
+     *  <li><b>total_classes_watched</b>: Total classes watched by current 
+     *  student</li>
+     * </ul>
+     * 
+     * @throws      \InvalidArgumentException If student id is invalid
      */
-    private function getPhoto()
+    public function getTotalWatchedClasses() : array
     {
-        $response = null;
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Invalid student id");
         
-        $sql = $this->db->query("
-            SELECT photo 
-            FROM students 
-            WHERE id = ".$this->id_student
-        );
+        // Query construction
+        $sql = $this->db->prepare("
+            SELECT      SUM(length) AS total_length,
+                        COUNT(id_module) AS total_classes_watched
+            FROM        student_historic_watched_length
+            WHERE       id_student = ?
+            GROUP BY    id_module
+            HAVING      id_module IN (SELECT    id_module
+            			        	  FROM      course_modules 
+                                                NATURAL JOIN bundle_courses 
+                                                NATURAL JOIN purchases
+            					      WHERE     id_student = ?)
+        ");
         
-        if ($sql->rowCount() > 0) {
-            $response = $sql->fetch()['photo'];
-        }
+        // Executes query
+        $sql->execute(array($this->id_student, $this->id_student));
         
-        return $response;
+        return $sql->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    
+    /**
+     * Adds a bundle to current student.
+     * 
+     * @param       int $id_bundle Bundle id to be added
+     * 
+     * @return      bool If the bundle was sucessfully added
+     * 
+     * @throws      \InvalidArgumentException If student id or bundle id are
+     * invalid
+     */
+    public function addBundle(int $id_bundle) : bool
+    {
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Invalid student id");
+        
+        // Query construction
+        $sql = $this->db->prepare("
+            INSERT INTO purchases
+            (id_student, id_bundle, date)
+            VALUES (?, ?, NOW())
+        ");
+        
+        // Executes query
+        $sql->execute(array($this->id_student, $id_bundle));
+        
+        return $sql && $sql->rowCount() > 0;
     }
     
     /**
-     * Checks whether a student exists by its email.
+     * Checks whether an email is already in use.
      *
-     * @param       Student $Student Informations about the student
+     * @param       string $email Email to be analyzed
      *
-     * @return      boolean If there is already a student with the email used.
+     * @return      bool If there is already an user using the given email
+     * 
+     * @throws      \InvalidArgumentException If email is empty
      */
-    private function existUser($student) 
+    public function existStudent(string $email) : bool
     {
-        $email = $student->getEmail();
-        
-        if (empty($email)) { return false; }
-        
+        if (empty($email))
+            throw new \InvalidArgumentException("Email cannot be empty");
+
+        // Query construction
         $sql = $this->db->prepare("
-            SELECT COUNT(*) as count 
-            FROM students 
-            WHERE email = ?
+            SELECT  COUNT(*) AS count 
+            FROM    students, admins 
+            WHERE   email = ?
         ");
+        
+        // Executes query
         $sql->execute(array($email));
 
         return $sql->fetch()['count'] > 0;
+    }
+    
+    /**
+     * Gets photo from current student.
+     *
+     * @return      string Photo filename or empty string if there is no photo
+     *
+     * @throws      \InvalidArgumentException If student id is invalid
+     */
+    private function getPhoto() : string
+    {
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Invalid student id");
+            
+        $response = "";
+        
+        // Query construction
+        $sql = $this->db->prepare("
+            SELECT  photo
+            FROM    students
+            WHERE   id_student = ?
+        ");
+            
+        // Executes query
+        $sql->execute(array($this->id_student));
+        
+        // Parses result
+        if ($sql && $sql->rowCount() > 0) {
+            $response = $sql->fetch()['photo'];
+            
+            if (empty($response))
+                $response = "";
+        }
+        
+        return $response;
     }
     
     /**
@@ -449,9 +541,14 @@ class Students extends Model
      * @param       array $photo Submitted photo (from $_FILES)
      * 
      * @return      boolean If the photo is really a photo
+     * 
+     * @throws      \InvalidArgumentException If photo is empty
      */
-    private function isPhoto($photo)
+    private function isPhoto(array $photo) : bool
     {
+        if (empty($photo))
+            throw new \InvalidArgumentException("Photo cannot be empty");
+        
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime = finfo_file($finfo, $photo['tmp_name']);
         finfo_close($finfo);
