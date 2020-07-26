@@ -1,16 +1,20 @@
 <?php
+declare (strict_types=1);
+
 namespace models;
+
 
 use core\Model;
 use models\obj\Questionnaire;
+use models\enum\ClassTypeEnum;
 
 
 /**
- * Responsible for managing questionnaires table.
+ * Responsible for managing 'questionnaires' table.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class Questionnaires extends Model
 {
@@ -18,7 +22,7 @@ class Questionnaires extends Model
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Creates questionnaires table manager.
+     * Creates 'questionnaires' table manager.
      *
      * @apiNote     It will connect to the database when it is instantiated
      */
@@ -34,26 +38,36 @@ class Questionnaires extends Model
     /**
      * Gets questionnaire class
      *
-     * @param       int $id_class Class id
+     * @param       int $id_module Module id that the class belongs to
+     * @param       int $class_order Class order inside the module that it 
+     * belongs to
      *
-     * @return      array questions from this class
+     * @return      Questionnaire Questionnaire class or null if class does not exist
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function get($id_module, $class_order)
+    public function get(int $id_module, int $class_order) : Questionnaire
     {
-//         if (empty($id_module) || $id_module <= 0) { return array(); }
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Invalid module id");
         
-        $response = NULL;
+        if (empty($class_order) || $class_order <= 0)
+            throw new \InvalidArgumentException("Invalid class order");
         
+        $response = null;
+        
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  * 
             FROM    questionnaires 
-            WHERE   id_module = ? AND
-                    class_order = ?
+            WHERE   id_module = ? AND class_order = ?
         ");
         
+        // Executes query
         $sql->execute(array($id_module, $class_order));
         
-        if ($sql->rowCount() > 0) {
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
             $class = $sql->fetch(\PDO::FETCH_ASSOC);
             
             $response = new Questionnaire(
@@ -74,44 +88,72 @@ class Questionnaires extends Model
     /**
      * Gets the answer from a quest.
      *
-     * @param       int $id_question Quest id
+     * @param       int $id_module Module id that the class belongs to
+     * @param       int $class_order Class order inside the module that it 
+     * belongs to
      *
      * @return      int Correct answer
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function getAnswer($id_module, $class_order)
+    public function getAnswer(int $id_module, int $class_order) : int
     {
-//         if (empty($id_question) || $id_question <= 0) { return -1; }
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Invalid module id");
+            
+        if (empty($class_order) || $class_order <= 0)
+            throw new \InvalidArgumentException("Invalid class order");
         
         $response = -1;
         
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  answer 
             FROM    questionnaires 
-            WHERE   id_module = ? AND
-                    class_order = ?
+            WHERE   id_module = ? AND class_order = ?
         ");
+        
+        // Executes query
         $sql->execute(array($id_module, $class_order));
         
-        if ($sql->rowCount() > 0) {
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
             $response = $sql->fetch()['answer'];
         }
         
         return $response;
     }
     
-    public function getFromModule($id_module)
+    /**
+     * Gets all questionnaire classes from a module.
+     * 
+     * @param       int $id_module Module id
+     * 
+     * @return      Questionnaire[] Classes that belongs to the module
+     * 
+     * @throws      \InvalidArgumentException If any argument is invalid
+     * 
+     * @Override
+     */
+    public function getAllFromModule(int $id_module) : array
     {
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Invalid module id");
+        
         $response = array();
         
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  *
             FROM    questionnaires
             WHERE   id_module = ?   
         ");
         
+        // Executes query
         $sql->execute(array($id_module));
         
-        if ($sql->rowCount() > 0) {
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
             $classes = $sql->fetchAll(\PDO::FETCH_ASSOC);
             
             foreach ($classes as $class) {
@@ -132,26 +174,32 @@ class Questionnaires extends Model
     }
     
     /**
+     * {@inheritdoc}
+     * @Override
+     */
+    public function totalLength() : int
+    {
+        return $this->db->query("
+            SELECT  SUM(length) AS total_length
+            FROM    (SELECT 5 AS length
+                     FROM   questionnaires) AS tmp
+        ")->fetch()['total_length'];
+    }
+    
+    /**
      * Marks a class as watched by a student.
      *
+     * @param       int $id_student Student id
+     * @param       int $id_module Module id
+     * @param       int $class_order Class order
+     *
+     * @throws      \InvalidArgumentException If any argument is invalid
+     *
+     * @Override
      */
-    public function markAsWatched($id_student, $id_module, $class_order)
+    public function markAsWatched(int $id_student, int $id_module, int $class_order) : void
     {
-        if (empty($id_student) || $id_student <= 0)
-            return;
-            
-        if (empty($id_module) || $id_module <= 0)
-            return;
-                
-        if ($class_order <= 0)
-            return;
-                    
-        $sql = $this->db->prepare("
-            INSERT INTO student_historic
-            (id_student, id_module, class_order, 1, date)
-            VALUES (?, ?, ?, NOW())
-        ");
-                    
-        $sql->execute(array($id_student, $id_module, $class_order));
+        $this->markAsWatched($id_student, $id_module, $class_order, 
+            new ClassTypeEnum(ClassTypeEnum::QUESTIONNAIRE));
     }
 }
