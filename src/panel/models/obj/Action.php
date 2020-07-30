@@ -31,6 +31,9 @@ namespace models\obj;
  */
 class Action extends User
 {
+    //-------------------------------------------------------------------------
+    //        Methods
+    //-------------------------------------------------------------------------
     /**
      * Generates an action message regarding adding a course.
      * 
