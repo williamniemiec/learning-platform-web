@@ -1,17 +1,21 @@
 <?php
+declare (strict_types=1);
+
 namespace models;
 
 use core\Model;
+use models\enum\OrderDirectionEnum;
 use models\obj\Bundle;
-
+use models\enum\BundleOrderTypeEnum;
+use models\util\IllegalAccessException;
 
 
 /**
- * Responsible for managing bundles table.
+ * Responsible for managing 'bundles' table.
  *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class Bundles extends Model
 {
@@ -19,7 +23,7 @@ class Bundles extends Model
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Creates bundles table manager.
+     * Creates 'bundles' table manager.
      *
      * @apiNote     It will connect to the database when it is instantiated
      */
@@ -32,24 +36,40 @@ class Bundles extends Model
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
-    public function get($id_bundle)
+    /**
+     * Gets a bundle
+     *
+     * @param       int $id_bundle Bundle id or null if there is no bundle with
+     * the given id
+     *
+     * @return      Bundle Bundle with the given id
+     *
+     * @throws      \InvalidArgumentException If bundle id is invalid
+     */
+    public function get(int $id_bundle) : Bundle
     {
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Invalid bundle id");
+            
         $response = null;
         
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  *
             FROM    bundles
             WHERE   id_bundle = ?
         ");
-        
+            
+        // Executes query
         $sql->execute(array($id_bundle));
         
-        if ($sql->rowCount() > 0) {
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
             $bundle = $sql->fetch();
             $response = new Bundle(
-                $bundle['id_bundle'], 
-                $bundle['name'], 
-                $bundle['price'], 
+                $bundle['id_bundle'],
+                $bundle['name'],
+                $bundle['price'],
                 $bundle['description']
             );
         }
@@ -57,49 +77,129 @@ class Bundles extends Model
         return $response;
     }
     
-    public function getAll($limit = -1, $orderBy = '', $orderType = '')
+    /**
+     * Gets all registered bundles. If a filter option is provided, it gets
+     * only those bundles that satisfy these filters.
+     *
+     * @param       int $id_student [Optional] Student id
+     * @param       int $limit [Optional] Maximum bundles returned
+     * @param       string $name [Optional] Bundle name
+     * @param       BundleOrderTypeEnum $orderBy [Optional] Ordering criteria
+     * @param       OrderDirectionEnum $orderType [Optional] Order that the
+     * elements will be returned. Default is ascending.
+     *
+     * @return      array Bundles with the provided filters or empty array if
+     * no bundles are found. If a student id is provided, also returns, for
+     * each bundle, if this student has it. Each position of the returned array
+     * has the following keys:
+     * <ul>
+     *  <li><b>bundle</b>: Bundle information</li>
+     *  <li><b>has_bundle</b>: If the student with the given id has this
+     *  bundle</li>
+     * </ul>
+     */
+    public function getAll(int $id_student = -1, int $limit = -1, string $name = '',
+        BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
+        
+        if (empty($orderType))
+            $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
+            
+        // Query construction
         $query = "
             SELECT      id_bundle, name, price, description,
-                        COUNT(id_course) as total_courses
-            FROM        bundles NATURAL JOIN bundle_courses
+                        COUNT(id_course) AS total_courses,
+        ";
+        
+        // If a student was provided, for each bundle add the information if he
+        // has the bundle or not
+        if ($id_student > 0) {
+            $query .= "
+                CASE
+                    WHEN id_student = ? THEN 1
+                    ELSE 0
+                END AS has_bundle,
+            ";
+        }
+        
+        $query .= "
+                        COUNT(id_student) as total_students
+            FROM        bundles
+                        NATURAL JOIN bundle_courses
+                        NATURAL JOIN purchases
             GROUP BY    id_bundle, name, price, description
         ";
         
-        if (!empty($orderBy)) {
-            $orderType = empty($orderType) ? '' : $orderType;
-            if ($orderBy == 'price') {
-                $query .= " ORDER BY price ".$orderType;
-            }
-            else if ($orderBy == 'courses') {
-                $query .= " ORDER BY total_courses ".$orderType;
-            }
-        }
+        // Sets order by criteria (if any)
+        if (!empty($orderBy))
+            $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
         
+        // Limits the search to a specified name (if a name was specified)
+        if (!empty($name))
+            $query .= empty($orderBy) ? " HAVING name LIKE ?" : " HAVING name LIKE ?";
+            
+        // Limits the results (if a limit was given)
         if ($limit > 0)
             $query .= " LIMIT ".$limit;
+            
+        // Prepares query
+        $sql = $this->db->prepare($query);
         
-        $sql = $this->db->query($query);
-        
-        if ($sql->rowCount() > 0) {
+        // Executes query
+        if (!empty($name))
+            $sql->execute(array($id_student, $name.'%'));
+        else
+            $sql->execute(array($id_student));
+            
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
             $bundles = $sql->fetchAll();
+            $i = 0;
             
             foreach ($bundles as $bundle) {
-                $response[] = new Bundle(
+                $response[$i]['bundle'] = new Bundle(
                     $bundle['id_bundle'],
                     $bundle['name'],
                     $bundle['price'],
                     $bundle['description']
                 );
+                
+                if ($id_student > 0)
+                    $response[$i]['has_bundle'] = $bundle['has_bundle'] > 0;
             }
         }
-        
+            
         return $response;
     }
     
-    public function new($name, $price, $description = "")
+    /**
+     * Creates a new bundle.
+     * 
+     * @param       string $name Bundle name
+     * @param       float $price Bundle price
+     * @param       string $description Bundle description
+     * 
+     * @return      bool If bundle was successfully added
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to create bundles
+     * @throws      \InvalidArgumentException If any argument is invalid
+     */
+    public function new(int $name, float $price, string $description = "") : bool
     {
+        if ($this->getAuthorization()->getLevel() != 0 && 
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+        
+        if (empty($name))
+            throw new \InvalidArgumentException("Name cannot be empty");
+        
+        if (empty($price) || $price < 0)
+            throw new \InvalidArgumentException("Invalid price");
+            
+        // Query construction
         $query = "
             INSERT INTO bundles
             SET name = ?, price = ?
@@ -109,8 +209,10 @@ class Bundles extends Model
             $query .= ", description = ?";
         }
         
+        // Prepares query
         $sql = $this->db->prepare($query);
         
+        // Executes query
         if (!empty($description)) {
             $sql->execute(array($name, $price, $description));
         }
@@ -121,8 +223,28 @@ class Bundles extends Model
         return $sql->rowCount() > 0;
     }
     
-    public function edit(Bundle $bundle)
+    /**
+     * Updates a bundle.
+     * 
+     * @param       Bundle $bundle Updated bundle
+     * 
+     * @return      bool If bundle has been successfully updated
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update bundles
+     * @throws      \InvalidArgumentException If bundle is empty
+     */
+    public function update(Bundle $bundle) : bool
     {
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($bundle))
+            throw new \InvalidArgumentException("Bundle cannot be empty");
+
+        // Query construction
         $query = "
             UPDATE bundles
             SET name = ?, price = ?
@@ -132,8 +254,10 @@ class Bundles extends Model
             $query .= ", description = ?";
         }
         
+        // Prepares query
         $sql = $this->db->prepare($query);
         
+        // Executes query
         if (!empty($bundle->getDescription())) {
             $sql->execute(array(
                 $bundle->getName(), 
@@ -148,38 +272,112 @@ class Bundles extends Model
             ));
         }
         
+        return $sql->rowCount() > 0;
     }
     
-    public function delete($id_bundle)
+    /**
+     * Removes a bundle.
+     * 
+     * @param       int $id_bundle Bundle id
+     * 
+     * @return      bool If bundle was successfully removed
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to remove bundles
+     * @throws      \InvalidArgumentException If bundle id is invalid
+     */
+    public function remove($id_bundle)
     {
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Invalid bundle id");
+        
+        // Query construction
         $sql = $this->db->prepare("
             DELETE FROM bundles
             WHERE id_bundle = ?
         ");
         
+        // Executes query
         $sql->execute(array($id_bundle));
+        
+        return $sql->rowCount() > 0;
     }
     
-    public function addCourse($id_bundle, $id_course)
+    /**
+     * Adds a course to a bundle.
+     * 
+     * @param       int $id_bundle Bundle id
+     * @param       int $id_course Course id
+     * 
+     * @return      bool If course was successfully added to the bundle
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update bundles
+     * @throws      \InvalidArgumentException If any argument is invalid
+     */
+    public function addCourse(int $id_bundle, int $id_course) : bool
     {
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Invalid bundle id");
+        
+        if (empty($id_course) || $id_course <= 0)
+            throw new \InvalidArgumentException("Invalid course id");
+                
+        // Query construction
         $sql = $this->db->prepare("
             INSERT INTO bundle_courses
             (id_bundle, id_course)
             VALUES (?, ?)
         ");
         
+        // Executes query
         $sql->execute(array($id_bundle, $id_course));
         
         return $sql->rowCount() > 0;
     }
     
-    public function deleteCourseFromBundle($id_bundle, $id_course)
+    /**
+     * Removes a course from a bundle.
+     * 
+     * @param       int $id_bundle Bundle id
+     * @param       int $id_course Course id
+     * 
+     * @return      bool If course was successfully removed from the bundle
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update bundles
+     * @throws      \InvalidArgumentException If any argument is invalid
+     */
+    public function deleteCourseFromBundle(int $id_bundle, int $id_course) : bool
     {
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Invalid bundle id");
+            
+        if (empty($id_course) || $id_course <= 0)
+            throw new \InvalidArgumentException("Invalid course id");
+        
+        // Query construction
         $sql = $this->db->prepare("
             DELETE FROM bundle_courses
             WHERE id_bundle = ? AND id_course = ?
         ");
         
+        // Executes query
         $sql->execute(array($id_bundle, $id_course));
         
         return $sql->rowCount() > 0;
