@@ -32,6 +32,12 @@ namespace models\obj;
 class Action extends User
 {
     //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $action;
+    
+    
+    //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
     /**
@@ -39,18 +45,16 @@ class Action extends User
      * 
      * @param       int $id_course New course id
      * 
-     * @return      string Action message
-     * 
      * @throws      \InvalidArgumentException If course id is null or less than
      * or equal to zero
      */
-    public static function addCourse(int $id_course) : string
+    public function addCourse(int $id_course) : void
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be null or". 
                 "less than or equal to zero");
         
-        return Action::add("Course - id_course=".$id_course);
+        $this->action = $this->add("Course - id_course=".$id_course);
     }
     
     /**
@@ -58,18 +62,16 @@ class Action extends User
      *
      * @param       int $id_course Course id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If course id is null or less than
      * or equal to zero
      */
-    public static function editCourse(int $id_course) : string
+    public function editCourse(int $id_course) : void
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be null or".
                 "less than or equal to zero");
         
-        return Action::update("Course - id_course=".$id_course);
+        $this->action = $this->update("Course - id_course=".$id_course);
     }
     
     /**
@@ -77,18 +79,16 @@ class Action extends User
      *
      * @param       int $id_course Course id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If course id is null or less than
      * or equal to zero
      */
-    public static function deleteCourse(int $id_course) : string
+    public function deleteCourse(int $id_course) : void
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::delete("Course - id_course=".$id_course);
+        $this->action = $this->delete("Course - id_course=".$id_course);
     }
     
     /**
@@ -96,18 +96,16 @@ class Action extends User
      *
      * @param       int $id_bundle New bundle id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If bundle id is null or less than
      * or equal to zero
      */
-    public static function addBundle(int $id_bundle) : string
+    public function addBundle(int $id_bundle) : void
     {
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::add("Bundle - id_bundle=".$id_bundle);
+        $this->action = $this->add("Bundle - id_bundle=".$id_bundle);
     }
     
     /**
@@ -115,18 +113,16 @@ class Action extends User
      *
      * @param       int $id_bundle Bundle id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If bundle id is null or less than
      * or equal to zero
      */
-    public static function editBundle(int $id_bundle) : string
+    public function editBundle(int $id_bundle) : void
     {
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::update("Bundle - id_bundle=".$id_bundle);
+        $this->action = $this->update("Bundle - id_bundle=".$id_bundle);
     }
     
     /**
@@ -134,18 +130,16 @@ class Action extends User
      *
      * @param       int $id_bundle Bundle id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If bundle id is null or less than
      * or equal to zero
      */
-    public static function deleteBundle(int $id_bundle) : string
+    public function deleteBundle(int $id_bundle) : void
     {
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::delete("Bundle - id_bundle=".$id_bundle);
+        $this->action = $this->delete("Bundle - id_bundle=".$id_bundle);
     }
     
     /**
@@ -153,18 +147,16 @@ class Action extends User
      *
      * @param       int $id_module New module id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If module id is null or less than
      * or equal to zero
      */
-    public static function addModule(int $id_module) : string
+    public function addModule(int $id_module) : void
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::add("Module - id_module=".$id_module);
+        $this->action = $this->add("Module - id_module=".$id_module);
     }
     
     /**
@@ -172,18 +164,16 @@ class Action extends User
      *
      * @param       int $id_module Module id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If module id is null or less than
      * or equal to zero
      */
-    public static function editModule(int $id_module) : string
+    public function editModule(int $id_module) : void
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::update("Module - id_module=".$id_module);
+        $this->action = $this->update("Module - id_module=".$id_module);
     }
     
     /**
@@ -191,18 +181,16 @@ class Action extends User
      *
      * @param       int $id_module Module id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If module id is null or less than
      * or equal to zero
      */
-    public static function deleteModule(int $id_module) : string
+    public function deleteModule(int $id_module) : void
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::delete("Module - id_module=".$$id_module);
+        $this->action = $this->delete("Module - id_module=".$$id_module);
     }
     
     /**
@@ -211,12 +199,10 @@ class Action extends User
      * @param       int $id_module Module id to which the new class belongs
      * @param       int $class_order Class order in the module 
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If module id or class order are 
      * null or less than or equal to zero
      */
-    public static function addClass(int $id_module, int $class_order) : string
+    public function addClass(int $id_module, int $class_order) : void
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be null or".
@@ -226,7 +212,7 @@ class Action extends User
             throw new \InvalidArgumentException("Class order cannot be null or".
                 "less than or equal to zero");
             
-        return Action::add("Class - id_module=".$id_module.", class_order=".$class_order);
+        $this->action = $this->add("Class - id_module=".$id_module.", class_order=".$class_order);
     }
     
     /**
@@ -235,12 +221,10 @@ class Action extends User
      * @param       int $id_module Module id to which the class belongs
      * @param       int $class_order Class order in the module
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If module id or class order are
      * null or less than or equal to zero
      */
-    public static function editClass(int $id_module, int $class_order) : string
+    public function editClass(int $id_module, int $class_order) : void
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be null or".
@@ -250,7 +234,7 @@ class Action extends User
             throw new \InvalidArgumentException("Class order cannot be null or".
                 "less than or equal to zero");
             
-        return Action::edit("Class - id_module=".$id_module.", class_order=".$class_order);
+        $this->action = $this->edit("Class - id_module=".$id_module.", class_order=".$class_order);
     }
     
     /**
@@ -259,12 +243,10 @@ class Action extends User
      * @param       int $id_module Module id to which the class belongs
      * @param       int $class_order Class order in the module
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If module id or class order are
      * null or less than or equal to zero
      */
-    public static function deleteClass(int $id_module, int $class_order) : string
+    public function deleteClass(int $id_module, int $class_order) : void
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be null or".
@@ -274,7 +256,7 @@ class Action extends User
             throw new \InvalidArgumentException("Class order cannot be null or".
                 "less than or equal to zero");
             
-        return Action::delete("Class - id_module=".$id_module.", class_order=".$class_order);
+        $this->action = $this->delete("Class - id_module=".$id_module.", class_order=".$class_order);
     }
     
     /**
@@ -282,18 +264,16 @@ class Action extends User
      *
      * @param       int $id_admin New admin id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If admin id is null or less than
      * or equal to zero
      */
-    public static function addAdmin(int $id_admin) : string
+    public function addAdmin(int $id_admin) : void
     {
         if (empty($id_admin) || $id_admin <= 0)
             throw new \InvalidArgumentException("Admin id cannot be null or".
                 "less than or equal to zero");
         
-        return Action::add("Admin - id_admin=".$id_admin);
+        $this->action = $this->add("Admin - id_admin=".$id_admin);
     }
     
     /**
@@ -301,18 +281,16 @@ class Action extends User
      *
      * @param       int $id_admin Admin id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If admin id is null or less than
      * or equal to zero
      */
-    public static function editAdmin(int $id_admin) : string
+    public function editAdmin(int $id_admin) : void
     {
         if (empty($id_admin) || $id_admin <= 0)
             throw new \InvalidArgumentException("Admin id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::edit("Admin - id_admin=".$id_admin);
+        $this->action = $this->edit("Admin - id_admin=".$id_admin);
     }
     
     /**
@@ -320,18 +298,16 @@ class Action extends User
      *
      * @param       int $id_admin Admin id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If admin id is null or less than
      * or equal to zero
      */
-    public static function deleteAdmin(int $id_admin) : string
+    public function deleteAdmin(int $id_admin) : void
     {
         if (empty($id_admin) || $id_admin <= 0)
             throw new \InvalidArgumentException("Admin id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::delete("Admin - id_admin=".$id_admin);
+        $this->action = $this->delete("Admin - id_admin=".$id_admin);
     }
     
     /**
@@ -339,18 +315,16 @@ class Action extends User
      *
      * @param       int $id_student Student id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If student id is null or less than
      * or equal to zero
      */
-    public static function editStudent(int $id_student) : string
+    public function editStudent(int $id_student) : void
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::edit("Student - id_student=".$id_student);
+        $this->action = $this->edit("Student - id_student=".$id_student);
     }
     
     /**
@@ -358,18 +332,16 @@ class Action extends User
      *
      * @param       int $id_student Student id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If student id is null or less than
      * or equal to zero
      */
-    public static function deleteStudent(int $id_student) : string
+    public function deleteStudent(int $id_student) : void
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::delete("Student - id_student=".$id_student);
+        $this->action = $this->delete("Student - id_student=".$id_student);
     }
     
     /**
@@ -377,18 +349,16 @@ class Action extends User
      *
      * @param       int $id_topic Support topic id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If topic id is null or less than
      * or equal to zero
      */
-    public static function answerTopic(int $id_topic) : string
+    public function answerTopic(int $id_topic) : void
     {
         if (empty($id_topic) || $id_topic <= 0)
             throw new \InvalidArgumentException("Topic id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::edit("Topic answered - id_topic=".$id_topic);
+        $this->action = $this->edit("Topic answered - id_topic=".$id_topic);
     }
     
     /**
@@ -396,18 +366,16 @@ class Action extends User
      *
      * @param       int $id_topic Support topic id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If topic id is null or less than
      * or equal to zero
      */
-    public static function openTopic(int $id_topic) : string
+    public function openTopic(int $id_topic) : void
     {
         if (empty($id_topic) || $id_topic <= 0)
             throw new \InvalidArgumentException("Topic id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::update("Topic opened - id_topic=".$id_topic);
+        $this->action = $this->update("Topic opened - id_topic=".$id_topic);
     }
     
     /**
@@ -415,18 +383,16 @@ class Action extends User
      *
      * @param       int $id_topic Support topic id
      *
-     * @return      string Action message
-     *
      * @throws      \InvalidArgumentException If topic id is null or less than
      * or equal to zero
      */
-    public static function closeTopic(int $id_topic) : string
+    public function closeTopic(int $id_topic) : void
     {
         if (empty($id_topic) || $id_topic <= 0)
             throw new \InvalidArgumentException("Topic id cannot be null or".
                 "less than or equal to zero");
             
-        return Action::update("Topic closed - id_topic=".$id_topic);
+        $this->action = $this->update("Topic closed - id_topic=".$id_topic);
     }
     
     /**
@@ -438,7 +404,7 @@ class Action extends User
      *
      * @throws      \InvalidArgumentException If content is null
      */
-    private static function add(string $content) : string
+    private function add(string $content) : string
     {
         if (empty($content))
             throw new \InvalidArgumentException("Content cannot be null");
@@ -455,7 +421,7 @@ class Action extends User
      *
      * @throws      \InvalidArgumentException If text is null
      */
-    private static function update(string $content) : string
+    private function update(string $content) : string
     {
         if (empty($content))
             throw new \InvalidArgumentException("Content cannot be null");
@@ -472,11 +438,26 @@ class Action extends User
      *
      * @throws      \InvalidArgumentException If text is null
      */
-    private static function delete(string $content) : string
+    private function delete(string $content) : string
     {
         if (empty($content))
             throw new \InvalidArgumentException("Content cannot be null");
         
         return "[DEL] ".$content;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Getters
+    //-------------------------------------------------------------------------
+    /**
+     * Gets selected action.
+     * 
+     * @return      string Selected action or empty string if no action was 
+     * selected
+     */
+    public function get() : string
+    {
+        return empty($this->action) ? "" : $this->action;
     }
 }
