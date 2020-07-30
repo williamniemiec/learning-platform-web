@@ -1,4 +1,6 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
@@ -39,7 +41,8 @@ class Video extends _Class
      * @param       int $length Video length
      * @param       string $description [Optional] Class description
      */
-    public function __construct($id_module, $class_order, $title, $videoID, $length, $description = '')
+    public function __construct(int $id_module, int $class_order, string $title,
+        string $videoID, int $length, string $description = '')
     {
         $this->id_module = $id_module;
         $this->class_order = $class_order;
@@ -58,7 +61,7 @@ class Video extends _Class
      * 
      * @return      string Class title
      */
-    public function getTitle()
+    public function getTitle() : string
     {
         return $this->title;
     }
@@ -68,7 +71,7 @@ class Video extends _Class
      * 
      * @return      string Video id
      */
-    public function getVideoId()
+    public function getVideoId() : int
     {
         return $this->videoID;
     }
@@ -78,7 +81,7 @@ class Video extends _Class
      * 
      * @return      int Video length
      */
-    public function getLength()
+    public function getLength() : int
     {
         return $this->length;
     }
@@ -89,7 +92,7 @@ class Video extends _Class
      * @return      string Video description or empty string if there is no
      * description
      */
-    public function getDescription()
+    public function getDescription() : string
     {
         return $this->description;
     }

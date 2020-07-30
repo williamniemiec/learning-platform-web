@@ -1,7 +1,10 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 use models\Courses;
+use models\Bundles;
 
 
 /**
@@ -21,6 +24,8 @@ class Bundle
     private $price;
     private $description;
     private $courses;
+    private $totalClasses;
+    private $totalLength;
     
     
     //-------------------------------------------------------------------------
@@ -34,12 +39,12 @@ class Bundle
      * @param       float $price Bundle price
      * @param       string $description [Optional] Bundle description
      */
-    public function __construct($id_bundle, $name, $price, $description = '')
+    public function __construct(int $id_bundle, string $name, float $price, string $description = '')
     {
         $this->id_bundle = $id_bundle;
         $this->name = $name;
         $this->price = $price;
-        $this->description = $description;
+        $this->description = empty($description) ? '' : $description;
     }
     
     
@@ -51,7 +56,7 @@ class Bundle
      *
      * @return      int Bundle id
      */
-    public function getBundleId()
+    public function getBundleId() : int
     {
         return $this->id_bundle;
     }
@@ -61,7 +66,7 @@ class Bundle
      *
      * @return      string Bundle name
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
@@ -71,7 +76,7 @@ class Bundle
      *
      * @return      float Bundle price
      */
-    public function getPrice()
+    public function getPrice() : float
     {
         return $this->price;
     }
@@ -82,17 +87,67 @@ class Bundle
      * @return      string Bundle description or empty string if
      * bundle does not have a description
      */
-    public function getDescription()
+    public function getDescription() : string
     {
         return $this->description;
     }
     
-    public function getCourses()
+    /**
+     * Gets courses that belongs to the bundle.
+     * 
+     * @return      \models\obj\Course[] Courses that belongs to the bundle or
+     * empty array if there are no courses in the bundle
+     * 
+     * @implNote    Lazy initialization
+     */
+    public function getCourses() : array
     {
         if (empty($this->courses)) {
-            $this->courses = Courses::getFromBundle($this->id_bundle);
+            $courses = new Courses();
+            
+            $this->courses = $courses->getFromBundle($this->id_bundle);
         }
         
         return $this->courses;
+    }
+    
+    /**
+     * Gets the total length of the bundle.
+     * 
+     * @return      int Total length of the bundle
+     * 
+     * @implNote    Lazy initialization
+     */
+    public function getTotalLength() : int
+    {
+        if (empty($this->totalLength)) {
+            $bundles = new Bundles();
+            $total = $bundles->countTotalClasses();
+            
+            $this->totalLength = $total['total_length'];
+            $this->totalClasses = $total['total_classes'];
+        }
+        
+        return $this->totalLength;
+    }
+    
+    /**
+     * Gets the total classes of the bundle.
+     *
+     * @return      int Total classes of the bundle
+     *
+     * @implNote    Lazy initialization
+     */
+    public function getTotalClasses() : int
+    {
+        if (empty($this->totalClasses)) {
+            $bundles = new Bundles();
+            $total = $bundles->countTotalClasses();
+            
+            $this->totalLength = $total['total_length'];
+            $this->totalClasses = $total['total_classes'];
+        }
+        
+        return $this->totalClasses;
     }
 }

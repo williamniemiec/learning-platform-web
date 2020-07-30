@@ -1,4 +1,6 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
@@ -27,7 +29,7 @@ abstract class _Class
      * 
      * @return      int Module id
      */
-    public function getModuleId()
+    public function getModuleId() : int
     {
         return $this->id_module;
     }
@@ -37,7 +39,7 @@ abstract class _Class
      *
      * @return      int Module id
      */
-    public function getClassOrder()
+    public function getClassOrder() : int
     {
         return $this->class_order;
     }

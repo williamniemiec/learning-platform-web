@@ -1,4 +1,6 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
@@ -29,7 +31,7 @@ class Message
      * @param       string $date Message posting date
      * @param       string $message Message content
      */
-    public function __construct($user, $date, $message)
+    public function __construct(User $user, string $date, string $message)
     {
         $this->user = $user;
         $this->date = $date;
@@ -45,7 +47,7 @@ class Message
      * 
      * @return      User User who created the message
      */
-    public function getCreator()
+    public function getCreator() : int
     {
         return $this->id_comment;
     }
@@ -55,7 +57,7 @@ class Message
      *
      * @return      string Message creation date
      */
-    public function getDate()
+    public function getDate() : string
     {
         return $this->date;
     }
@@ -65,7 +67,7 @@ class Message
      *
      * @return      string Message content
      */
-    public function getContent()
+    public function getContent() : string
     {
         return $this->text;
     }

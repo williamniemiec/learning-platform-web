@@ -1,11 +1,13 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
 use models\Comments;
 
 /**
- * Responsible for representing a comment.
+ * Responsible for representing comments.
  *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
  * @version		1.0.0
@@ -35,7 +37,8 @@ class Comment
      * @param       string $text Comment content
      * @param       Message[] $replies [Optional] Comment replies
      */
-    public function __construct($id_comment, $student, $date, $text, $replies = array())
+    public function __construct(int $id_comment, Student $student, string $date, 
+        string $text, array $replies = array())
     {
         $this->id_comment = $id_comment;
         $this->student = $student;
@@ -53,7 +56,7 @@ class Comment
      * 
      * @return      int Comment id
      */
-    public function getCommentId()
+    public function getCommentId() : int
     {
         return $this->id_comment;
     }
@@ -63,7 +66,7 @@ class Comment
      *
      * @return      Student Student who created the comment
      */
-    public function getCreator()
+    public function getCreator() : Student
     {
         return $this->student;
     }
@@ -73,7 +76,7 @@ class Comment
      *
      * @return      string Comment creation date
      */
-    public function getCreationDate()
+    public function getCreationDate() : string
     {
         return $this->date;
     }
@@ -83,7 +86,7 @@ class Comment
      *
      * @return      string Comment content
      */
-    public function getContent()
+    public function getContent() : string
     {
         return $this->text;
     }
@@ -94,7 +97,7 @@ class Comment
      * @return      Message[] Comment replies or empty array if there are no
      * replies
      */
-    public function getReplies()
+    public function getReplies() : array
     {
         if (empty($this->replies)) {
             $comments = new Comments();

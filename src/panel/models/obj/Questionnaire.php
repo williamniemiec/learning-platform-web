@@ -1,4 +1,6 @@
 <?php
+declare (strict_types=1);
+
 namespace models\obj;
 
 
@@ -38,7 +40,8 @@ class Questionnaire extends _Class
      * @param       string $q4 Fourth response option
      * @param       int $answer Questionnaire answer (number between [1;4])
      */
-    public function __construct($id_module, $class_order, $question, $q1, $q2, $q3, $q4, $answer)
+    public function __construct(int $id_module, int $class_order, string $question, 
+        string $q1, string $q2, string $q3, string $q4, int $answer)
     {
         $this->id_module = $id_module;
         $this->class_order = $class_order;
@@ -59,7 +62,7 @@ class Questionnaire extends _Class
      * 
      * @return      string Questionnarie question
      */
-    public function getQuestion()
+    public function getQuestion() : string
     {
         return $this->question;
     }
@@ -69,7 +72,7 @@ class Questionnaire extends _Class
      * 
      * @return      string First response option
      */
-    public function getQ1()
+    public function getQ1() : string
     {
         return $this->q1;
     }
@@ -79,7 +82,7 @@ class Questionnaire extends _Class
      *
      * @return      string Second response option
      */
-    public function getQ2()
+    public function getQ2() : string
     {
         return $this->q2;
     }
@@ -89,7 +92,7 @@ class Questionnaire extends _Class
      *
      * @return      string Third response option
      */
-    public function getQ3()
+    public function getQ3() : string
     {
         return $this->q3;
     }
@@ -99,7 +102,7 @@ class Questionnaire extends _Class
      *
      * @return      string Fourth response option
      */
-    public function getQ4()
+    public function getQ4() : string
     {
         return $this->q4;
     }
@@ -109,7 +112,7 @@ class Questionnaire extends _Class
      *
      * @return      int Questionnaire answer (number between [1;4])
      */
-    public function getAnswer()
+    public function getAnswer() : int
     {
         return $this->answer;
     }

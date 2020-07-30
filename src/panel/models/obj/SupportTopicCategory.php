@@ -4,35 +4,38 @@ declare (strict_types=1);
 namespace models\obj;
 
 
+use models\Students;
+use models\Comments;
+
 /**
- * Responsible for representing an authorization.
+ * Responsible for representing a support topic category.
  *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Authorization extends User
+class SupportTopicCategory
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
+    private $id_category;
     private $name;
-    private $level;
     
     
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Creates a representation of a admin-type user.
+     * Creates a representation of a support topic category.
      *
-     * @param       string $name Authorization's name
-     * @param       int $level Authorization's level
+     * @param       int $id_category Category id
+     * @param       string $name Category name
      */
-    public function __construct(string $name, int $level)
+    public function __construct(int $id_category, string $name)
     {
+        $this->id_category = $id_category;
         $this->name = $name;
-        $this->level = $level;
     }
     
     
@@ -40,22 +43,22 @@ class Authorization extends User
     //        Getters
     //-------------------------------------------------------------------------
     /**
-     * Gets authorization name.
-     *
-     * @return      string Authorization name
+     * Gets category id.
+     * 
+     * @return      int Category id
      */
-    public function getName() : string
+    public function getId() : int
     {
-        return $this->name;
+        return $this->id_category;
     }
     
     /**
-     * Gets authorization level.
-     *
-     * @return      int Authorization level
+     * Gets category name.
+     * 
+     * @return      string Category name
      */
-    public function getLevel() : int
-    {
-        return $this->level;
+    public function getName() : string
+    { 
+        return $this->name;
     }
 }
