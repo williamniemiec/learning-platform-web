@@ -50,12 +50,14 @@ class BundlesDAO
      * 
      * @return      Bundle Bundle with the given id
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If bundle id is empty or less 
+     * than or equal to zero
      */
     public function get(int $id_bundle) : Bundle
     {
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid id_bundle");
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = null;
         
@@ -190,15 +192,18 @@ class BundlesDAO
      *  @return     Bundle[] Bundles that are contained in the given bundle 
      *  disregarding those that the student already has
      *  
-     *  @throws      \InvalidArgumentException If any argument is invalid 
+     *  @throws      \InvalidArgumentException If bundle id or student id is 
+     * empty or less than or equal to zero
      */
     public function extensionBundles(int $id_bundle, int $id_student) : array
     {
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid id_bundle");
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid id_student");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
             
         $response = array();
         
@@ -247,15 +252,18 @@ class BundlesDAO
      * @return      Bundle[] Bundles that does not have courses contained in the
      * given bundle disregarding those that the student already has
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If bundle id or student id is 
+     * empty or less than or equal to zero
      */
     public function unrelatedBundles(int $id_bundle, int $id_student) : array
     {
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid id_bundle");
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid id_student");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array(); 
         
@@ -310,7 +318,8 @@ class BundlesDAO
      *  has</li>
      * </ul>
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If bundle id is empty or less 
+     * than or equal to zero
      * 
      * @implSpec    It will always return an array with the two keys informed
      * above, even if both have zero value
@@ -318,7 +327,8 @@ class BundlesDAO
     public function countTotalClasses(int $id_bundle) : array
     {
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid id_bundle");
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
             
         $response = array(
             "total_classes" => 0,

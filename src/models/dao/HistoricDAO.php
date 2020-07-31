@@ -20,6 +20,7 @@ class HistoricDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
+    private $id_student;
     
     
     //-------------------------------------------------------------------------
@@ -36,9 +37,10 @@ class HistoricDAO
     public function __construct(Database $db, int $id_student)
     {
         if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Student id cannot be empty or". 
+            throw new \InvalidArgumentException("Student id cannot be empty or ". 
                 "less than or equal to zero");
         
+        $this->id_student = $id_student;
         $this->db = $db->getConnection();
     }
     
@@ -59,7 +61,7 @@ class HistoricDAO
     public function countWatchedClasses(int $id_course) : int
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Course id cannot be empty or". 
+            throw new \InvalidArgumentException("Course id cannot be empty or ". 
                 "less than or equal to zero");
         
         // Query construction

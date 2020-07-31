@@ -48,12 +48,14 @@ class ModulesDAO
      *
      * @return      Module[] Modules from this course
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If course id is empty or less than
+     * or equal to zero 
      */
     public function getFromCourse(int $id_course) : array
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         
@@ -96,12 +98,14 @@ class ModulesDAO
      *  <li><b>Value</b>: {@link _Class}</li>
      * </ul>
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If module id is empty or less 
+     * than or equal to zero
      */
     public function getClassesFromModule(int $id_module) : array
     {
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         $videos = new VideosDAO($this->db);

@@ -48,17 +48,21 @@ class QuestionnairesDAO
      * @param       int $class_order Class order inside the module that it 
      * belongs to
      *
-     * @return      Questionnaire Questionnaire class or null if class does not exist
+     * @return      Questionnaire Questionnaire class or null if class does not
+     * exist
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If module id or class order is 
+     * empty or less than or equal to zero
      */
     public function get(int $id_module, int $class_order) : Questionnaire
     {
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class order");
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
         
         $response = null;
         
@@ -100,15 +104,18 @@ class QuestionnairesDAO
      *
      * @return      int Correct answer
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If module id or class order is 
+     * empty or less than or equal to zero
      */
     public function getAnswer(int $id_module, int $class_order) : int
     {
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class order");
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
         
         $response = -1;
         
@@ -137,14 +144,16 @@ class QuestionnairesDAO
      * 
      * @return      Questionnaire[] Classes that belongs to the module
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If module id is empty or less
+     * than or equal to zero
      * 
      * @Override
      */
     public function getAllFromModule(int $id_module) : array
     {
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         

@@ -50,15 +50,18 @@ class VideosDAO
      *
      * @return      Video Video class or null if class does not exist
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If module id or class order is 
+     * empty or less than or equal to zero
      */
     public function get(int $id_module, int $class_order) : Video
     {
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class order");
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
             
         $response = null;
         
@@ -96,12 +99,17 @@ class VideosDAO
      * 
      * @return      Video[] Classes that belongs to the module
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If module id is empty or less 
+     * than or equal to zero
      * 
      * @Override
      */
     public function getAllFromModule(int $id_module) : array
     {
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
+            
         $response = array();
         
         $sql = $this->db->prepare("

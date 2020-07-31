@@ -29,12 +29,14 @@ abstract class ClassesDAO
      * null if there are no registered modules - classes in the course with
      * the given id
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If course id or student id is 
+     * empty or less than or equal to zero
      */
     public function getFirstClassFromFirstModule(int $id_course) : _Class
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid id_course");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = null;
         
@@ -81,7 +83,8 @@ abstract class ClassesDAO
      *
      * @return      array Classes that belongs to the module
      *
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If module id or student id is 
+     * empty or less than or equal to zero
      */
     public abstract function getAllFromModule(int $id_module) : array;
     
@@ -99,16 +102,19 @@ abstract class ClassesDAO
         ClassTypeEnum $class_type) : void
     {
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
                 
         if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class order");
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($class_type->get()))
-            throw new \InvalidArgumentException("Class type cannot be empty");
+            throw new \InvalidArgumentException("Class type cannot be empty ");
                     
         // Query construction
         $sql = $this->db->prepare("
@@ -135,18 +141,22 @@ abstract class ClassesDAO
      * @param       int $id_module Module id
      * @param       int $class_order Class order
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If student id, module id or 
+     * class order is empty or less than or equal to zero
      */
     public function removeWatched(int $id_student, int $id_module, int $class_order) : void
     {
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid id_student");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid id_module");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Class order must be greater than zero");
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("

@@ -56,13 +56,16 @@ class CommentsDAO
     public function newComment(int $id_student, int $id_module, int $class_order, string $text) : bool
     {
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid id_student");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid id_module");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class_order");
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($text))
             throw new \InvalidArgumentException("Invalid text");
@@ -88,15 +91,18 @@ class CommentsDAO
      * 
      * @return      Comment[] Comments from this class
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If module id or class order is 
+     * empty or less than or equal to zero
      */
     public function getComments(int $id_module, int $class_order) : array
     {
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid id_module");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class_order");
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         
@@ -139,10 +145,12 @@ class CommentsDAO
     public function newReply(int $id_comment, int $id_student, string $text) : int 
     {
         if (empty($id_comment) || $id_comment <= 0)
-            throw new \InvalidArgumentException("Invalid id_comment");
+            throw new \InvalidArgumentException("Comment id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid id_student");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($text))
             throw new \InvalidArgumentException("Invalid text");
@@ -174,12 +182,14 @@ class CommentsDAO
      * 
      * @return      array Replies from this comment
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If comment id is empty or less 
+     * than or equal to zero
      */
     public function getReplies(int $id_comment) : array
     {
         if (empty($id_comment) || $id_comment <= 0)
-            throw new \InvalidArgumentException("Invalid id_comment");
+            throw new \InvalidArgumentException("Comment id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         
@@ -217,12 +227,14 @@ class CommentsDAO
      * 
      * @return      boolean If doubt was sucessfully deleted
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If comment id is empty or less 
+     * than or equal to zero
      */
     public function deleteComment(int $id_comment) : bool
     {
         if (empty($id_comment) || $id_comment <= 0)
-            throw new \InvalidArgumentException("Invalid id_comment");
+            throw new \InvalidArgumentException("Comment id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -244,15 +256,18 @@ class CommentsDAO
      * 
      * @return      boolean If reply was sucessfully deleted
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If comment id or student id is 
+     * empty or less than or equal to zero
      */
     public function deleteReply(int $id_comment, int $id_student) : bool
     {
         if (empty($id_comment) || $id_comment <= 0)
-            throw new \InvalidArgumentException("Invalid id_comment");
+            throw new \InvalidArgumentException("Comment id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid id_student");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("

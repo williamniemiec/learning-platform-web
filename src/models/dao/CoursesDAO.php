@@ -54,16 +54,18 @@ class CoursesDAO
      *  <li><b>course</b>: Courses that the student has</li>
      *  <li><b>total_length_watched</b>: Total time of classes watched by the 
      *  student in this course</li>
-     *  <li><b>total_classes_watched</b>: Total classes watched by the student in
-     *  this course</li>
+     *  <li><b>total_classes_watched</b>: Total classes watched by the student
+     *  in this course</li>
      * </ul>
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If student id is empty or less 
+     * than or equal to zero
      */
     public function getMyCourses(int $id_student, string $name = '') : array
     {
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid id_student");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         
@@ -146,12 +148,14 @@ class CoursesDAO
      *  <li><b>total_length</b>: Total course duration (in minutes)</li>
      * </ul>
      * 
-     * @throws      \InvalidArgumentException If course id is invalid 
+     * @throws      \InvalidArgumentException If course id is empty or less
+     * than or equal to zero 
      */
     public function countClasses(int $id_course) : array
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
        
         // Query construction
         $sql = $this->db->prepare("
@@ -179,12 +183,14 @@ class CoursesDAO
      * 
      * @return      Course[] Courses belonging to this bundle
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If bundle id is empty or less 
+     * than or equal to zero
      */
     public function getFromBundle(int $id_bundle) : array
     {
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid bundle id");
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         
@@ -224,12 +230,14 @@ class CoursesDAO
      *
      * @return      Course Informations about a course
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If bundle id is empty or less 
+     * than or equal to zero
      */
     public function get(int $id_course) : Course
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = null;
         
@@ -266,13 +274,19 @@ class CoursesDAO
      * 
      * @return      bool If current student is enrolled in a course
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If bundle id or student id is 
+     * empty or less than or equal to zero
      */
     public function isEnrolled(int $id_course, int $id_student) : bool
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
+        if (empty($id_student) || $id_student <= 0)
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
+            
         // Query construction
         $sql = $this->db->prepare("
             SELECT  COUNT(*) AS count

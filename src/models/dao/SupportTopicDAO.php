@@ -50,12 +50,14 @@ class SupportTopicDAO
      * @return      SupportTopic Support topic with the given id or null if there
      * is no topic with the provided id
      * 
-     * @throws      \InvalidArgumentException If topic id is invalid
+     * @throws      \InvalidArgumentException If topic id is empty or less than
+     * or equal to zero
      */
     public function get(int $id_topic) : array
     {
         if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
+            throw new \InvalidArgumentException("Topic id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = NULL;
         
@@ -100,13 +102,16 @@ class SupportTopicDAO
      * 
      * @throws      \InvalidArgumentException If any argument is invalid
      */
-    public function new(int $id_category, int $id_student, string $title, string $message) : bool
+    public function new(int $id_category, int $id_student, string $title, 
+        string $message) : bool
     {
         if (empty($id_category) || $id_category <= 0)
-            throw new \InvalidArgumentException("Invalid category id");
+            throw new \InvalidArgumentException("Category id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($title))
             throw new \InvalidArgumentException("Title cannot be empty");
@@ -135,15 +140,18 @@ class SupportTopicDAO
      * 
      * @return      bool If support topic was sucessfully removed
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If topic id or student id is empty
+     * or less than or equal to zero
      */
     public function delete(int $id_student, int $id_topic) : bool
     {
         if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
+            throw new \InvalidArgumentException("Topic id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -165,15 +173,18 @@ class SupportTopicDAO
      * 
      * @return      bool If support topic was successfully closed
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If topic id or student id is empty
+     * or less than or equal to zero
      */
     public function close(int $id_student, int $id_topic) : bool
     {
         if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
+            throw new \InvalidArgumentException("Topic id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -196,15 +207,18 @@ class SupportTopicDAO
      *
      * @return      bool If support topic was successfully closed
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If topic id or student id is empty
+     * or less than or equal to zero
      */
     public function open(int $id_student, int $id_topic) : bool
     {
         if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
+            throw new \InvalidArgumentException("Topic id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -233,10 +247,12 @@ class SupportTopicDAO
     public function newReply(int $id_topic, int $id_student, string $text) : bool
     {
         if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
+            throw new \InvalidArgumentException("Topic id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($text))
             throw new \InvalidArgumentException("Text cannot be empty");
@@ -262,12 +278,14 @@ class SupportTopicDAO
      * @return      Message[] Support topic replies or empty array if there are
      * no replies
      * 
-     * @throws      \InvalidArgumentException If topic id is invalid
+     * @throws      \InvalidArgumentException If topic id is empty or less than
+     * or equal to zero
      */
     public function getReplies(int $id_topic) : array
     {
         if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
+            throw new \InvalidArgumentException("Topic id cannot be empty ".
+                "or less than or equal to zero");
 
         $response = array();
         
@@ -316,15 +334,18 @@ class SupportTopicDAO
      * answered and that belongs to the category with the given id or empty
      * array if there are no matches
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If topic id or category id is
+     * empty or less than or equal to zero
      */
     public function getAllAnsweredByCategory(int $id_student, int $id_category) : array
     {
         if (empty($id_category) || $id_category <= 0)
-            throw new \InvalidArgumentException("Invalid category id");
+            throw new \InvalidArgumentException("Category id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         
@@ -370,12 +391,14 @@ class SupportTopicDAO
      * @return      SupportTopic[] Support topics that match with the provided
      * name or empty array if there are no matches
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If name is empty or student id is
+     * empty or less than or equal to zero
      */
     public function search(int $id_student, string $name) : array
     {
         if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($name))
             throw new \InvalidArgumentException("Name cannot be empty");

@@ -31,12 +31,18 @@ class NotificationsDAO
      * Creates 'notifications' table manager.
      *
      * @param       Database $db Database
+     * 
+     * @throws      \InvalidArgumentException If student id is empty or less 
+     * than or equal to zero
      */
-    public function __construct(Database $db, int $id_user)
+    public function __construct(Database $db, int $id_student)
     {
-        $this->db = $db->getConnection();
-        $this->id_student = $id_user;
-        
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Student id cannot be empty or ".
+                "less than or equal to zero");
+            
+        $this->id_student = $id_student;
+        $this->db = $db->getConnection();        
     }
     
     
@@ -51,12 +57,14 @@ class NotificationsDAO
      * 
      * @return      Notification[] Notifications that current student has
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If limit is empty or less than or
+     * equal to zero
      */
     public function getNotifications(int $limit = 10) : array
     {
         if (empty($limit) || $limit <= 0)
-            throw new \InvalidArgumentException("Invalid limit");
+            throw new \InvalidArgumentException("Limit cannot be empty or ".
+                "less than or equal to zero");
         
         $response = array();
         
@@ -127,12 +135,12 @@ class NotificationsDAO
      * 
      * @return      bool If notification was sucessfully deleted
 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If date is empty
      */
     public function delete(string $date) : bool
     {
         if (empty($date))
-            throw new \InvalidArgumentException("Invalid date");
+            throw new \InvalidArgumentException("Date cannot be empty");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -157,10 +165,12 @@ class NotificationsDAO
      * 
      * @throws \InvalidArgumentException If any argument is invalid 
      */
-    public function new(int $id_reference, NotificationTypeEnum $type, string $message) : bool
+    public function new(int $id_reference, NotificationTypeEnum $type, 
+        string $message) : bool
     {
         if (empty($id_reference) || $id_reference <= 0)
-            throw new \InvalidArgumentException("Invalid id_reference");
+            throw new \InvalidArgumentException("Reference id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($type) || ($type != 0 && $type != 1))
             throw new \InvalidArgumentException("Invalid type");
@@ -186,12 +196,12 @@ class NotificationsDAO
      * 
      * @param       string $date Notification creation date
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If date is empty
      */
     public function markAsRead(string $date) : void
     {
         if (empty($date))
-            throw new \InvalidArgumentException("Invalid date");
+            throw new \InvalidArgumentException("Date cannot be empty");
             
         // Query construction
         $sql = $this->db->prepare("
@@ -209,12 +219,12 @@ class NotificationsDAO
      *
      * @param       string $date Notification creation date
      *
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If date is empty
      */
     public function markAsUnread(string $date) : void
     {
         if (empty($date))
-            throw new \InvalidArgumentException("Invalid date");
+            throw new \InvalidArgumentException("Date cannot be empty");
             
         // Query construction
         $sql = $this->db->prepare("

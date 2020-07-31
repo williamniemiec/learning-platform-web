@@ -5,6 +5,7 @@ namespace models;
 
 
 use database\Database;
+use models\dao\SupportTopicDAO;
 
 
 /**
