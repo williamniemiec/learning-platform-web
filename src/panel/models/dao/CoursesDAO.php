@@ -6,8 +6,9 @@ namespace models\dao;
 
 use database\Database;
 use models\Course;
-use models\enum\OrderDirectionEnum;
 use models\enum\CourseOrderByEnum;
+use models\enum\OrderDirectionEnum;
+use models\util\IllegalAccessException;
 
 
 /**
@@ -23,6 +24,7 @@ class CoursesDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
+    private $id_admin;
     
     
     //-------------------------------------------------------------------------
@@ -32,10 +34,12 @@ class CoursesDAO
      * Creates courses manager.
      *
      * @param       Database $db Database
+     * @param       int $id_admin [Optional] Admin id logged in
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, int $id_admin = -1)
     {
         $this->db = $db->getConnection();
+        $this->id_admin = $id_admin;
     }
     
     
@@ -54,12 +58,14 @@ class CoursesDAO
      *  <li><b>total_length</b>: Total course duration (in minutes)</li>
      * </ul>
      * 
-     * @throws      \InvalidArgumentException If course id is invalid 
+     * @throws      \InvalidArgumentException If course id is empty, less than
+     * or equal to zero
      */
     public function countClasses(int $id_course) : array
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
        
         // Query construction
         $sql = $this->db->prepare("
@@ -200,13 +206,26 @@ class CoursesDAO
      * Deletes a course.
      * 
      * @param       int $id_course Course id to be deleted
-     * 
-     * @throws      \InvalidArgumentException If course id is invalid 
+     *
+     * @throws      IllegalAccessException If current admin does not have root
+     * authorization
+     * @throws      \InvalidArgumentException If course id or admin id provided
+     * in the constructor is empty, less than or equal to zero
      */
     public function delete(int $id_course) : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         // Delete image, if there is one
         $imageName = $this->getImage($id_course);
@@ -229,52 +248,20 @@ class CoursesDAO
     }
     
     /**
-     * Gets course banner.
-     * 
-     * @param       int $id_course Course id
-     * 
-     * @return      string Course logo filename or empty string if course does
-     * not have a logo 
-     * 
-     * @throws      \InvalidArgumentException If course id is invalid 
-     */
-    private function getImage($id_course)
-    {
-        if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
-        
-        $response = "";
-        
-        $sql = $this->db->prepare("
-            SELECT logo 
-            FROM courses 
-            WHERE id_course = ?
-        ");
-        $sql->execute(array($id_course));
-        
-        if ($sql->rowCount() > 0) {
-            $response = $sql->fetch()['logo'];
-            
-            if (empty($response))
-                $response = "";
-        }
-        
-        return $response;
-    }
-    
-    /**
      * Gets informations about a course.
      *
      * @param       int $id_course Course id
      *
      * @return      Course Informations about a course
      * 
-     * @throws      \InvalidArgumentException If course id is invalid 
+     * @throws      \InvalidArgumentException If course id or admin id provided
+     * in the constructor is empty, less than or equal to zero
      */
     public function get(int $id_course) : Course
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = null;
         
@@ -310,12 +297,24 @@ class CoursesDAO
      * @param       string $description [Optional] Course description
      * @param       string $logo [Optional] Course logo (obtained from $POST) 
      * 
-     * @return      bool If course was successfully added
+     * @return      bool If course has been successfully added
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      IllegalAccessException If current admin does not have root
+     * authorization
+     * @throws      \InvalidArgumentException If name is empty or admin id 
+     * provided in the constructor is empty, less than or equal to zero
      */
     public function add(string $name, string $description = '', string $logo = array()) : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+        
         if (empty($name))
             throw new \InvalidArgumentException("Course name cannot be empty");
         
@@ -380,15 +379,29 @@ class CoursesDAO
      * @param       string $logo [Optional] New course banner (obtained from
      * POST)
      * 
-     * @return      bool If course was successfully edited
+     * @return      bool If course has been successfully edited
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      IllegalAccessException If current admin does not have root
+     * authorization
+     * @throws      \InvalidArgumentException If course id or admin id provided
+     * in the constructor is empty, less than or equal to zero or if name is
+     * empty
      */
     public function edit(int $id_course, string $name, string $description = '',
         array $logo = array()) : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($name))
             throw new \InvalidArgumentException("Course name cannot be empty");
@@ -457,20 +470,35 @@ class CoursesDAO
      * @param       int $id_module Module id
      * @param       int $order Module order in the course
      * 
-     * @return      bool If module was successfully added
+     * @return      bool If module has been successfully added
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      IllegalAccessException If current admin does not have root
+     * authorization
+     * @throws      \InvalidArgumentException If course id, module id, order or
+     * admin id provided in the constructor is empty, less than or equal to zero
      */
     public function addModule(int $id_course, int $id_module, int $order) : bool
     {   
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($order) || $order <= 0)
-            throw new \InvalidArgumentException("Invalid order");
+            throw new \InvalidArgumentException("Order cannot be empty or less ".
+                "than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -491,17 +519,31 @@ class CoursesDAO
      * @param       int $id_course Course id
      * @param       int $id_module Module id
      * 
-     * @return      bool If module was successfully removed from the course
+     * @return      bool If module has been successfully removed from the course
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      IllegalAccessException If current admin does not have root
+     * authorization
+     * @throws      \InvalidArgumentException If course id, module id or admin id
+     * provided in the constructor is empty, less than or equal to zero
      */
-    public function deleteModuleFromCourse($id_course, $id_module)
+    public function deleteModuleFromCourse(int $id_course, int $id_module) : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
             
         // Query construction
         $sql = $this->db->prepare("
@@ -513,6 +555,43 @@ class CoursesDAO
         $sql->execute(array($id_course, $id_module));
         
         return $sql->rowCount() > 0;
+    }
+    
+    /**
+     * Gets course banner.
+     *
+     * @param       int $id_course Course id
+     *
+     * @return      string Course logo filename or empty string if course does
+     * not have a logo
+     *
+     * @throws      \InvalidArgumentException If course id is empty, less than
+     * or equal to zero
+     */
+    private function getImage($id_course)
+    {
+        if (empty($id_course) || $id_course <= 0)
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
+            
+        $response = "";
+        
+        $sql = $this->db->prepare("
+            SELECT logo
+            FROM courses
+            WHERE id_course = ?
+        ");
+        
+        $sql->execute(array($id_course));
+        
+        if ($sql->rowCount() > 0) {
+            $response = $sql->fetch()['logo'];
+            
+            if (empty($response))
+                $response = "";
+        }
+        
+        return $response;
     }
     
     /**

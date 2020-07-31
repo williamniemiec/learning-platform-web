@@ -5,8 +5,9 @@ namespace models\dao;
 
 
 use database\Database;
-use models\SupportTopic;
 use models\Message;
+use models\SupportTopic;
+use models\util\IllegalAccessException;
 
 
 
@@ -23,6 +24,8 @@ class SupportTopicDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
+    private $id_topic;
+    private $id_admin;
     
     
     //-------------------------------------------------------------------------
@@ -32,9 +35,24 @@ class SupportTopicDAO
      * Creates 'support_topic' table manager.
      *
      * @param       Database $db Database
+     * @param       int $id_topic Topic id
+     * @param       int $id_admin Admin id logged in
+     * 
+     * @throws      \InvalidArgumentException If topic id is empty, less than 
+     * or equal to zero
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, int $id_topic, int $id_admin)
     {
+        if (empty($id_topic) || $id_topic <= 0)
+            throw new \InvalidArgumentException("Topic id cannot be empty ".
+                "or less than or equal to zero");
+            
+        if (empty($id_admin) || $id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id cannot be empty ".
+                "or less than or equal to zero");
+            
+        $this->id_topic = $id_topic;
+        $this->id_admin = $id_admin;
         $this->db = $db->getConnection();
     }
     
@@ -45,17 +63,15 @@ class SupportTopicDAO
     /**
      * Gets information about a support topic.
      *
-     * @param      int $id_topic Topic id
-     *
      * @return      SupportTopic Support topic with the given id or null if there
      * is no topic with the provided id
-     *
-     * @throws      \InvalidArgumentException If topic id is invalid
      */
-    public function get(int $id_topic) : array
-    {
-        if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
+    public function get() : array
+    {            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
             
         $response = NULL;
         
@@ -67,7 +83,7 @@ class SupportTopicDAO
         ");
             
         // Executes query
-        $sql->execute(array($id_topic));
+        $sql->execute(array($this->id_topic));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
@@ -91,17 +107,15 @@ class SupportTopicDAO
     /**
      * Closes a support topic.
      * 
-     * @param       int $id_topic Support topic id to be closed
-     * 
      * @return      bool If support topic has been successfully closed
-     * 
-     * @throws      \InvalidArgumentException If any argument is invalid
      */
-    public function close(int $id_topic) : bool
+    public function close() : bool
     {
-        if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
-        
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  support_topic
@@ -110,7 +124,7 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_topic));
+        $sql->execute(array($this->id_topic));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -118,17 +132,15 @@ class SupportTopicDAO
     /**
      * Opens a support topic.
      *
-     * @param       int $id_topic Support topic id to be opened
-     *
      * @return      bool If support topic has been successfully closed
-     *
-     * @throws      \InvalidArgumentException If any argument is invalid
      */
-    public function open(int $id_topic) : bool
+    public function open() : bool
     {
-        if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
-        
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  support_topic
@@ -137,7 +149,7 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_topic));
+        $sql->execute(array($this->id_topic));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -145,21 +157,24 @@ class SupportTopicDAO
     /**
      * Replies a support topic.
      *
-     * @param       int $id_topic Support topic id to be replied
      * @param       int $id_admin Admin id that will reply the support topic
      * @param       string $text Reply's content
      *
-     * @return      bool If the reply was sucessfully added
+     * @return      bool If the reply has been sucessfully added
      *
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If admin id is empty, less than 
+     * or equal to zero or if text is empty
      */
-    public function newReply(int $id_topic, int $id_admin, string $text) : bool
+    public function newReply(int $id_admin, string $text) : bool
     {
-        if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
             
         if (empty($id_admin) || $id_admin <= 0)
-            throw new \InvalidArgumentException("Invalid admin id");
+            throw new \InvalidArgumentException("Admin id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($text))
             throw new \InvalidArgumentException("Text cannot be empty");
@@ -172,7 +187,7 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_topic, $id_admin, $text));
+        $sql->execute(array($this->id_topic, $id_admin, $text));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -180,18 +195,16 @@ class SupportTopicDAO
     /**
      * Gets all replies from a support topic.
      *
-     * @param       int $id_topic Support topic id
-     *
      * @return      Message[] Support topic replies or empty array if there are
      * no replies
-     *
-     * @throws      \InvalidArgumentException If topic id is invalid
      */
-    public function getReplies($id_topic)
+    public function getReplies()
     {
-        if (empty($id_topic) || $id_topic <= 0)
-            throw new \InvalidArgumentException("Invalid topic id");
-        
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         $response = array();
         
         // Query construction
@@ -202,7 +215,7 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_topic));
+        $sql->execute(array($this->id_topic));
         
         // Parses result
         if ($sql && $sql->rowCount() > 0) {

@@ -163,13 +163,14 @@ class Course
      * 
      * @param       int $totalClasses Total classes of the course
      * 
-     * @throws      \InvalidArgumentException If total length is empty or less 
+     * @throws      \InvalidArgumentException If total classes  is empty or less 
      * than zero
      */
     public function setTotalClasses(int $totalClasses) : void
     {
         if (empty($totalClasses) || $totalClasses < 0)
-            throw new \InvalidArgumentException("Invalid total classes");
+            throw new \InvalidArgumentException("Total classes cannot be empty ".
+                "or less than or equal to zero");
         
         $this->total_classes = $totalClasses;
     }
@@ -185,7 +186,8 @@ class Course
     public function setTotalLength(int $totalLength) : void
     {
         if (empty($totalLength) || $totalLength < 0)
-            throw new \InvalidArgumentException("Invalid total length");
+            throw new \InvalidArgumentException("Total length cannot be empty ".
+                "or less than or equal to zero");
             
         $this->total_length = $totalLength;
     }

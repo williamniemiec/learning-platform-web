@@ -6,6 +6,7 @@ namespace models\dao;
 
 use database\Database;
 use models\Video;
+use models\util\IllegalAccessException;
 
 
 /**
@@ -18,16 +19,25 @@ use models\Video;
 class VideosDAO
 {
     //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    private $id_admin;
+    
+    
+    //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'videos' table manager.
      *
      * @param       Database $db Database
+     * @param       int $id_admin [Optional] Admin id logged in
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, int $id_admin = -1)
     {
         $this->db = $db->getConnection();
+        $this->id_admin = $id_admin;
     }
     
     
@@ -43,15 +53,18 @@ class VideosDAO
      *
      * @return      Video Video class or null if class does not exist
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If module id or class order is 
+     * empty or less than or equal to zero
      */
     public function get(int $id_module, int $class_order) : Video
     {
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class order");
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
             
         $response = null;
         
@@ -85,34 +98,30 @@ class VideosDAO
     /**
      * Adds a new video class.
      * 
-     * @param       int $id_module Module id
-     * @param       int $id_module Class order in module
-     * @param       string $title Class title
-     * @param       string $url Video url (must be from YouTube)
-     * @param       int $length Video length
-     * @param       string $description [Optional] Class description
+     * @param       Video $video Video to be added
      * 
      * @return      bool If class was sucessfully added
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to create new classes
+     * @throws      \InvalidArgumentException If video is empty or if admin id
+     * provided in the constructor is empty, less than or equal to zero
      */
-    public function add(int $id_module, int $class_order, string $title, 
-        string $videoID, int $length, string $description = '') : bool
+    public function add(Video $video) : bool
     {
-        if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
             
-        if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class order");
-        
-        if (empty($title))
-            throw new \InvalidArgumentException("Title cannot be empty");
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
             
-        if (empty($videoID))
-            throw new \InvalidArgumentException("Video ID cannot be empty");
+        if (empty($video))
+            throw new \InvalidArgumentException("Video cannot be empty");
         
-        if (empty($length) || $length <= 0)
-            throw new \InvalidArgumentException("Invalid length");
-        
-        if (empty($description)) {
+        if (empty($video->getDescription())) {
             $sql = $this->db->prepare("
                 INSERT INTO videos
                 (id_module, class_order, title, videoID, length)
@@ -120,17 +129,30 @@ class VideosDAO
             ");
             
             // Executes query
-            $sql->execute(array($id_module, $class_order, $title, $videoID, $length));
+            $sql->execute(array(
+                $video->getModuleId(), 
+                $video->getClassOrder(), 
+                $video->getTitle(), 
+                $video->getVideoId(), 
+                $video->getLength()
+            ));
         }
         else {
             $sql = $this->db->prepare("
                 INSERT INTO videos
-                (id_module, class_order, title, description, videoID, length)
+                (id_module, class_order, title, videoID, length, description)
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
             
             // Executes query
-            $sql->execute(array($id_module, $class_order, $title, $description, $videoID, $length));
+            $sql->execute(array(
+                $video->getModuleId(),
+                $video->getClassOrder(),
+                $video->getTitle(), 
+                $video->getVideoId(),
+                $video->getLength(),
+                $video->getDescription()
+            ));
         }
         
          
@@ -139,50 +161,107 @@ class VideosDAO
     
     
     /**
-     * Edits a video class.
+     * Updates a video class.
      * 
-     * @param       int $id_video Class id
-     * @param       string $title New class title
-     * @param       string $videoID New class URL (must be from YouTube)
-     * @param       string $description [Optional] New class description 
+     * @param       Video $video Video to be added
      * 
-     * @return      boolean If class was sucessfully edited
+     * @return      boolean If class has been sucessfully updated
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update classes
+     * @throws      \InvalidArgumentException If video is empty or if admin id
+     * provided in the constructor is empty, less than or equal to zero
      */
-    public function edit($id_module, $class_order, $title, $videoID, $length, $description = '')
+    public function update(Video $video)
     {
-        if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
             
-        if (empty($class_order) || $class_order <= 0)
-            throw new \InvalidArgumentException("Invalid class order");
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($video))
+            throw new \InvalidArgumentException("Video cannot be empty");
         
-        if (empty($title))
-            throw new \InvalidArgumentException("Title cannot be empty");
-        
-        if (empty($videoID))
-            throw new \InvalidArgumentException("Video ID cannot be empty");
-                    
-        if (empty($length) || $length <= 0)
-            throw new \InvalidArgumentException("Invalid length");
-        
-        if (empty($description)) {
+        if (empty($video->getDescription())) {
             $sql = $this->db->prepare("
-                UPDATE videos
-                (title, videoID, length)
-                WHERE id_module = ? AND class_order = ?
+                UPDATE  videos
+                SET     title = ?, videoID = ?, length = ?
+                WHERE   id_module = ? AND class_order = ?
             ");
                 
-            $sql->execute(array($title, $videoID, $length, $id_module, $class_order));
+            $sql->execute(array(
+                $video->getTitle(), 
+                $video->getVideoId(),
+                $video->getLength(),
+                $video->getModuleId(),
+                $video->getClassOrder()
+            ));
         }
         else {
             $sql = $this->db->prepare("
-                UPDATE videos
-                (title, description, videoID, length)
-                WHERE id_module = ? AND class_order = ?
+                UPDATE  videos
+                SET     title = ?, videoID = ?, length = ?, description = ?
+                WHERE   id_module = ? AND class_order = ?
             ");
             
-            $sql->execute(array($title, $description, $videoID, $length, $id_module, $class_order));
+            $sql->execute(array(
+                $video->getTitle(),
+                $video->getVideoId(),
+                $video->getLength(),
+                $video->getDescription(),
+                $video->getModuleId(),
+                $video->getClassOrder()
+            ));
         }
+        
+        return $sql->rowCount() > 0;
+    }
+    
+    /**
+     * Removes a video class.
+     *
+     * @param       int $id_module Module id to which the class belongs
+     * @param       int $class_order Class order in the module
+     *
+     * @return      bool If class has been successfully removed
+     *
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to delete classes
+     * @throws      \InvalidArgumentException If module id, class order or 
+     * admin id provided in the constructor is empty, less than or equal to
+     * zero
+     */
+    public function delete(int $id_module, int $class_order) : bool
+    {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
+                
+        if (empty($class_order) || $class_order <= 0)
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
+                    
+        // Query construction
+        $sql = $this->db->prepare("
+            DELETE FROM videos
+            WHERE id_module = ? AND class_order = ?
+        ");
+                    
+        // Executes query
+        $sql->execute(array($id_module, $class_order));
         
         return $sql->rowCount() > 0;
     }

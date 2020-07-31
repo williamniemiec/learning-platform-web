@@ -46,15 +46,16 @@ class ActionsDAO
      * @param       int $id_admin Admin who performed the action
      * @param       Action $action Action description
      * 
-     * @return      bool If the action was sucessfully registered
+     * @return      bool If the action has been sucessfully registered
      * 
      * @throws      \InvalidArgumentException If action is empty or no action was 
-     * selected or admin id is null or less than or equal to zero
+     * selected or admin id is empty, less than or equal to zero
      */
     public function register(int $id_admin, Action $action) : bool
     {
         if (empty($id_admin) || $id_admin <= 0)
-            throw new \InvalidArgumentException("Invalid admin id");
+            throw new \InvalidArgumentException("Admin id cannot be null or less ".
+                "than or equal to zero");
         
         if (empty($action) || empty($action->get()))
             throw new \InvalidArgumentException("Action cannot be empty");

@@ -98,7 +98,7 @@ class Bundle
      * 
      * @param       Database $db Database
      * 
-     * @return      \models\obj\Course[] Courses that belongs to the bundle or
+     * @return      \models\Course[] Courses that belongs to the bundle or
      * empty array if there are no courses in the bundle
      * 
      * @implNote    Lazy initialization

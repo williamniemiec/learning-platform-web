@@ -47,12 +47,14 @@ class AuthorizationDAO
      * 
      * @return      \models\Authorization Admin authorization 
      * 
-     * @throws      \InvalidArgumentException If admin id is invalid 
+     * @throws      \InvalidArgumentException If admin id is empty, less than 
+     * or equal to zero
      */
     public function getAuthorization(int $id_admin) : Authorization
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Invalid admin id");
+        if (empty($id_admin)  || ($id_admin <= 0))
+            throw new \InvalidArgumentException("Admin id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("

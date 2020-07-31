@@ -27,7 +27,8 @@ abstract class ClassesDAO
      *
      * @return      array Classes that belongs to the module
      *
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If module id is empty, less than
+     * or equal to zero
      */
     public abstract function getAllFromModule(int $id_module) : array;
     

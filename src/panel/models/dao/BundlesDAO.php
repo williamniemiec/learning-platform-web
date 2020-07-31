@@ -24,6 +24,7 @@ class BundlesDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
+    private $id_admin;
     
     
     //-------------------------------------------------------------------------
@@ -33,8 +34,9 @@ class BundlesDAO
      * Creates 'bundles' table manager.
      *
      * @param       Database $db Database
+     * @param       int $id_admin [Optional] Admin id logged in
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, int $id_admin = -1)
     {
         $this->db = $db->getConnection();
     }
@@ -51,12 +53,14 @@ class BundlesDAO
      *
      * @return      Bundle Bundle with the given id
      *
-     * @throws      \InvalidArgumentException If bundle id is invalid
+     * @throws      \InvalidArgumentException If bundle id is empty, less than
+     * or equal to zero
      */
     public function get(int $id_bundle) : Bundle
     {
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid bundle id");
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
             
         $response = null;
         
@@ -187,14 +191,20 @@ class BundlesDAO
      * @param       float $price Bundle price
      * @param       string $description Bundle description
      * 
-     * @return      bool If bundle was successfully added
+     * @return      bool If bundle has been successfully added
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to create bundles
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If name or price is empty or if 
+     * price or admin id provided in the constructor is empty, less than or 
+     * equal to zero
      */
     public function new(int $name, float $price, string $description = "") : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
         if ($this->getAuthorization()->getLevel() != 0 && 
             $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
@@ -239,10 +249,15 @@ class BundlesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update bundles
-     * @throws      \InvalidArgumentException If bundle is empty
+     * @throws      \InvalidArgumentException If bundle is empty or admin id 
+     * provided in the constructor is empty, less than or equal to zero
      */
     public function update(Bundle $bundle) : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
         if ($this->getAuthorization()->getLevel() != 0 &&
             $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
@@ -287,21 +302,27 @@ class BundlesDAO
      * 
      * @param       int $id_bundle Bundle id
      * 
-     * @return      bool If bundle was successfully removed
+     * @return      bool If bundle has been successfully removed
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to remove bundles
-     * @throws      \InvalidArgumentException If bundle id is invalid
+     * @throws      \InvalidArgumentException If bundle id is empty or admin id 
+     * provided in the constructor is empty, less than or equal to zero
      */
     public function remove($id_bundle)
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
         if ($this->getAuthorization()->getLevel() != 0 &&
             $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid bundle id");
+                throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                    "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -321,24 +342,31 @@ class BundlesDAO
      * @param       int $id_bundle Bundle id
      * @param       int $id_course Course id
      * 
-     * @return      bool If course was successfully added to the bundle
+     * @return      bool If course has been successfully added to the bundle
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update bundles
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If bundle id, course id or admin
+     * id provided in the constructor is empty, less than or equal to zero
      */
     public function addCourse(int $id_bundle, int $id_course) : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
         if ($this->getAuthorization()->getLevel() != 0 &&
             $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid bundle id");
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
                 
         // Query construction
         $sql = $this->db->prepare("
@@ -359,24 +387,31 @@ class BundlesDAO
      * @param       int $id_bundle Bundle id
      * @param       int $id_course Course id
      * 
-     * @return      bool If course was successfully removed from the bundle
+     * @return      bool If course has been successfully removed from the bundle
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update bundles
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If bundle id, course id or admin
+     * id provided in the constructor is empty, less than or equal to zero
      */
     public function deleteCourseFromBundle(int $id_bundle, int $id_course) : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
         if ($this->getAuthorization()->getLevel() != 0 &&
             $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
         if (empty($id_bundle) || $id_bundle <= 0)
-            throw new \InvalidArgumentException("Invalid bundle id");
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("

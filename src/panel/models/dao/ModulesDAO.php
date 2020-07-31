@@ -6,6 +6,7 @@ namespace models\dao;
 
 use database\Database;
 use models\Module;
+use models\util\IllegalAccessException;
 
 
 /**
@@ -21,6 +22,7 @@ class ModulesDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
+    private $id_admin;
     
     
     //-------------------------------------------------------------------------
@@ -30,10 +32,12 @@ class ModulesDAO
      * Creates 'modules' table manager.
      *
      * @param       Database $db Database
+     * @param       int $id_admin [Optional] Admin id logged in
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, int $id_admin = -1)
     {
         $this->db = $db->getConnection();
+        $this->id_admin = $id_admin;
     }
     
     
@@ -47,12 +51,14 @@ class ModulesDAO
      *
      * @return      Module[] Modules from this course
      * 
-     * @throws      \InvalidArgumentException If course id is invalid
+     * @throws      \InvalidArgumentException If course id is empty, less than
+     * or equal to zero
      */
     public function getFromCourse(int $id_course) : array
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = array();
         
@@ -84,22 +90,36 @@ class ModulesDAO
     }
     
     /**
-     * Deletes a module from a course.
+     * Removes a module from a course.
      * 
      * @param       int $id_admin Admin id logged in
      * @param       int $id_module Module id to be deleted
      * 
-     * @return      bool If module was successfully deleted
+     * @return      bool If module has been successfully deleted
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to delete modules
+     * @throws      \InvalidArgumentException If course id or admin id provided
+     * in the constructor is empty, less than or equal to zero
      */
     public function delete(int $id_admin, int $id_module) : bool
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         if (empty($id_admin) || $id_admin <= 0)
-            throw new \InvalidArgumentException("Invalid admin id");
+            throw new \InvalidArgumentException("Admin id cannot be empty ".
+                "or less than or equal to zero");
         
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -121,12 +141,25 @@ class ModulesDAO
      * 
      * @return      int Module id added or -1 if the module has not been added
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to add new modules
+     * @throws      \InvalidArgumentException If admin id provided in the 
+     * constructor is empty, less than or equal to zero or if name is empty
      */
     public function new(int $id_admin, string $name) : int
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         if (empty($id_admin) || $id_admin <= 0)
-            throw new \InvalidArgumentException("Invalid admin id");
+            throw new \InvalidArgumentException("Admin id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($name))
             throw new \InvalidArgumentException("Name cannot be empty");
@@ -156,14 +189,27 @@ class ModulesDAO
      * @param       int $id_module Module id
      * @param       string $name New module name
      * 
-     * @return      bool If the module was successfully edited
+     * @return      bool If the module has been successfully edited
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      IllegalAccessException If current admin does not have 
+     * authorization to update modules
+     * @throws      \InvalidArgumentException If admin id provided in the 
+     * constructor is empty, less than or equal to zero or if name is empty
      */
-    public function edit($id_module, $name)
+    public function update(int $id_module, string $name)
     {
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->getAuthorization()->getLevel() != 0 &&
+            $this->getAuthorization()->getLevel() != 2)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
             
         if (empty($name))
             throw new \InvalidArgumentException("Name cannot be empty");
@@ -188,12 +234,14 @@ class ModulesDAO
      *
      * @return      array Informations about all classes from the module
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      \InvalidArgumentException If module id is empty, less than
+     * or equal to zero
      */
     public function getClassesFromModule($id_module)
     {
         if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Invalid module id");
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
         
         $videos = new VideosDAO($this->db);
         $questionnaires = new QuestionnairesDAO($this->db);
