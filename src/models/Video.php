@@ -71,7 +71,7 @@ class Video extends _Class
      * 
      * @return      string Video id
      */
-    public function getVideoId() : int
+    public function getVideoId() : string
     {
         return $this->videoID;
     }

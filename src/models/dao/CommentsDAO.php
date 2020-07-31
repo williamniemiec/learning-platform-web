@@ -49,7 +49,7 @@ class CommentsDAO
      * @param       int $class_order Class order within the module
      * @param       string $text Comment content
      * 
-     * @return      bool If the comment was successfully added
+     * @return      bool If the comment has been successfully added
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
@@ -138,7 +138,7 @@ class CommentsDAO
      * @param       int $id_student Student id that replies the comment
      * @param       string $text Reply content
      * 
-     * @return      int Reply id added or -1 if reply was not added
+     * @return      int Reply id added or -1 if reply has not been added
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
@@ -225,7 +225,7 @@ class CommentsDAO
      * 
      * @param       int $id_comment Doubt id
      * 
-     * @return      boolean If doubt was sucessfully deleted
+     * @return      boolean If doubt has been successfully deleted
      * 
      * @throws      \InvalidArgumentException If comment id is empty or less 
      * than or equal to zero
@@ -254,7 +254,7 @@ class CommentsDAO
      * @param       int $id_comment Comment id that the reply belongs to
      * @param       int $id_student Student id that made the reply
      * 
-     * @return      boolean If reply was sucessfully deleted
+     * @return      boolean If reply hsa been successfully deleted
      * 
      * @throws      \InvalidArgumentException If comment id or student id is 
      * empty or less than or equal to zero

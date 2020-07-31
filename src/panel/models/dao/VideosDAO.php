@@ -100,7 +100,7 @@ class VideosDAO
      * 
      * @param       Video $video Video to be added
      * 
-     * @return      bool If class was sucessfully added
+     * @return      bool If class was successfully added
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to create new classes
@@ -165,7 +165,7 @@ class VideosDAO
      * 
      * @param       Video $video Video to be added
      * 
-     * @return      boolean If class has been sucessfully updated
+     * @return      boolean If class has been successfully updated
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update classes

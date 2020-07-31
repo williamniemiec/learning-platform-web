@@ -267,17 +267,17 @@ class CoursesDAO
     }
     
     /**
-     * Checks whether a student is enrolled in a course.
+     * Checks whether a student has a course.
      * 
      * @param       int $id_course Course id
      * @param       int $id_student Student id
      * 
-     * @return      bool If current student is enrolled in a course
+     * @return      bool If current student has the course
      * 
      * @throws      \InvalidArgumentException If bundle id or student id is 
      * empty or less than or equal to zero
      */
-    public function isEnrolled(int $id_course, int $id_student) : bool
+    public function hasCourse(int $id_course, int $id_student) : bool
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty ".

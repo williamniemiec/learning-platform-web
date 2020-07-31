@@ -103,7 +103,7 @@ class StudentsController extends Controller
      * @param       int $_POST['email'] New student email
      * @param       int $_POST['password'] [Optional] New student password
      * 
-     * @return      bool If the student was sucessfully edited
+     * @return      bool If the student was successfully edited
      * 
      * @apiNote     Must be called using POST request method
      */
@@ -212,7 +212,7 @@ class StudentsController extends Controller
      * @param       int $_POST['id_course'] Course id to which the student will
      * be enrolled
      * 
-     * @return      boolean If the course was sucessfully added to the student
+     * @return      boolean If the course was successfully added to the student
      * 
      * @apiNote     Must be called using POST request method
      */

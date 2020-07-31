@@ -46,7 +46,7 @@ class ActionsDAO
      * @param       int $id_admin Admin who performed the action
      * @param       Action $action Action description
      * 
-     * @return      bool If the action has been sucessfully registered
+     * @return      bool If the action has been successfully registered
      * 
      * @throws      \InvalidArgumentException If action is empty or no action was 
      * selected or admin id is empty, less than or equal to zero

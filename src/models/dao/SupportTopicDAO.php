@@ -98,7 +98,7 @@ class SupportTopicDAO
      * @param       string $title Support topic's title
      * @param       string $message Support topic's content
      * 
-     * @return      bool If support topic was successfully created
+     * @return      bool If support topic has been successfully created
      * 
      * @throws      \InvalidArgumentException If any argument is invalid
      */
@@ -138,7 +138,7 @@ class SupportTopicDAO
      * @param       int $id_student Student id logged in
      * @param       int $id_topic Support topic id to be deleted
      * 
-     * @return      bool If support topic was sucessfully removed
+     * @return      bool If support topic has been successfully removed
      * 
      * @throws      \InvalidArgumentException If topic id or student id is empty
      * or less than or equal to zero
@@ -171,7 +171,7 @@ class SupportTopicDAO
      * @param       int $id_student Student id logged in
      * @param       int $id_topic Support topic id to be closed
      * 
-     * @return      bool If support topic was successfully closed
+     * @return      bool If support topic has been successfully closed
      * 
      * @throws      \InvalidArgumentException If topic id or student id is empty
      * or less than or equal to zero
@@ -205,7 +205,7 @@ class SupportTopicDAO
      * @param       int $id_student Student id logged in
      * @param       int $id_topic Support topic id to be opened
      *
-     * @return      bool If support topic was successfully closed
+     * @return      bool If support topic has been successfully closed
      * 
      * @throws      \InvalidArgumentException If topic id or student id is empty
      * or less than or equal to zero
@@ -240,7 +240,7 @@ class SupportTopicDAO
      * @param       int $id_student Student id that will reply the support topic
      * @param       string $text Reply's content
      * 
-     * @return      bool If the reply was sucessfully added
+     * @return      bool If the reply has been successfully added
      * 
      * @throws      \InvalidArgumentException If any argument is invalid
      */

@@ -131,7 +131,7 @@ class SettingsController extends Controller
      * @param       string $_POST['new_password'] New password
      * @param       string $_POST['current_password'] Current password
      * 
-     * @return      bool If password was sucessfully updated
+     * @return      bool If password was successfully updated
      * 
      * @apiNote     Must be called using POST request method
      */

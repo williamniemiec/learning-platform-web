@@ -7,6 +7,7 @@ namespace models\dao;
 use database\Database;
 use models\Student;
 use models\_Class;
+use models\enum\GenreEnum;
 
 
 /**
@@ -101,12 +102,14 @@ class StudentsDAO
      * @return      Student Informations about the student or null if student 
      * does not exist
      * 
-     * @throws      \InvalidArgumentException If student id is invalid
+     * @throws      \InvalidArgumentException If student id provided in the 
+     * constructor is empty, less than or equal to zero
      */
     public function get() : array
     {
         if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
         
         $response = NULL;
         
@@ -143,16 +146,18 @@ class StudentsDAO
      *
      * @return      _Class Last class watched by the student
      * 
-     * @throws      \InvalidArgumentException If course id or student id are 
-     * invalid 
+     * @throws      \InvalidArgumentException If student id provided in the 
+     * constructor or course id is empty, less than or equal to zero
      */
     public function getLastClassWatched(int $id_course) : _Class
     {
         if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
         
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
         
         $response = null;
         
@@ -205,8 +210,8 @@ class StudentsDAO
      *
      * @param       Student $student Informations about the student
      * @param       string $password Student password
-     * @param       bool $autologin [Optional] If true, after registration is completed
-     * the student will automatically login to the system
+     * @param       bool $autologin [Optional] If true, after registration is
+     * completed the student will automatically login to the system
      *
      * @return      int Student id or -1 if the student has not been added
      *
@@ -253,20 +258,21 @@ class StudentsDAO
      * Updates current student information.
      * 
      * @param       string $name
-     * @param       int $genre New genre (0 => Man; 1 => Woman)
+     * @param       GenreEnum $genre New genre
      * @param       string $birthdate New birthdate
      * 
-     * @return      boolean If student information was sucessfully updated
+     * @return      boolean If student information has been successfully updated
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function update(string $name, int $genre, string $birthdate) : bool
+    public function update(string $name, GenreEnum $genre, string $birthdate) : bool
     {
         if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
         
-        if (empty($genre) || ($genre != 0 && $genre != 1))
-            throw new \InvalidArgumentException("Invalid genre - must be 0 or 1");
+        if (empty($genre) || empty($genre->get()))
+            throw new \InvalidArgumentException("Genre cannot be empty");
         
         if (empty($name))
             throw new \InvalidArgumentException("Name cannot be empty");
@@ -290,14 +296,16 @@ class StudentsDAO
     /**
      * Deletes current student.
      * 
-     * @return      bool If student was sucessfully deleted
+     * @return      bool If student has been successfully deleted
      * 
-     * @throws      \InvalidArgumentException If student id is invalid
+     * @throws      \InvalidArgumentException If student id provided in the 
+     * constructor is empty, less than or equal to zero
      */
     public function delete() : bool
     {
         if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
         
         // Query construction
         $sql = $this->db->query("
@@ -316,7 +324,7 @@ class StudentsDAO
      * 
      * @param       array $photo New photo (from $_FILES)
      * 
-     * @return      boolean If photo was sucessfully updated
+     * @return      boolean If photo has been successfully updated
      * 
      * @throws      \InvalidArgumentException If photo is invalid
      * 
@@ -370,7 +378,7 @@ class StudentsDAO
      * @param       string $currentPassword Current student password
      * @param       string $newPassword New password
      * 
-     * @return      bool If password was sucessfully updated
+     * @return      bool If password has been successfully updated
      * 
      * @throws      \InvalidArgumentException If any password is empty 
      */
@@ -425,12 +433,14 @@ class StudentsDAO
      *  student</li>
      * </ul>
      * 
-     * @throws      \InvalidArgumentException If student id is invalid
+     * @throws      \InvalidArgumentException If student id provided in the 
+     * constructor is empty, less than or equal to zero
      */
     public function getTotalWatchedClasses() : array
     {
         if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -458,15 +468,16 @@ class StudentsDAO
      * 
      * @param       int $id_bundle Bundle id to be added
      * 
-     * @return      bool If the bundle was sucessfully added
+     * @return      bool If the bundle has been successfully added
      * 
-     * @throws      \InvalidArgumentException If student id or bundle id are
-     * invalid
+     * @throws      \InvalidArgumentException If student id provided in the 
+     * constructor or bundle id is empty, less than or equal to zero
      */
     public function addBundle(int $id_bundle) : bool
     {
         if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -513,12 +524,14 @@ class StudentsDAO
      *
      * @return      string Photo filename or empty string if there is no photo
      *
-     * @throws      \InvalidArgumentException If student id is invalid
+     * @throws      \InvalidArgumentException If student id provided in the 
+     * constructor is empty, less than or equal to zero
      */
     private function getPhoto() : string
     {
         if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
             
         $response = "";
         

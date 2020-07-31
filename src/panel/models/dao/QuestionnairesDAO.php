@@ -158,7 +158,7 @@ class QuestionnairesDAO
      * @param       string $op4 New option 4
      * @param       string $answer New answer
      * 
-     * @return      boolean If class has been sucessfully edited
+     * @return      boolean If class has been successfully edited
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update classes

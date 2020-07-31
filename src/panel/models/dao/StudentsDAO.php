@@ -231,7 +231,7 @@ class StudentsDAO
      * 
      * @param       int $id_student Student id
      * 
-     * @return      bool If student has been sucessfully removed 
+     * @return      bool If student has been successfully removed 
      * 
      * @throws      \InvalidArgumentException If student id or admin id provided
      * in the constructor is empty, less than or equal to zerois empty, less than
@@ -271,7 +271,7 @@ class StudentsDAO
      * @param       string $newEmail New student email
      * @param       string $newPassword [Optional] New student password
      * 
-     * @return      bool If student has been sucessfully edited
+     * @return      bool If student has been successfully edited
      * 
      * @throws      \InvalidArgumentException If student id or admin id provided
      * in the constructor is empty, less than or equal to zerois empty, less than
@@ -317,7 +317,7 @@ class StudentsDAO
      * @param       int $id_student Student id
      * @param       string $newPassword New password
      *
-     * @return      bool If password has been sucessfully updated
+     * @return      bool If password has been successfully updated
      *
      * @throws      \InvalidArgumentException If student id or admin id provided
      * in the constructor is empty, less than or equal to zerois empty, less than
@@ -360,7 +360,7 @@ class StudentsDAO
      * @param       int $id_student Student id
      * @param       int $id_bundle Bundle id to be added
      * 
-     * @return      bool If bundle has been sucessfully added
+     * @return      bool If bundle has been successfully added
      * 
      * @throws      \InvalidArgumentException If student id, bundle id or admin
      * id provided in the constructor is empty, less than or equal to zero
@@ -403,7 +403,7 @@ class StudentsDAO
      * @param       int $id_student Student id
      * @param       int $id_bundle Bundle id to be added
      *
-     * @return      bool If bundle has been sucessfully added
+     * @return      bool If bundle has been successfully added
      *
      * @throws      \InvalidArgumentException If student id, bundle id or admin
      * id provided in the constructor is empty, less than or equal to zero

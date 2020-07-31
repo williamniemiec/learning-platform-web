@@ -80,7 +80,7 @@ class HistoricDAO
     /**
      * Removes all student history.
      * 
-     * @return      bool If historic was sucessfully removed
+     * @return      bool If historic has been successfully removed
      */
     public function clear() : bool
     {

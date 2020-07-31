@@ -160,7 +160,7 @@ class SupportTopicDAO
      * @param       int $id_admin Admin id that will reply the support topic
      * @param       string $text Reply's content
      *
-     * @return      bool If the reply has been sucessfully added
+     * @return      bool If the reply has been successfully added
      *
      * @throws      \InvalidArgumentException If admin id is empty, less than 
      * or equal to zero or if text is empty

@@ -129,11 +129,11 @@ class NotificationsDAO
     }
     
     /**
-     * Deletes a notification
+     * Removes a notification.
      * 
      * @param       string $date Notification creation date
      * 
-     * @return      bool If notification was sucessfully deleted
+     * @return      bool If notification has been successfully removed
 
      * @throws      \InvalidArgumentException If date is empty
      */
@@ -161,7 +161,7 @@ class NotificationsDAO
      * @param       NotificationTypeEnum $type Notification type
      * @param       string $message Notification content
      * 
-     * @return      bool If the notification was sucessfully created
+     * @return      bool If the notification has been successfully created
      * 
      * @throws \InvalidArgumentException If any argument is invalid 
      */
