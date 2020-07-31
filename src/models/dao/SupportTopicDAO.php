@@ -1,11 +1,13 @@
 <?php
-namespace models;
+declare (strict_types=1);
 
-use core\Model;
-use models\obj\SupportTopic;
-use models\obj\Message;
-use models\obj\SupportTopicCategory;
+namespace models\dao;
 
+
+use database\Database;
+use models\SupportTopic;
+use models\Message;
+use models\SupportTopicCategory;
 
 
 /**
@@ -15,19 +17,25 @@ use models\obj\SupportTopicCategory;
  * @version		1.0.0
  * @since		1.0.0
  */
-class SupportTopics extends Model
+class SupportTopicDAO
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'support_topic' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     
@@ -64,9 +72,9 @@ class SupportTopics extends Model
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $supportTopic = $sql->fetch(\PDO::FETCH_ASSOC);
-            $students = new Students();
+            $students = new StudentsDAO($this->db);
             
-            $response = new SupportTopics(
+            $response = new SupportTopicDAO(
                 $supportTopic['id_topic'],
                 $students->get($supportTopic['id_student']), 
                 $supportTopic['title'], 
@@ -279,11 +287,11 @@ class SupportTopics extends Model
             
             foreach ($replies as $reply) {
                 if ($reply['user_type'] == 0) {
-                    $students = new Students();
+                    $students = new StudentsDAO($this->db);
                     $user = $students->get($reply['id_user']);
                 }
                 else {
-                    $admins = new Admins();
+                    $admins = new AdminsDAO($this->db);
                     $user = $admins->get($reply['id_user']);
                 }
                 
@@ -335,10 +343,10 @@ class SupportTopics extends Model
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $students = new Students();
+            $students = new StudentsDAO($this->db);
             
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $supportTopic) {
-                $response = new SupportTopics(
+                $response = new SupportTopicDAO(
                     $supportTopic['id_topic'],
                     $students->get($supportTopic['id_student']),
                     $supportTopic['title'],
@@ -386,10 +394,10 @@ class SupportTopics extends Model
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $students = new Students();
+            $students = new StudentsDAO($this->db);
             
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $supportTopic) {
-                $response = new SupportTopics(
+                $response = new SupportTopicDAO(
                     $supportTopic['id_topic'],
                     $students->get($supportTopic['id_student']),
                     $supportTopic['title'],

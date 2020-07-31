@@ -1,11 +1,11 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
 
-use core\Model;
-use models\obj\Notification;
+use database\Database;
+use models\Notification;
 use models\enum\NotificationTypeEnum;
 
 /**
@@ -15,12 +15,13 @@ use models\enum\NotificationTypeEnum;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Notifications extends Model
+class NotificationsDAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
     private $id_student;
+    private $db;
     
     
     //-------------------------------------------------------------------------
@@ -29,12 +30,13 @@ class Notifications extends Model
     /**
      * Creates 'notifications' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct(int $id_user)
+    public function __construct(Database $db, int $id_user)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
         $this->id_student = $id_user;
+        
     }
     
     
@@ -214,14 +216,14 @@ class Notifications extends Model
         if (empty($date))
             throw new \InvalidArgumentException("Invalid date");
             
-            // Query construction
-            $sql = $this->db->prepare("
+        // Query construction
+        $sql = $this->db->prepare("
             UPDATE  notifications
             SET     read = 0
             WHERE   id_student = ? AND date = ?
         ");
             
-            // Executes query
-            $sql->execute(array($this->id_student, $date));
+        // Executes query
+        $sql->execute(array($this->id_student, $date));
     }
 }

@@ -1,10 +1,12 @@
 <?php
 declare (strict_types=1);
 
-namespace models\obj;
+namespace models;
 
 
-use models\Comments;
+use database\Database;
+use models\dao\CommentsDAO;
+
 
 /**
  * Responsible for representing comments.
@@ -93,14 +95,16 @@ class Comment
     
     /**
      * Gets comment replies.
-     *
+     * 
+     * @param       Database $db Database
+     * 
      * @return      Message[] Comment replies or empty array if there are no
      * replies
      */
-    public function getReplies() : array
+    public function getReplies(Database $db) : array
     {
         if (empty($this->replies)) {
-            $comments = new Comments();
+            $comments = new CommentsDAO($db);
             
             $this->replies = $comments->getReplies($this->id_comment);
         }

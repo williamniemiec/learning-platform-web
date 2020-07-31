@@ -1,7 +1,7 @@
 <?php
 declare (strict_types=1);
 
-namespace models\obj;
+namespace models;
 
 use models\enum\GenreEnum;
 

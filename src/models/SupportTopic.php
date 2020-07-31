@@ -1,11 +1,11 @@
 <?php
 declare (strict_types=1);
 
-namespace models\obj;
+namespace models;
 
 
-use models\Students;
-use models\Comments;
+use database\Database;
+
 
 /**
  * Responsible for representing a support topic.
@@ -133,16 +133,18 @@ class SupportTopic
     /**
      * Gets support topic replies.
      *
+     * @param       Database $db Database
+     *
      * @return      Message[] Support topic replies or empty array if there are no
      * replies
      * 
      * @implNote    Lazy initialization
      */
-    public function getReplies() : array
+    public function getReplies(Database $db) : array
     {
         if (empty($this->replies)) {
-            $comments = new Comments();
-            $this->replies = $comments->getReplies($this->id_comment);
+            $topic = new SupportTopicDAO($db);
+            $this->replies = $topic->getReplies($this->id_topic);
         }
         
         return $this->replies;

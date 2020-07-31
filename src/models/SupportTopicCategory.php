@@ -1,11 +1,8 @@
 <?php
 declare (strict_types=1);
 
-namespace models\obj;
+namespace models;
 
-
-use models\Students;
-use models\Comments;
 
 /**
  * Responsible for representing a support topic category.

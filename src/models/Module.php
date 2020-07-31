@@ -1,13 +1,13 @@
 <?php
 declare (strict_types=1);
 
-namespace models\obj;
+namespace models;
 
 
-use models\Modules;
-use models\Classes;
-use models\Videos;
-use models\Questionnaires;
+use models\dao\VideosDAO;
+use models\dao\QuestionnairesDAO;
+use database\Database;
+
 
 /**
  * Responsible for representing modules.
@@ -67,6 +67,8 @@ class Module
     /**
      * Gets all classes that belongs to the module.
      * 
+     * @param       Database $db Database
+     * 
      * @return      array Classes that belongs to this module. The returned
      * array is empty if there are no classes; otherwise, it has the following
      * format:
@@ -77,12 +79,12 @@ class Module
      * 
      * @implNote    Lazy initialization
      */
-    public function getClasses() : array
+    public function getClasses(Database $db) : array
     {
         if (empty($this->classes)) {
             $this->classes = array();
-            $videos = new Videos();
-            $questionnaires = new Questionnaires();
+            $videos = new VideosDAO($db);
+            $questionnaires = new QuestionnairesDAO($$db);
             
             $classes_video = $videos->getAllFromModule($this->id_module);
             $classes_questionnaire = $questionnaires->getAllFromModule($this->id_module);

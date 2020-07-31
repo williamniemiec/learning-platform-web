@@ -1,12 +1,12 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
 
-use core\Model;
-use models\obj\Module;
-use models\obj\_Class;
+use database\Database;
+use models\Module;
+use models\_Class;
 
 
 /**
@@ -16,19 +16,25 @@ use models\obj\_Class;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Modules extends Model
+class ModulesDAO
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'modules' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     
@@ -44,7 +50,7 @@ class Modules extends Model
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function getModules(int $id_course) : array
+    public function getFromCourse(int $id_course) : array
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Invalid course id");
@@ -98,8 +104,8 @@ class Modules extends Model
             throw new \InvalidArgumentException("Invalid module id");
         
         $response = array();
-        $videos = new Videos();
-        $questionnaires = new Questionnaires();
+        $videos = new VideosDAO($this->db);
+        $questionnaires = new QuestionnairesDAO($this->db);
         
         // Gets video classes inside the module 
         $class_video = $videos->getFromModule($id_module);

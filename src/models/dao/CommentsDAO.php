@@ -1,12 +1,12 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
 
-use core\Model;
-use models\obj\Message;
-use models\obj\Comment;
+use database\Database;
+use models\Message;
+use models\Comment;
 
 
 /**
@@ -16,19 +16,25 @@ use models\obj\Comment;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Comments extends Model
+class CommentsDAO
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'comments' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     
@@ -190,7 +196,7 @@ class Comments extends Model
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $replies = $sql->fetchAll(\PDO::FETCH_ASSOC);
-            $students = new Students();
+            $students = new StudentsDAO($this->db);
             
             foreach ($replies as $reply) {
                 $response[] = new Message(

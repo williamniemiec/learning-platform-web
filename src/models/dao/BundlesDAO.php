@@ -1,13 +1,13 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
 
-use core\Model;
-use models\obj\Bundle;
+use database\Database;
+use models\Bundle;
 use models\enum\OrderDirectionEnum;
-use models\obj\Bundle\BundleOrderTypeEnum;
+use models\enum\BundleOrderTypeEnum;
 
 
 /**
@@ -17,19 +17,25 @@ use models\obj\Bundle\BundleOrderTypeEnum;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Bundles extends Model
+class BundlesDAO
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'bundles' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     
@@ -53,14 +59,17 @@ class Bundles extends Model
         
         $response = null;
         
+        // Query construction
         $sql = $this->db->prepare("
             SELECT  *
             FROM    bundles
             WHERE   id_bundle = ?
         ");
         
+        // Executes query
         $sql->execute(array($id_bundle));
         
+        // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $bundle = $sql->fetch();
             $response = new Bundle(
@@ -130,17 +139,7 @@ class Bundles extends Model
         
         // Sets order by criteria (if any)
         if (!empty($orderBy)) {
-            switch ($orderBy) {
-                case BundleOrderTypeEnum::PRICE:
-                    $query .= " ORDER BY price ".$orderType->get();
-                    break;
-                case BundleOrderTypeEnum::COURSES:
-                    $query .= " ORDER BY total_courses ".$orderType->get();
-                    break;
-                case BundleOrderTypeEnum::SALES:
-                    $query .= " ORDER BY total_students ".$orderType->get();
-                    break;
-            }
+            $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
         }
         
         // Limits the search to a specified name (if a name was specified)

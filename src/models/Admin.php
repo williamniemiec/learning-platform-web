@@ -1,10 +1,10 @@
 <?php 
 declare (strict_types=1);
 
-namespace models\obj;
+namespace models;
 
 
-use models\Authorization;
+use models\dao\AuthorizationDAO;
 use models\enum\GenreEnum;
 
 /**

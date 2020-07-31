@@ -1,7 +1,10 @@
 <?php
-namespace models;
+declare (strict_types=1);
 
-use core\Model;
+namespace models\dao;
+
+
+use database\Database;
 
 
 /**
@@ -11,19 +14,25 @@ use core\Model;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Historic extends Model
+class HistoricDAO
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'student_historic' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     

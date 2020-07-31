@@ -1,12 +1,12 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
 
-use core\Model;
+use database\Database;
 use models\enum\ClassTypeEnum;
-use models\obj\Video;
+use models\Video;
 
 
 /**
@@ -16,19 +16,25 @@ use models\obj\Video;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Videos extends Model
+class VideosDAO
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'videos' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     
@@ -75,7 +81,8 @@ class Videos extends Model
                 $class['class_order'],
                 $class['title'],
                 $class['videoID'],
-                $class['length']
+                $class['length'],
+                $class['description']
             ); 
         }
         
@@ -114,7 +121,8 @@ class Videos extends Model
                     $class['class_order'], 
                     $class['title'], 
                     $class['videoID'], 
-                    $class['length']
+                    $class['length'],
+                    $class['description']
                 );
             }
         }

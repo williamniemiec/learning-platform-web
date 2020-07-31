@@ -1,11 +1,11 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
 
-use core\Model;
-use models\obj\Questionnaire;
+use database\Database;
+use models\Questionnaire;
 use models\enum\ClassTypeEnum;
 
 
@@ -16,19 +16,25 @@ use models\enum\ClassTypeEnum;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Questionnaires extends Model
+class QuestionnairesDAO
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'questionnaires' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     

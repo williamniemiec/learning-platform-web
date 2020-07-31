@@ -1,12 +1,11 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
 
-use core\Model;
-use models\obj;
-use models\obj\Course;
+use database\Database;
+use models\Course;
 
 
 /**
@@ -16,12 +15,13 @@ use models\obj\Course;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Courses extends Model
+class CoursesDAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
     private $id_user;
+    private $db;
     
     
     //-------------------------------------------------------------------------
@@ -30,11 +30,11 @@ class Courses extends Model
     /**
      * Creates 'courses' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       Database $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     
@@ -146,12 +146,12 @@ class Courses extends Model
      *  <li><b>total_length</b>: Total course duration (in minutes)</li>
      * </ul>
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If course id is invalid 
      */
     public function countClasses(int $id_course) : array
     {
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid id_student");
+            throw new \InvalidArgumentException("Invalid course id");
        
         // Query construction
         $sql = $this->db->prepare("
@@ -226,7 +226,7 @@ class Courses extends Model
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function getCourse(int $id_course) : Course
+    public function get(int $id_course) : Course
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Invalid course id");
@@ -254,7 +254,6 @@ class Courses extends Model
                 $course['description']
             );
         }
-        
         
         return $response;
     }

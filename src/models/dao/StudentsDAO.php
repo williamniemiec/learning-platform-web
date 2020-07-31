@@ -1,9 +1,12 @@
 <?php
-namespace models;
+declare (strict_types=1);
 
-use core\Model;
-use models\obj\Student;
-use models\obj\_Class;
+namespace models\dao;
+
+
+use database\Database;
+use models\Student;
+use models\_Class;
 
 
 /**
@@ -13,12 +16,13 @@ use models\obj\_Class;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Students extends Model
+class StudentsDAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
     private $id_student;
+    private $db;
     
     
     //-------------------------------------------------------------------------
@@ -27,13 +31,12 @@ class Students extends Model
     /**
      * Creates 'students' table manager.
      *
+     * @param       Database $db Database
      * @param       int $id_student [Optional] Student id
-     *
-     * @apiNote     It will connect to the database when it is instantiated
      */
-    public function __construct(int $id_student = -1)
+    public function __construct(Database $db, int $id_student = -1)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
         $this->id_student = $id_student;
     }
 
@@ -64,10 +67,10 @@ class Students extends Model
     public function login(string $email, string $pass) : bool
     {
         if (empty($email))
-            throw new \InvalidArgumentException("Invalid email");
+            throw new \InvalidArgumentException("Email cannot be empty");
         
         if (empty($pass))
-            throw new \InvalidArgumentException("Invalid password");
+            throw new \InvalidArgumentException("Password cannot be empty");
         
         $response = false;
             
@@ -93,54 +96,7 @@ class Students extends Model
     }
     
     /**
-     * Adds a new student.
-     *
-     * @param       Student $student Informations about the student
-     * @param       bool $autologin [Optional] If true, after registration is completed
-     * the student will automatically login to the system
-     *
-     * @return      int Student id or -1 if the student has not been added
-     * 
-     * @throws      \InvalidArgumentException If student is empty
-     */
-    public function register(Student $student, bool $autologin = true) : int
-    {
-        if (empty($student))
-            throw new \InvalidArgumentException("Student cannot be empty");
-            
-        $response = -1;
-            
-        // Query construction
-        $sql = $this->db->prepare("
-            INSERT INTO students 
-            (name,genre,birthdate,email,password) 
-            VALUES (?,?,?,?,?)
-        ");
-        
-        // Executes query
-        $sql->execute(array(
-            $student->getName(), 
-            $student->getGenre(),
-            $student->getBirthdate(),
-            $student->getEmail(),
-            md5($student->getPassword())
-        ));
-
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) { 
-            if ($autologin)
-                $_SESSION['s_login'] = $this->db->lastInsertId();
-        
-            $response = $this->db->lastInsertId();
-        }
-        
-        return $response;
-    }
-    
-    /**
-     * Gets information about a student.
-     *
-     * @param       int $id_student Student id
+     * Gets information about the logged in student.
      *
      * @return      Student Informations about the student or null if student 
      * does not exist
@@ -185,7 +141,7 @@ class Students extends Model
      *
      * @param       int $id_course Course id
      *
-     * @return      _Class ...
+     * @return      _Class Last class watched by the student
      * 
      * @throws      \InvalidArgumentException If course id or student id are 
      * invalid 
@@ -224,7 +180,7 @@ class Students extends Model
             $class = $sql->fetch();
             
             if ($class['class_type'] == 'video') {
-                $videos = new Videos();
+                $videos = new VideosDAO($this->db);
                 
                 $response = $videos->get(
                     $class['id_module'], 
@@ -232,13 +188,62 @@ class Students extends Model
                 ); 
             }
             else {
-                $questionnaries = new Questionnaires();
+                $questionnaries = new QuestionnairesDAO($this->db);
                 
                 $response = $questionnaries->get(
                     $class['id_module'],
                     $class['class_order']
                 ); 
             }
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Adds a new student.
+     *
+     * @param       Student $student Informations about the student
+     * @param       string $password Student password
+     * @param       bool $autologin [Optional] If true, after registration is completed
+     * the student will automatically login to the system
+     *
+     * @return      int Student id or -1 if the student has not been added
+     *
+     * @throws      \InvalidArgumentException If student or password are empty
+     */
+    public function register(Student $student, string $password, bool $autologin = true) : int
+    {
+        if (empty($student))
+            throw new \InvalidArgumentException("Student cannot be empty");
+            
+        if (empty($password))
+            throw new \InvalidArgumentException("Password cannot be empty");
+                
+        $response = -1;
+        
+        // Query construction
+        $sql = $this->db->prepare("
+            INSERT INTO students
+            (name,genre,birthdate,email,password)
+            VALUES (?,?,?,?,?)
+        ");
+                
+        // Executes query
+        $sql->execute(array(
+            $student->getName(),
+            $student->getGenre(),
+            $student->getBirthdate(),
+            $student->getEmail(),
+            md5($password)
+        ));
+        
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
+            if ($autologin)
+                $_SESSION['s_login'] = $this->db->lastInsertId();
+                
+            $response = $this->db->lastInsertId();
         }
         
         return $response;
@@ -263,6 +268,9 @@ class Students extends Model
         if (empty($genre) || ($genre != 0 && $genre != 1))
             throw new \InvalidArgumentException("Invalid genre - must be 0 or 1");
         
+        if (empty($name))
+            throw new \InvalidArgumentException("Name cannot be empty");
+            
         if (empty($birthdate))
             throw new \InvalidArgumentException("Birthdate cannot be empty");
         

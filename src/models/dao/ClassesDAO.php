@@ -1,12 +1,11 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
 
-use core\Model;
 use models\enum\ClassTypeEnum;
-use models\obj\_Class;
+use models\_Class;
 
 
 /**
@@ -16,7 +15,7 @@ use models\obj\_Class;
  * @version		1.0.0
  * @since		1.0.0
  */
-abstract class Classes extends Model
+abstract class ClassesDAO
 {
     //-------------------------------------------------------------------------
     //        Methods
@@ -62,11 +61,11 @@ abstract class Classes extends Model
             $response = $sql->fetch();
             
             if ($response['class_type'] == 'video') {
-                $videos = new Videos();
+                $videos = new VideosDAO($this->db);
                 
                 $response = $videos->get($response['id_module'], 1);
             } else {
-                $quests = new Questionnaires();
+                $quests = new QuestionnairesDAO($this->db);
                 
                 $response = $quests->get($response['id_module'], 1);
             }
