@@ -29,9 +29,16 @@ class HistoricDAO
      * Creates 'student_historic' table manager.
      *
      * @param       Database $db Database
+     * 
+     * @throws      \InvalidArgumentException If student id is empty or less 
+     * than or equal to zero
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, int $id_student)
     {
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Student id cannot be empty or". 
+                "less than or equal to zero");
+        
         $this->db = $db->getConnection();
     }
     
@@ -42,20 +49,18 @@ class HistoricDAO
     /**
      * Gets total watched classes by a student in a course.
      * 
-     * @param       int $id_student Student id
      * @param       int $id_course Course id
      * 
      * @return      int Watched classes
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If course id is empty or less 
+     * than or equal to zero
      */
-    public function countWatchedClasses(int $id_student, int $id_course) : int
+    public function countWatchedClasses(int $id_course) : int
     {
-        if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
-        
         if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Invalid course id");
+            throw new \InvalidArgumentException("Course id cannot be empty or". 
+                "less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
@@ -65,7 +70,7 @@ class HistoricDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_student, $id_course));
+        $sql->execute(array($this->id_student, $id_course));
         
         return $sql->fetch()['watchedClasses'];
     }
@@ -73,17 +78,10 @@ class HistoricDAO
     /**
      * Removes all student history.
      * 
-     * @param       int $id_student Student id
-     * 
      * @return      bool If historic was sucessfully removed
-     * 
-     * @throws      \InvalidArgumentException If any argument is invalid
      */
-    public function clear(int $id_student) : bool
+    public function clear() : bool
     {
-        if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
-        
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM student_historic
@@ -91,13 +89,11 @@ class HistoricDAO
         ");
 
         // Executes query
-        $sql->execute(array($id_student))->rowCount() > 0;
+        $sql->execute(array($this->id_student))->rowCount() > 0;
     }
     
     /**
      * Gets total classes that a student watched in the last 7 days.
-     * 
-     * @param       int $id_student
      * 
      * @return      array Total classes that a student watched in the last 7
      * days. The returned array has the following keys:
@@ -106,14 +102,9 @@ class HistoricDAO
      *  <li><b>total_classes_watched</b>: Total classes watched by the student
      *  on this date</li>
      * </ul>
-     * 
-     * @throws      \InvalidArgumentException If any argument is invalid
      */
-    public function getWeeklyHistory(int $id_student) : array
+    public function getWeeklyHistory() : array
     {
-        if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Invalid student id");
-        
         // Query construction
         $sql = $this->db->prepare("
             SELECT      date, SUM(*) AS total_classes_watched
@@ -125,7 +116,7 @@ class HistoricDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_student));
+        $sql->execute(array($this->id_student));
         
         return ($sql && $sql->rowCount() > 0) ?
             $sql->fetchAll(\PDO::FETCH_ASSOC) : array();
