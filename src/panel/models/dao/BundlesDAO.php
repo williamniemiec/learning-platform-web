@@ -1,11 +1,12 @@
 <?php
 declare (strict_types=1);
 
-namespace models;
+namespace models\dao;
 
-use core\Model;
+
+use database\Database;
 use models\enum\OrderDirectionEnum;
-use models\obj\Bundle;
+use models\Bundle;
 use models\enum\BundleOrderTypeEnum;
 use models\util\IllegalAccessException;
 
@@ -17,19 +18,25 @@ use models\util\IllegalAccessException;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Bundles extends Model
+class BundlesDAO
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates 'bundles' table manager.
      *
-     * @apiNote     It will connect to the database when it is instantiated
+     * @param       mixed $db Database
      */
-    public function __construct()
+    public function __construct(Database $db)
     {
-        parent::__construct();
+        $this->db = $db->getConnection();
     }
     
     

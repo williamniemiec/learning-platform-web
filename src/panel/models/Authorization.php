@@ -1,56 +1,61 @@
 <?php
-namespace models;
+declare (strict_types=1);
 
-use core\Model;
+namespace models;
 
 
 /**
- * Responsible for managing authorization table.
+ * Responsible for representing an authorization.
  *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
-class Authorization extends Model
+class Authorization extends User
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private $name;
+    private $level;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Creates authorization table manager.
+     * Creates a representation of a admin-type user.
+     *
+     * @param       string $name Authorization's name
+     * @param       int $level Authorization's level
      */
-    public function __construct()
+    public function __construct(string $name, int $level)
     {
-        parent::__construct();
+        $this->name = $name;
+        $this->level = $level;
     }
     
     
     //-------------------------------------------------------------------------
-    //        Methods
+    //        Getters
     //-------------------------------------------------------------------------
     /**
-     * Gets admin authorization.
-     * 
-     * @param       int $id_admin Admin id
-     * 
-     * @return      \models\Authorization Admin authorization 
+     * Gets authorization name.
+     *
+     * @return      string Authorization name
      */
-    public function getAuthorization($id_admin)
+    public function getName() : string
     {
-        $sql = $this->db->prepare("
-            SELECT  *
-            FROM    authorization
-            WHERE   id_authorization = (select  id_authorization
-                                        from    admins
-                                        where   id_admin = ?)
-        ");
-        $sql->execute(array($id_admin));
-        $sql = $sql->fetch();
-        return new Authorization(
-            $sql['id_authorization'],
-            $sql['name'], 
-            $sql['level']
-        );
+        return $this->name;
     }
     
+    /**
+     * Gets authorization level.
+     *
+     * @return      int Authorization level
+     */
+    public function getLevel() : int
+    {
+        return $this->level;
+    }
 }

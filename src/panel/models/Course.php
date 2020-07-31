@@ -1,11 +1,12 @@
 <?php
 declare (strict_types=1);
 
-namespace models\obj;
+namespace models;
 
 
-use models\Modules;
-use models\Courses;
+use database\Database;
+use models\dao\ModulesDAO;
+use models\dao\CoursesDAO;
 
 /**
  * Responsible for representing courses.
@@ -96,14 +97,16 @@ class Course
     /**
      * Gets all modules from a course.
      * 
+     * @param       Database $db Database
+     * 
      * @return      Module[] Modules from this course
      * 
      * @implNote    Lazy initialization
      */
-    public function getModules() : array
+    public function getModules(Database $db) : array
     {
         if (empty($this->modules)) {
-            $modules = new Modules();
+            $modules = new ModulesDAO($db);
             
             $this->modules = $modules->getModules($this->id_course);
         }
@@ -114,14 +117,16 @@ class Course
     /**
      * Gets the total classes of the course.
      *
+     * @param       Database $db Database
+     *
      * @return      int Total classes of the course
      *
      * @implNote    Lazy initialization
      */
-    public function getTotalClasses() : int
+    public function getTotalClasses(Database $db) : int
     {
         if (empty($this->total_classes)) {
-            $courses = new Courses();
+            $courses = new CoursesDAO($db);
             $total = $courses->countClasses($this->id_course);
             
             $this->total_classes = $total['total_classes'];
@@ -134,14 +139,16 @@ class Course
     /**
      * Gets the total length of the course.
      *
+     * @param       Database $db Database
+     *
      * @return      int Total length of the course
      *
      * @implNote    Lazy initialization
      */
-    public function getTotalLength() : int
+    public function getTotalLength(Database $db) : int
     {
         if (empty($this->total_length)) {
-            $courses = new Courses();
+            $courses = new CoursesDAO($db);
             $total = $courses->countClasses($this->id_course);
             
             $this->total_classes = $total['total_classes'];

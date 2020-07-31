@@ -1,10 +1,11 @@
 <?php
 declare (strict_types=1);
 
-namespace models\obj;
+namespace models;
 
-use models\Courses;
-use models\Bundles;
+use database\Database;
+use models\dao\CoursesDAO;
+use models\dao\BundlesDAO;
 
 
 /**
@@ -95,15 +96,17 @@ class Bundle
     /**
      * Gets courses that belongs to the bundle.
      * 
+     * @param       Database $db Database
+     * 
      * @return      \models\obj\Course[] Courses that belongs to the bundle or
      * empty array if there are no courses in the bundle
      * 
      * @implNote    Lazy initialization
      */
-    public function getCourses() : array
+    public function getCourses(Database $db) : array
     {
         if (empty($this->courses)) {
-            $courses = new Courses();
+            $courses = new CoursesDAO($db);
             
             $this->courses = $courses->getFromBundle($this->id_bundle);
         }
@@ -114,14 +117,16 @@ class Bundle
     /**
      * Gets the total length of the bundle.
      * 
+     * @param       Database $db Database
+     * 
      * @return      int Total length of the bundle
      * 
      * @implNote    Lazy initialization
      */
-    public function getTotalLength() : int
+    public function getTotalLength(Database $db) : int
     {
         if (empty($this->totalLength)) {
-            $bundles = new Bundles();
+            $bundles = new BundlesDAO($db);
             $total = $bundles->countTotalClasses();
             
             $this->totalLength = $total['total_length'];
@@ -134,14 +139,16 @@ class Bundle
     /**
      * Gets the total classes of the bundle.
      *
+     * @param       Database $db Database
+     *
      * @return      int Total classes of the bundle
      *
      * @implNote    Lazy initialization
      */
-    public function getTotalClasses() : int
+    public function getTotalClasses(Database $db) : int
     {
         if (empty($this->totalClasses)) {
-            $bundles = new Bundles();
+            $bundles = new BundlesDAO($db);
             $total = $bundles->countTotalClasses();
             
             $this->totalLength = $total['total_length'];

@@ -3,6 +3,10 @@ declare (strict_types=1);
 
 namespace models\enum;
 
+
+use models\util\Enumeration;
+
+
 /**
  * Contains course 'order by' options.
  *
