@@ -32,7 +32,7 @@ class BundlesDAO
     /**
      * Creates 'bundles' table manager.
      *
-     * @param       mixed $db Database
+     * @param       Database $db Database
      */
     public function __construct(Database $db)
     {

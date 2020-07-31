@@ -23,7 +23,7 @@ class VideosDAO
     /**
      * Creates 'videos' table manager.
      *
-     * @param       mixed $db Database
+     * @param       Database $db Database
      */
     public function __construct(Database $db)
     {

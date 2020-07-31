@@ -31,7 +31,7 @@ class SupportTopicDAO
     /**
      * Creates 'support_topic' table manager.
      *
-     * @param       mixed $db Database
+     * @param       Database $db Database
      */
     public function __construct(Database $db)
     {

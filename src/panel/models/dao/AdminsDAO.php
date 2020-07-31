@@ -33,7 +33,7 @@ class AdminsDAO
     /**
      * Creates 'admins' table manager.
      *
-     * @param       mixed $db Database
+     * @param       Database $db Database
      * @param       int $id_user [Optional] Admin id
      *
      * @apiNote     It will connect to the database when it is instantiated

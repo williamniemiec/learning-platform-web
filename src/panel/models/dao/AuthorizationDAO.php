@@ -29,7 +29,7 @@ class AuthorizationDAO
     /**
      * Creates 'authorization' table manager.
      * 
-     * @param       mixed $db Database
+     * @param       Database $db Database
      */
     public function __construct(Database $db)
     {
