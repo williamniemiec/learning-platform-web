@@ -8,6 +8,7 @@ use database\Database;
 use models\Student;
 use models\_Class;
 use models\enum\GenreEnum;
+use models;
 
 
 /**
@@ -22,8 +23,8 @@ class StudentsDAO
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_student;
     private $db;
+    private $id_student;
     
     
     //-------------------------------------------------------------------------
@@ -462,6 +463,44 @@ class StudentsDAO
         return $sql->fetch(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Gets all bundles purchased by the student.
+     * 
+     * @param       int $limit [Optional] Maximum bundles returned
+     * @param       int $offset [Optional] Ignores first results from the return
+     * 
+     * @return      models\Bundle[] Bundles purchased by the student
+     * 
+     * @throws      \InvalidArgumentException If student id provided in the 
+     * constructor or bundle id is empty, less than or equal to zero
+     */
+    public function getPurchases(int $limit = -1, int $offset = -1) : array
+    {
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
+            
+        // Query construction
+        $query = "
+            SELECT  *
+            FROM    purchases NATURAL JOIN bundles
+            WHERE   id_student = ?    
+        ";
+        
+        if ($limit > 0) {
+            if ($offset > 0)
+                $query .= " LIMIT ".$offset.",".$limit;
+            else
+                $query .= " LIMIT ".$limit;
+        }
+            
+        $sql = $this->db->prepare($query);
+            
+        // Executes query
+        $sql->execute(array($this->id_student));
+        
+        return $sql && $sql->rowCount() > 0;
+    }
     
     /**
      * Adds a bundle to current student.
