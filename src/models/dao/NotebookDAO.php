@@ -81,7 +81,7 @@ class NotebookDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $note = $sql->fetch(\PDO::ATTR_FETCH_TABLE_NAMES);
+            $note = $sql->fetch(true);
             
             $response = new Note(
                 $note['notebook.id_note'],
@@ -145,7 +145,7 @@ class NotebookDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $note = $sql->fetchAll(\PDO::ATTR_FETCH_TABLE_NAMES);
+            $note = $sql->fetchAll(true);
             
             $response[] = new Note(
                 $note['notebook.id_note'],
@@ -280,7 +280,7 @@ class NotebookDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $note = $sql->fetchAll(\PDO::ATTR_FETCH_TABLE_NAMES);
+            $note = $sql->fetchAll(true);
             
             $response[] = new Note(
                 $note['notebook.id_note'],

@@ -453,7 +453,7 @@ class SupportTopicDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $category) {
+            foreach ($sql->fetchAll() as $category) {
                 $response[] = new SupportTopicCategory(
                     $category['id_category'],
                     $category['name']

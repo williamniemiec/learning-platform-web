@@ -376,8 +376,7 @@ class AdminsDAO
             throw new \InvalidArgumentException("Admin id cannot be less than ".
                 "or equal to zero");
         
-        $response = NULL;
-        $sql = $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
+        $response = null;
         
         // Query construction
         $sql = $this->db->prepare("
@@ -391,7 +390,7 @@ class AdminsDAO
         
         // Parses result
         if ($sql->rowCount() > 0) {
-            $admin = $sql->fetch(\PDO::FETCH_ASSOC);
+            $admin = $sql->fetch(true);
             
             $response = new Admin(
                 $admin['admins.id_admin'], 

@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace database\pdo;
 
 
+use database\Database;
 use database\DatabaseStatement;
 
 
@@ -12,17 +13,22 @@ use database\DatabaseStatement;
  */
 class PDODatabaseStatement extends DatabaseStatement
 {
+    private $db;
+    
+    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
      * Creates database statement for PDO.
      *
+     * @param       Database $db PDO database
      * @param       \PDOStatement $statement PDO statement
      */
-    public function __construct(\PDOStatement $statement)
+    public function __construct(Database $db, \PDOStatement $statement)
     {
-        $this->statement = $statement;    
+        $this->statement = $statement;
+        $this->db = $db;
     }
     
     
@@ -43,26 +49,30 @@ class PDODatabaseStatement extends DatabaseStatement
      * {@inheritdoc}
      * @Override
      */
-    public function fetchAll(): array
+    public function fetchAll(bool $withTableName = false): array
     {
-        $result = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
-        
-        
-        return $result == false ? array() : $result;
+        if ($withTableName)
+            $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
+            
+            $result = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
+            
+            return $result == false ? array() : $result;
     }
-
+    
     /**
      * {@inheritdoc}
      * @Override
      */
-    public function fetch()
+    public function fetch(bool $withTableName = false)
     {
-        $result = $this->statement->fetch();
-        
-        
-        return $result == false ? array() : $result;
+        if ($withTableName)
+            $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
+            
+            $result = $this->statement->fetch(\PDO::FETCH_ASSOC);
+            
+            return $result == false ? array() : $result;
     }
-
+    
     /**
      * {@inheritdoc}
      * @Override

@@ -121,7 +121,7 @@ class VideosDAO
         $sql->execute(array($id_module));
         
         if ($sql->rowCount() > 0) {
-            $classes =  $sql->fetchAll(\PDO::FETCH_ASSOC);
+            $classes =  $sql->fetchAll();
             
             foreach ($classes as $class) {
                 $response[] = new Video(

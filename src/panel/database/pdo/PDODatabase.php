@@ -9,7 +9,7 @@ use database\Database;
 
 /**
  * Connects to the database via PDO.
- * 
+ *
  * @link https://www.php.net/manual/pt_BR/book.pdo.php
  */
 abstract class PDODatabase extends Database
@@ -21,14 +21,23 @@ abstract class PDODatabase extends Database
      * {@inheritdoc}
      * @Override
      */
+    public function setAttribute(int $attribute, $value) : bool
+    {
+        return $this->conn->setAttribute($attribute, $value);
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @Override
+     */
     public function prepare(string $statement)
     {
         $statement = $this->conn->prepare($statement);
         
         
-        return $statement == false ? null : new PDODatabaseStatement($statement);
+        return $statement == false ? null : new PDODatabaseStatement($this->conn, $statement);
     }
-
+    
     /**
      * {@inheritdoc}
      * @Override
@@ -38,9 +47,9 @@ abstract class PDODatabase extends Database
         $statement = $this->conn->query($statement);
         
         
-        return $statement == false ? null : new PDODatabaseStatement($statement);
+        return $statement == false ? null : new PDODatabaseStatement($this->conn, $statement);
     }
-
+    
     /**
      * {@inheritdoc}
      * @Override

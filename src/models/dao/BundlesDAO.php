@@ -228,7 +228,7 @@ class BundlesDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $bundle) {
+            foreach ($sql->fetchAll() as $bundle) {
                 $response[] = new Bundle(
                     $bundle['id_bundle'],
                     $bundle['name'],
@@ -290,7 +290,7 @@ class BundlesDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $bundle) {
+            foreach ($sql->fetchAll() as $bundle) {
                 $response[] = new Bundle(
                     $bundle['id_bundle'], 
                     $bundle['name'], 
@@ -355,7 +355,7 @@ class BundlesDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $result) {
+            foreach ($sql->fetchAll() as $result) {
                 $response["total_classes"] += $result["total_classes"];
                 $response["total_length"] += $result["total_length"];
             }

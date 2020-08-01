@@ -83,7 +83,7 @@ class CoursesDAO
         // Executes query
         $sql->execute(array($id_course, $id_course));
         
-        return $sql->fetch(\PDO::FETCH_ASSOC);
+        return $sql->fetch();
     }
     
     /**
@@ -120,7 +120,7 @@ class CoursesDAO
         
         // Parses results
         if ($sql->rowCount() > 0) {
-            foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $course) {
+            foreach ($sql->fetchAll() as $course) {
                 $response[] = new Course(
                     $course['id_course'],
                     $course['name'],
@@ -189,7 +189,7 @@ class CoursesDAO
         
         // Parses results
         if ($sql->rowCount() > 0) {
-            foreach($sql->fetchAll(\PDO::FETCH_ASSOC) as $course) {
+            foreach($sql->fetchAll() as $course) {
                 $response[] = new Course(
                     $course['id_course'],
                     $course['name'],

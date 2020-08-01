@@ -205,7 +205,7 @@ class CommentsDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $replies = $sql->fetchAll(\PDO::FETCH_ASSOC);
+            $replies = $sql->fetchAll();
             $students = new StudentsDAO($this->db);
             
             foreach ($replies as $reply) {

@@ -460,7 +460,7 @@ class StudentsDAO
         // Executes query
         $sql->execute(array($this->id_student, $this->id_student));
         
-        return $sql->fetch(\PDO::FETCH_ASSOC);
+        return $sql->fetch();
     }
 
     /**

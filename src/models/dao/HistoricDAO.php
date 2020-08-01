@@ -121,6 +121,6 @@ class HistoricDAO
         $sql->execute(array($this->id_student));
         
         return ($sql && $sql->rowCount() > 0) ?
-            $sql->fetchAll(\PDO::FETCH_ASSOC) : array();
+            $sql->fetchAll() : array();
     }
 }

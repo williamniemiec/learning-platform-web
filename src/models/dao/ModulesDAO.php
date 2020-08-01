@@ -73,7 +73,7 @@ class ModulesDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $modules = $sql->fetchAll(\PDO::FETCH_ASSOC);
+            $modules = $sql->fetchAll();
             
             foreach ($modules as $module) {
                 $response[] = new Module(

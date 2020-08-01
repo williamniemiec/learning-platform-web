@@ -81,7 +81,7 @@ class QuestionnairesDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $class = $sql->fetch(\PDO::FETCH_ASSOC);
+            $class = $sql->fetch();
             
             $response = new Questionnaire(
                 $class['id_module'],

@@ -42,6 +42,16 @@ abstract class Database
     }
     
     /**
+     * Set an attribute.
+     * 
+     * @param       int $attribute Attribute to be set
+     * @param       mixed $value Attribute's value 
+     * 
+     * @return      bool True on success or false on failure
+     */
+    public abstract function setAttribute(int $attribute, $value) : bool;
+    
+    /**
      * Executes an SQL statement, returning a result set as an object.
      *
      * @return      DatabaseStatement Returns a statement object, or null on 

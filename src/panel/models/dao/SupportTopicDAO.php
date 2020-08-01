@@ -87,7 +87,7 @@ class SupportTopicDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $supportTopic = $sql->fetch(\PDO::FETCH_ASSOC);
+            $supportTopic = $sql->fetch();
             $students = new StudentsDAO();
             
             $response = new SupportTopicDAO(
@@ -219,7 +219,7 @@ class SupportTopicDAO
         
         // Parses result
         if ($sql && $sql->rowCount() > 0) {
-            $replies = $sql->fetchAll(\PDO::FETCH_ASSOC);
+            $replies = $sql->fetchAll();
             
             foreach ($replies as $reply) {
                 if ($reply['user_type'] == 0) {

@@ -32,13 +32,21 @@ abstract class DatabaseStatement
     /**
      * Fetches the next row from a result set.
      *
-     * @return     array Return an array containing the row in the result set 
-     * or empty array on failure. 
+     * @param       bool $withTableName If true array keys will be:
+     * <b><code>table_name.attribute</code></b> <br />
+     * Otherwise, array keys will be: <b><code>attribute</code></b>
+     *
+     * @return     array Return an array containing the row in the result set
+     * or empty array on failure.
      */
-    public abstract function fetch();
+    public abstract function fetch(bool $withTableName = false) : array;
     
     /**
      * Returns an array containing all of the result set rows.
+     *
+     * @param       bool $withTableName If true array keys of each position
+     * will be: <b><code>table_name.attribute</code></b> <br />
+     * Otherwise, array keys will be: <b><code>attribute</code></b>
      *
      * @return      array Returns an array containing all of the remaining rows
      * in the result set. The array represents each row as either an array of
@@ -46,7 +54,7 @@ abstract class DatabaseStatement
      * name. An empty array is returned if there are zero results to fetch, or
      * empty array on failure.
      */
-    public abstract function fetchAll() : array;
+    public abstract function fetchAll(bool $withTableName = false) : array;
     
     /**
      * Returns the number of rows affected by the last SQL statement.

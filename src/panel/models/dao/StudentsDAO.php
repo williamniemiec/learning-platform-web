@@ -167,7 +167,7 @@ class StudentsDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $student) {
+            foreach ($sql->fetchAll() as $student) {
                 $response[] = new Student(
                     $student['id'],
                     $student['name'], 

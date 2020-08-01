@@ -80,7 +80,7 @@ class VideosDAO
         
         // Parses results
         if ($sql->rowCount() > 0) {
-            $class = $sql->fetch(\PDO::FETCH_ASSOC);
+            $class = $sql->fetch();
             
             $response = new Video(
                 $class['id_module'],
