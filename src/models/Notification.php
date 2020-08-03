@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace models;
 
+use DateTime;
 use models\enum\NotificationTypeEnum;
 
 
@@ -18,6 +19,7 @@ class Notification
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
+    private $id_notification;
     private $id_student;
     private $date;
     private $id_reference;
@@ -33,9 +35,10 @@ class Notification
     /**
      * Creates a representation of a notification.
      *
+     * @param       int $id_notification Notification id
      * @param       int $id_student Student id to which the notification
      * belongs
-     * @param       string $date Date to which the notification was generated
+     * @param       DateTime $date Date to which the notification was generated
      * @param       int $id_reference Comment id or Support topic id to which
      * the notification refers
      * @param       NotificationTypeEnum $type $id_reference type
@@ -45,9 +48,10 @@ class Notification
      * @param       int $read [Optional] If the notification has not yet been
      * read
      */
-    public function __construct(int $id_student, string $date, int $id_reference,
+    public function __construct(int $id_notification, int $id_student, DateTime $date, int $id_reference,
         NotificationTypeEnum $type, string $ref_text, string $message, int $read = 0)
     {
+        $this->id_notification = $id_notification;
         $this->id_student = $id_student;
         $this->date = $date;
         $this->id_reference = $id_reference;
@@ -62,6 +66,16 @@ class Notification
     //        Getters
     //-------------------------------------------------------------------------
     /**
+     * Gets notification id.
+     *
+     * @return      int Notification id
+     */
+    public function getId() : int
+    {
+        return $this->id_notification;
+    }
+    
+    /**
      * Gets student id to which the notification belongs.
      * 
      * @return      int Student id
@@ -74,10 +88,9 @@ class Notification
     /**
      * Gets creation date.
      * 
-     * @return      string Creation date in the following format:
-     * <code>YYYY-MM-DD HH:MM:SS</code>
+     * @return      DateTime Creation date
      */
-    public function getDate() : string
+    public function getDate() : DateTime
     {
         return $this->date;
     }

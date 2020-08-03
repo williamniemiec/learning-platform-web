@@ -69,7 +69,7 @@ class SupportTopicDAO
     public function get() : array
     {            
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+            $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -95,7 +95,7 @@ class SupportTopicDAO
                 $students->get($supportTopic['id_student']),
                 $supportTopic['title'],
                 $supportTopic['name'],
-                $supportTopic['date'],
+                new \DateTime($supportTopic['date']),
                 $supportTopic['message'],
                 $supportTopic['closed']
             );
@@ -112,7 +112,7 @@ class SupportTopicDAO
     public function close() : bool
     {
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+            $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -137,7 +137,7 @@ class SupportTopicDAO
     public function open() : bool
     {
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+            $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -168,7 +168,7 @@ class SupportTopicDAO
     public function newReply(int $id_admin, string $text) : bool
     {
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+            $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -179,6 +179,9 @@ class SupportTopicDAO
         if (empty($text))
             throw new \InvalidArgumentException("Text cannot be empty");
                 
+        if (!$this->isOpen($this->id_topic))
+            throw new IllegalAccessException("Topic is closed");
+            
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO support_topic_replies
@@ -201,7 +204,7 @@ class SupportTopicDAO
     public function getReplies()
     {
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+            $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -233,12 +236,30 @@ class SupportTopicDAO
                 
                 $response[] = new Message(
                     $user, 
-                    $reply['date'], 
-                    $reply['text']
+                    new \DateTime($reply['date']), 
+                    $reply['text'],
+                    $reply['id_reply']
                 );
             }
         }
             
         return $response;
+    }
+    
+    /**
+     * Checks whether a support topic is open.
+     *
+     * @param       int $id_topic Support topic id
+     *
+     * @return      bool If support topic is open
+     */
+    private function isOpen(int $id_topic) : bool
+    {
+        $sql = $this->db->prepare("CALL sp_support_topic_is_open(?, @isOpen)");
+        $sql->execute(array($id_topic));
+        
+        $sql = $this->db->query("SELECT @isOpen AS is_open");
+        
+        return $sql->fetch()['is_open'] == 1;
     }
 }

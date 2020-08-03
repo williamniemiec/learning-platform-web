@@ -5,6 +5,7 @@ namespace models;
 
 
 use database\Database;
+use DateTime;
 use models\dao\CommentsDAO;
 
 
@@ -35,11 +36,11 @@ class Comment
      *
      * @param       int $id_comment Comment id
      * @param       Student $student Student who wrote the comment
-     * @param       string $date Comment posting date
+     * @param       DateTime $date Comment posting date
      * @param       string $text Comment content
      * @param       Message[] $replies [Optional] Comment replies
      */
-    public function __construct(int $id_comment, Student $student, string $date, 
+    public function __construct(int $id_comment, Student $student, DateTime $date, 
         string $text, array $replies = array())
     {
         $this->id_comment = $id_comment;
@@ -76,9 +77,9 @@ class Comment
     /**
      * Gets comment creation date.
      *
-     * @return      string Comment creation date
+     * @return      DateTime Comment creation date
      */
-    public function getCreationDate() : string
+    public function getCreationDate() : DateTime
     {
         return $this->date;
     }

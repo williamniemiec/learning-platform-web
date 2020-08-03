@@ -5,6 +5,7 @@ namespace models;
 
 
 use database\Database;
+use DateTime;
 use models\dao\SupportTopicDAO;
 
 /**
@@ -39,13 +40,13 @@ class SupportTopic
      * @param       Student $student Student who created the support topic
      * @param       string $title
      * @param       string $category Support topic category 
-     * @param       string $date Support topic creation date
+     * @param       DateTime $date Support topic creation date
      * @param       string $text Initial Support topic message
      * @param       bool $closed Support topic status
      * @param       Message[] $replies [Optional] Support topic replies
      */
     public function __construct(int $id_topic, Student $student, string $title,
-        string $category, string $date, string $message, int $closed)
+        string $category, DateTime $date, string $message, int $closed)
     {
         $this->id_topic = $id_topic;
         $this->student = $student;
@@ -103,9 +104,9 @@ class SupportTopic
     /**
      * Gets support topic creation date.
      *
-     * @return      string Support topic creation date
+     * @return      DateTime Support topic creation date
      */
-    public function getCreationDate() : string
+    public function getCreationDate() : DateTime
     {
         return $this->date;
     }

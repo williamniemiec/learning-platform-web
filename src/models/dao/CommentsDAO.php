@@ -122,7 +122,7 @@ class CommentsDAO
                 $response[] = new Comment(
                     $comment['id_comment'], 
                     $comment['student'], 
-                    $comment['date'], 
+                    new \DateTime($comment['date']), 
                     $comment['text']
                 );
             }
@@ -211,8 +211,9 @@ class CommentsDAO
             foreach ($replies as $reply) {
                 $response[] = new Message(
                     $students->get($reply['id_student']),
-                    $reply['date'], 
-                    $reply['text']
+                    new \DateTime($reply['date']), 
+                    $reply['text'],
+                    $reply['id_reply']
                 );                
             }
         }
@@ -224,18 +225,24 @@ class CommentsDAO
      * Deletes a comment.
      * 
      * @param       int $id_comment Doubt id
+     * @param       int $id_student Student id logged in. It is necessary to 
+     * prevent a student from deleting a comment that is not his 
      * 
      * @return      boolean If doubt has been successfully deleted
      * 
-     * @throws      \InvalidArgumentException If comment id is empty or less 
-     * than or equal to zero
+     * @throws      \InvalidArgumentException If comment id or student id is 
+     * empty or less than or equal to zero
      */
-    public function deleteComment(int $id_comment) : bool
+    public function deleteComment(int $id_comment, int $id_student) : bool
     {
         if (empty($id_comment) || $id_comment <= 0)
             throw new \InvalidArgumentException("Comment id cannot be empty ".
                 "or less than or equal to zero");
         
+        if (empty($id_student) || $id_student <= 0)
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                "or less than or equal to zero");
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM comments 
@@ -249,34 +256,35 @@ class CommentsDAO
     }
     
     /**
-     * Deletes a reply.
+     * Removes a reply.
      * 
-     * @param       int $id_comment Comment id that the reply belongs to
-     * @param       int $id_student Student id that made the reply
+     * @param       int $id_reply Reply id to be removed
+     * @param       int $id_student Student id logged in. It is necessary to 
+     * prevent a student from deleting a reply that is not his 
      * 
-     * @return      boolean If reply hsa been successfully deleted
+     * @return      bool If reply has been successfully deleted
      * 
-     * @throws      \InvalidArgumentException If comment id or student id is 
+     * @throws      \InvalidArgumentException If reply id or student id is 
      * empty or less than or equal to zero
      */
-    public function deleteReply(int $id_comment, int $id_student) : bool
+    public function deleteReply(int $id_reply, int $id_student) : bool
     {
-        if (empty($id_comment) || $id_comment <= 0)
-            throw new \InvalidArgumentException("Comment id cannot be empty ".
+        if (empty($id_reply) || $id_reply <= 0)
+            throw new \InvalidArgumentException("Reply id cannot be empty ".
                 "or less than or equal to zero");
             
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
-        
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM comment_replies 
-            WHERE id_comment = ? AND id_student = ? 
+            WHERE id_reply = ? AND id_student = ?
         ");
         
         // Executes query
-        $sql->execute(array($id_comment, $id_student));
+        $sql->execute(array($id_reply, $id_student));
         
         return $sql && $sql->rowCount() > 0;
     }

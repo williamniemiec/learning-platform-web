@@ -29,7 +29,7 @@ namespace models;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Action extends User
+class Action
 {
     //-------------------------------------------------------------------------
     //        Attributes

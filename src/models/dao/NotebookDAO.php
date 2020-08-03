@@ -87,6 +87,7 @@ class NotebookDAO
                 $note['notebook.id_note'],
                 $note['notebook.content'],
                 $note['notebook.note'],
+                new \DateTime($note['notebook.date']),
                 new Video(
                     $note['videos.id_module'],
                     $note['videos.class_order'],
@@ -151,6 +152,7 @@ class NotebookDAO
                 $note['notebook.id_note'],
                 $note['notebook.content'],
                 $note['notebook.note'],
+                new \DateTime($note['notebook.date']),
                 new Video(
                     $note['videos.id_module'],
                     $note['videos.class_order'],
@@ -286,6 +288,7 @@ class NotebookDAO
                 $note['notebook.id_note'],
                 $note['notebook.content'],
                 $note['notebook.note'],
+                new \DateTime($note['notebook.date']),
                 new Video(
                     $note['videos.id_module'],
                     $note['videos.class_order'],

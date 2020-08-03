@@ -3,6 +3,8 @@ declare (strict_types=1);
 
 namespace models;
 
+use DateTime;
+
 
 /**
  * Responsible for representing notebook notes.
@@ -32,11 +34,11 @@ class Note
      * @param       int $id_note Note id
      * @param       string $title Note title
      * @param       string $content Note content
-     * @param       string $date Note date
+     * @param       DateTime $date Note date
      * @param       Video $class Class to which the note belongs
      */
     public function __construct(int $id_note, string $title, string $content, 
-        string $date, Video $class)
+        DateTime $date, Video $class)
     {
         $this->id_note = $id_note;
         $this->title = $title;
@@ -82,9 +84,9 @@ class Note
     /**
      * Gets annotation creation date.
      *
-     * @return      string Creation date
+     * @return      DateTime Creation date
      */
-    public function getCreationDate() : string
+    public function getCreationDate() : DateTime
     {
         return $this->date;
     }

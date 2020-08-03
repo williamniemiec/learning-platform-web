@@ -27,6 +27,6 @@ class MySqlPDODatabase extends PDODatabase
             charset=".$this->getCharset(),
             $this->getUsername(),
             $this->getPassword()
-            );
+        );
     }
 }

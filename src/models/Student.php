@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace models;
 
+use DateTime;
 use models\enum\GenreEnum;
 
 
@@ -30,12 +31,12 @@ class Student extends User
      * @param       int $id Student id
      * @param       string $name Student name
      * @param       GenreEnum $genre Student genre
-     * @param       string $birthdate Student birthdate
+     * @param       DateTime $birthdate Student birthdate
      * @param       string $email Student email
      * @param       string $photo [Optional] Name of the student photo file
      */
     public function __construct(int $id, string $name, GenreEnum $genre, 
-        string $birthdate, string $email, string $photo = '')
+        DateTime $birthdate, string $email, string $photo = '')
     {
         $this->id = $id;
         $this->name = $name;
@@ -45,6 +46,20 @@ class Student extends User
         $this->photo = empty($photo) ? "" : $photo;
     }
 
+    
+    //-------------------------------------------------------------------------
+    //        Methods
+    //-------------------------------------------------------------------------
+    /**
+     * Checks whether a student is logged.
+     *
+     * @return      bool If student is logged
+     */
+    public static function isLogged() : bool
+    {
+        return !empty($_SESSION['s_login']);
+    }
+    
     
     //-------------------------------------------------------------------------
     //        Getters

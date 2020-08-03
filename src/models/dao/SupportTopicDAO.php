@@ -8,6 +8,7 @@ use database\Database;
 use models\SupportTopic;
 use models\Message;
 use models\SupportTopicCategory;
+use models\util\IllegalAccessException;
 
 
 /**
@@ -81,7 +82,7 @@ class SupportTopicDAO
                 $students->get($supportTopic['id_student']), 
                 $supportTopic['title'], 
                 $supportTopic['name'], 
-                $supportTopic['date'], 
+                new \DateTime($supportTopic['date']), 
                 $supportTopic['message'], 
                 $supportTopic['closed']
             );
@@ -133,17 +134,18 @@ class SupportTopicDAO
     }
     
     /**
-     * Deletes a support topic
+     * Removes a support topic
      * 
-     * @param       int $id_student Student id logged in
      * @param       int $id_topic Support topic id to be deleted
+     * @param       int $id_student Student id logged in. It is necessary to 
+     * prevent a student from deleting a topic that is not his 
      * 
      * @return      bool If support topic has been successfully removed
      * 
      * @throws      \InvalidArgumentException If topic id or student id is empty
      * or less than or equal to zero
      */
-    public function delete(int $id_student, int $id_topic) : bool
+    public function delete(int $id_topic, int $id_student) : bool
     {
         if (empty($id_topic) || $id_topic <= 0)
             throw new \InvalidArgumentException("Topic id cannot be empty ".
@@ -168,8 +170,9 @@ class SupportTopicDAO
     /**
      * Closes a support topic.
      * 
-     * @param       int $id_student Student id logged in
      * @param       int $id_topic Support topic id to be closed
+     * @param       int $id_student Student id logged in. It is necessary to 
+     * prevent a student from closing a topic that is not his 
      * 
      * @return      bool If support topic has been successfully closed
      * 
@@ -202,15 +205,16 @@ class SupportTopicDAO
     /**
      * Opens a support topic.
      *
-     * @param       int $id_student Student id logged in
      * @param       int $id_topic Support topic id to be opened
+     * @param       int $id_student Student id logged in. It is necessary to 
+     * prevent a student from opening a topic that is not his 
      *
      * @return      bool If support topic has been successfully closed
      * 
      * @throws      \InvalidArgumentException If topic id or student id is empty
      * or less than or equal to zero
      */
-    public function open(int $id_student, int $id_topic) : bool
+    public function open(int $id_topic, int $id_student) : bool
     {
         if (empty($id_topic) || $id_topic <= 0)
             throw new \InvalidArgumentException("Topic id cannot be empty ".
@@ -243,6 +247,7 @@ class SupportTopicDAO
      * @return      bool If the reply has been successfully added
      * 
      * @throws      \InvalidArgumentException If any argument is invalid
+     * @throws      IllegalAccessException If support topic is closed
      */
     public function newReply(int $id_topic, int $id_student, string $text) : bool
     {
@@ -257,6 +262,9 @@ class SupportTopicDAO
         if (empty($text))
             throw new \InvalidArgumentException("Text cannot be empty");
         
+        if (!$this->isOpen($id_topic))
+            throw new IllegalAccessException("Topic is closed");
+            
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO support_topic_replies
@@ -315,8 +323,9 @@ class SupportTopicDAO
                 
                 $response[] = new Message(
                     $user, 
-                    $reply['date'], 
-                    $reply['text']
+                    new \DateTime($reply['date']), 
+                    $reply['text'],
+                    $reply['id_reply']
                 );
             }
         }
@@ -372,7 +381,7 @@ class SupportTopicDAO
                     $students->get($supportTopic['id_student']),
                     $supportTopic['title'],
                     $supportTopic['name'],
-                    $supportTopic['date'],
+                    new \DateTime($supportTopic['date']),
                     $supportTopic['message'],
                     $supportTopic['closed']
                 );
@@ -425,7 +434,7 @@ class SupportTopicDAO
                     $students->get($supportTopic['id_student']),
                     $supportTopic['title'],
                     $supportTopic['name'],
-                    $supportTopic['date'],
+                    new \DateTime($supportTopic['date']),
                     $supportTopic['message'],
                     $supportTopic['closed']
                 );
@@ -462,5 +471,22 @@ class SupportTopicDAO
         }
         
         return $response;
+    }
+    
+    /**
+     * Checks whether a support topic is open.
+     * 
+     * @param       int $id_topic Support topic id
+     * 
+     * @return      bool If support topic is open
+     */
+    private function isOpen(int $id_topic) : bool
+    {
+        $sql = $this->db->prepare("CALL sp_support_topic_is_open(?, @isOpen)");
+        $sql->execute(array($id_topic));
+        
+        $sql = $this->db->query("SELECT @isOpen AS is_open");
+        
+        return $sql->fetch()['is_open'] == 1;
     }
 }

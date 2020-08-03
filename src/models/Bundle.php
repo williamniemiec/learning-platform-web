@@ -24,6 +24,7 @@ class Bundle
     private $id_bundle;
     private $name;
     private $price;
+    private $logo;
     private $description;
     private $courses;
     private $totalClasses;
@@ -39,13 +40,16 @@ class Bundle
      * @param       int $id_bundle Bundle id
      * @param       string $name Bundle name
      * @param       float $price Bundle price
+     * @param       string $logo [Optional] Bundle logo
      * @param       string $description [Optional] Bundle description
      */
-    public function __construct(int $id_bundle, string $name, float $price, string $description = '')
+    public function __construct(int $id_bundle, string $name, float $price, 
+        string $logo = '', string $description = '')
     {
         $this->id_bundle = $id_bundle;
         $this->name = $name;
         $this->price = $price;
+        $this->logo = empty($logo) ? '' : $logo;
         $this->description = empty($description) ? '' : $description;
     }
     
@@ -81,6 +85,17 @@ class Bundle
     public function getPrice() : float
     {
         return $this->price;
+    }
+    
+    /**
+     * Gets bundle logo.
+     * 
+     * @return      string Bundle logo file name or empty string if the bundle
+     * does not have a logo
+     */
+    public function getLogo() : string
+    {
+        return $this->logo;
     }
     
     /**

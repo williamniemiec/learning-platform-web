@@ -47,16 +47,6 @@ class StudentsDAO
     //        Methods
     //-------------------------------------------------------------------------
     /**
-     * Checks whether a student is logged.
-     *
-     * @return      bool If student is logged
-     */
-    public static function isLogged() : bool
-    {
-        return !empty($_SESSION['s_login']);
-    }
-    
-    /**
      * Checks whether student credentials are correct.
      *
      * @param       string $email Student's email
@@ -131,7 +121,7 @@ class StudentsDAO
             $response = new Student(
                 $student['name'], 
                 $student['genre'], 
-                $student['birthdate'], 
+                new \DateTime($student['birthdate']), 
                 $student['email'],
                 $student['photo'] 
             );

@@ -219,7 +219,7 @@ class CoursesDAO
                 "provided in the constructor");
             
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+            $this->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -311,7 +311,7 @@ class CoursesDAO
                 "provided in the constructor");
             
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+            $this->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
         
@@ -395,7 +395,7 @@ class CoursesDAO
                 "provided in the constructor");
             
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+            $this->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -484,7 +484,7 @@ class CoursesDAO
                 "provided in the constructor");
             
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+            $this->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -533,7 +533,7 @@ class CoursesDAO
                 "provided in the constructor");
             
         if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+            $this->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             

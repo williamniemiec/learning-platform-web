@@ -118,7 +118,7 @@ class StudentsDAO
             $response = new Student(
                 $student['name'], 
                 $student['genre'], 
-                $student['birthdate'], 
+                new \DateTime($student['birthdate']), 
                 $student['email'],
                 $student['photo'] 
             );
@@ -172,7 +172,7 @@ class StudentsDAO
                     $student['id'],
                     $student['name'], 
                     $student['genre'], 
-                    $student['birthdate'], 
+                    new \DateTime($student['birthdate']), 
                     $student['email']
                 );
             }
@@ -243,8 +243,7 @@ class StudentsDAO
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -265,7 +264,7 @@ class StudentsDAO
     }
     
     /**
-     * Edits a student.
+     * Updates a student.
      * 
      * @param       int $id_student Student id
      * @param       string $newEmail New student email
@@ -277,14 +276,13 @@ class StudentsDAO
      * in the constructor is empty, less than or equal to zerois empty, less than
      * or equal to zero or if email is empty
      */
-    public function edit(int $id_student, string $newEmail, string $newPassword = '') : bool
+    public function update(int $id_student, string $newEmail, string $newPassword = '') : bool
     {
         if (empty($this->id_admin) || $this->id_admin <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
         
@@ -329,8 +327,7 @@ class StudentsDAO
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -371,8 +368,7 @@ class StudentsDAO
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -414,8 +410,7 @@ class StudentsDAO
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             

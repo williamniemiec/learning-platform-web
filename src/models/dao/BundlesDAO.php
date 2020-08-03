@@ -77,7 +77,8 @@ class BundlesDAO
             $response = new Bundle(
                 $bundle['id_bundle'], 
                 $bundle['name'], 
-                $bundle['price'], 
+                $bundle['price'],
+                $bundle['logo'],
                 $bundle['description']
             );
         }
@@ -170,6 +171,7 @@ class BundlesDAO
                 $response[$i]['bundle'] = new Bundle(
                     $bundle['id_bundle'],
                     $bundle['name'],
+                    $bundle['logo'],
                     $bundle['price'],
                     $bundle['description']
                 );
@@ -233,6 +235,7 @@ class BundlesDAO
                     $bundle['id_bundle'],
                     $bundle['name'],
                     $bundle['price'],
+                    $bundle['logo'],
                     $bundle['description']
                 );
             }
@@ -295,6 +298,7 @@ class BundlesDAO
                     $bundle['id_bundle'], 
                     $bundle['name'], 
                     $bundle['price'],
+                    $bundle['logo'],
                     $bundle['description']
                 );
                 

@@ -4,10 +4,6 @@ declare (strict_types=1);
 namespace models\dao;
 
 
-use models\enum\ClassTypeEnum;
-use models\_Class;
-
-
 /**
  * Responsible for representing classes.
  *

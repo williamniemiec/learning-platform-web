@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace models;
 
 
-use models\dao\AuthorizationDAO;
+use DateTime;
 use models\enum\GenreEnum;
 
 /**
@@ -33,11 +33,11 @@ class Admin extends User
      * administrator has
      * @param       string $name Administrator name
      * @param       GenreEnum $genre Administrator genre
-     * @param       string $birthdate Administrator birthdate
+     * @param       DateTime $birthdate Administrator birthdate
      * @param       string $email Administrator email
      */
     public function __construct(int $id, Authorization $authorization, string $name, 
-        GenreEnum $genre, string $birthdate, string $email)
+        GenreEnum $genre, DateTime $birthdate, string $email)
     {
         $this->id = $id;
         $this->authorization = $authorization;

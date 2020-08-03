@@ -3,6 +3,8 @@ declare (strict_types=1);
 
 namespace models;
 
+use DateTime;
+
 
 /**
  * Responsible for representing messages of a support topic or a class.
@@ -19,6 +21,7 @@ class Message
     private $user;
     private $date;
     private $message;
+    private $id;
     
     
     //-------------------------------------------------------------------------
@@ -29,13 +32,15 @@ class Message
      *
      * @param       User $user User who answered the topic
      * @param       string $date Message posting date
-     * @param       string $message Message content
+     * @param       DateTime $message Message content
+     * @param       int $id [Optional] Message id
      */
-    public function __construct(User $user, string $date, string $message)
+    public function __construct(User $user, DateTime $date, string $message, int $id = -1)
     {
         $this->user = $user;
         $this->date = $date;
         $this->message = $message;
+        $this->id = $id;
     }
     
     
@@ -44,7 +49,7 @@ class Message
     //-------------------------------------------------------------------------
     /**
      * Gets user who created the message.
-     * 
+     *
      * @return      User User who created the message
      */
     public function getCreator() : int
@@ -55,9 +60,9 @@ class Message
     /**
      * Gets message creation date.
      *
-     * @return      string Message creation date
+     * @return      DateTime Message creation date
      */
-    public function getDate() : string
+    public function getDate() : DateTime
     {
         return $this->date;
     }
@@ -70,5 +75,15 @@ class Message
     public function getContent() : string
     {
         return $this->text;
+    }
+    
+    /**
+     * Gets message id.
+     *
+     * @return      int Message id or -1 if there is no id
+     */
+    public function getId() : int
+    {
+        return $this->id;
     }
 }

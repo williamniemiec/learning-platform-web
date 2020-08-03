@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace models;
 
+use DateTime;
 use models\enum\GenreEnum;
 
 
@@ -61,9 +62,9 @@ abstract class User
     /**
      * Gets user birthdate.
      * 
-     * @return      string User birthdate
+     * @return      DateTime User birthdate
      */
-    public function getBirthdate() : string
+    public function getBirthdate() : DateTime
     {
         return $this->birthdate;
     }

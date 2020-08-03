@@ -49,16 +49,6 @@ class AdminsDAO
     //        Methods
     //-------------------------------------------------------------------------
     /**
-     * Checks whether an admin is logged.
-     *
-     * @return      bool If admin is logged or not
-     */
-    public static function isLogged() : bool
-    {
-        return !empty($_SESSION['a_login']);
-    }
-    
-    /**
      * Checks whether the supplied credentials are valid.
      *
      * @param       string $email Student email
@@ -397,7 +387,7 @@ class AdminsDAO
                 new Authorization($admin['authorization.name'], $admin['authorization.level']), 
                 $admin['admins.name'], 
                 $admin['admins.genre'], 
-                $admin['admins.birthdate'], 
+                new \DateTime($admin['admins.birthdate']), 
                 $admin['admins.email']
             );
         }
