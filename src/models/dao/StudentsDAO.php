@@ -9,6 +9,7 @@ use models\Student;
 use models\_Class;
 use models\enum\GenreEnum;
 use models;
+use models\util\DataUtil;
 
 
 /**
@@ -331,7 +332,7 @@ class StudentsDAO
             unlink("assets/images/profile_photos/".$imageName);
         
         if (!empty($photo)) {
-            if (empty($photo['tmp_name']) || $this->isPhoto($photo))
+            if (empty($photo['tmp_name']) || DataUtil::isPhoto($photo))
                 throw new \InvalidArgumentException("Invalid photo");
             
             $extension = explode("/", $photo['type'])[1];
@@ -546,63 +547,5 @@ class StudentsDAO
         $sql->execute(array($email));
 
         return $sql->fetch()['count'] > 0;
-    }
-    
-    /**
-     * Gets photo from current student.
-     *
-     * @return      string Photo filename or empty string if there is no photo
-     *
-     * @throws      \InvalidArgumentException If student id provided in the 
-     * constructor is empty, less than or equal to zero
-     */
-    private function getPhoto() : string
-    {
-        if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-            
-        $response = "";
-        
-        // Query construction
-        $sql = $this->db->prepare("
-            SELECT  photo
-            FROM    students
-            WHERE   id_student = ?
-        ");
-            
-        // Executes query
-        $sql->execute(array($this->id_student));
-        
-        // Parses result
-        if ($sql && $sql->rowCount() > 0) {
-            $response = $sql->fetch()['photo'];
-            
-            if (empty($response))
-                $response = "";
-        }
-        
-        return $response;
-    }
-    
-    /**
-     * Checks if a submitted photo is really a photo.
-     *
-     * @param       array $photo Submitted photo (from $_FILES)
-     * 
-     * @return      boolean If the photo is really a photo
-     * 
-     * @throws      \InvalidArgumentException If photo is empty
-     */
-    private function isPhoto(array $photo) : bool
-    {
-        if (empty($photo))
-            throw new \InvalidArgumentException("Photo cannot be empty");
-        
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $photo['tmp_name']);
-        finfo_close($finfo);
-        
-        return explode("/", $mime)[0] == "image";
     }
 }
