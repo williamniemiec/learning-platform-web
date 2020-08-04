@@ -11,6 +11,11 @@ body {
 	background-color:				var(--color-primary);
 	background-image:				linear-gradient(315deg, var(--color-primary) 0%, var(--color-secondary) 74%);
 	background-size:				cover;
+	display: 						flex;
+    flex-direction: 				column;
+    justify-content: 				space-between;
+    flex: 							1;
+    height: 						100%;
 }
 
 main {

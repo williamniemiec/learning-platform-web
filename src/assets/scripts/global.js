@@ -1,7 +1,7 @@
 $(function() {
 	// Fix footer
-	updateFooter()
-	$(window).resize(updateFooter)
+	//updateFooter()
+	//$(window).resize(updateFooter)
 	
 	// Activates bootstrap tooltips
 	$("[data-toggle='tooltip']").tooltip()
