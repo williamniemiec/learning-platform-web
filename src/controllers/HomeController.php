@@ -5,10 +5,15 @@ use core\Controller;
 use models\Students;
 use models\Admins;
 use models\Courses;
+use models\Student;
 
 
 /**
  * Main controller. It will be responsible for site's main page behavior.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class HomeController extends Controller 
 {
@@ -16,13 +21,13 @@ class HomeController extends Controller
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * It will check if student is logged; otherwise, redirects him to login
+     * It will check if student is logged; otherwise, redirects him to home
      * page.
      */
     public function __construct()
     {
-        if (!Students::isLogged()){
-            header("Location: ".BASE_URL."login");
+        if (Student::isLogged()) {
+            header("Location: ".BASE_URL);
             exit;
         }
     }

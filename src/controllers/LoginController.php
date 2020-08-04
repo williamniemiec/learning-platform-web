@@ -10,11 +10,26 @@ use models\Student;
  * Responsible for the behavior of the view {@link login.php}.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class LoginController extends Controller
 {      
+    //-------------------------------------------------------------------------
+    //        Constructor
+    //-------------------------------------------------------------------------
+    /**
+     * Checks if student is logged in. If yes, redirects him to home page.
+     */
+    public function __construct()
+    {
+        if (Student::isLogged()) {
+            header("Location: ".BASE_URL);
+            exit;
+        }
+    }
+    
+    
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
