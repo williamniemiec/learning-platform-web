@@ -19,7 +19,7 @@ class MySqlPDODatabase extends PDODatabase
      * {@inheritdoc}
      * @Override
      */
-    private function getInstance()
+    protected function getInstance()
     {
         $this->conn = new \PDO(
             "mysql:dbname=".$this->getDatabase().";

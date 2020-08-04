@@ -6,9 +6,9 @@ namespace database;
 
 /**
  * Class responsible for connecting to the database.
- *
+ * 
  * @apiNote     The documentation was obtained in conjunction with the PDO class.
- *
+ * 
  * @link https://www.php.net/manual/pt_BR/book.pdo.php
  */
 abstract class Database
@@ -21,7 +21,7 @@ abstract class Database
     private $host = "";
     private $username = "";
     private $password = "";
-    protected $conn = null;
+    protected $conn = null; 
     
     
     //-------------------------------------------------------------------------
@@ -29,7 +29,7 @@ abstract class Database
     //-------------------------------------------------------------------------
     /**
      * Connects to the database.
-     *
+     * 
      * @return      Database Connected database
      */
     public function getConnection() : Database
@@ -43,10 +43,10 @@ abstract class Database
     
     /**
      * Set an attribute.
-     *
+     * 
      * @param       int $attribute Attribute to be set
-     * @param       mixed $value Attribute's value
-     *
+     * @param       mixed $value Attribute's value 
+     * 
      * @return      bool True on success or false on failure
      */
     public abstract function setAttribute(int $attribute, $value) : bool;
@@ -54,7 +54,7 @@ abstract class Database
     /**
      * Executes an SQL statement, returning a result set as an object.
      *
-     * @return      DatabaseStatement Returns a statement object, or null on
+     * @return      DatabaseStatement Returns a statement object, or null on 
      * failure.
      */
     public abstract function query(string $statement) : DatabaseStatement;
@@ -62,10 +62,10 @@ abstract class Database
     /**
      * Prepares a statement for execution and returns a statement object.
      *
-     * @param       string $statement This must be a valid SQL statement
+     * @param       string $statement This must be a valid SQL statement 
      * template for the target database server.
      *
-     * @return      DatabaseStatement If the database server successfully
+     * @return      DatabaseStatement If the database server successfully 
      * prepares the statement, returns a PDOStatement object. If the database
      * server cannot successfully prepare the statement, returns null;
      */
@@ -86,12 +86,12 @@ abstract class Database
     /**
      * Gets database instance that will be used to connect to the database.
      */
-    private abstract function getInstance();
+    protected abstract function getInstance();
     
     /**
      * Sets environment and connects to the database.
      */
-    private function conect()
+    private function conect() : void
     {
         if (ENVIRONMENT == "development") {
             $this->host = "127.0.0.1";

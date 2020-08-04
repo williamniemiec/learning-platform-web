@@ -31,21 +31,21 @@ abstract class DatabaseStatement
     
     /**
      * Fetches the next row from a result set.
-     *
-     * @param       bool $withTableName If true array keys will be:
-     * <b><code>table_name.attribute</code></b> <br />
+     * 
+     * @param       bool $withTableName If true array keys will be: 
+     * <b><code>table_name.attribute</code></b> <br /> 
      * Otherwise, array keys will be: <b><code>attribute</code></b>
-     *
-     * @return     array Return an array containing the row in the result set
-     * or empty array on failure.
+     * 
+     * @return     array Return an array containing the row in the result set 
+     * or empty array on failure. 
      */
     public abstract function fetch(bool $withTableName = false) : array;
     
     /**
      * Returns an array containing all of the result set rows.
      *
-     * @param       bool $withTableName If true array keys of each position
-     * will be: <b><code>table_name.attribute</code></b> <br />
+     * @param       bool $withTableName If true array keys of each position 
+     * will be: <b><code>table_name.attribute</code></b> <br /> 
      * Otherwise, array keys will be: <b><code>attribute</code></b>
      *
      * @return      array Returns an array containing all of the remaining rows

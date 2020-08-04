@@ -5,6 +5,7 @@ namespace database\pdo;
 
 
 use database\Database;
+use database\DatabaseStatement;
 
 
 /**
@@ -30,7 +31,7 @@ abstract class PDODatabase extends Database
      * {@inheritdoc}
      * @Override
      */
-    public function prepare(string $statement)
+    public function prepare(string $statement) : DatabaseStatement
     {
         $statement = $this->conn->prepare($statement);
         
@@ -42,7 +43,7 @@ abstract class PDODatabase extends Database
      * {@inheritdoc}
      * @Override
      */
-    public function query(string $statement)
+    public function query(string $statement) : DatabaseStatement
     {
         $statement = $this->conn->query($statement);
         
@@ -63,5 +64,5 @@ abstract class PDODatabase extends Database
      * {@inheritdoc}
      * @Override
      */
-    private abstract function getInstance();
+    protected abstract function getInstance();
 }

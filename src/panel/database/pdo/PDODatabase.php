@@ -5,11 +5,12 @@ namespace database\pdo;
 
 
 use database\Database;
+use database\DatabaseStatement;
 
 
 /**
  * Connects to the database via PDO.
- *
+ * 
  * @link https://www.php.net/manual/pt_BR/book.pdo.php
  */
 abstract class PDODatabase extends Database
@@ -30,26 +31,26 @@ abstract class PDODatabase extends Database
      * {@inheritdoc}
      * @Override
      */
-    public function prepare(string $statement)
+    public function prepare(string $statement) : DatabaseStatement
     {
         $statement = $this->conn->prepare($statement);
         
         
         return $statement == false ? null : new PDODatabaseStatement($this->conn, $statement);
     }
-    
+
     /**
      * {@inheritdoc}
      * @Override
      */
-    public function query(string $statement)
+    public function query(string $statement) : DatabaseStatement
     {
         $statement = $this->conn->query($statement);
         
         
         return $statement == false ? null : new PDODatabaseStatement($this->conn, $statement);
     }
-    
+
     /**
      * {@inheritdoc}
      * @Override
@@ -63,5 +64,5 @@ abstract class PDODatabase extends Database
      * {@inheritdoc}
      * @Override
      */
-    private abstract function getInstance();
+    protected abstract function getInstance();
 }

@@ -86,12 +86,12 @@ abstract class Database
     /**
      * Gets database instance that will be used to connect to the database.
      */
-    private abstract function getInstance();
+    protected abstract function getInstance();
     
     /**
      * Sets environment and connects to the database.
      */
-    private function conect()
+    private function conect() : void
     {
         if (ENVIRONMENT == "development") {
             $this->host = "127.0.0.1";

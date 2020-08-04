@@ -52,13 +52,13 @@ class PDODatabaseStatement extends DatabaseStatement
     public function fetchAll(bool $withTableName = false): array
     {
         if ($withTableName)
-            $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
-            
-            $result = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
-            
-            return $result == false ? array() : $result;
+           $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
+        
+        $result = $this->statement->fetchAll(\PDO::FETCH_ASSOC);    
+        
+        return $result == false ? array() : $result;
     }
-    
+
     /**
      * {@inheritdoc}
      * @Override
@@ -67,12 +67,12 @@ class PDODatabaseStatement extends DatabaseStatement
     {
         if ($withTableName)
             $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
-            
-            $result = $this->statement->fetch(\PDO::FETCH_ASSOC);
-            
-            return $result == false ? array() : $result;
+        
+        $result = $this->statement->fetch(\PDO::FETCH_ASSOC);
+        
+        return $result == false ? array() : $result;
     }
-    
+
     /**
      * {@inheritdoc}
      * @Override
