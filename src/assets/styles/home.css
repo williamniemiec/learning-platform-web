@@ -1,64 +1,44 @@
-/* Home */
-.home h1 {
-	color:							var(--text-color);
+/* PARALLAX */
+.parallax {
+	margin-top:100px;
+	background-image: url('/assets/img/php.png');
+		background-color:#eee;
+	height:200px;
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size:cover;
 }
 
-.home .courses {
-	display:						flex;
-	color:							var(--text-dark);
-	flex-wrap:						wrap;
-	margin-top:						30px;
-	justify-content:				center;
+.parallax-container {
+	height:100%;
+	display:flex;
+	flex:1;
+	flex-direction:column;
+	justify-content:space-around;
 }
 
-.home .course img {
-	display:						block;
-	max-width:						250px;
-	margin:							auto;
-	border-radius:					5px;
-	height:							140px;
+.parallax-title, 
+.parallax-caption {
+	display:flex;
+	flex:1;
+	align-items:center;
 }
 
-.home .course {
-	text-align:						center;
-	margin-right:					20px;
-	background-color:				var(--color-snow);
-	border-radius:					5px;
-	border:							1px solid var(--border-light);
-	width:							300px;
-	min-height:						300px;
-	padding:						15px 20px;
-	margin-bottom:					30px;
+.parallax-caption {
+	justify-content:space-around;
+	font-size:30px;
+	color:rgba(0,0,0,0.5);
 }
 
-.home .course .progress {
-	margin-top:						10px;
-	background-color:				var(--color-light);
+.parallax-title {
+	justify-content:center;
 }
 
-.home .course .progress .progress-bar-caption {
-	text-align:						center;
-	color:							var(--text-color);
-	width:							100%;
-}
-
-.home .course .progress .bg-success {
-	background-color:				var(--color-success)!important;
-}
-
-.home .courses a {
-	color:							var(--text-dark);
-	text-decoration:				none;
-}
-
-.home .courses .course {
-	transition:						100ms all ease-in;
-}
-
-.home .courses .course:hover {
-	transform:						scale(1.08);
-}
-
-.home .courses a:hover {
-	color:							var(--text-dark);
+/* CENTRAL AREA */
+#area-central {
+	display:flex;
+	flex:1;
+	background-color:#888;
+	height:100%;
 }

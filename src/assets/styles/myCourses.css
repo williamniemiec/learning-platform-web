@@ -1,0 +1,64 @@
+/* Home */
+.home h1 {
+	color:							var(--text-color);
+}
+
+.home .courses {
+	display:						flex;
+	color:							var(--text-dark);
+	flex-wrap:						wrap;
+	margin-top:						30px;
+	justify-content:				center;
+}
+
+.home .course img {
+	display:						block;
+	max-width:						250px;
+	margin:							auto;
+	border-radius:					5px;
+	height:							140px;
+}
+
+.home .course {
+	text-align:						center;
+	margin-right:					20px;
+	background-color:				var(--color-snow);
+	border-radius:					5px;
+	border:							1px solid var(--border-light);
+	width:							300px;
+	min-height:						300px;
+	padding:						15px 20px;
+	margin-bottom:					30px;
+}
+
+.home .course .progress {
+	margin-top:						10px;
+	background-color:				var(--color-light);
+}
+
+.home .course .progress .progress-bar-caption {
+	text-align:						center;
+	color:							var(--text-color);
+	width:							100%;
+}
+
+.home .course .progress .bg-success {
+	background-color:				var(--color-success)!important;
+}
+
+.home .courses a {
+	color:							var(--text-dark);
+	text-decoration:				none;
+}
+
+.home .courses .course {
+	transition:						100ms all ease-in;
+}
+
+.home .courses .course:hover {
+	transform:						scale(1.08);
+}
+
+.home .courses a:hover {
+	color:							var(--text-dark);
+}
