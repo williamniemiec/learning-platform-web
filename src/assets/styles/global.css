@@ -178,6 +178,11 @@ li.dropdown-item a:hover {
 }
 
 
+.view_section_header {
+	margin:							30px 0;
+}
+
+
 /* Modal */
 .modal-header  {
 	color:							var(--view-header-text);

@@ -71,14 +71,94 @@
         	</div>
     	</div>
     	
-    	<!-- Price -->
     	<div class="purchase-option">
+        	<!-- Price -->
     		<div class="purchase-price">US$ 124.23</div>
+        	<!-- Buy option (if student does not have it) -->
     		<div class="purchase-btn">Buy</div>
     	</div>
-    	<!-- Buy option (if student does not have it) -->
+    	
     	<!-- Extension bundles -->
+    	<h2 class="view_section_header">Extension bundles</h2>
+    	<div class="gallery">
+			<div class="gallery-control gallery-control-left">&lt;-</div>
+			<div class="gallery-control gallery-control-right">-&gt;</div>
+			<div class="gallery-items">
+    			<div class="gallery-item">
+    				<img class="gallery-item-thumbnail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    				<div class="gallery-item-content">
+        				<div class="gallery-item-header">name</div>
+        				<div class="gallery-item-body"><p>descriptiosafdsfdsfdsfsafasfdsfsdfsdfsn</p></div>
+        				<div class="gallery-item-footer">price</div>
+    				</div>
+    			</div>
+    			<div class="gallery-item">
+    				<img class="gallery-item-thumbnail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    				<div class="gallery-item-content">
+        				<div class="gallery-item-header">name</div>
+        				<div class="gallery-item-body"><p>descriptiosafdsfdsfdsfsafasfdsfsdfsdfsn</p></div>
+        				<div class="gallery-item-footer">price</div>
+    				</div>
+    			</div>
+    			<div class="gallery-item">
+    				<img class="gallery-item-thumbnail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    				<div class="gallery-item-content">
+        				<div class="gallery-item-header">name</div>
+        				<div class="gallery-item-body"><p>descriptiosafdsfdsfdsfsafasfdsfsdfsdfsn</p></div>
+        				<div class="gallery-item-footer">price</div>
+    				</div>
+    			</div>
+    			<div class="gallery-item">
+    				<img class="gallery-item-thumbnail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    				<div class="gallery-item-content">
+        				<div class="gallery-item-header">name</div>
+        				<div class="gallery-item-body"><p>descriptiosafdsfdsfdsfsafasfdsfsdfsdfsn</p></div>
+        				<div class="gallery-item-footer">price</div>
+    				</div>
+    			</div>
+			</div>
+		</div>
+		
     	<!-- Try something new -->
+    	<h2 class="view_section_header">Try something new</h2>
+    	<div class="gallery">
+			<div class="gallery-control gallery-control-left">&lt;-</div>
+			<div class="gallery-control gallery-control-right">-&gt;</div>
+			<div class="gallery-items">
+    			<div class="gallery-item">
+    				<img class="gallery-item-thumbnail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    				<div class="gallery-item-content">
+        				<div class="gallery-item-header">name</div>
+        				<div class="gallery-item-body"><p>descriptiosafdsfdsfdsfsafasfdsfsdfsdfsn</p></div>
+        				<div class="gallery-item-footer">price</div>
+    				</div>
+    			</div>
+    			<div class="gallery-item">
+    				<img class="gallery-item-thumbnail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    				<div class="gallery-item-content">
+        				<div class="gallery-item-header">name</div>
+        				<div class="gallery-item-body"><p>descriptiosafdsfdsfdsfsafasfdsfsdfsdfsn</p></div>
+        				<div class="gallery-item-footer">price</div>
+    				</div>
+    			</div>
+    			<div class="gallery-item">
+    				<img class="gallery-item-thumbnail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    				<div class="gallery-item-content">
+        				<div class="gallery-item-header">name</div>
+        				<div class="gallery-item-body"><p>descriptiosafdsfdsfdsfsafasfdsfsdfsdfsn</p></div>
+        				<div class="gallery-item-footer">price</div>
+    				</div>
+    			</div>
+    			<div class="gallery-item">
+    				<img class="gallery-item-thumbnail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    				<div class="gallery-item-content">
+        				<div class="gallery-item-header">name</div>
+        				<div class="gallery-item-body"><p>descriptiosafdsfdsfdsfsafasfdsfsdfsdfsn</p></div>
+        				<div class="gallery-item-footer">price</div>
+    				</div>
+    			</div>
+			</div>
+		</div>
     </div>
 	</div>
 </div>

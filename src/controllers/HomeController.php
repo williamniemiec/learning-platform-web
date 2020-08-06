@@ -44,7 +44,7 @@ class HomeController extends Controller
 	    
 	    $header = array(
 	        'title' => 'Home - Learning Platform',
-	        'styles' => array('home'),
+	        'styles' => array('home', 'gallery'),
 	        'description' => "Start learning today",
 	        'keywords' => array('learning platform', 'home'),
 	        'robots' => 'index'

@@ -34,7 +34,7 @@ class BundleController extends Controller
 	    
 	    $header = array(
 	        'title' => '<name_bundle> - Learning Platform',
-	        'styles' => array('BundleStyle'),
+	        'styles' => array('BundleStyle', 'gallery'),
 	        'description' => "<bundle_desc>",
 	        'keywords' => array('learning platform', 'bundle', '<name_bundle>'),
 	        'robots' => 'index'
