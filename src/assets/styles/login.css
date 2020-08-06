@@ -2,6 +2,7 @@
 .login {
 	margin:							auto;
 	margin-top:						100px;
+	margin-bottom:					100px;
 	max-width:						400px;
 	padding:						20px;
 	color:							var(--text-dark);
