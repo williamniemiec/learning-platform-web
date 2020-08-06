@@ -2,10 +2,9 @@
 namespace controllers;
 
 use core\Controller;
-use models\Students;
-use models\Admins;
-use models\Courses;
+use database\pdo\MySqlPDODatabase;
 use models\Student;
+use models\dao\CoursesDAO;
 
 
 /**
@@ -40,27 +39,38 @@ class HomeController extends Controller
      * @Override
      */
 	public function index ()
-	{
-	    $students = new Students($_SESSION['s_login']);
-	    $courses = new Courses($_SESSION['s_login']);
-	    
+	{   
+	    $dbConnection = new MySqlPDODatabase();
 	    
 	    $header = array(
-	        'title' => 'Home - Learning platform',
+	        'title' => 'Home - Learning Platform',
 	        'styles' => array('home'),
 	        'description' => "Start learning today",
 	        'keywords' => array('learning platform', 'home'),
 	        'robots' => 'index'
 	    );
 	    
-		$viewArgs = array(
-		    'username' => $students->getName(),
-		    'courses' => $courses->getMyCourses(),
-		    'totalCourses' => $courses->countCourses(),
-		    'header' => $header
-		);
+	    if (Student::isLogged()) {
+// 	        $student = Student::getLoggedIn($dbConnection);
+// 	        $coursesDAO = new CoursesDAO($dbConnection);
+	        
+//     		$viewArgs = array(
+//     		    'username' => $student->getName(),
+//     		    'courses' => $coursesDAO->getMyCourses($student->getId()),
+//     		    'totalCourses' => $student->countCourses(),
+//     		    'header' => $header
+//     		);
+	    }
+	    else {
+	        $viewArgs = array(
+	            'header' => $header,
+	            'total_bundles' => 10,
+	            'total_courses' => 100,
+	            'total_length' => 100000
+	        );
+	    }
 
-		$this->loadTemplate("home", $viewArgs, true);
+		$this->loadTemplate("home", $viewArgs, Student::isLogged());
 	}
 	
 	/**
@@ -68,14 +78,14 @@ class HomeController extends Controller
 	 */
 	public function logout()
 	{
-	    unset($_SESSION['s_login']);
-	    header("Location: ".BASE_URL."login");
+	    Student::logout();
+	    header("Refresh: 0");
 	}
 	
 	/**
 	 * Opens student settings.
 	 */
-	public function settings()
+	/*public function settings()
 	{
 	    $students = new Students($_SESSION['s_login']);
 	    $courses = new Courses($_SESSION['s_login']);
@@ -101,5 +111,5 @@ class HomeController extends Controller
 	    );
 	    
 	    $this->loadTemplate("settings", $viewArgs, true);
-	}
+	}*/
 }

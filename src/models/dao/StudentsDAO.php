@@ -53,11 +53,11 @@ class StudentsDAO
      * @param       string $email Student's email
      * @param       string $pass Student's password
      *
-     * @return      bool If student credentials are correct
+     * @return      Student Information about student logged in or null if credentials provided are incorrect
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function login(string $email, string $pass) : bool
+    public function login(string $email, string $pass) : Student
     {
         if (empty($email))
             throw new \InvalidArgumentException("Email cannot be empty");
@@ -65,11 +65,11 @@ class StudentsDAO
         if (empty($pass))
             throw new \InvalidArgumentException("Password cannot be empty");
         
-        $response = false;
+        $response = null;
             
         // Query construction
         $sql = $this->db->prepare("
-            SELECT  id 
+            SELECT  * 
             FROM    students 
             WHERE   email = ? AND password = ?
         ");
@@ -79,10 +79,15 @@ class StudentsDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $result = $sql->fetch();
-            $_SESSION['s_login'] = $result['id'];
-            $this->id_student = $result['id'];
-            $response = true;
+            $student = $sql->fetch();
+            
+            $response = new Student(
+                $student['name'],
+                $student['genre'],
+                new \DateTime($student['birthdate']),
+                $student['email'],
+                $student['photo']
+            );
         }
         
         return $response;

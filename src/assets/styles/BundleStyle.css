@@ -1,0 +1,107 @@
+.bundle-info {
+	display:flex;
+}
+
+.bundle-info-logo {
+	width:400px;
+	max-height: 400px;
+}
+
+.bundle-info-content {
+	display:flex;
+	flex:1;
+	margin-left:50px;
+}
+
+.bundle-info-content p {
+	margin-bottom:0;
+}
+
+table.bundle-details {
+	width:100%;
+	margin-top: 50px;
+}
+
+.bundle-details th, .bundle-details td  {
+	width:50%;	
+}
+
+/* MOSAIC */
+.mosaic {
+	margin-top:15px;
+	display: flex;
+	justify-content:space-around;
+	flex-wrap:wrap;
+}
+
+.mosaic-item {
+	display:flex;
+	flex-direction:column;
+	justify-content:center;
+	align-items:center;
+	width:150px;
+	margin: 30px 30px;
+}
+
+
+.mosaic-item-content,
+.mosaic-item-header,
+.mosaic-item-caption {
+	display:flex;
+	flex:1;
+	width:100%;
+	justify-content:center;
+	align-items:center;
+}
+
+
+.mosaic-item-thumbnail {
+	width:150px;
+	height:150px;
+	border-radius:75px;
+}
+
+.mosaic-item-content {
+	flex-direction:column;
+	margin-top:10px;
+}
+
+.mosaic-item-caption-split {
+	width:100%;
+	display:flex;
+	flex-direction:row;
+	justify-content:space-between;
+}
+
+
+
+
+
+.bundle-courses {
+	margin:30px 0;
+}
+
+
+
+.purchase-option {
+	display:flex;
+	flex-direction:row;
+	width:100%;
+	height:100px;
+}
+
+.purchase-price, .purchase-btn {
+	display:flex;
+	flex:1;
+	justify-content:center;
+	align-items:center;
+	font-size:40px;
+}
+
+.purchase-btn {
+	background-color:purple;
+}
+
+.purchase-price {
+	background-color:red;
+}

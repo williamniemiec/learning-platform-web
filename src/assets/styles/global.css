@@ -45,6 +45,10 @@ a:hover {
 	color:							var(--color-hover-link);
 }
 
+.container {
+	height:							100%;
+}
+
 .text_centered {
 	text-align:						center;
 }

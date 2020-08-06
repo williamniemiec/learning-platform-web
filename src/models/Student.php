@@ -5,6 +5,8 @@ namespace models;
 
 use DateTime;
 use models\enum\GenreEnum;
+use models\dao\StudentsDAO;
+use database\Database;
 
 
 /**
@@ -58,6 +60,33 @@ class Student extends User
     public static function isLogged() : bool
     {
         return !empty($_SESSION['s_login']);
+    }
+    
+//     public static function login(Database $db, string $email, string $password) : Student
+//     {
+//         $studentsDAO = new StudentsDAO($db);
+        
+//         return $studentsDAO->login($email, $password);
+//     }
+    
+    
+    /**
+     * Gets logged in student.
+     * 
+     * @param       Database $db Database
+     */
+    public static function getLoggedIn(Database $db) : Student
+    {
+        $studentsDAO = new StudentsDAO($db);
+        $studentsDAO->get($_SESSION['s_login']);
+    }
+    
+    /**
+     * Logout current student.
+     */
+    public static function logout() : void
+    {
+        unset($_SESSION['s_login']);
     }
     
     

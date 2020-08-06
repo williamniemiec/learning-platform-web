@@ -11,6 +11,10 @@ class ComposerStaticInit3ba7a62a39a5e36056dbebde813798b8
         array (
             'models\\' => 7,
         ),
+        'd' => 
+        array (
+            'database\\' => 9,
+        ),
         'c' => 
         array (
             'core\\' => 5,
@@ -22,6 +26,10 @@ class ComposerStaticInit3ba7a62a39a5e36056dbebde813798b8
         'models\\' => 
         array (
             0 => __DIR__ . '/../..' . '/models',
+        ),
+        'database\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/database',
         ),
         'core\\' => 
         array (

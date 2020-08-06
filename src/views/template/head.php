@@ -16,7 +16,7 @@
 <title><?php echo $title; ?></title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-<link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/bootstrap/boobootstrap.min.css' />
+<link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/bootstrap/bootstrap.min.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/scrollbar_light/jquery.mCustomScrollbar.min.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/scrollbar_light/scrollbar_light.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL."assets/styles/colors/".THEME.".css"; ?>' />
