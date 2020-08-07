@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace models;
 
+
 use DateTime;
 use models\enum\GenreEnum;
 use models\dao\StudentsDAO;
@@ -38,7 +39,7 @@ class Student extends User
      * @param       string $photo [Optional] Name of the student photo file
      */
     public function __construct(int $id, string $name, GenreEnum $genre, 
-        DateTime $birthdate, string $email, string $photo = '')
+        DateTime $birthdate, string $email, ?string $photo = '')
     {
         $this->id = $id;
         $this->name = $name;
@@ -62,12 +63,25 @@ class Student extends User
         return !empty($_SESSION['s_login']);
     }
     
-//     public static function login(Database $db, string $email, string $password) : Student
-//     {
-//         $studentsDAO = new StudentsDAO($db);
+    /**
+     * Checks if login has been successfully or failed.
+     *
+     * @param       string $email Student's email
+     * @param       string $password Student's password
+     *
+     * @return      Student Information about student logged in or null if 
+     * login failed
+     */
+    public static function login(Database $db, string $email, string $password) : ?Student
+    {
+        $studentsDAO = new StudentsDAO($db);
+        $student = $studentsDAO->login($email, $password);
         
-//         return $studentsDAO->login($email, $password);
-//     }
+        if (!empty($student))
+            $_SESSION['s_login'] = $student->getId();
+        
+        return $student;
+    }
     
     
     /**
