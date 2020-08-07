@@ -63,13 +63,13 @@ abstract class ClassesDAO
             $response = $sql->fetch();
             
             if ($response['class_type'] == 'video') {
-                $videos = new VideosDAO($this->db);
+                $videosDAO = new VideosDAO($this->db);
                 
-                $response = $videos->get($response['id_module'], 1);
+                $response = $videosDAO->get($response['id_module'], 1);
             } else {
-                $quests = new QuestionnairesDAO($this->db);
+                $questionnairesDAO = new QuestionnairesDAO($this->db);
                 
-                $response = $quests->get($response['id_module'], 1);
+                $response = $questionnairesDAO->get((int)$response['id_module'], 1);
             }
         }
         

@@ -80,11 +80,11 @@ class VideosDAO
             $class = $sql->fetch(\PDO::FETCH_ASSOC);
             
             $response = new Video(
-                $class['id_module'],
-                $class['class_order'],
+                (int)$class['id_module'],
+                (int)$class['class_order'],
                 $class['title'],
                 $class['videoID'],
-                $class['length'],
+                (int)$class['length'],
                 $class['description']
             ); 
         }
@@ -125,11 +125,11 @@ class VideosDAO
             
             foreach ($classes as $class) {
                 $response[] = new Video(
-                    $class['id_module'], 
-                    $class['class_order'], 
+                    (int)$class['id_module'], 
+                    (int)$class['class_order'], 
                     $class['title'], 
                     $class['videoID'], 
-                    $class['length'],
+                    (int)$class['length'],
                     $class['description']
                 );
             }

@@ -41,13 +41,13 @@ class Comment
      * @param       Message[] $replies [Optional] Comment replies
      */
     public function __construct(int $id_comment, Student $student, DateTime $date, 
-        string $text, array $replies = array())
+        string $text, ?array $replies = array())
     {
         $this->id_comment = $id_comment;
         $this->student = $student;
         $this->date = $date;
         $this->text = $text;
-        $this->replies = $replies;
+        $this->replies = empty($replies) ? array() : $replies;
     }
     
     

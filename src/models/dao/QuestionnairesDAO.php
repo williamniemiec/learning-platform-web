@@ -81,14 +81,14 @@ class QuestionnairesDAO
             $class = $sql->fetch();
             
             $response = new Questionnaire(
-                $class['id_module'],
-                $class['class_order'],
+                (int)$class['id_module'],
+                (int)$class['class_order'],
                 $class['question'],
                 $class['q1'],
                 $class['q2'],
                 $class['q3'],
                 $class['q4'],
-                $class['answer']
+                (int)$class['answer']
             ); 
         }
         
@@ -173,14 +173,14 @@ class QuestionnairesDAO
             
             foreach ($classes as $class) {
                 $response[] = new Questionnaire(
-                    $class['id_module'], 
-                    $class['class_order'], 
+                    (int)$class['id_module'], 
+                    (int)$class['class_order'], 
                     $class['question'], 
                     $class['q1'], 
                     $class['q2'], 
                     $class['q3'], 
                     $class['q4'], 
-                    $class['answer']
+                    (int)$class['answer']
                 ); 
             }
         }

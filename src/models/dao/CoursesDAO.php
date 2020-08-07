@@ -86,12 +86,12 @@ class CoursesDAO
                         END AS total_classes_watched
             FROM        courses 
                         NATURAL LEFT JOIN course_modules
-                        NATURAL LEFT JOIN courses_total_length
+                        NATURAL LEFT JOIN vw_courses_total_length
                 		NATURAL LEFT JOIN (
                 			SELECT       id_module, 
                                          SUM(length) AS total_length_watched,
                                          COUNT(id_module) AS total_classes_watched
-                			FROM         student_historic_watched_length
+                			FROM         vw_student_historic_watched_length
                 			WHERE        id_student = ?
                 			GROUP BY     id_module
             			) AS tmp
@@ -106,11 +106,11 @@ class CoursesDAO
         if (!empty($name)) {
             $query .= " HAVING      name LIKE ?";
             $sql = $this->db->prepare($query);
-            $sql->execute(array($id_student, $name));
+            $sql->execute(array($id_student, $id_student, $name));
         }
         else {
             $sql = $this->db->prepare($query);
-            $sql->execute(array($id_student));
+            $sql->execute(array($id_student, $id_student));
         }
         
         // Parses results
@@ -119,15 +119,15 @@ class CoursesDAO
             
             foreach ($sql->fetchAll() as $course) {
                 $response[$i]['course'] = new Course(
-                    $course['id_course'], 
+                    (int)$course['id_course'], 
                     $course['name'],
                     $course['logo'],
                     $course['description']
                 );
                 
-                $response[$i]['course']->setTotalLength($course['total_length']);
-                $response[$i]['total_classes_watched'] = $course['total_classes_watched'];
-                $response[$i]['total_length_watched'] = $course['total_length_watched'];
+                $response[$i]['course']->setTotalLength((int)$course['total_length']);
+                $response[$i]['total_classes_watched'] = (int)$course['total_classes_watched'];
+                $response[$i]['total_length_watched'] = (int)$course['total_length_watched'];
                 
                 $i++;
             }
@@ -212,7 +212,7 @@ class CoursesDAO
             
             foreach ($courses as $course) {
                 $response[] = new Course(
-                    $course['id_course'],
+                    (int)$course['id_course'],
                     $course['name'],
                     $course['logo'],
                     $course['description']
@@ -256,7 +256,7 @@ class CoursesDAO
             $course = $sql->fetch();
             
             $response = new Course(
-                $course['id_course'],
+                (int)$course['id_course'],
                 $course['name'],
                 $course['logo'],
                 $course['description']

@@ -120,7 +120,7 @@ class CommentsDAO
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $comment) {
                 $response[] = new Comment(
-                    $comment['id_comment'], 
+                    (int)$comment['id_comment'], 
                     $comment['student'], 
                     new \DateTime($comment['date']), 
                     $comment['text']
@@ -210,10 +210,10 @@ class CommentsDAO
             
             foreach ($replies as $reply) {
                 $response[] = new Message(
-                    $students->get($reply['id_student']),
+                    (int)$students->get($reply['id_student']),
                     new \DateTime($reply['date']), 
                     $reply['text'],
-                    $reply['id_reply']
+                    (int)$reply['id_reply']
                 );                
             }
         }

@@ -84,16 +84,16 @@ class NotebookDAO
             $note = $sql->fetch(true);
             
             $response = new Note(
-                $note['notebook.id_note'],
+                (int)$note['notebook.id_note'],
                 $note['notebook.content'],
                 $note['notebook.note'],
                 new \DateTime($note['notebook.date']),
                 new Video(
-                    $note['videos.id_module'],
-                    $note['videos.class_order'],
+                    (int)$note['videos.id_module'],
+                    (int)$note['videos.class_order'],
                     $note['videos.title'],
                     $note['videos.videoID'],
-                    $note['videos.length'],
+                    (int)$note['videos.length'],
                     $note['videos.description']
                 )
             );
@@ -149,16 +149,16 @@ class NotebookDAO
             $note = $sql->fetchAll(true);
             
             $response[] = new Note(
-                $note['notebook.id_note'],
+                (int)$note['notebook.id_note'],
                 $note['notebook.content'],
                 $note['notebook.note'],
                 new \DateTime($note['notebook.date']),
                 new Video(
-                    $note['videos.id_module'],
-                    $note['videos.class_order'],
+                    (int)$note['videos.id_module'],
+                    (int)$note['videos.class_order'],
                     $note['videos.title'],
                     $note['videos.videoID'],
-                    $note['videos.length'],
+                    (int)$note['videos.length'],
                     $note['videos.description']
                 )
             );
@@ -285,16 +285,16 @@ class NotebookDAO
             $note = $sql->fetchAll(true);
             
             $response[] = new Note(
-                $note['notebook.id_note'],
+                (int)$note['notebook.id_note'],
                 $note['notebook.content'],
                 $note['notebook.note'],
                 new \DateTime($note['notebook.date']),
                 new Video(
-                    $note['videos.id_module'],
-                    $note['videos.class_order'],
+                    (int)$note['videos.id_module'],
+                    (int)$note['videos.class_order'],
                     $note['videos.title'],
                     $note['videos.videoID'],
-                    $note['videos.length'],
+                    (int)$note['videos.length'],
                     $note['videos.description']
                 )
             );

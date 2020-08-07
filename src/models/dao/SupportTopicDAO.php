@@ -78,13 +78,13 @@ class SupportTopicDAO
             $students = new StudentsDAO($this->db);
             
             $response = new SupportTopicDAO(
-                $supportTopic['id_topic'],
-                $students->get($supportTopic['id_student']), 
+                (int)$supportTopic['id_topic'],
+                $students->get((int)$supportTopic['id_student']), 
                 $supportTopic['title'], 
                 $supportTopic['name'], 
                 new \DateTime($supportTopic['date']), 
                 $supportTopic['message'], 
-                $supportTopic['closed']
+                (int)$supportTopic['closed']
             );
         }
         
@@ -314,18 +314,18 @@ class SupportTopicDAO
             foreach ($replies as $reply) {
                 if ($reply['user_type'] == 0) {
                     $students = new StudentsDAO($this->db);
-                    $user = $students->get($reply['id_user']);
+                    $user = $students->get((int)$reply['id_user']);
                 }
                 else {
                     $admins = new AdminsDAO($this->db);
-                    $user = $admins->get($reply['id_user']);
+                    $user = $admins->get((int)$reply['id_user']);
                 }
                 
                 $response[] = new Message(
                     $user, 
                     new \DateTime($reply['date']), 
                     $reply['text'],
-                    $reply['id_reply']
+                    (int)$reply['id_reply']
                 );
             }
         }
@@ -377,13 +377,13 @@ class SupportTopicDAO
             
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $supportTopic) {
                 $response = new SupportTopicDAO(
-                    $supportTopic['id_topic'],
-                    $students->get($supportTopic['id_student']),
+                    (int)$supportTopic['id_topic'],
+                    $students->get((int)$supportTopic['id_student']),
                     $supportTopic['title'],
                     $supportTopic['name'],
                     new \DateTime($supportTopic['date']),
                     $supportTopic['message'],
-                    $supportTopic['closed']
+                    (int)$supportTopic['closed']
                 );
             }
         }
@@ -430,13 +430,13 @@ class SupportTopicDAO
             
             foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $supportTopic) {
                 $response = new SupportTopicDAO(
-                    $supportTopic['id_topic'],
-                    $students->get($supportTopic['id_student']),
+                    (int)$supportTopic['id_topic'],
+                    $students->get((int)$supportTopic['id_student']),
                     $supportTopic['title'],
                     $supportTopic['name'],
                     new \DateTime($supportTopic['date']),
                     $supportTopic['message'],
-                    $supportTopic['closed']
+                    (int)$supportTopic['closed']
                 );
             }
         }
@@ -464,7 +464,7 @@ class SupportTopicDAO
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $category) {
                 $response[] = new SupportTopicCategory(
-                    $category['id_category'],
+                    (int)$category['id_category'],
                     $category['name']
                 );
             }

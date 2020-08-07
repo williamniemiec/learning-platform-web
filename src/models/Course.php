@@ -41,7 +41,7 @@ class Course
      * @param       string $logo [Optional] Name of the course logo file
      * @param       string $description [Optional] Course description
      */
-    public function __construct(int $id_course, string $name, string $logo = '', string $description = '')
+    public function __construct(int $id_course, string $name, ?string $logo = '', ?string $description = '')
     {
         $this->id_course = $id_course;
         $this->name = $name;

@@ -75,9 +75,9 @@ class BundlesDAO
         if ($sql && $sql->rowCount() > 0) {
             $bundle = $sql->fetch();
             $response = new Bundle(
-                $bundle['id_bundle'], 
+                (int)$bundle['id_bundle'], 
                 $bundle['name'], 
-                $bundle['price'],
+                (float)$bundle['price'],
                 $bundle['logo'],
                 $bundle['description']
             );
@@ -169,10 +169,10 @@ class BundlesDAO
             
             foreach ($bundles as $bundle) {
                 $response[$i]['bundle'] = new Bundle(
-                    $bundle['id_bundle'],
+                    (int)$bundle['id_bundle'],
                     $bundle['name'],
                     $bundle['logo'],
-                    $bundle['price'],
+                    (float)$bundle['price'],
                     $bundle['description']
                 );
                 
@@ -232,9 +232,9 @@ class BundlesDAO
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $bundle) {
                 $response[] = new Bundle(
-                    $bundle['id_bundle'],
+                    (int)$bundle['id_bundle'],
                     $bundle['name'],
-                    $bundle['price'],
+                    (float)$bundle['price'],
                     $bundle['logo'],
                     $bundle['description']
                 );
@@ -295,9 +295,9 @@ class BundlesDAO
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $bundle) {
                 $response[] = new Bundle(
-                    $bundle['id_bundle'], 
+                    (int)$bundle['id_bundle'], 
                     $bundle['name'], 
-                    $bundle['price'],
+                    (float)$bundle['price'],
                     $bundle['logo'],
                     $bundle['description']
                 );

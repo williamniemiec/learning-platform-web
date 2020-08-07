@@ -88,11 +88,15 @@ class Student extends User
      * Gets logged in student.
      * 
      * @param       Database $db Database
+     * 
+     * @return      Student Student logged in or null if there is no student 
+     * logged in
      */
-    public static function getLoggedIn(Database $db) : Student
+    public static function getLoggedIn(Database $db) : ?Student
     {
-        $studentsDAO = new StudentsDAO($db);
-        $studentsDAO->get($_SESSION['s_login']);
+        $studentsDAO = new StudentsDAO($db, $_SESSION['s_login']);
+        
+        return $studentsDAO->get();
     }
     
     /**

@@ -93,15 +93,14 @@ class NotificationsDAO
             
             foreach ($notifications as $notification) {
                 $response[] = new Notification(
-                    $notification['id_notification'],
-                    $notification['id_student'], 
+                    (int)$notification['id_notification'],
+                    (int)$notification['id_student'], 
                     new \DateTime($notification['date']),
-                    $notification['id_reference'],
+                    (int)$notification['id_reference'],
                     new NotificationTypeEnum($notification['type']),
                     $notification['ref_text'],
-                    $notification['type'],
                     $notification['message'],
-                    $notification['read']
+                    (int)$notification['read']
                 );
             }
         }

@@ -77,7 +77,7 @@ class ModulesDAO
             
             foreach ($modules as $module) {
                 $response[] = new Module(
-                    $module['id_module'], 
+                    (int)$module['id_module'], 
                     $module['name']
                 );
             }

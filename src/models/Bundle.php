@@ -44,7 +44,7 @@ class Bundle
      * @param       string $description [Optional] Bundle description
      */
     public function __construct(int $id_bundle, string $name, float $price, 
-        string $logo = '', string $description = '')
+        ?string $logo = '', ?string $description = '')
     {
         $this->id_bundle = $id_bundle;
         $this->name = $name;

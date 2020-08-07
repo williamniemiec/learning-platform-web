@@ -53,11 +53,12 @@ class StudentsDAO
      * @param       string $email Student's email
      * @param       string $pass Student's password
      *
-     * @return      Student Information about student logged in or null if credentials provided are incorrect
+     * @return      Student Information about student logged in or null if 
+     * credentials provided are incorrect
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function login(string $email, string $pass) : Student
+    public function login(string $email, string $pass) : ?Student
     {
         if (empty($email))
             throw new \InvalidArgumentException("Email cannot be empty");
@@ -80,10 +81,11 @@ class StudentsDAO
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $student = $sql->fetch();
-            
+            var_dump($student);
             $response = new Student(
+                (int)$student['id_student'],
                 $student['name'],
-                $student['genre'],
+                new GenreEnum($student['genre']),
                 new \DateTime($student['birthdate']),
                 $student['email'],
                 $student['photo']
@@ -102,7 +104,7 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor is empty, less than or equal to zero
      */
-    public function get() : array
+    public function get() : Student
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
@@ -125,8 +127,9 @@ class StudentsDAO
             $student = $sql->fetch();
             
             $response = new Student(
+                (int)$student['id_student'],
                 $student['name'], 
-                $student['genre'], 
+                new GenreEnum($student['genre']), 
                 new \DateTime($student['birthdate']), 
                 $student['email'],
                 $student['photo'] 
@@ -185,16 +188,16 @@ class StudentsDAO
                 $videos = new VideosDAO($this->db);
                 
                 $response = $videos->get(
-                    $class['id_module'], 
-                    $class['class_order']
+                    (int)$class['id_module'], 
+                    (int)$class['class_order']
                 ); 
             }
             else {
                 $questionnaries = new QuestionnairesDAO($this->db);
                 
                 $response = $questionnaries->get(
-                    $class['id_module'],
-                    $class['class_order']
+                    (int)$class['id_module'],
+                    (int)$class['class_order']
                 ); 
             }
         }
