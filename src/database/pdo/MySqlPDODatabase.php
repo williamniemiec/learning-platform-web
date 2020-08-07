@@ -21,7 +21,7 @@ class MySqlPDODatabase extends PDODatabase
      */
     protected function getInstance()
     {
-        $this->conn = new \PDO(
+        return new \PDO(
             "mysql:dbname=".$this->getDatabase().";
             host=".$this->getHost().";
             charset=".$this->getCharset(),

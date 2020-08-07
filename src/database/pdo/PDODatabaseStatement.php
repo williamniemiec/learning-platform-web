@@ -63,7 +63,7 @@ class PDODatabaseStatement extends DatabaseStatement
      * {@inheritdoc}
      * @Override
      */
-    public function fetch(bool $withTableName = false)
+    public function fetch(bool $withTableName = false) : array
     {
         if ($withTableName)
             $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);

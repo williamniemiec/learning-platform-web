@@ -21,7 +21,7 @@ abstract class Database
     private $host = "";
     private $username = "";
     private $password = "";
-    protected $conn = null; 
+    protected $conn; 
     
     
     //-------------------------------------------------------------------------
@@ -91,7 +91,7 @@ abstract class Database
     /**
      * Sets environment and connects to the database.
      */
-    private function conect() : void
+    private function connect() : void
     {
         if (ENVIRONMENT == "development") {
             $this->host = "127.0.0.1";
@@ -137,6 +137,6 @@ abstract class Database
     
     protected function getPassword()
     {
-        return $this->getPassword();
+        return $this->password;
     }
 }

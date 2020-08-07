@@ -36,7 +36,7 @@ abstract class PDODatabase extends Database
         $statement = $this->conn->prepare($statement);
         
         
-        return $statement == false ? null : new PDODatabaseStatement($this->conn, $statement);
+        return $statement == false ? null : new PDODatabaseStatement($this, $statement);
     }
 
     /**
