@@ -19,6 +19,6 @@ class OrderDirectionEnum extends Enumeration
     //-------------------------------------------------------------------------
     //        Enumerations
     //-------------------------------------------------------------------------
-    public static const ASCENDING = 'asc';
-    public static const DESCENDING = 'desc';
+    public const ASCENDING = 'asc';
+    public const DESCENDING = 'desc';
 }

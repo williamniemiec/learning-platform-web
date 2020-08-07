@@ -19,6 +19,6 @@ class NotificationTypeEnum extends Enumeration
     //-------------------------------------------------------------------------
     //        Enumerations
     //-------------------------------------------------------------------------
-    public static const COMMENT = 0;
-    public static const SUPPORT_TOPIC = 1;
+    public const COMMENT = 0;
+    public const SUPPORT_TOPIC = 1;
 }

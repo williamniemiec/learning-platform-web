@@ -19,6 +19,6 @@ class ClassTypeEnum extends Enumeration
     //-------------------------------------------------------------------------
     //        Enumerations
     //-------------------------------------------------------------------------
-    public static const VIDEO = '0';
-    public static const QUESTIONNAIRE = '1';
+    public const VIDEO = '0';
+    public const QUESTIONNAIRE = '1';
 }
