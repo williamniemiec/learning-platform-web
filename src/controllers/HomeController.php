@@ -44,31 +44,29 @@ class HomeController extends Controller
 	    
 	    $header = array(
 	        'title' => 'Home - Learning Platform',
-	        'styles' => array('home', 'gallery'),
+	        'styles' => array('home', 'gallery', 'searchBar'),
 	        'description' => "Start learning today",
 	        'keywords' => array('learning platform', 'home'),
 	        'robots' => 'index'
 	    );
 	    
-// 	    if (Student::isLogged()) {
-// // 	        $student = Student::getLoggedIn($dbConnection);
-// // 	        $coursesDAO = new CoursesDAO($dbConnection);
+	    if (Student::isLogged()) {
+	        $student = Student::getLoggedIn($dbConnection);
+	        $coursesDAO = new CoursesDAO($dbConnection);
 	        
-// //     		$viewArgs = array(
-// //     		    'username' => $student->getName(),
-// //     		    'courses' => $coursesDAO->getMyCourses($student->getId()),
-// //     		    'totalCourses' => $student->countCourses(),
-// //     		    'header' => $header
-// //     		);
-// 	    }
-// 	    else {
+    		$viewArgs = array(
+    		    'username' => $student->getName(),
+    		    'header' => $header
+    		);
+	    }
+	    else {
 	        $viewArgs = array(
 	            'header' => $header,
 	            'total_bundles' => 10,
 	            'total_courses' => 100,
 	            'total_length' => 100000
 	        );
-// 	    }
+	    }
 
 		$this->loadTemplate("home", $viewArgs, Student::isLogged());
 	}

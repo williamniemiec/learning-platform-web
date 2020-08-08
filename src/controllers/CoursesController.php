@@ -52,7 +52,7 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => 'My courses - Learning Platform',
-            'styles' => array('home', 'MyCoursesStyle'),
+            'styles' => array('home', 'MyCoursesStyle', 'searchBar'),
             'description' => "Start learning today",
             'keywords' => array('learning platform', 'courses'),
             'robots' => 'noindex'
@@ -66,7 +66,8 @@ class CoursesController extends Controller
 		    'username' => $student->getName(),
 		    'courses' => $courses,
 		    'totalCourses' => count($courses),
-		    'header' => $header
+		    'header' => $header,
+		    'scripts' => array('chart_progress')
 		);
 
 		// Checks if it is student's birthdate
