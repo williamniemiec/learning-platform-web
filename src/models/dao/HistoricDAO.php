@@ -36,7 +36,7 @@ class HistoricDAO
      */
     public function __construct(Database $db, int $id_student)
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty or ". 
                 "less than or equal to zero");
         
@@ -74,7 +74,7 @@ class HistoricDAO
         // Executes query
         $sql->execute(array($this->id_student, $id_course));
         
-        return $sql->fetch()['watchedClasses'];
+        return (int)$sql->fetch()['watchedClasses'];
     }
 
     /**
@@ -92,6 +92,50 @@ class HistoricDAO
 
         // Executes query
         $sql->execute(array($this->id_student))->rowCount() > 0;
+    }
+    
+    /**
+     * 
+     * Gets all classes classes watched by the student.
+     * 
+     * @param       int $id_course Course id
+     * 
+     * @return      array Classes watched by the student. It will return an 
+     * array in the following format:
+     * <code>$returnedArray[id_module][class_order] = true</code>
+     * 
+     * @throws      \InvalidArgumentException If course id is empty or less 
+     * than or equal to zero
+     */
+    public function getWatchedClassesFromCourse(int $id_course)
+    {
+        if (empty($id_course) || $id_course <= 0)
+            throw new \InvalidArgumentException("Course id cannot be empty or ".
+                "less than or equal to zero");
+        
+        $response = array();
+            
+        // Query construction
+        $sql = $this->db->prepare("
+            SELECT  id_module, class_order
+            FROM    student_historic
+            WHERE   id_student = ? AND
+                    id_module IN (SELECT    id_module
+                                  FROM      course_modules
+                                  WHERE     id_course = ?)
+        ");
+        
+        // Executes query
+        $sql->execute(array($this->id_student, $id_course));
+        
+        
+        if ($sql && $sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $class) {
+                $response[$class['id_module']][$class['class_order']] = true;                
+            }
+        }
+            
+        return $response;
     }
     
     /**
