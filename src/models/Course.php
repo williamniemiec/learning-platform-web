@@ -58,7 +58,7 @@ class Course
      * 
      * @return      int Course id
      */
-    public function getCourseId() : int
+    public function getId() : int
     {
         return $this->id_course;
     }
@@ -118,20 +118,25 @@ class Course
     /**
      * Gets the total classes of the course.
      * 
-     * @param       Database $db Database
+     * @param       Database $db [Optional] Database to get total classes
      * 
      * @return      int Total classes of the course
      *
+     * @throws      \InvalidArgumentException If total classes has not yet been
+     * set and a database is not provided to obtain this information
+     *
      * @implNote    Lazy initialization
      */
-    public function getTotalClasses(Database $db) : int
+    public function getTotalClasses(?Database $db = null) : int
     {
         if (empty($this->total_classes)) {
+            if (empty($db))
+                throw new \InvalidArgumentException("Database cannot be empty");
+            
             $courses = new CoursesDAO($db);
             $total = $courses->countClasses($this->id_course);
             
-            $this->total_classes = $total['total_classes'];
-            $this->total_length = $total['total_length'];
+            $this->total_classes = (int)$total['total_classes'];
         }
         
         return $this->total_classes;
@@ -143,17 +148,22 @@ class Course
      * @param       Database $db Database
      * 
      * @return      int Total length of the course
+     * 
+     * @throws      \InvalidArgumentException If total length has not yet been
+     * set and a database is not provided to obtain this information
      *
      * @implNote    Lazy initialization
      */
     public function getTotalLength(Database $db) : int
     {
         if (empty($this->total_length)) {
+            if (empty($db))
+                throw new \InvalidArgumentException("Database cannot be empty");
+            
             $courses = new CoursesDAO($db);
             $total = $courses->countClasses($this->id_course);
             
-            $this->total_classes = $total['total_classes'];
-            $this->total_length = $total['total_length'];
+            $this->total_length = (int)$total['total_length'];
         }
         
         return $this->total_length;

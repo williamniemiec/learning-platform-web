@@ -35,11 +35,11 @@
         		<div class="mosaic-item">
             		<img class="mosaic-item-thumbnail" src="https://i.ytimg.com/vi/mkVcuntLIsg/maxresdefault.jpg" />
             		<div class="mosaic-item-content">
-                		<div class="mosaic-item-header">title</div>
+                		<div class="mosaic-item-header">course name</div>
                 		<div class="mosaic-item-caption">
                 			<div class="mosaic-item-caption-split">
-                				<p>left</p>
-                				<p>right</p>
+                				<p>total classes</p>
+                				<p>total length (hours)</p>
                 			</div>
                 		</div>
             		</div>
@@ -47,11 +47,11 @@
         		<div class="mosaic-item">
             		<img class="mosaic-item-thumbnail" src="https://i.ytimg.com/vi/mkVcuntLIsg/maxresdefault.jpg" />
             		<div class="mosaic-item-content">
-                		<div class="mosaic-item-header">title</div>
+                		<div class="mosaic-item-header">course name</div>
                 		<div class="mosaic-item-caption">
                 			<div class="mosaic-item-caption-split">
-                				<p>left</p>
-                				<p>right</p>
+                				<p>total classes</p>
+                				<p>total length (hours)</p>
                 			</div>
                 		</div>
             		</div>
@@ -59,11 +59,11 @@
         		<div class="mosaic-item">
             		<img class="mosaic-item-thumbnail" src="https://i.ytimg.com/vi/mkVcuntLIsg/maxresdefault.jpg" />
             		<div class="mosaic-item-content">
-                		<div class="mosaic-item-header">title</div>
+                		<div class="mosaic-item-header">course name</div>
                 		<div class="mosaic-item-caption">
                 			<div class="mosaic-item-caption-split">
-                				<p>left</p>
-                				<p>right</p>
+                				<p>total classes</p>
+                				<p>total length (hours)</p>
                 			</div>
                 		</div>
             		</div>

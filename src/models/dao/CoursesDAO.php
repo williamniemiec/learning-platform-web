@@ -126,6 +126,7 @@ class CoursesDAO
                 );
                 
                 $response[$i]['course']->setTotalLength((int)$course['total_length']);
+                $response[$i]['course']->getTotalClasses($this->db);
                 $response[$i]['total_classes_watched'] = (int)$course['total_classes_watched'];
                 $response[$i]['total_length_watched'] = (int)$course['total_length_watched'];
                 

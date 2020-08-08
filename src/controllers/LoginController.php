@@ -2,8 +2,9 @@
 namespace controllers;
 
 use core\Controller;
-use models\Students;
+use models\dao\StudentsDAO;
 use models\Student;
+use database\pdo\MySqlPDODatabase;
 
 
 /**
@@ -38,6 +39,8 @@ class LoginController extends Controller
      */
     public function index ()
     {
+        $dbConnection = new MySqlPDODatabase();
+        
         $header = array(
             'title' => 'Login - Learning platform',
             'styles' => array('login'),
@@ -54,10 +57,11 @@ class LoginController extends Controller
         
         // Checks if login form has been sent
         if (!empty($_POST['email'])) {
-            $students = new Students();
+            //$students = new StudentsDAO($dbConnection);
             
-            if ($students->login($_POST['email'], $_POST['password'])) {
-                header("Location: ".BASE_URL);
+            //if ($students->login($_POST['email'], $_POST['password'])) {
+            if (!empty(Student::login($dbConnection, $_POST['email'], $_POST['password']))) {
+                header("Location: ".BASE_URL."courses");
                 exit;
             }
             
@@ -75,7 +79,7 @@ class LoginController extends Controller
     {
         $header = array(
             'title' => 'Register - Learning platform',
-            'styles' => array('ps_style'),
+            'styles' => array(),
             'description' => "Start learning today",
             'keywords' => array('learning platform', 'register'),
             'robots' => 'index'
@@ -83,7 +87,7 @@ class LoginController extends Controller
         
         $viewArgs = array(
             'header' => $header,
-            'scripts' => array('ps_script'),
+            'scripts' => array(),
             'error' => false,
             'msg' => ''
         );
@@ -92,7 +96,7 @@ class LoginController extends Controller
         if ($this->wasRegistrationFormSent()) {
             // Checks if all fields are filled
             if ($this->isAllFieldsFilled()) {
-                $students = new Students();
+                $students = new StudentsDAO(new MySqlPDODatabase());
                 
                 $student = new Student(
                     $_POST['name'],

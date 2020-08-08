@@ -25,10 +25,10 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        if (Student::isLogged()) {
-            header("Location: ".BASE_URL);
-            exit;
-        }
+//         if (Student::isLogged()) {
+//             header("Location: ".BASE_URL);
+//             exit;
+//         }
     }
     
     
@@ -50,25 +50,25 @@ class HomeController extends Controller
 	        'robots' => 'index'
 	    );
 	    
-	    if (Student::isLogged()) {
-// 	        $student = Student::getLoggedIn($dbConnection);
-// 	        $coursesDAO = new CoursesDAO($dbConnection);
+// 	    if (Student::isLogged()) {
+// // 	        $student = Student::getLoggedIn($dbConnection);
+// // 	        $coursesDAO = new CoursesDAO($dbConnection);
 	        
-//     		$viewArgs = array(
-//     		    'username' => $student->getName(),
-//     		    'courses' => $coursesDAO->getMyCourses($student->getId()),
-//     		    'totalCourses' => $student->countCourses(),
-//     		    'header' => $header
-//     		);
-	    }
-	    else {
+// //     		$viewArgs = array(
+// //     		    'username' => $student->getName(),
+// //     		    'courses' => $coursesDAO->getMyCourses($student->getId()),
+// //     		    'totalCourses' => $student->countCourses(),
+// //     		    'header' => $header
+// //     		);
+// 	    }
+// 	    else {
 	        $viewArgs = array(
 	            'header' => $header,
 	            'total_bundles' => 10,
 	            'total_courses' => 100,
 	            'total_length' => 100000
 	        );
-	    }
+// 	    }
 
 		$this->loadTemplate("home", $viewArgs, Student::isLogged());
 	}

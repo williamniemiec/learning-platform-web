@@ -23,6 +23,7 @@
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/styles/btnTheme.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/styles/notifications.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/password_strength/ps_style.css' />
+<link rel='stylesheet' type='text/css' href='<?php echo BASE_URL; ?>assets/styles/BirthdateAlertStyle.php' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/styles/global.css' />
 
 <?php if (!empty($styles)) foreach ($styles as $style): ?>

@@ -25,11 +25,15 @@ body {
     overflow:						hidden;
 }
 
-.row, 
+.full-table {
+	width:							100%;
+}
+
+/*.row, 
 main, 
 footer {
 	position:						relative;
-}
+}*/
 
 footer {
 	width:							100%;
@@ -37,8 +41,11 @@ footer {
 	line-height:					50px;
 	text-align:						center;
 	color:							var(--text-light);
-	bottom:							0;
+	/*bottom:							0;*/
 	background-color:				var(--color-dark)!important;
+	display:flex;
+	justify-content:center;
+	align-items:center;
 }
 
 a:hover {

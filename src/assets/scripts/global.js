@@ -1,4 +1,5 @@
 $(function() {
+	// Fix footer
 	setInterval(() => {
 		if ($("body").hasClass("mCS_no_scrollbar")) {
 			$("footer").css("position", "fixed").css("bottom", 0)

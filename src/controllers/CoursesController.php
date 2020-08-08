@@ -2,20 +2,25 @@
 namespace controllers;
 
 use core\Controller;
-use models\Students;
-use models\Courses;
-use models\Classes;
-use models\Doubts;
-use models\Historic;
-use models\Questionnaires;
+use database\pdo\MySqlPDODatabase;
+use models\Student;
+use models\dao\CoursesDAO;
+use models\dao\StudentsDAO;
+
+// use models\Students;
+// use models\Courses;
+// use models\Classes;
+// use models\Doubts;
+// use models\Historic;
+// use models\Questionnaires;
 
 
 /**
  * Responsible for the behavior of the view {@link course.php}.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class CoursesController extends Controller
 {
@@ -28,7 +33,7 @@ class CoursesController extends Controller
      */
     public function __construct()
     {
-        if (!Students::isLogged()){
+        if (!Student::isLogged()){
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -43,7 +48,36 @@ class CoursesController extends Controller
      */
     public function index ()
     { 
-        header("Location: ".BASE_URL); 
+        $dbConnection = new MySqlPDODatabase();
+        
+        $header = array(
+            'title' => 'My courses - Learning Platform',
+            'styles' => array('home', 'MyCoursesStyle'),
+            'description' => "Start learning today",
+            'keywords' => array('learning platform', 'courses'),
+            'robots' => 'noindex'
+        );
+        
+        $student = Student::getLoggedIn($dbConnection);
+        $coursesDAO = new CoursesDAO($dbConnection);
+        $courses = $coursesDAO->getMyCourses($student->getId());
+        
+		$viewArgs = array(
+		    'username' => $student->getName(),
+		    'courses' => $courses,
+		    'totalCourses' => count($courses),
+		    'header' => $header
+		);
+
+		// Checks if it is student's birthdate
+		if ($student->getBirthdate()->format("m-d") == (new \DateTime())->format("m-d")) {
+		    $studentsDAO = new StudentsDAO($dbConnection);
+		    $historicInfo = $studentsDAO->getTotalWatchedClasses();
+		    $viewArgs['totalWatchedVideos'] = $historicInfo['total_classes_watched'];
+		    $viewArgs['totalWatchedLength'] = $historicInfo['total_length_watched'];
+		}
+        
+        $this->loadTemplate("MyCoursesView", $viewArgs, Student::isLogged());
     }
     
     /**
@@ -54,121 +88,121 @@ class CoursesController extends Controller
      * @param       int $id_course Course id
      * @param       int $id_class [Optional] Class id to be opened
      */
-    public function open($id_course, $id_class = -1)
-    {
-        $students = new Students($_SESSION['s_login']);
-        $courses = new Courses($_SESSION['s_login']);
-        $classes = new Classes();
-        $historic = new Historic();
+//     public function open($id_course, $id_class = -1)
+//     {
+//         $students = new Students($_SESSION['s_login']);
+//         $courses = new Courses($_SESSION['s_login']);
+//         $classes = new Classes();
+//         $historic = new Historic();
         
         
-        // If student is not enrolled in the course, redirects it to home page
-        if (!$courses->isEnrolled($id_course))
-            header("Location: ".BASE_URL);
+//         // If student is not enrolled in the course, redirects it to home page
+//         if (!$courses->isEnrolled($id_course))
+//             header("Location: ".BASE_URL);
         
-        if ($id_class == -1)
-            $id_class = $students->getLastClassWatched($id_course);
+//         if ($id_class == -1)
+//             $id_class = $students->getLastClassWatched($id_course);
         
-        // Checks if a comment was sent
-        if (!empty($_POST['question'])) {
-            $doubts = new Doubts();
+//         // Checks if a comment was sent
+//         if (!empty($_POST['question'])) {
+//             $doubts = new Doubts();
             
             
-            $doubts->sendDoubt($_SESSION['s_login'], $id_class, $_POST['question']);
-            header("Refresh:0");
-        }
+//             $doubts->sendDoubt($_SESSION['s_login'], $id_class, $_POST['question']);
+//             header("Refresh:0");
+//         }
             
-        // Gets class to be opened
-        if ($id_class == -1)
-            $class = $classes->getFirstClassFromFirstModule($id_course);
-        else
-            $class = $classes->getClass($id_class, $_SESSION['s_login']);
+//         // Gets class to be opened
+//         if ($id_class == -1)
+//             $class = $classes->getFirstClassFromFirstModule($id_course);
+//         else
+//             $class = $classes->getClass($id_class, $_SESSION['s_login']);
         
-        // Gets information about current course
-        $course = $courses->getCourse($id_course);
+//         // Gets information about current course
+//         $course = $courses->getCourse($id_course);
 
-        // Gets class information
-        if (empty($class)) {
-            $name = '';
-            $class['type'] = "noClasses";
-            $classContent = array(
-                'message' => 'There are no registered classes'
-            );
-            $view = "noClasses";
-            $class['watched'] = false;
-            $class['id'] = -1;
-        } 
-        else {
-            if ($class['type'] == 'video') {
-                $doubts = new Doubts();
+//         // Gets class information
+//         if (empty($class)) {
+//             $name = '';
+//             $class['type'] = "noClasses";
+//             $classContent = array(
+//                 'message' => 'There are no registered classes'
+//             );
+//             $view = "noClasses";
+//             $class['watched'] = false;
+//             $class['id'] = -1;
+//         } 
+//         else {
+//             if ($class['type'] == 'video') {
+//                 $doubts = new Doubts();
                 
                 
-                $name = $class['video']['title'];
-                $classContent = array(
-                    'id_class' => $class['id'],
-                    'video' => $class['video'],
-                    'doubts' => $doubts->getDoubts($class['id']),
-                    'watched' => $class['watched']
-                );
-                $view = "class_video";
-            }
-            else {
-                $name = "Questionnaire";
-                $classContent = array(
-                    'id_class' => $class['id'],
-                    'quest' => $class['quest'],
-                    'watched' => $class['watched']
-                );
-                $view = "class_quest";
-            }
-        }
+//                 $name = $class['video']['title'];
+//                 $classContent = array(
+//                     'id_class' => $class['id'],
+//                     'video' => $class['video'],
+//                     'doubts' => $doubts->getDoubts($class['id']),
+//                     'watched' => $class['watched']
+//                 );
+//                 $view = "class_video";
+//             }
+//             else {
+//                 $name = "Questionnaire";
+//                 $classContent = array(
+//                     'id_class' => $class['id'],
+//                     'quest' => $class['quest'],
+//                     'watched' => $class['watched']
+//                 );
+//                 $view = "class_quest";
+//             }
+//         }
         
-        $header = array(
-            'title' => $course['name'].' - Learning platform',
-            'styles' => array('courses', 'mobile_menu_button'),
-            'description' => $name,
-            'keywords' => array('learning platform', 'course', $course['name']),
-            'robots' => 'index'
-        );
+//         $header = array(
+//             'title' => $course['name'].' - Learning platform',
+//             'styles' => array('courses', 'mobile_menu_button'),
+//             'description' => $name,
+//             'keywords' => array('learning platform', 'course', $course['name']),
+//             'robots' => 'index'
+//         );
         
-        $viewArgs = array(
-            'header' => $header,
-            'scripts' => array('course'),
-            'username' => $students->getName(),
-            'info_menu' => array(
-                'modules' => $course['modules'],
-                'logo' => $course['logo']
-            ),
-            'info_course' => array(
-                'title' => $name,
-                'wasWatched' => $class['watched']
-            ),
-            'info_class' => array(
-                'totalClasses' => $classes->countClasses($id_course),
-                'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
-                'wasWatched' => $class['watched'],
-                'classId' => $class['id'],
-                'classType' => $class['type']
-            ),
-            'view' => 'class/'.$view,
-            'classContent' => $classContent
-        );
+//         $viewArgs = array(
+//             'header' => $header,
+//             'scripts' => array('course'),
+//             'username' => $students->getName(),
+//             'info_menu' => array(
+//                 'modules' => $course['modules'],
+//                 'logo' => $course['logo']
+//             ),
+//             'info_course' => array(
+//                 'title' => $name,
+//                 'wasWatched' => $class['watched']
+//             ),
+//             'info_class' => array(
+//                 'totalClasses' => $classes->countClasses($id_course),
+//                 'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
+//                 'wasWatched' => $class['watched'],
+//                 'classId' => $class['id'],
+//                 'classType' => $class['type']
+//             ),
+//             'view' => 'class/'.$view,
+//             'classContent' => $classContent
+//         );
         
-        $this->loadTemplate("class/course", $viewArgs);
-    }
+//         $this->loadTemplate("class/course", $viewArgs);
+//     }
     
     /**
      * Opens a class within a course.
      *
      * @param       int $id_class Class id
      */
-    public function class($id_class)
-    {
-        $classes = new Classes();
+//     public function class($id_class)
+//     {
+//         $classes = new Classes();
         
         
-        $this->open($classes->getCourseId($id_class), $id_class);
-    }
+//         $this->open($classes->getCourseId($id_class), $id_class);
+//     }
     
     
     //-------------------------------------------------------------------------
@@ -183,20 +217,20 @@ class CoursesController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function class_getAnswer()
-    {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     public function class_getAnswer()
+//     {
+//         // Checks if it is an ajax request
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        if (empty($_POST['id_quest']))
-            echo -1;
+//         if (empty($_POST['id_quest']))
+//             echo -1;
         
-        $quests = new Questionnaires();
+//         $quests = new Questionnaires();
         
         
-        echo $quests->getAnswer($_POST['id_quest']);
-    }
+//         echo $quests->getAnswer($_POST['id_quest']);
+//     }
     
     /**
      * Marks a class as watched.
@@ -206,20 +240,20 @@ class CoursesController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function class_mark_watched()
-    {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     public function class_mark_watched()
+//     {
+//         // Checks if it is an ajax request
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        if (empty($_POST['id_class']))
-            return;
+//         if (empty($_POST['id_class']))
+//             return;
         
-        $classes = new Classes();
+//         $classes = new Classes();
         
         
-        $classes->markAsWatched($_SESSION['s_login'], $_POST['id_class']);
-    }
+//         $classes->markAsWatched($_SESSION['s_login'], $_POST['id_class']);
+//     }
     
     /**
      * Marks a class as unwatched.
@@ -229,20 +263,20 @@ class CoursesController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function class_remove_watched()
-    {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     public function class_remove_watched()
+//     {
+//         // Checks if it is an ajax request
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        if (empty($_POST['id_class']))
-            return;
+//         if (empty($_POST['id_class']))
+//             return;
         
-        $classes = new Classes();
+//         $classes = new Classes();
         
         
-        $classes->removeWatched($_SESSION['s_login'], $_POST['id_class']);
-    }
+//         $classes->removeWatched($_SESSION['s_login'], $_POST['id_class']);
+//     }
     
     /**
      * Removes a comment from a class.
@@ -251,19 +285,19 @@ class CoursesController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function class_remove_comment()
-    {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     public function class_remove_comment()
+//     {
+//         // Checks if it is an ajax request
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        if (empty($_POST['id_comment']))
-            return;
+//         if (empty($_POST['id_comment']))
+//             return;
         
         
-        $doubts = new Doubts();
-        $doubts->delete($_POST['id_comment']);
-    }
+//         $doubts = new Doubts();
+//         $doubts->delete($_POST['id_comment']);
+//     }
     
     /**
      * Adds a reply to a class comment.
@@ -276,21 +310,21 @@ class CoursesController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function class_add_reply()
-    {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     public function class_add_reply()
+//     {
+//         // Checks if it is an ajax request
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        if (empty($_POST['id_doubt']) || $_POST['id_doubt'] <= 0)   { return false; }
-        if (empty($_POST['id_user']) || $_POST['id_user'] <= 0)     { return false; }
-        if (empty($_POST['text']))                                  { return false; }
+//         if (empty($_POST['id_doubt']) || $_POST['id_doubt'] <= 0)   { return false; }
+//         if (empty($_POST['id_user']) || $_POST['id_user'] <= 0)     { return false; }
+//         if (empty($_POST['text']))                                  { return false; }
         
-        $doubts = new Doubts();
+//         $doubts = new Doubts();
         
         
-        echo $doubts->addReply($_POST['id_doubt'], $_POST['id_user'], $_POST['text']);
-    }
+//         echo $doubts->addReply($_POST['id_doubt'], $_POST['id_user'], $_POST['text']);
+//     }
     
     /**
      * Gets student name.
@@ -301,20 +335,20 @@ class CoursesController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function get_student_name()
-    {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     public function get_student_name()
+//     {
+//         // Checks if it is an ajax request
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        if (empty($_POST['id_student']) || $_POST['id_student'] <= 0)
-            echo "";
+//         if (empty($_POST['id_student']) || $_POST['id_student'] <= 0)
+//             echo "";
         
-        $students = new Students();
+//         $students = new Students();
         
         
-        echo $students->get($_POST['id_student'])->getName();
-    }
+//         echo $students->get($_POST['id_student'])->getName();
+//     }
     
     /**
      * Removes reply from a class comment.
@@ -323,18 +357,18 @@ class CoursesController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function class_remove_reply()
-    {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     public function class_remove_reply()
+//     {
+//         // Checks if it is an ajax request
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        if (empty($_POST['id_reply']) || $_POST['id_reply'] <= 0)
-            return;
+//         if (empty($_POST['id_reply']) || $_POST['id_reply'] <= 0)
+//             return;
         
-        $doubts = new Doubts();
+//         $doubts = new Doubts();
         
         
-        $doubts->deleteReply($_POST['id_reply']);
-    }
+//         $doubts->deleteReply($_POST['id_reply']);
+//     }
 }
