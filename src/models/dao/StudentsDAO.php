@@ -427,7 +427,7 @@ class StudentsDAO
      * @return      array Total classes watched by current student along with
      * its total duration. The returned array has the following keys:
      * <ul>
-     *  <li><b>total_length</b>: Total time of classes watched by current
+     *  <li><b>total_length_watched</b>: Total time of classes watched by current
      *  student/li>
      *  <li><b>total_classes_watched</b>: Total classes watched by current 
      *  student</li>
@@ -444,9 +444,9 @@ class StudentsDAO
         
         // Query construction
         $sql = $this->db->prepare("
-            SELECT      SUM(length) AS total_length,
+            SELECT      SUM(length) AS total_length_watched,
                         COUNT(id_module) AS total_classes_watched
-            FROM        student_historic_watched_length
+            FROM        vw_student_historic_watched_length
             WHERE       id_student = ?
             GROUP BY    id_module
             HAVING      id_module IN (SELECT    id_module
