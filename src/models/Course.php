@@ -99,17 +99,25 @@ class Course
      * Gets all modules from a course.
      * 
      * @param       Database $db Database
+     * @param       bool $provideDatabase [Optional] If true, provide database
+     * to all modules. Default is false
      * 
      * @return      Module[] Modules from this course
      * 
      * @implNote    Lazy initialization
      */
-    public function getModules(Database $db) : array
+    public function getModules(Database $db, bool $provideDatabase = false) : array
     {
         if (empty($this->modules)) {
             $modules = new ModulesDAO($db);
             
-            $this->modules = $modules->getModules($this->id_course);
+            $this->modules = $modules->getFromCourse($this->id_course);
+            
+            if ($provideDatabase) {
+                foreach ($this->modules as $module) {
+                    $module->setDatabase($db);
+                }
+            }
         }
         
         return $this->modules;

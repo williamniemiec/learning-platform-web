@@ -144,12 +144,13 @@ class StudentsDAO
      *
      * @param       int $id_course Course id
      *
-     * @return      _Class Last class watched by the student
+     * @return      _Class Last class watched by the student or null if student
+     * has never watched one 
      * 
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor or course id is empty, less than or equal to zero
      */
-    public function getLastClassWatched(int $id_course) : _Class
+    public function getLastClassWatched(int $id_course) : ?_Class
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".

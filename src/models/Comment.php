@@ -59,7 +59,7 @@ class Comment
      * 
      * @return      int Comment id
      */
-    public function getCommentId() : int
+    public function getId() : int
     {
         return $this->id_comment;
     }

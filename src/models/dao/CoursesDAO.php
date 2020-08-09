@@ -6,6 +6,7 @@ namespace models\dao;
 
 use database\Database;
 use models\Course;
+use models\_Class;
 
 
 /**
@@ -264,6 +265,62 @@ class CoursesDAO
             );
         }
         
+        return $response;
+    }
+    
+    /**
+     * Gets the first class from the first module from a course.
+     *
+     * @param       int $id_course Course id
+     *
+     * @return      _Class First class from the first module from a course or
+     * null if there are no registered modules - classes in the course with
+     * the given id
+     *
+     * @throws      \InvalidArgumentException If course id or student id is
+     * empty or less than or equal to zero
+     */
+    public function getFirstClassFromFirstModule(int $id_course) : _Class
+    {
+        if (empty($id_course) || $id_course <= 0)
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
+            
+        $response = null;
+        
+        // Query construction
+        $sql = $this->db->prepare("
+            SELECT      id_module, class_order, class_type FROM (
+                SELECT    id_module, class_order, 'questionnaire' AS class_type
+                FROM        questionnaires NATURAL JOIN course_modules
+                WHERE       class_order = 1 AND id_course = ?
+                UNION
+                SELECT      id_module, class_order, 'video' AS class_type
+                FROM        videos NATURAL JOIN course_module
+                WHERE       class_order = 1 AND id_course = ?
+            ) AS tmp JOIN course_modules USING (id_module)
+            WHERE       id_course = ?
+            ORDER BY    module_order
+        ");
+            
+        // Executes query
+        $sql->execute(array($id_course, $id_course, $id_course));
+        
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
+            $response = $sql->fetch();
+            
+            if ($response['class_type'] == 'video') {
+                $videosDAO = new VideosDAO($this->db);
+                
+                $response = $videosDAO->get($response['id_module'], 1);
+            } else {
+                $questionnairesDAO = new QuestionnairesDAO($this->db);
+                
+                $response = $questionnairesDAO->get((int)$response['id_module'], 1);
+            }
+        }
+            
         return $response;
     }
     

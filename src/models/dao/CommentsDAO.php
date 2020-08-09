@@ -89,7 +89,12 @@ class CommentsDAO
      * @param       int $id_module Module id that the class belongs
      * @param       int $class_order Class order within the module
      * 
-     * @return      Comment[] Comments from this class
+     * @return      array Comments from this class along with its replies. Each 
+     * position of the returned array has the following keys:
+     * <ul>
+     *  <li><b>comment</b>: (type:Comment) Comment</li>
+     *  <li><b>replies</b>: (type:Message[]) Comment replies</li>
+     * </ul>
      * 
      * @throws      \InvalidArgumentException If module id or class order is 
      * empty or less than or equal to zero
@@ -108,7 +113,7 @@ class CommentsDAO
         
         // Query construction
         $sql = $this->db->prepare("
-            SELECT  student_name, student_photo, text, date
+            SELECT  *
             FROM    comments NATURAL JOIN students
             WHERE   id_module = ? AND class_order = ?
         ");
@@ -118,13 +123,19 @@ class CommentsDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll(\PDO::FETCH_ASSOC) as $comment) {
-                $response[] = new Comment(
-                    (int)$comment['id_comment'], 
-                    $comment['student'], 
+            $i = 0;
+            
+            foreach ($sql->fetchAll() as $comment) {
+                $studentsDAO = new StudentsDAO($this->db, (int)$comment['id_student']);
+                
+                $response[$i]['comment'] = new Comment(
+                    (int)$comment['id_comment'],
+                    $studentsDAO->get(), 
                     new \DateTime($comment['date']), 
                     $comment['text']
                 );
+                
+                $response[$i]['replies'] = $this->getReplies((int)$comment['id_comment']);
             }
         }
         
@@ -170,52 +181,6 @@ class CommentsDAO
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $response = $this->db->lastInsertId();
-        }
-        
-        return $response;
-    }
-    
-    /**
-     * Gets replies from a comment.
-     * 
-     * @param       int $id_comment Comment id
-     * 
-     * @return      array Replies from this comment
-     * 
-     * @throws      \InvalidArgumentException If comment id is empty or less 
-     * than or equal to zero
-     */
-    public function getReplies(int $id_comment) : array
-    {
-        if (empty($id_comment) || $id_comment <= 0)
-            throw new \InvalidArgumentException("Comment id cannot be empty ".
-                "or less than or equal to zero");
-        
-        $response = array();
-        
-        // Query construction
-        $sql = $this->db->prepare("
-            SELECT  student_name, student_photo, text, date
-            FROM    comment_replies NATURAL JOIN students
-            WHERE   id_comment = ?
-        ");
-        
-        // Executes query
-        $sql->execute(array($id_comment));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $replies = $sql->fetchAll();
-            $students = new StudentsDAO($this->db);
-            
-            foreach ($replies as $reply) {
-                $response[] = new Message(
-                    (int)$students->get($reply['id_student']),
-                    new \DateTime($reply['date']), 
-                    $reply['text'],
-                    (int)$reply['id_reply']
-                );                
-            }
         }
         
         return $response;
@@ -287,5 +252,51 @@ class CommentsDAO
         $sql->execute(array($id_reply, $id_student));
         
         return $sql && $sql->rowCount() > 0;
+    }
+    
+    /**
+     * Gets replies from a comment.
+     *
+     * @param       int $id_comment Comment id
+     *
+     * @return      Message[] Replies from this comment
+     *
+     * @throws      \InvalidArgumentException If comment id is empty or less
+     * than or equal to zero
+     */
+    private function getReplies(int $id_comment) : array
+    {
+        if (empty($id_comment) || $id_comment <= 0)
+            throw new \InvalidArgumentException("Comment id cannot be empty ".
+                "or less than or equal to zero");
+            
+            $response = array();
+            
+            // Query construction
+            $sql = $this->db->prepare("
+            SELECT  student_name, student_photo, text, date
+            FROM    comment_replies NATURAL JOIN students
+            WHERE   id_comment = ?
+        ");
+            
+            // Executes query
+            $sql->execute(array($id_comment));
+            
+            // Parses results
+            if ($sql && $sql->rowCount() > 0) {
+                $replies = $sql->fetchAll();
+                $students = new StudentsDAO($this->db);
+                
+                foreach ($replies as $reply) {
+                    $response[] = new Message(
+                        (int)$students->get($reply['id_student']),
+                        new \DateTime($reply['date']),
+                        $reply['text'],
+                        (int)$reply['id_reply']
+                        );
+                }
+            }
+            
+            return $response;
     }
 }

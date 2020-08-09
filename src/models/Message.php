@@ -52,9 +52,9 @@ class Message
      * 
      * @return      User User who created the message
      */
-    public function getCreator() : int
+    public function getCreator() : User
     {
-        return $this->id_comment;
+        return $this->user;
     }
     
     /**

@@ -202,6 +202,26 @@ class QuestionnairesDAO
     }
     
     /**
+     * {@inheritdoc}
+     * @Override
+     */
+    public function wasWatched(int $id_student, int $id_module, int $class_order) : bool
+    {
+        $sql = $this->db->prepare("
+            SELECT  COUNT(*) AS was_watched
+            FROM    student_historic
+            WHERE   class_type = 1 AND
+                    id_student = ? AND
+                    id_module = ? AND
+                    class_order = ?
+        ");
+        
+        $sql->execute(array($id_student, $id_module, $class_order));
+        
+        return $sql->fetch()['was_watched'] > 0;
+    }
+    
+    /**
      * Marks a class as watched by a student.
      *
      * @param       int $id_student Student id

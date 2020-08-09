@@ -42,14 +42,14 @@ class Video extends _Class
      * @param       string $description [Optional] Class description
      */
     public function __construct(int $id_module, int $class_order, string $title,
-        string $videoID, int $length, string $description = '')
+        string $videoID, int $length, ?string $description = '')
     {
         $this->id_module = $id_module;
         $this->class_order = $class_order;
         $this->title = $title;
         $this->videoID = $videoID;
         $this->length = $length;
-        $this->description = $description;
+        $this->description = empty($description) ? '' : $description;
     }
     
     

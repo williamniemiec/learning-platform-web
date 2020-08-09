@@ -1,18 +1,18 @@
 <?php
 namespace controllers;
 
+
 use core\Controller;
 use database\pdo\MySqlPDODatabase;
 use models\Student;
+use models\Video;
+use models\dao\CommentsDAO;
 use models\dao\CoursesDAO;
+use models\dao\HistoricDAO;
 use models\dao\StudentsDAO;
+use models\dao\VideosDAO;
+use models\dao\QuestionnairesDAO;
 
-// use models\Students;
-// use models\Courses;
-// use models\Classes;
-// use models\Doubts;
-// use models\Historic;
-// use models\Questionnaires;
 
 
 /**
@@ -83,28 +83,43 @@ class CoursesController extends Controller
     
     /**
      * Opens a course. The class that will be displayed it will be the last
-     * watched by the student. If he never watched one, the first one will be
-     * open.
+     * watched by the student. If he never watched one, the first class from
+     * the first module will open.
      * 
      * @param       int $id_course Course id
-     * @param       int $id_class [Optional] Class id to be opened
+     * @param       int $id_module [Optional] Module id to which the class 
+     * belongs
+     * @param       int $class_order [Optional] Class order in module
      */
-//     public function open($id_course, $id_class = -1)
-//     {
-//         $students = new Students($_SESSION['s_login']);
-//         $courses = new Courses($_SESSION['s_login']);
-//         $classes = new Classes();
-//         $historic = new Historic();
+    public function open(int $id_course, int $id_module = -1, int $class_order = -1) : void
+    {
+        $dbConnection = new MySqlPDODatabase();
+        
+        $student = Student::getLoggedIn($dbConnection);
+        $students = new StudentsDAO($dbConnection, $student->getId());
+        $courses = new CoursesDAO($dbConnection);
+        $historic = new HistoricDAO($dbConnection, $student->getId());
+        //$classes = new Classes();
+        $historic = new HistoricDAO($dbConnection, $student->getId());
         
         
-//         // If student is not enrolled in the course, redirects it to home page
-//         if (!$courses->isEnrolled($id_course))
-//             header("Location: ".BASE_URL);
+        // If student is not enrolled in the course, redirects it to home page
+        if (!$courses->hasCourse($id_course, $student->getId()))
+            header("Location: ".BASE_URL);
         
-//         if ($id_class == -1)
-//             $id_class = $students->getLastClassWatched($id_course);
+        if ($id_module > 0 && $class_order > 0) {
+            $videosDAO = new VideosDAO($dbConnection);
+            $class = $videosDAO->get($id_module, $class_order);
+            
+            if (empty($class)) {
+                $questionnairesDAO = new QuestionnairesDAO($dbConnection);
+                $class = $questionnairesDAO->get($id_module, $class_order);
+            }
+        }
+        else
+            $class = $students->getLastClassWatched($id_course);
         
-//         // Checks if a comment was sent
+        // Checks if a comment was sent
 //         if (!empty($_POST['question'])) {
 //             $doubts = new Doubts();
             
@@ -113,97 +128,110 @@ class CoursesController extends Controller
 //             header("Refresh:0");
 //         }
             
-//         // Gets class to be opened
-//         if ($id_class == -1)
-//             $class = $classes->getFirstClassFromFirstModule($id_course);
-//         else
-//             $class = $classes->getClass($id_class, $_SESSION['s_login']);
+        // Gets class to be opened
+        if (empty($class))
+            $class = $courses->getFirstClassFromFirstModule($id_course);
         
-//         // Gets information about current course
-//         $course = $courses->getCourse($id_course);
+        // Gets information about current course
+        $course = $courses->get($id_course);
 
-//         // Gets class information
-//         if (empty($class)) {
-//             $name = '';
-//             $class['type'] = "noClasses";
-//             $classContent = array(
-//                 'message' => 'There are no registered classes'
-//             );
-//             $view = "noClasses";
-//             $class['watched'] = false;
-//             $class['id'] = -1;
-//         } 
-//         else {
-//             if ($class['type'] == 'video') {
-//                 $doubts = new Doubts();
+        // Gets class information
+        if (empty($class)) {
+            $name = '';
+            $class['type'] = "noClasses";
+            $classContent = array(
+                'message' => 'There are no registered classes'
+            );
+            $view = "noClasses";
+            $class['watched'] = false;
+            $class['id'] = -1;
+        } 
+        else {
+            if ($class instanceof Video) {
+                $commentsDAO = new CommentsDAO($dbConnection);
+                $videosDAO = new VideosDAO($dbConnection);
+                $name = $class->getTitle();
                 
-                
-//                 $name = $class['video']['title'];
 //                 $classContent = array(
 //                     'id_class' => $class['id'],
 //                     'video' => $class['video'],
-//                     'doubts' => $doubts->getDoubts($class['id']),
+//                     'doubts' => $commentsDAO->get($class->getModuleId(), $class->getClassOrder()),
 //                     'watched' => $class['watched']
 //                 );
-//                 $view = "class_video";
-//             }
-//             else {
-//                 $name = "Questionnaire";
+                $classContent = array(
+                    'class' => $class,
+                    'comments' => $commentsDAO->getComments(
+                        $class->getModuleId(), 
+                        $class->getClassOrder()
+                    ),
+                    'watched' => $videosDAO->wasWatched(
+                        $student->getId(), $class->getModuleId(),
+                        $class->getClassOrder()
+                    )
+                );
+                
+                $view = "class_video";
+            }
+            else {
+                $questionnairesDAO = new QuestionnairesDAO($dbConnection);
+                $name = "Questionnaire";
+                
 //                 $classContent = array(
 //                     'id_class' => $class['id'],
 //                     'quest' => $class['quest'],
 //                     'watched' => $class['watched']
 //                 );
-//                 $view = "class_quest";
-//             }
-//         }
+                $classContent = array(
+                    'class' => $class,
+                    'watched' => $questionnairesDAO->wasWatched(
+                        $student->getId(), $class->getModuleId(), 
+                        $class->getClassOrder()
+                    )
+                );
+                
+                $view = "class_quest";
+            }
+        }
         
-//         $header = array(
-//             'title' => $course['name'].' - Learning platform',
-//             'styles' => array('courses', 'mobile_menu_button'),
-//             'description' => $name,
-//             'keywords' => array('learning platform', 'course', $course['name']),
-//             'robots' => 'index'
-//         );
+        $header = array(
+            'title' => $course->getName().' - Learning platform',
+            'styles' => array('courses', 'mobile_menu_button'),
+            'description' => $name,
+            //'keywords' => array('learning platform', 'course', $course['name']),
+            'robots' => 'noindex'
+        );
         
-//         $viewArgs = array(
-//             'header' => $header,
-//             'scripts' => array('course'),
-//             'username' => $students->getName(),
-//             'info_menu' => array(
-//                 'modules' => $course['modules'],
-//                 'logo' => $course['logo']
-//             ),
-//             'info_course' => array(
-//                 'title' => $name,
-//                 'wasWatched' => $class['watched']
-//             ),
-//             'info_class' => array(
-//                 'totalClasses' => $classes->countClasses($id_course),
-//                 'totalWatchedClasses' => $historic->getWatchedClasses($_SESSION['s_login'], $id_course),
-//                 'wasWatched' => $class['watched'],
-//                 'classId' => $class['id'],
-//                 'classType' => $class['type']
-//             ),
-//             'view' => 'class/'.$view,
-//             'classContent' => $classContent
-//         );
+        $viewArgs = array(
+            'header' => $header,
+            'scripts' => array('course'),
+            'username' => $student->getName(),
+            'view' => 'class/'.$view,
+            'info_menu' => array(
+                'id_course' => $id_course,
+                'modules' => $course->getModules($dbConnection, true),
+                'watched_classes' => $historic->getWatchedClassesFromCourse($id_course),
+                'logo' => $course->getLogo()
+            )
+        );
         
-//         $this->loadTemplate("class/course", $viewArgs);
-//     }
-    
-    /**
-     * Opens a class within a course.
-     *
-     * @param       int $id_class Class id
-     */
-//     public function class($id_class)
-//     {
-//         $classes = new Classes();
+        if (!empty($class)) {
+            $viewArgs['info_course'] = array(
+                'title' => $name,
+                'wasWatched' => $classContent['watched']
+            );
+            
+            $viewArgs['info_class'] = array(
+                'class' => $class,
+                'total' => $courses->countClasses($id_course),
+                'totalWatchedClasses' => $historic->countWatchedClasses($id_course),
+                'wasWatched' => $classContent['watched']
+            );
+            
+            $viewArgs['classContent'] = $classContent;
+        }
         
-        
-//         $this->open($classes->getCourseId($id_class), $id_class);
-//     }
+        $this->loadTemplate("class/course", $viewArgs);
+    }
     
     
     //-------------------------------------------------------------------------

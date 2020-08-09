@@ -1,17 +1,21 @@
+<?php
+use models\Video;
+?>
+
 <div class="class_info">
 	<!-- Mark as watched button -->
-    <?php if ($classType != "quest"): ?>
+    <?php if ($class instanceof Video): ?>
     	<button class="btn btn-outline-primary btn_mark_watch" 
-    			onclick="<?php echo $wasWatched ? "markAsWatched" : "removeWatched"; ?>(<?php echo $classId; ?>)">
+    			onclick="<?php echo $wasWatched ? "markAsWatched" : "removeWatched"; ?>(<?php echo $class->getModuleId().",".$class->getClassOrder(); ?>)">
     		Mark as watched
     	</button>
 	<?php endif; ?>
 	
 	<!-- Progress bar -->
-	<?php if ($totalClasses > 0): ?>
+	<?php if ($total['total_classes'] > 0): ?>
     	<div id="class_course__progress" class="progress">
-    		<div class="progress-bar bg-success" style="width:<?php echo floor($totalWatchedClasses / $totalClasses * 100); ?>%">
-    			<?php echo $totalWatchedClasses; ?> / <?php echo $totalClasses; ?>
+    		<div class="progress-bar bg-success" style="width:<?php echo floor($totalWatchedClasses / $total['total_classes'] * 100); ?>%">
+    			<?php echo $totalWatchedClasses; ?> / <?php echo $total['total_classes']; ?>
 			</div>
     	</div>
     <?php endif; ?>
