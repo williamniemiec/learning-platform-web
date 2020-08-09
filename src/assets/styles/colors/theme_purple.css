@@ -7,6 +7,7 @@
 	--color-accent:					#7d4689;
 	--color-accent-strong:			#711757;
 	--color-light:					rgba(221,221,221,0.9);
+	--color-small:					#777;
 	--color-dark:					#3e4041;
 	--color-dark-light:				#555;
 	--color-danger:					#e50000;
@@ -23,11 +24,11 @@
 	--view-header-background:		rgba(93,13,107,0.7);
 	--view-header-accent:			#ae86b5;
 	--view-panel-text:				var(--text-dark);
-	--view-widget:					var(--border-light);
+	--view-widget:					var(--color-light);
 	--view-widget-accent:			#ccc;
-	--view-widget-info:				#888;
+	--view-widget-info:				var(--color-small);
 	--privilege-admin:				var(--color-accent);
-	--border-light:					#ddd;
+	--border-light:					var(--color-light);
 	--color-snow:					#eee;
 	--glass:						rgba(238,238,238,0.3);
 	--alert-danger-close:			white;

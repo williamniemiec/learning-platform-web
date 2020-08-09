@@ -1,0 +1,63 @@
+/* Notebook */
+ul.notebook {
+	list-style:						none;
+	display:						flex;
+	flex-direction:					column;
+	padding-left:					0!important;
+	margin-bottom:					0!important;
+}
+
+.notebook-item-header {
+	display:						flex;
+	flex:							1;
+	flex-direction:					column;
+	justify-content:				center;
+}
+
+.notebook-item-header a {
+	font-size:						1.6rem;
+	display:						block;
+	color:							var(--text-dark);
+}
+
+.notebook-item-header a:hover {
+	color:var(--color-primary);
+}
+
+.notebook-item-header a:hover {
+	text-decoration:				none;
+}
+
+.notebook-item {
+	border-radius:					5px;
+	padding:						30px;
+	display:						flex;
+	height:							80px;
+	flex-direction:					column;
+	justify-content:				space-around;
+	background-color:				var(--color-light);
+}
+
+li.notebook-item:not(:last-child)  {
+	margin-bottom:					20px;
+}
+
+.notebook-item-class, 
+.notebook-item-date {
+    font-size: 						12px;
+}
+
+.notebook-item-date {
+	font-size: 						10px;
+    border: 						1px solid var(--color-small);
+    border-radius: 					5px;
+    color: 							var(--color-small);
+    padding: 						3px;
+}
+
+.notebook-item-footer {
+	display:						flex;
+	flex-direction:					row;
+	justify-content:				space-between;
+	align-items:					center;
+}

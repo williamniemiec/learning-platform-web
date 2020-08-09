@@ -24,7 +24,7 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
         		</div>
     		</div>
         	
-        	
+        	<!-- Courses -->
         	<div class="view_panel">
             	<h1 class="view_header">My Courses</h1>
             	<div class="view_content">
@@ -66,6 +66,26 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
                 	</div>
             	</div>
     		</div>
+    		
+    		<!-- Student notes -->
+			<div class="view_panel">
+            	<h1 class="view_header">Notebook</h1>
+            	<div class="view_content">
+            		<ul class="notebook">
+            			<?php foreach($notebook as $note): ?>
+            				<li class="notebook-item">
+        						<div class="notebook-item-header">
+        							<a href="<?php echo BASE_URL."notebook/".$note->getId(); ?>"><?php echo $note->getTitle(); ?></a>
+        						</div>
+        						<div class="notebook-item-footer">
+        							<div class="notebook-item-class"><?php echo $note->getClass()->getTitle(); ?></div>
+        							<div class="notebook-item-date"><?php echo $note->getCreationDate()->format("m-d-Y H:m:s"); ?></div>
+        						</div>
+            				</li>
+        				<?php endforeach; ?>
+        			</ul>
+            	</div>
+			</div>
     	<?php endif; ?>
     </div>
 </div>

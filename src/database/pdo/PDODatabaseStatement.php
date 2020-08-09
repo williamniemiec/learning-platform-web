@@ -44,7 +44,6 @@ class PDODatabaseStatement extends DatabaseStatement
         return $this->statement->execute($bindArguments);
     }
     
-    
     /**
      * {@inheritdoc}
      * @Override
@@ -54,7 +53,9 @@ class PDODatabaseStatement extends DatabaseStatement
         if ($withTableName)
            $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
         
-        $result = $this->statement->fetchAll(\PDO::FETCH_ASSOC);    
+        $result = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
+        
+        $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, false);
         
         return $result == false ? array() : $result;
     }

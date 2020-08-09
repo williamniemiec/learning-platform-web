@@ -12,6 +12,7 @@ use models\dao\HistoricDAO;
 use models\dao\StudentsDAO;
 use models\dao\VideosDAO;
 use models\dao\QuestionnairesDAO;
+use models\dao\NotebookDAO;
 
 
 
@@ -52,7 +53,7 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => 'My courses - Learning Platform',
-            'styles' => array('home', 'MyCoursesStyle', 'searchBar'),
+            'styles' => array('home', 'MyCoursesStyle', 'searchBar', 'notebook'),
             'description' => "Start learning today",
             'keywords' => array('learning platform', 'courses'),
             'robots' => 'noindex'
@@ -60,14 +61,16 @@ class CoursesController extends Controller
         
         $student = Student::getLoggedIn($dbConnection);
         $coursesDAO = new CoursesDAO($dbConnection);
+        $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
         $courses = $coursesDAO->getMyCourses($student->getId());
-        
+
 		$viewArgs = array(
 		    'username' => $student->getName(),
 		    'courses' => $courses,
 		    'totalCourses' => count($courses),
 		    'header' => $header,
-		    'scripts' => array('chart_progress')
+		    'scripts' => array('chart_progress'),
+		    'notebook' => $notebookDAO->getAll()
 		);
 
 		// Checks if it is student's birthdate

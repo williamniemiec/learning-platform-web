@@ -96,7 +96,7 @@ class Note
      *
      * @return      Video Class associated with the annotation.
      */
-    public function getClass() : string
+    public function getClass() : Video
     {
         return $this->class;
     }

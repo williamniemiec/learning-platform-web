@@ -57,7 +57,7 @@ class NotebookDAO
      * @throws      \InvalidArgumentException If note id or student id provided
      * in the constructor is empty, less than or equal to zero
      */
-    public function get(int $id_note) : Note
+    public function get(int $id_note) : ?Note
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
@@ -71,7 +71,9 @@ class NotebookDAO
             
         // Query construction
         $sql = $this->db->prepare("
-            SELECT  *
+            SELECT  *,
+                    notebook.title AS notebook_title, 
+                    videos.title AS videos_title
             FROM    notebook NATURAL JOIN videos
             WHERE   id_student = ? AND id_note = ?
         ");
@@ -84,17 +86,17 @@ class NotebookDAO
             $note = $sql->fetch(true);
             
             $response = new Note(
-                (int)$note['notebook.id_note'],
-                $note['notebook.content'],
-                $note['notebook.note'],
-                new \DateTime($note['notebook.date']),
+                (int)$note['id_note'],
+                $note['notebook_title'],
+                $note['content'],
+                new \DateTime($note['date']),
                 new Video(
-                    (int)$note['videos.id_module'],
-                    (int)$note['videos.class_order'],
-                    $note['videos.title'],
-                    $note['videos.videoID'],
-                    (int)$note['videos.length'],
-                    $note['videos.description']
+                    (int)$note['id_module'],
+                    (int)$note['class_order'],
+                    $note['videos_title'],
+                    $note['videoID'],
+                    (int)$note['length'],
+                    $note['description']
                 )
             );
         }
@@ -136,7 +138,9 @@ class NotebookDAO
             
         // Query construction
         $sql = $this->db->prepare("
-            SELECT  *
+            SELECT  *,
+                    notebook.title AS notebook_title, 
+                    videos.title AS videos_title
             FROM    notebook NATURAL JOIN videos
             WHERE   id_student = ? AND id_module = ? AND class_order = ?
         ");
@@ -149,17 +153,17 @@ class NotebookDAO
             $note = $sql->fetchAll(true);
             
             $response[] = new Note(
-                (int)$note['notebook.id_note'],
-                $note['notebook.content'],
-                $note['notebook.note'],
-                new \DateTime($note['notebook.date']),
+                (int)$note['id_note'],
+                $note['notebook_title'],
+                $note['content'],
+                new \DateTime($note['date']),
                 new Video(
-                    (int)$note['videos.id_module'],
-                    (int)$note['videos.class_order'],
-                    $note['videos.title'],
-                    $note['videos.videoID'],
-                    (int)$note['videos.length'],
-                    $note['videos.description']
+                    (int)$note['id_module'],
+                    (int)$note['class_order'],
+                    $note['videos_title'],
+                    $note['videoID'],
+                    (int)$note['length'],
+                    $note['description']
                 )
             );
         }
@@ -262,8 +266,10 @@ class NotebookDAO
         $response = array();
         
         $query = "
-            SELECT  *
-            FROM    notebook NATURAL JOIN videos
+            SELECT  *, 
+                    notebook.title AS notebook_title, 
+                    videos.title AS videos_title
+            FROM    notebook JOIN videos USING (id_module, class_order)
             WHERE   id_student = ?
         ";
         
@@ -282,22 +288,22 @@ class NotebookDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $note = $sql->fetchAll(true);
-            
-            $response[] = new Note(
-                (int)$note['notebook.id_note'],
-                $note['notebook.content'],
-                $note['notebook.note'],
-                new \DateTime($note['notebook.date']),
-                new Video(
-                    (int)$note['videos.id_module'],
-                    (int)$note['videos.class_order'],
-                    $note['videos.title'],
-                    $note['videos.videoID'],
-                    (int)$note['videos.length'],
-                    $note['videos.description']
-                )
-            );
+            foreach ($sql->fetchAll(true) as $note) {
+                $response[] = new Note(
+                    (int)$note['id_note'],
+                    $note['notebook_title'],
+                    $note['content'],
+                    new \DateTime($note['date']),
+                    new Video(
+                        (int)$note['id_module'],
+                        (int)$note['class_order'],
+                        $note['videos_title'],
+                        $note['videoID'],
+                        (int)$note['length'],
+                        $note['description']
+                    )
+                );
+            }
         }
         
         return $response;

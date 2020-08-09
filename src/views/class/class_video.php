@@ -5,6 +5,9 @@
 	<!-- Video description -->
 	<div class="content_desc"><?php echo $class->getDescription(); ?></div>
 	
+	<!-- Student notes -->
+	<div class="notebook"></div>
+	
 	<!-- Comments area -->
 	<div class="content_comments">
     	<h3>Comments</h3>
