@@ -117,7 +117,7 @@ li.dropdown-item a {
 
 li.dropdown-item a:hover {
 	text-decoration:				none;
-	background-color:				#ddd;
+	background-color:				var(--color-light);
 }
 
 .dropdown:hover .dropdown-menu {
@@ -131,6 +131,44 @@ li.dropdown-item a:hover {
 
 .dropdown-menu {
 	margin-top:						0;
+}
+
+.nav-left ul {
+	padding-left:					0;
+	list-style:						none;
+}
+
+.nav-pages {
+	display:						flex;
+	justify-content:				center;
+	align-items:					center;
+	margin:							0;
+}
+
+.nav-pages li {
+	display:						flex;
+	align-items:					center;
+	height:							100%;
+	padding: 						0 20px;
+}
+
+.nav-pages li a {
+	text-decoration:				none;
+}
+
+#navbarMenu {
+	display:						flex;
+	flex:							1;
+	flex-direction:					row;
+	justify-content:				space-between;
+}
+
+.nav-left {
+	display:						flex;
+	flex:							1;
+	flex-direction:					row;
+	justify-content:				flex-start;
+	align-items:					center;
 }
 
 

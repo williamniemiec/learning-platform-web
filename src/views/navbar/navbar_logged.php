@@ -5,7 +5,13 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div id="navbarMenu" class="navbar-collapse collapse">
-			<div class="navbar-nav ml-auto">
+			<div class="nav-left">
+				<ul class="nav-pages">
+					<li><a href="<?php echo BASE_URL; ?>courses">My courses</a></li>
+					<li><a href="<?php echo BASE_URL; ?>purchases">Purchases</a></li>
+				</ul>
+			</div>
+			<div class="navbar-nav nav-right">
 				<div class="notifications">
 					<div class="notification_icon">
     					<span class="notifications_new badge badge-danger badge-pill">1</span>
