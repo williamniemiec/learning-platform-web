@@ -2,16 +2,18 @@
 namespace controllers;
 
 use core\Controller;
-use models\Students;
-use models\Courses;
+use models\Student;
+use database\pdo\MySqlPDODatabase;
+use models\dao\StudentsDAO;
+use models\enum\GenreEnum;
 
 
 /**
  * Responsible for the behavior of the view {@link settings/settings.php}.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class SettingsController extends Controller
 {
@@ -24,7 +26,7 @@ class SettingsController extends Controller
      */
     public function __construct()
     {
-        if (!Students::isLogged()){
+        if (!Student::isLogged()){
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -39,15 +41,14 @@ class SettingsController extends Controller
      */
     public function index ()
     {
-        $students = new Students($_SESSION['s_login']);
-        $courses = new Courses($_SESSION['s_login']);
-        $student = $students->get($_SESSION['s_login']);
+        $dbConnection = new MySqlPDODatabase();
         
+        $student = Student::getLoggedIn($dbConnection);
         
         $header = array(
             'title' => 'Settings - Learning platform',
             'styles' => array('settings'),
-            'description' => "Start learning today",
+            'description' => "User settings",
             'robots' => 'noindex'
         );
         
@@ -55,12 +56,7 @@ class SettingsController extends Controller
             'header' => $header,
             'scripts' => array("settings"),
             'username' => $student->getName(),
-            'profilePhoto' => $student->getPhoto(),
-            'genre' => $student->getGenre(),
-            'birthdate' => explode(" ", $student->getBirthdate())[0],
-            'email' => $student->getEmail(),
-            'courses' => $courses->getMyCourses(),
-            'totalCourses' => $courses->countCourses()
+            'user' => $student
         );
         
         $this->loadTemplate("settings/settings", $viewArgs);
@@ -71,21 +67,24 @@ class SettingsController extends Controller
      */
     public function edit()
     {
-        $students = new Students($_SESSION['s_login']);
-        $courses = new Courses($_SESSION['s_login']);
-        $student = $students->get($_SESSION['s_login']);
+        $dbConnection = new MySqlPDODatabase();
         
+        $student = Student::getLoggedIn($dbConnection);
         
         $header = array(
-            'title' => 'Settings - Edition - Learning platform',
+            'title' => 'Settings - Update - Learning platform',
             'styles' => array('settings'),
-            'description' => "Start learning today",
+            'description' => "User settings",
             'robots' => 'noindex'
         );
         
         // Checks if edition form has been sent
         if (!empty($_POST['name'])) {
-            $students->update($_POST['name'], $_POST['genre'], $_POST['birthdate']);
+            $studentsDAO = new StudentsDAO($dbConnection);
+            $student->setGenre(new GenreEnum($_POST['genre']));
+            $student->setBirthdate(new \DateTime($_POST['birthdate']));
+            
+            $studentsDAO->update($student);
             header("Location: ".BASE_URL."settings");
             exit;
         }
@@ -93,11 +92,7 @@ class SettingsController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'genre' => $student->getGenre(),
-            'birthdate' => explode(" ", $student->getBirthdate())[0],
-            'email' => $student->getEmail(),
-            'courses' => $courses->getMyCourses(),
-            'totalCourses' => $courses->countCourses()
+            'user' => $student
         );
         
         $this->loadTemplate("settings/settings_edit", $viewArgs);
@@ -107,45 +102,45 @@ class SettingsController extends Controller
     //-------------------------------------------------------------------------
     //        Ajax
     //-------------------------------------------------------------------------
-    /**
-     * Updates student photo.
-     * 
-     * @param       array $_FILES['photo'] Photo information
-     * 
-     * @apiNote     Must be called using POST request method
-     */
-    public function update_profile_photo()
-    {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     /**
+//      * Updates student photo.
+//      * 
+//      * @param       array $_FILES['photo'] Photo information
+//      * 
+//      * @apiNote     Must be called using POST request method
+//      */
+//     public function update_profile_photo()
+//     {
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        $students = new Students($_SESSION['s_login']);
+//         $students = new Students($_SESSION['s_login']);
         
         
-        $students->updatePhoto($_FILES['photo']);
-    }
+//         $students->updatePhoto($_FILES['photo']);
+//     }
     
-    /**
-     * Updates student password.
-     * 
-     * @param       string $_POST['new_password'] New password
-     * @param       string $_POST['current_password'] Current password
-     * 
-     * @return      bool If password was successfully updated
-     * 
-     * @apiNote     Must be called using POST request method
-     */
-    public function update_password()
-    {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+//     /**
+//      * Updates student password.
+//      * 
+//      * @param       string $_POST['new_password'] New password
+//      * @param       string $_POST['current_password'] Current password
+//      * 
+//      * @return      bool If password was successfully updated
+//      * 
+//      * @apiNote     Must be called using POST request method
+//      */
+//     public function update_password()
+//     {
+//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
+//             header("Location: ".BASE_URL);
         
-        if (empty($_POST['new_password']) || empty($_POST['current_password']))
-            echo false;
+//         if (empty($_POST['new_password']) || empty($_POST['current_password']))
+//             echo false;
         
-        $students = new Students($_SESSION['s_login']);
+//         $students = new Students($_SESSION['s_login']);
         
         
-        echo $students->updatePassword($_POST['current_password'], $_POST['new_password']);
-    }
+//         echo $students->updatePassword($_POST['current_password'], $_POST['new_password']);
+//     }
 }

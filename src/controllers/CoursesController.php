@@ -102,8 +102,6 @@ class CoursesController extends Controller
         $students = new StudentsDAO($dbConnection, $student->getId());
         $courses = new CoursesDAO($dbConnection);
         $historic = new HistoricDAO($dbConnection, $student->getId());
-        //$classes = new Classes();
-        $historic = new HistoricDAO($dbConnection, $student->getId());
         
         
         // If student is not enrolled in the course, redirects it to home page
@@ -122,7 +120,7 @@ class CoursesController extends Controller
         else
             $class = $students->getLastClassWatched($id_course);
         
-        // Checks if a comment was sent
+        // Checks if a comment has been sent
 //         if (!empty($_POST['question'])) {
 //             $doubts = new Doubts();
             
@@ -140,27 +138,22 @@ class CoursesController extends Controller
 
         // Gets class information
         if (empty($class)) {
-            $name = '';
-            $class['type'] = "noClasses";
+            $name = 'No classes';
+            //$class['type'] = "noClasses";
             $classContent = array(
                 'message' => 'There are no registered classes'
             );
             $view = "noClasses";
-            $class['watched'] = false;
-            $class['id'] = -1;
+            //$class['watched'] = false;
+            //$class['id'] = -1;
         } 
         else {
             if ($class instanceof Video) {
                 $commentsDAO = new CommentsDAO($dbConnection);
                 $videosDAO = new VideosDAO($dbConnection);
+                
                 $name = $class->getTitle();
                 
-//                 $classContent = array(
-//                     'id_class' => $class['id'],
-//                     'video' => $class['video'],
-//                     'doubts' => $commentsDAO->get($class->getModuleId(), $class->getClassOrder()),
-//                     'watched' => $class['watched']
-//                 );
                 $classContent = array(
                     'class' => $class,
                     'comments' => $commentsDAO->getComments(
@@ -177,13 +170,9 @@ class CoursesController extends Controller
             }
             else {
                 $questionnairesDAO = new QuestionnairesDAO($dbConnection);
+                
                 $name = "Questionnaire";
                 
-//                 $classContent = array(
-//                     'id_class' => $class['id'],
-//                     'quest' => $class['quest'],
-//                     'watched' => $class['watched']
-//                 );
                 $classContent = array(
                     'class' => $class,
                     'watched' => $questionnairesDAO->wasWatched(
@@ -229,9 +218,9 @@ class CoursesController extends Controller
                 'totalWatchedClasses' => $historic->countWatchedClasses($id_course),
                 'wasWatched' => $classContent['watched']
             );
-            
-            $viewArgs['classContent'] = $classContent;
         }
+        
+        $viewArgs['classContent'] = $classContent;
         
         $this->loadTemplate("class/course", $viewArgs);
     }

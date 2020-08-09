@@ -52,7 +52,7 @@ class NotebookDAO
      * @param       int $id_note Note id
      *
      * @return      Note Information about the note or null if note does
-     * not exist
+     * not exist or it exists but does not belongs to the student
      *
      * @throws      \InvalidArgumentException If note id or student id provided
      * in the constructor is empty, less than or equal to zero
@@ -74,7 +74,7 @@ class NotebookDAO
             SELECT  *,
                     notebook.title AS notebook_title, 
                     videos.title AS videos_title
-            FROM    notebook NATURAL JOIN videos
+            FROM    notebook JOIN videos USING (id_module, class_order)
             WHERE   id_student = ? AND id_note = ?
         ");
             
@@ -174,31 +174,21 @@ class NotebookDAO
     /**
      * Updates a note.
      * 
-     * @param       int $id_note Note id to be updated
-     * @param       string $newTitle New title
-     * @param       string $newContent New content
+     * @param       Note $note Note to be updated
      * 
      * @return      bool If note has been successfully updated
      * 
-     * @throws      \InvalidArgumentException If note id or student id provided
-     * in the constructor is empty, less than or equal to zero or if title or
-     * content is empty
+     * @throws      \InvalidArgumentException If note is empty or student id 
+     * provided in the constructor is empty, less than or equal to zero
      */
-    public function update(int $id_note, string $newTitle, string $newContent) : bool
+    public function update(Note $note) : bool
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
             
-        if (empty($id_note) || $id_note <= 0)
-            throw new \InvalidArgumentException("Note id cannot be empty ".
-                "or less than or equal to zero");
-            
-        if (empty($newTitle))
-            throw new \InvalidArgumentException("Title cannot be empty");
-        
-        if (empty($newContent))
-            throw new \InvalidArgumentException("Content cannot be empty");
+        if (empty($note))
+            throw new \InvalidArgumentException("Note cannot be empty");
    
         // Query construction
         $sql = $this->db->prepare("
@@ -208,8 +198,13 @@ class NotebookDAO
         ");
                         
         // Executes query
-        $sql->execute(array($this->id_student, $newTitle, $newContent));
-        
+        $sql->execute(array(
+            $note->getTitle(),
+            $note->getContent(),
+            $this->id_student, 
+            $note->getId()
+        ));
+
         return $sql && $sql->rowCount() > 0;
     }
     
@@ -234,11 +229,11 @@ class NotebookDAO
                 "or less than or equal to zero");
             
         // Query construction
-        $sql = $this->db->query("
+        $sql = $this->db->prepare("
             DELETE FROM notebook
             WHERE id_student = ? AND id_note = ?
         ");
-            
+        
         // Executes query
         $sql->execute(array($this->id_student, $id_note));
             

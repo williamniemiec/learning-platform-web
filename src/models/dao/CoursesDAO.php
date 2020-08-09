@@ -280,7 +280,7 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If course id or student id is
      * empty or less than or equal to zero
      */
-    public function getFirstClassFromFirstModule(int $id_course) : _Class
+    public function getFirstClassFromFirstModule(int $id_course) : ?_Class
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty ".

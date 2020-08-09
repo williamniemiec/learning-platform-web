@@ -75,7 +75,7 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
             			<?php foreach($notebook as $note): ?>
             				<li class="notebook-item">
         						<div class="notebook-item-header">
-        							<a href="<?php echo BASE_URL."notebook/".$note->getId(); ?>"><?php echo $note->getTitle(); ?></a>
+        							<a href="<?php echo BASE_URL."notebook/open/".$note->getId(); ?>"><?php echo $note->getTitle(); ?></a>
         						</div>
         						<div class="notebook-item-footer">
         							<div class="notebook-item-class"><?php echo $note->getClass()->getTitle(); ?></div>

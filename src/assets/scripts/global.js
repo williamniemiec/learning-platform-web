@@ -8,4 +8,7 @@ $(function() {
 			$("footer").css("position", "")
 		}
 	}, 500)
+	
+	// Enables tooltip
+	$("[data-toggle='tooltip']").tooltip()
 })

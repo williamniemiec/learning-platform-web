@@ -61,3 +61,7 @@ li.notebook-item:not(:last-child)  {
 	justify-content:				space-between;
 	align-items:					center;
 }
+
+#note_content {
+	height:							275px;
+}

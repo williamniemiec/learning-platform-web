@@ -1,16 +1,18 @@
 <?php
 namespace controllers;
 
+
 use core\Controller;
-use models\Students;
+use models\Student;
+use database\pdo\MySqlPDODatabase;
 
 
 /**
  * Responsible for the behavior of the view {@link support/support.php}.
  *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class SupportController extends Controller
 {
@@ -23,7 +25,7 @@ class SupportController extends Controller
      */
     public function __construct()
     {
-        if (!Students::isLogged()){
+        if (!Student::isLogged()){
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -38,9 +40,9 @@ class SupportController extends Controller
      */
     public function index ()
     {   
-        $students = new Students($_SESSION['s_login']);
-        $student = $students->get($_SESSION['s_login']);
+        $dbConnection = new MySqlPDODatabase();
         
+        $student = Student::getLoggedIn($dbConnection);
         
         $header = array(
             'title' => 'Support - Learning platform',
@@ -62,13 +64,13 @@ class SupportController extends Controller
      */
     public function open()
     {
-        $students = new Students($_SESSION['s_login']);
-        $student = $students->get($_SESSION['s_login']);
+        $dbConnection = new MySqlPDODatabase();
         
+        $student = Student::getLoggedIn($dbConnection);
         
         $header = array(
             'title' => 'Support - Learning platform',
-            'styles' => array('support'),
+            'styles' => array('support', 'message'),
             'description' => "Support topic",
             'robots' => 'noindex'
         );
@@ -86,9 +88,9 @@ class SupportController extends Controller
      */
     public function new()
     {
-        $students = new Students($_SESSION['s_login']);
-        $student = $students->get($_SESSION['s_login']);
+        $dbConnection = new MySqlPDODatabase();
         
+        $student = Student::getLoggedIn($dbConnection);
         
         $header = array(
             'title' => 'New topic - Support - Learning platform',

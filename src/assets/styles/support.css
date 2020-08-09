@@ -25,23 +25,6 @@
 	width:							175px;
 }
 
-.message {
-	margin-bottom:					20px;
-	padding:						20px;
-	margin-top:						20px;
-}
-
-.message_author {
-	font-weight:					bold;
-	line-height:					31px;
-}
-
-.message_info {
-	display:						flex;
-	justify-content:				space-between;
-	margin-bottom:					5px;
-}
-
 .privilege_admin {
 	margin-left:					10px;
 	color:							var(--privilege-admin);

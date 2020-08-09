@@ -27,7 +27,7 @@ abstract class User
     
     
     //-------------------------------------------------------------------------
-    //        Getters
+    //        Getters & Setters
     //-------------------------------------------------------------------------
     /**
      * Gets user id.
@@ -50,13 +50,39 @@ abstract class User
     }
     
     /**
+     * Sets user name.
+     * 
+     * @param       string $name User name
+     * 
+     * @return      User Itself to allow chained calls
+     */
+    public function setName(string $name) : User
+    {
+        $this->name = $name;
+        return $this;
+    }
+    
+    /**
      * Gets user genre
      * 
-     * @return      GenreEnum User genre
+     * @return      GenreEnum User's genre
      */
     public function getGenre() : GenreEnum
     {
         return $this->genre;
+    }
+    
+    /**
+     * Sets user genre.
+     *
+     * @param       string $name User genre
+     *
+     * @return      User Itself to allow chained calls
+     */
+    public function setGenre(GenreEnum $genre) : User
+    {
+        $this->genre = $genre;
+        return $this;
     }
     
     /**
@@ -67,6 +93,19 @@ abstract class User
     public function getBirthdate() : DateTime
     {
         return $this->birthdate;
+    }
+    
+    /**
+     * Sets user birthdate.
+     *
+     * @param       \DateTime $birthdate User birthdate
+     *
+     * @return      User Itself to allow chained calls
+     */
+    public function setBirthdate(\DateTime $birthdate) : User
+    {
+        $this->birthdate = $birthdate;
+        return $this;
     }
     
     /**

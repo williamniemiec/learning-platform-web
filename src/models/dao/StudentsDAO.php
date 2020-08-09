@@ -258,38 +258,31 @@ class StudentsDAO
     /**
      * Updates current student information.
      * 
-     * @param       string $name
-     * @param       GenreEnum $genre New genre
-     * @param       string $birthdate New birthdate
+     * @param       Student $student Student to be updated
      * 
      * @return      boolean If student information has been successfully updated
      * 
-     * @throws      \InvalidArgumentException If any argument is invalid 
+     * @throws      \InvalidArgumentException If student is empty
      */
-    public function update(string $name, GenreEnum $genre, string $birthdate) : bool
+    public function update(Student $student) : bool
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        
-        if (empty($genre) || empty($genre->get()))
-            throw new \InvalidArgumentException("Genre cannot be empty");
-        
-        if (empty($name))
-            throw new \InvalidArgumentException("Name cannot be empty");
-            
-        if (empty($birthdate))
-            throw new \InvalidArgumentException("Birthdate cannot be empty");
-        
+        if (empty($student))
+            throw new \InvalidArgumentException("Student cannot be empty");
+
         // Query construction
         $sql = $this->db->prepare("
-            UPDATE students 
-            SET name = ?, genre = ?, birthdate = ? 
-            WHERE id = ?
+            UPDATE  students 
+            SET     name = ?, genre = ?, birthdate = ? 
+            WHERE   id_student = ?
         ");
         
         // Executes query
-        $sql->execute(array($name, $genre, $birthdate));
+        $sql->execute(array(
+            $student->getName(), 
+            $student->getGenre()->get(), 
+            $student->getBirthdate()->format("Y-m-d"),
+            $student->getId()
+        ));
         
         return $sql && $sql->rowCount() > 0;
     }
