@@ -26,7 +26,7 @@ class Enumeration
      */
     public final function __construct($enum = null)
     {
-        if (!empty($enum))
+        if (!empty($enum) || (empty($enum) && $enum == '0'))
             $this->selected = $enum;
     }
     
