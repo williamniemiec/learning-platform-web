@@ -29,6 +29,7 @@ class SupportTopic
     private $message;
     private $closed;
     private $replies;
+    private $db;
     
     
     //-------------------------------------------------------------------------
@@ -40,14 +41,13 @@ class SupportTopic
      * @param       int $id_topic Topic id
      * @param       Student $student Student who created the support topic
      * @param       string $title
-     * @param       string $category Support topic category 
+     * @param       SupportTopicCategory $category Support topic category 
      * @param       DateTime $date Support topic creation date
-     * @param       string $text Initial Support topic message
+     * @param       string $message Initial Support topic message
      * @param       bool $closed Support topic status
-     * @param       Message[] $replies [Optional] Support topic replies
      */
     public function __construct(int $id_topic, Student $student, string $title,
-        string $category, DateTime $date, string $message, int $closed)
+        SupportTopicCategory $category, DateTime $date, string $message, int $closed)
     {
         $this->id_topic = $id_topic;
         $this->student = $student;
@@ -60,16 +60,16 @@ class SupportTopic
     
     
     //-------------------------------------------------------------------------
-    //        Getters
+    //        Getters & Setters
     //-------------------------------------------------------------------------
     /**
      * Gets support topic id.
      * 
      * @return      int support topic id
      */
-    public function getSupportTopicId() : int
+    public function getId() : int
     {
-        return $this->id_comment;
+        return $this->id_topic;
     }
     
     /**
@@ -77,7 +77,7 @@ class SupportTopic
      *
      * @return      Student Student who created the support topic
      */
-    public function getCreator() : string
+    public function getCreator() : Student
     {
         return $this->student;
     }
@@ -95,9 +95,9 @@ class SupportTopic
     /**
      * Gets support topic category.
      * 
-     * @return      string Support topic category
+     * @return      SupportTopicCategory Support topic category
      */
-    public function getCategory() : string
+    public function getCategory() : SupportTopicCategory
     {
         return $this->category;
     }
@@ -140,15 +140,44 @@ class SupportTopic
      * @return      Message[] Support topic replies or empty array if there are no
      * replies
      * 
+     * @throws      \InvalidArgumentException If database has not yet been
+     * set and a database is not provided to obtain this information
+     * 
      * @implNote    Lazy initialization
      */
-    public function getReplies(Database $db) : array
+    public function getReplies(?Database $db = null) : array
     {
+        if (empty($this->db) && empty($db))
+            throw new \InvalidArgumentException("Database cannot be empty");
+        
+        if (empty($db)) {
+            $db = $this->db;       
+        }
+            
         if (empty($this->replies)) {
-            $topic = new SupportTopicDAO($db);
+            $topic = new SupportTopicDAO($db, Student::getLoggedIn($db)->getId());
             $this->replies = $topic->getReplies($this->id_topic);
         }
         
         return $this->replies;
+    }
+    
+    /**
+     * Sets a database.
+     * 
+     * @param       Database $db Database
+     * 
+     * @return      SupportTopic Itself to allow chained calls
+     * 
+     * @throws      \InvalidArgumentException If database is null
+     */
+    public function setDatabase(Database $db) : SupportTopic
+    {
+        if (empty($db))
+            throw new \InvalidArgumentException("Database cannot be empty");
+        
+        $this->db = $db;
+        
+        return $this;
     }
 }

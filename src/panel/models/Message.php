@@ -74,7 +74,7 @@ class Message
      */
     public function getContent() : string
     {
-        return $this->text;
+        return $this->message;
     }
     
     /**

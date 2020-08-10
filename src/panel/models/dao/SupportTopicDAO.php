@@ -66,14 +66,14 @@ class SupportTopicDAO
      * @return      SupportTopic Support topic with the given id or null if there
      * is no topic with the provided id
      */
-    public function get() : array
+    public function get() : ?SupportTopic
     {            
         if ($this->getAuthorization()->getLevel() != 0 &&
             $this->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
-        $response = NULL;
+        $response = null;
         
         // Query construction
         $sql = $this->db->prepare("

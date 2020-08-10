@@ -1,28 +1,53 @@
+<?php use models\Admin; ?>
+
 <div class="container">
 	<div class="view_panel">
-		<h1 class="view_header">Support - {name}</h1>
+		<h1 class="view_header">Support - <?php echo $topic->getTitle(); ?></h1>
 		<div class="view_content">
-    		<button class="btn_theme">Close</button>
+            <!-- Topic actions -->
+            <?php if ($topic->isClosed()): ?>
+    			<a href="<?php echo BASE_URL."support/unlock/".$topic->getId(); ?>" class="btn_theme" >Open</a>
+			<?php else: ?>
+				<a href="<?php echo BASE_URL."support/lock/".$topic->getId(); ?>" class="btn_theme" >Close</a>
+			<?php endif; ?>
+    		
+    		<!-- Topic first message -->
         	<div class="message view_widget">
         		<div class="message_info">
-            		<div class="message_author">Name</div>
-            		<div class="view_widget_info">25/03/2020</div>
+            		<div class="message_author">
+            			<?php echo $topic->getCreator()->getName(); ?>
+            			<?php if ($topic->getCreator() instanceof Admin): ?>
+            				<span class="privilege_admin">Admin</span>
+        				<?php endif; ?>
+        			</div>
+            		<div class="view_widget_info"><?php echo $topic->getCreationDate()->format("m-d-Y H:m:s"); ?></div>
         		</div>
-        		<div class="message_content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sollicitudin diam commodo libero faucibus euismod. Maecenas dictum, ligula et luctus congue, nulla eros varius neque, nec auctor augue risus nec metus. Sed scelerisque accumsan nisl ut placerat. Vivamus congue vehicula tellus, in semper nulla vehicula ut. Donec efficitur et metus id interdum. Vivamus leo tortor, mattis id felis eu, aliquet mollis lacus. Nullam eget sapien tincidunt, tempus felis at, condimentum sapien. Vivamus metus tortor, egestas ac tortor quis, cursus commodo felis. Phasellus fermentum facilisis ornare. Duis tincidunt eget risus a dignissim. Quisque eu fermentum mauris. Maecenas dapibus commodo massa, eget tempus dolor tempor non. Donec finibus consequat arcu eu consequat. Sed hendrerit diam vel nulla aliquam pellentesque. Vestibulum et consectetur turpis. Praesent vel leo nec ligula fermentum euismod.</div>
+        		<div class="message_content"><?php echo $topic->getContent(); ?></div>
         	</div>
-        	<div class="message view_widget">
-        		<div class="message_info">
-            		<div class="message_author">Name<span class="privilege_admin">Admin</span></div>
-            		<div class="view_widget_info">25/03/2020</div>
-        		</div>
-        		<div class="message_content">Phasellus lobortis risus ligula, id auctor ante lobortis eget. Integer libero erat, congue id arcu eget, ultrices sodales nibh. Vivamus pellentesque in massa vel pulvinar. Morbi risus ante, feugiat vitae semper vel, scelerisque eu mauris. Nullam eu velit eget ex dignissim congue. Maecenas auctor sed purus in convallis. Praesent iaculis tincidunt accumsan. Duis interdum quis erat a tristique. In mattis eros non dolor dapibus, id mollis mauris sagittis. Maecenas placerat pharetra neque nec maximus. Morbi tempor facilisis tincidunt.</div>
-        	</div>
+        	
+        	<!-- Topic replies -->
+        	<?php foreach ($topic->getReplies() as $reply): ?>
+        		<div class="message view_widget">
+            		<div class="message_info">
+                		<div class="message_author">
+                			<?php echo $reply->getCreator()->getName(); ?>
+                			<?php if ($reply->getCreator() instanceof Admin): ?>
+                				<span class="privilege_admin">Admin</span>
+            				<?php endif; ?>
+            			</div>
+                		<div class="view_widget_info"><?php echo $reply->getDate()->format("m-d-Y H:m:s"); ?></div>
+            		</div>
+            		<div class="message_content"><?php echo $reply->getContent(); ?></div>
+            	</div>
+        	<?php endforeach; ?>
+        	
+        	<!-- Send form -->
         	<form method="POST">
         		<div class="form-group">
-        			<textarea class="form-control"></textarea>
+        			<textarea name="topic_message" class="form-control" <?php if ($topic->isClosed()) echo "disabled"; ?>></textarea>
         		</div>
         		<div class="form-group">
-        			<input class="btn_theme btn_full" type="submit" value="Send" />
+        			<input class="btn_theme btn_full" type="submit" value="Send" <?php if ($topic->isClosed()) echo "disabled"; ?> />
         		</div>
         	</form>
     	</div>

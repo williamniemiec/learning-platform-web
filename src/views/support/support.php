@@ -9,22 +9,18 @@
             			<th>Title</th>
             			<th>Category</th>
             			<th class="support_date">Date of publication</th>
-            			<th>Created by</th>
+            			<th>Status</th>
             		</tr>
             	</thead>
             	<tbody>
+            		<?php foreach ($supportTopics as $topic): ?>
             		<tr>
-            			<td><a href="<?php echo BASE_URL; ?>support/open">Some title</a></td>
-            			<td>Sugestion</td>
-            			<td>25/05/2020</td>
-            			<td>Creator's name</td>
+            			<td><a href="<?php echo BASE_URL."support/open/".$topic->getId(); ?>"><?php echo $topic->getTitle(); ?></a></td>
+            			<td><?php echo ucfirst(strtolower($topic->getCategory()->getName())); ?></td>
+            			<td><?php echo $topic->getCreationDate()->format("m-d-Y H:m:s"); ?></td>
+            			<td><?php echo $topic->isClosed() ? "Closed" : "Open" ?></td>
             		</tr>
-            		<tr>
-            			<td>Some title</td>
-            			<td>Sugestion</td>
-            			<td>25/05/2020</td>
-            			<td>Creator's name</td>
-            		</tr>
+            		<?php endforeach; ?>
             	</tbody>
             </table>
         </div>

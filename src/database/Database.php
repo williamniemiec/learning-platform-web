@@ -57,7 +57,7 @@ abstract class Database
      * @return      DatabaseStatement Returns a statement object, or null on 
      * failure.
      */
-    public abstract function query(string $statement) : DatabaseStatement;
+    public abstract function query(string $statement) : ?DatabaseStatement;
     
     /**
      * Prepares a statement for execution and returns a statement object.
@@ -69,7 +69,7 @@ abstract class Database
      * prepares the statement, returns a PDOStatement object. If the database
      * server cannot successfully prepare the statement, returns null;
      */
-    public abstract function prepare(string $statement) : DatabaseStatement;
+    public abstract function prepare(string $statement) : ?DatabaseStatement;
     
     /**
      * Returns the ID of the last inserted row or sequence value.

@@ -284,6 +284,7 @@ table,
 
 
 /* Input */
+select:focus,
 textarea:focus, 
 textarea.form-control:focus, 
 input.form-control:focus, 
@@ -296,8 +297,8 @@ input[type=number]:focus,
 [type=email].form-control:focus, 
 [type=tel].form-control:focus, 
 [contenteditable].form-control:focus {
-	box-shadow:						0 0 7px var(--color-accent);
-	border-color:					var(--color-accent);
+	box-shadow:						0 0 7px var(--color-accent)!important;
+	border-color:					var(--color-accent)!important;
 }
 
 input[type='file'] {
