@@ -41,6 +41,7 @@ class BundleController extends Controller
 	    );
 	    
 	    if (Student::isLogged()) {
+	        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
 	        //....
 	    }
 	    else {

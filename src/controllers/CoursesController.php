@@ -13,7 +13,7 @@ use models\dao\StudentsDAO;
 use models\dao\VideosDAO;
 use models\dao\QuestionnairesDAO;
 use models\dao\NotebookDAO;
-
+use models\dao\NotificationsDAO;
 
 
 /**
@@ -62,6 +62,7 @@ class CoursesController extends Controller
         $student = Student::getLoggedIn($dbConnection);
         $coursesDAO = new CoursesDAO($dbConnection);
         $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         $courses = $coursesDAO->getMyCourses($student->getId());
 
 		$viewArgs = array(
@@ -69,6 +70,9 @@ class CoursesController extends Controller
 		    'courses' => $courses,
 		    'totalCourses' => count($courses),
 		    'header' => $header,
+		    'notifications' => array(
+		        'notifications' => $notificationsDAO->getNotifications(10),
+		        'total_unread' => $notificationsDAO->countUnreadNotification()),
 		    'scripts' => array('chart_progress'),
 		    'notebook' => $notebookDAO->getAll()
 		);
@@ -102,6 +106,7 @@ class CoursesController extends Controller
         $students = new StudentsDAO($dbConnection, $student->getId());
         $courses = new CoursesDAO($dbConnection);
         $historic = new HistoricDAO($dbConnection, $student->getId());
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         
         
         // If student is not enrolled in the course, redirects it to home page
@@ -221,6 +226,10 @@ class CoursesController extends Controller
         }
         
         $viewArgs['classContent'] = $classContent;
+        $viewArgs['notifications'] = array(
+            'notifications' => $notificationsDAO->getNotifications(10),
+            'total_unread' => $notificationsDAO->countUnreadNotification()
+        );
         
         $this->loadTemplate("class/course", $viewArgs);
     }

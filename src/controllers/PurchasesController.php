@@ -5,6 +5,7 @@ namespace controllers;
 use core\Controller;
 use database\pdo\MySqlPDODatabase;
 use models\Student;
+use models\dao\NotificationsDAO;
 
 
 /**
@@ -42,6 +43,8 @@ class PurchasesController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $student = Student::getLoggedIn($dbConnection);
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+        
         $header = array(
             'title' => 'Purchases - Learning Platform',
             
@@ -53,7 +56,10 @@ class PurchasesController extends Controller
 
         $viewArgs = array(
             'header' => $header,
-            'username' => $student->getName()
+            'username' => $student->getName(),
+            'notifications' => array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
         $this->loadTemplate("PurchasesView", $viewArgs, Student::isLogged());

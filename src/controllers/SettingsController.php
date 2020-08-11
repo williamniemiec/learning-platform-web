@@ -6,6 +6,7 @@ use models\Student;
 use database\pdo\MySqlPDODatabase;
 use models\dao\StudentsDAO;
 use models\enum\GenreEnum;
+use models\dao\NotificationsDAO;
 
 
 /**
@@ -44,6 +45,7 @@ class SettingsController extends Controller
         $dbConnection = new MySqlPDODatabase();
         
         $student = Student::getLoggedIn($dbConnection);
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         
         $header = array(
             'title' => 'Settings - Learning platform',
@@ -56,7 +58,10 @@ class SettingsController extends Controller
             'header' => $header,
             'scripts' => array("settings"),
             'username' => $student->getName(),
-            'user' => $student
+            'user' => $student,
+            'notifications' => array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
         $this->loadTemplate("settings/settings", $viewArgs);
@@ -70,6 +75,7 @@ class SettingsController extends Controller
         $dbConnection = new MySqlPDODatabase();
         
         $student = Student::getLoggedIn($dbConnection);
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         
         $header = array(
             'title' => 'Settings - Update - Learning platform',
@@ -92,7 +98,10 @@ class SettingsController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'user' => $student
+            'user' => $student,
+            'notifications' => array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
         $this->loadTemplate("settings/settings_edit", $viewArgs);

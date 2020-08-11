@@ -6,6 +6,7 @@ use core\Controller;
 use models\Student;
 use database\pdo\MySqlPDODatabase;
 use models\dao\NotebookDAO;
+use models\dao\NotificationsDAO;
 use models\Note;
 
 
@@ -52,6 +53,7 @@ class NotebookController extends Controller
         
         $student = Student::getLoggedIn($dbConnection);
         $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         $note = $notebookDAO->get($id_note);
         
         // If does not exist an note with the provided id or if it exists but
@@ -71,7 +73,10 @@ class NotebookController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'note' => $note
+            'note' => $note,
+            'notifications' => array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
         $this->loadTemplate("notebook_content", $viewArgs);

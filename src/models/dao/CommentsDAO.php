@@ -84,6 +84,54 @@ class CommentsDAO
     }
     
     /**
+     * Gets a comment.
+     *
+     * @param       int $id_comment Comment id
+     *
+     * @return      Comment Comment with the specified id of null if does not 
+     * exist a commend with the specified id 
+     *
+     * @throws      \InvalidArgumentException If comment id is empty or less 
+     * than or equal to zero
+     */
+    public function get(int $id_comment) : ?Comment
+    {
+        if (empty($id_comment) || $id_comment <= 0)
+            throw new \InvalidArgumentException("Comment id cannot be empty ".
+                "or less than or equal to zero");
+            
+            $response = null;
+                
+        // Query construction
+        $sql = $this->db->prepare("
+            SELECT  *
+            FROM    comments
+            WHERE   id_comment = ?
+        ");
+                
+        // Executes query
+        $sql->execute(array($id_comment));
+                
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
+            $comment = $sql->fetch();
+            $studentsDAO = new StudentsDAO($this->db, (int)$comment['id_student']);
+            
+            $response = new Comment(
+                (int)$comment['id_comment'],
+                (int)$comment['id_course'],
+                (int)$comment['id_module'],
+                (int)$comment['class_order'],
+                $studentsDAO->get(),
+                new \DateTime($comment['date']),
+                $comment['text']
+            );
+        }
+        
+        return $response;
+    }
+    
+    /**
      * Gets comments from a class.
      * 
      * @param       int $id_module Module id that the class belongs
@@ -130,6 +178,9 @@ class CommentsDAO
                 
                 $response[$i]['comment'] = new Comment(
                     (int)$comment['id_comment'],
+                    (int)$comment['id_course'],
+                    (int)$comment['id_module'],
+                    (int)$comment['class_order'],
                     $studentsDAO->get(), 
                     new \DateTime($comment['date']), 
                     $comment['text']

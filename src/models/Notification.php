@@ -39,8 +39,8 @@ class Notification
      * @param       int $id_student Student id to which the notification
      * belongs
      * @param       DateTime $date Date to which the notification was generated
-     * @param       int $id_reference Comment id or Support topic id to which
-     * the notification refers
+     * @param       mixed $reference Comment or Support topic to which the 
+     * notification refers
      * @param       NotificationTypeEnum $type $id_reference type
      * @param       string $ref_text Topic message or comment message to which
      * the notification refers
@@ -48,13 +48,13 @@ class Notification
      * @param       int $read [Optional] If the notification has not yet been
      * read
      */
-    public function __construct(int $id_notification, int $id_student, DateTime $date, int $id_reference,
+    public function __construct(int $id_notification, int $id_student, DateTime $date, $reference,
         NotificationTypeEnum $type, string $ref_text, string $message, int $read = 0)
     {
         $this->id_notification = $id_notification;
         $this->id_student = $id_student;
         $this->date = $date;
-        $this->id_reference = $id_reference;
+        $this->reference = $reference;
         $this->type = $type;
         $this->ref_text = $ref_text;
         $this->message = $message;
@@ -98,10 +98,11 @@ class Notification
     /**
      * Gets reference id to which the notification refers.
      * 
+     * @return      mixed Support topic or Comment
      */
-    public function getReferenceId() : int
+    public function getReference()
     {
-        return $this->id_reference;
+        return $this->reference;
     }
     
     /**

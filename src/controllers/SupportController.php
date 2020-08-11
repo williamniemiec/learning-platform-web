@@ -6,6 +6,7 @@ use core\Controller;
 use models\Student;
 use database\pdo\MySqlPDODatabase;
 use models\dao\SupportTopicDAO;
+use models\dao\NotificationsDAO;
 
 
 /**
@@ -45,6 +46,7 @@ class SupportController extends Controller
         
         $student = Student::getLoggedIn($dbConnection);
         $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         
         $header = array(
             'title' => 'Support - Learning platform',
@@ -56,7 +58,10 @@ class SupportController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'supportTopics' => $supportTopicDAO->getAll()
+            'supportTopics' => $supportTopicDAO->getAll(),
+            'notifications' => array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
         $this->loadTemplate("support/support", $viewArgs);
@@ -71,6 +76,7 @@ class SupportController extends Controller
         
         $student = Student::getLoggedIn($dbConnection);
         $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         $topic = $supportTopicDAO->get($id_topic);
         
         // If topic does not exist or it exists but does not belongs to the 
@@ -97,7 +103,10 @@ class SupportController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'topic' => $topic->setDatabase($dbConnection)
+            'topic' => $topic->setDatabase($dbConnection),
+            'notifications' => array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
         $this->loadTemplate("support/support_content", $viewArgs);
@@ -160,6 +169,7 @@ class SupportController extends Controller
         
         $student = Student::getLoggedIn($dbConnection);
         $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         
         // Checks whether form has been sent
         if (!empty($_POST['topic_title']) && !empty($_POST['topic_category']) && 
@@ -185,7 +195,10 @@ class SupportController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'categories' => $supportTopicDAO->getCategories()
+            'categories' => $supportTopicDAO->getCategories(),
+            'notifications' => array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
         $this->loadTemplate("support/support_new", $viewArgs);

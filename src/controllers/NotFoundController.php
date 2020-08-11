@@ -4,6 +4,7 @@ namespace controllers;
 use core\Controller;
 use models\Student;
 use database\pdo\MySqlPDODatabase;
+use models\dao\NotificationsDAO;
 
 
 /**
@@ -39,8 +40,14 @@ class NotFoundController extends Controller
 	    
 	    if (empty($student))
 	        $this->loadTemplate('errors/404', $viewArgs, false);
+	    
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
 	        
         $viewArgs['username'] = $student->getName();
+        $viewArgs['notifications'] = array(
+            'notifications' => $notificationsDAO->getNotifications(10),
+            'total_unread' => $notificationsDAO->countUnreadNotification()
+        );
         
         $this->loadTemplate('errors/404', $viewArgs, true);
 	}

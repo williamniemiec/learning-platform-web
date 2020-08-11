@@ -7,6 +7,9 @@ namespace models\dao;
 use database\Database;
 use models\Notification;
 use models\enum\NotificationTypeEnum;
+use models\SupportTopic;
+use models\Comment;
+use models\Student;
 
 /**
  * Responsible for managing 'notifications' table.
@@ -92,11 +95,20 @@ class NotificationsDAO
             $notifications = $sql->fetchAll();
             
             foreach ($notifications as $notification) {
+                if ($notification['type'] == 0) {
+                    $commentsDAO = new CommentsDAO($this->db);
+                    $ref = $commentsDAO->get((int)$notification['id_reference']);
+                }
+                else {
+                    $supportTopicDAO = new SupportTopicDAO($this->db, Student::getLoggedIn($this->db)->getId());
+                    $ref = $supportTopicDAO->get((int)$notification['id_reference']);
+                }
+                
                 $response[] = new Notification(
                     (int)$notification['id_notification'],
                     (int)$notification['id_student'], 
                     new \DateTime($notification['date']),
-                    (int)$notification['id_reference'],
+                    $ref,
                     new NotificationTypeEnum($notification['type']),
                     $notification['text_ref'],
                     $notification['message'],
@@ -131,25 +143,27 @@ class NotificationsDAO
     /**
      * Removes a notification.
      * 
-     * @param       string $date Notification creation date
+     * @param       int $id_notification Notification id
      * 
      * @return      bool If notification has been successfully removed
 
-     * @throws      \InvalidArgumentException If date is empty
+     * @throws      \InvalidArgumentException If notification id is empty or
+     * less than or equal to zero
      */
-    public function delete(string $date) : bool
+    public function delete(int $id_notification) : bool
     {
-        if (empty($date))
-            throw new \InvalidArgumentException("Date cannot be empty");
+        if (empty($id_notification) or $id_notification <= 0)
+            throw new \InvalidArgumentException("Notification id cannot be empty ".
+                "or less than or equal to zero");
         
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM notifications
-            WHERE id_student = ? AND date = ?
+            WHERE id_student = ? AND id_notification = ?
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student, $date));
+        $sql->execute(array($this->id_student, $id_notification));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -194,46 +208,50 @@ class NotificationsDAO
     /**
      * Mark a notification as read.
      * 
-     * @param       string $date Notification creation date
+     * @param       int $id_notification Notification id
      * 
-     * @throws      \InvalidArgumentException If date is empty
+     * @throws      \InvalidArgumentException If notification id is empty or
+     * less than or equal to zero
      */
-    public function markAsRead(string $date) : void
+    public function markAsRead(int $id_notification) : void
     {
-        if (empty($date))
-            throw new \InvalidArgumentException("Date cannot be empty");
+        if (empty($id_notification) or $id_notification <= 0)
+            throw new \InvalidArgumentException("Notification id cannot be empty ".
+                "or less than or equal to zero");
             
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  notifications
-            SET     read = 1
-            WHERE   id_student = ? AND date = ?
+            SET     `read` = 1
+            WHERE   id_student = ? AND id_notification = ?
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student, $date));
+        $sql->execute(array($this->id_student, $id_notification));
     }
     
     /**
      * Mark a notification as unread.
      *
-     * @param       string $date Notification creation date
+     * @param       int $id_notification Notification id
      *
-     * @throws      \InvalidArgumentException If date is empty
+     * @throws      \InvalidArgumentException If notification id is empty or
+     * less than or equal to zero
      */
-    public function markAsUnread(string $date) : void
+    public function markAsUnread(int $id_notification) : void
     {
-        if (empty($date))
-            throw new \InvalidArgumentException("Date cannot be empty");
+        if (empty($id_notification) or $id_notification <= 0)
+            throw new \InvalidArgumentException("Notification id cannot be empty ".
+                "or less than or equal to zero");
             
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  notifications
-            SET     read = 0
-            WHERE   id_student = ? AND date = ?
+            SET     `read` = 0
+            WHERE   id_student = ? AND id_notification = ?
         ");
             
         // Executes query
-        $sql->execute(array($this->id_student, $date));
+        $sql->execute(array($this->id_student, $id_notification));
     }
 }

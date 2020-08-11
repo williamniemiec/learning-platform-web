@@ -76,3 +76,12 @@
     border-radius:					5px;
     color:							var(--view-widget-accent);
 }
+
+a.notification_msg {
+	text-decoration:				none;
+	display:						block;
+}
+
+.no_notifications {
+	display:						none;
+}
