@@ -5,7 +5,7 @@
 <script src='<?php echo BASE_URL; ?>lib/password_strength/ps_script.js'></script>
 <script src='<?php echo BASE_URL; ?>lib/chartjs/Chart.min.js'></script>
 <script src='<?php echo BASE_URL; ?>assets/scripts/global.js'></script>
-<script src='<?php echo BASE_URL; ?>assets/scripts/notifications.js'></script>
+<script src='<?php echo BASE_URL; ?>assets/scripts/NotificationScript.js'></script>
 <script>var BASE_URL = "<?php echo BASE_URL; ?>"</script>
 
 <?php if (!empty($scripts)) foreach ($scripts as $script): ?>

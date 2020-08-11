@@ -54,11 +54,6 @@
     padding:						10px;
 }
 
-/* Notification - scrollbar */
-#mCSB_2_container {
-	padding-right:					15px;
-}
-
 .notification:hover {
 	background-color:				var(--text-dark);
 }
@@ -84,4 +79,10 @@ a.notification_msg {
 
 .no_notifications {
 	display:						none;
+}
+
+
+/* Notification - scrollbar */
+#mCSB_2_container {
+	padding-right:					15px;
 }

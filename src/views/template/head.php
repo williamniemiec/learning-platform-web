@@ -22,7 +22,7 @@
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/scrollbar_light/scrollbar_light.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL."assets/styles/colors/".THEME.".css"; ?>' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/styles/btnTheme.css' />
-<link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/styles/notifications.css' />
+<link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/styles/NotificationStyle.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/password_strength/ps_style.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/chartjs/Chart.min.css' />
 <link rel='stylesheet' type='text/css' href='<?php echo BASE_URL; ?>assets/styles/BirthdateAlertStyle.php' />
