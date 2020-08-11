@@ -33,6 +33,10 @@
 	padding-right:					5px;
 }
 
+#mCSB_2_container.mCS_no_scrollbar_y {
+	padding-right:					0;
+}
+
 .notification.new {
 	background-color:				var(--color-primary);
 }
@@ -63,9 +67,11 @@
 	display:						flex;
 	justify-content:				space-between;
 	align-items:					center;
+	margin-bottom:					10px;
 }
 
 .notification_date {
+	font-size:						12px;
     padding:						2px 5px;
     border-radius:					5px;
     color:							var(--view-widget-accent);

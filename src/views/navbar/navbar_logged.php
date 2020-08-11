@@ -12,47 +12,7 @@
 				</ul>
 			</div>
 			<div class="navbar-nav nav-right">
-				<div class="notifications">
-					<div class="notification_icon">
-    					<span class="notifications_new badge badge-danger badge-pill">1</span>
-    					<i style="font-size:24px" class="fa">&#xf0f3;</i>
-					</div>
-					<div class="notifications_area scrollbar_light">
-						<div class="notification">
-							<div class="notification_info">
-    							<div class="notification_date">25/05/2020</div>
-    							<button class="notification_btn">Mark as unread</button>
-    							<span class="caret">&times;</span>
-							</div>
-							<div class="notification_msg">Donec id diam at nulla sagittis lobortis. Phasellus pellentesque vehicula massa id ultricies. Fusce ac mauris ac sapien blandit sodales non nec augue. Nullam odio mi, faucibus ac dolor non, ornare feugiat erat.</div>
-						</div>
-						<div class="notification new">
-							<div class="notification_info">
-    							<div class="notification_date">21/12/2019</div>
-    							<button class="notification_btn">Mark as read</button>
-    							<span class="caret">&times;</span>
-							</div>
-							<div class="notification_msg">Maecenas dapibus faucibus tortor quis posuere. Phasellus porta rhoncus neque in euismod. Morbi sit amet mauris aliquet, dictum lorem a, elementum purus.</div>
-						</div>
-						<div class="notification">
-							...
-						</div>
-						<div class="notification">
-							...
-						</div>
-						<div class="notification">
-							...
-						</div>
-						<div class="notification">
-							...
-						</div>
-						<div class="notification">
-							...
-						</div>
-					</div>
-				</div>
-				
-				
+				<?php $this->loadView("notification/notification", array("notifications" => $notifications)); ?>
 				
 				<div class="dropdown">
 					<a class="btn btn-link dropdown-toggle" data-toggle="dropdown">

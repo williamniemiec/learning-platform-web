@@ -37,7 +37,7 @@ class NotificationsDAO
      */
     public function __construct(Database $db, int $id_student)
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty or ".
                 "less than or equal to zero");
             
@@ -78,7 +78,7 @@ class NotificationsDAO
                ELSE (SELECT message
                      FROM   support_topic
                      WHERE  id_topic = id_reference)
-            END AS 'text_ref'
+            END AS text_ref
             FROM    notifications
             WHERE   id_student = ?
             LIMIT   ".$limit."
@@ -98,7 +98,7 @@ class NotificationsDAO
                     new \DateTime($notification['date']),
                     (int)$notification['id_reference'],
                     new NotificationTypeEnum($notification['type']),
-                    $notification['ref_text'],
+                    $notification['text_ref'],
                     $notification['message'],
                     (int)$notification['read']
                 );
@@ -125,7 +125,7 @@ class NotificationsDAO
         // Executes query
         $sql->execute(array($this->id_student));
         
-        return $sql->fetch()['total_unread'];
+        return (int)$sql->fetch()['total_unread'];
     }
     
     /**
