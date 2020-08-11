@@ -52,8 +52,8 @@ class NotebookController extends Controller
         $dbConnection = new MySqlPDODatabase();
         
         $student = Student::getLoggedIn($dbConnection);
-        $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
         $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+        $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
         $note = $notebookDAO->get($id_note);
         
         // If does not exist an note with the provided id or if it exists but
@@ -76,7 +76,7 @@ class NotebookController extends Controller
             'note' => $note,
             'notifications' => array(
                 'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification())
+                'total_unread' => $notificationsDAO->countUnreadNotification()),
         );
         
         $this->loadTemplate("notebook_content", $viewArgs);
@@ -93,6 +93,7 @@ class NotebookController extends Controller
         
         $student = Student::getLoggedIn($dbConnection);
         $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
+        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         $note = $notebookDAO->get($id_note);
         
         // If does not exist an note with the provided id or if it exists but 
@@ -127,7 +128,10 @@ class NotebookController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'note' => $note
+            'note' => $note,
+            'notifications' => array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification()),
         );
         
         $this->loadTemplate("notebook_edit", $viewArgs);
@@ -157,5 +161,43 @@ class NotebookController extends Controller
         
         header("Location: ".BASE_URL."courses");
         exit;
+    }
+    
+    //-------------------------------------------------------------------------
+    //        Ajax
+    //-------------------------------------------------------------------------
+    /**
+     * Creates a new note.
+     *
+     * @param       int $_POST['id_module'] Note's title
+     * @param       int $_POST['class_order'] Note's title
+     * @param       int $_POST['title'] Note's title
+     * @param       int $_POST['content'] Note's content
+     *
+     * @return      int Note id or -1 if note has not been created
+     *
+     * @apiNote     Must be called using POST request method
+     */
+    public function new()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+            
+            if (empty($_POST['title']) || empty($_POST['content']) || 
+                empty($_POST['id_module']) || empty($_POST['class_order']) || 
+                $_POST['id_module'] <= 0 || $_POST['class_order'] <= 0) {
+            return;
+        }
+        
+        $dbConnection = new MySqlPDODatabase();
+        $notebookDAO = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        
+        echo $notebookDAO->new(
+            (int)$_POST['id_module'], 
+            (int)$_POST['class_order'],
+            $_POST['title'], 
+            $_POST['content']
+        );
     }
 }

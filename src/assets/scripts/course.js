@@ -6,6 +6,7 @@ $(function(){
 	//setInterval(updateScreen, 200)
 	$(window).resize(updateScreen)
 	
+	
 	// Course menu button
 	$(".course_menu_action").click(function() {
 		$(".course_menu_action #mobile_menu_button").toggleClass("active")
@@ -156,6 +157,51 @@ function removeWatched(id_class)
 	$(".content_info").find(".class_watched").fadeOut("fast")
 	$(`.module_class[data-id='${id_class}']`).find(".class_watched").fadeOut("fast")
 	$(".btn_mark_watch").attr("onclick", "markAsWatched("+id_class+")")
+}
+
+/**
+ * Creates a new note.
+ *
+ * @param		object Send button
+ */
+function newNote(obj, id_module, class_order)
+{
+	//let form = $(obj).closest("form")
+	const data = $(obj).closest(".class_content")
+	const title = $("#note_title").val()
+	const content = $("#note_content").val()
+	
+	$.ajax({
+		type:"POST",
+		url:BASE_URL+"notebook/new",
+		data:{
+			id_module:id_module,
+			class_order:class_order,
+			title:title,
+			content:content
+		},
+		success:(id_note) => {
+			const d = new Date()
+			const year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(d)
+			const month = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(d)
+			const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d)
+			const newNote = `
+				<li class="notebook-item">
+					<div class="notebook-item-header">
+						<a href="${BASE_URL}notebook/open/${id_note}">${title}</a>
+					</div>
+					<div class="notebook-item-footer">
+						<div class="notebook-item-class">${title}</div>
+						<div class="notebook-item-date">${month+'-'+day+"-"+year}</div>
+					</div>
+				</li>
+			`
+			
+			$(obj).closest(".content_notes").find("ul.notebook").hide().prepend(newNote).fadeIn("fast")
+			$("#note_title").val("")
+			$("#note_content").val("")
+		}
+	})
 }
 
 /**

@@ -156,6 +156,7 @@ class CoursesController extends Controller
             if ($class instanceof Video) {
                 $commentsDAO = new CommentsDAO($dbConnection);
                 $videosDAO = new VideosDAO($dbConnection);
+                $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
                 
                 $name = $class->getTitle();
                 
@@ -167,6 +168,10 @@ class CoursesController extends Controller
                     ),
                     'watched' => $videosDAO->wasWatched(
                         $student->getId(), $class->getModuleId(),
+                        $class->getClassOrder()
+                    ),
+                    'notebook' => $notebookDAO->getAllFromClass(
+                        $class->getModuleId(),
                         $class->getClassOrder()
                     )
                 );
@@ -192,7 +197,7 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => $course->getName().' - Learning platform',
-            'styles' => array('courses', 'mobile_menu_button'),
+            'styles' => array('courses', 'mobile_menu_button', 'notebook'),
             'description' => $name,
             //'keywords' => array('learning platform', 'course', $course['name']),
             'robots' => 'noindex'

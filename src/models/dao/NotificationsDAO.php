@@ -73,15 +73,7 @@ class NotificationsDAO
         
         // Query construction
         $sql = $this->db->prepare("
-            SELECT  *,
-            CASE
-               WHEN type = 0 THEN (SELECT   text
-                                   FROM     comments
-                                   WHERE    id_comment = id_reference)
-               ELSE (SELECT message
-                     FROM   support_topic
-                     WHERE  id_topic = id_reference)
-            END AS text_ref
+            SELECT  *
             FROM    notifications
             WHERE   id_student = ?
             LIMIT   ".$limit."
@@ -97,6 +89,7 @@ class NotificationsDAO
             foreach ($notifications as $notification) {
                 if ($notification['type'] == 0) {
                     $commentsDAO = new CommentsDAO($this->db);
+                    
                     $ref = $commentsDAO->get((int)$notification['id_reference']);
                 }
                 else {
@@ -110,7 +103,6 @@ class NotificationsDAO
                     new \DateTime($notification['date']),
                     $ref,
                     new NotificationTypeEnum($notification['type']),
-                    $notification['text_ref'],
                     $notification['message'],
                     (int)$notification['read']
                 );

@@ -83,7 +83,7 @@ class NotebookDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $note = $sql->fetch(true);
+            $note = $sql->fetch();
             
             $response = new Note(
                 (int)$note['id_note'],
@@ -141,7 +141,7 @@ class NotebookDAO
             SELECT  *,
                     notebook.title AS notebook_title, 
                     videos.title AS videos_title
-            FROM    notebook NATURAL JOIN videos
+            FROM    notebook JOIN videos USING (id_module, class_order)
             WHERE   id_student = ? AND id_module = ? AND class_order = ?
         ");
             
@@ -150,24 +150,81 @@ class NotebookDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $note = $sql->fetchAll(true);
-            
-            $response[] = new Note(
-                (int)$note['id_note'],
-                $note['notebook_title'],
-                $note['content'],
-                new \DateTime($note['date']),
-                new Video(
-                    (int)$note['id_module'],
-                    (int)$note['class_order'],
-                    $note['videos_title'],
-                    $note['videoID'],
-                    (int)$note['length'],
-                    $note['description']
-                )
-            );
+            foreach ($sql->fetchAll() as $note) {
+                $response[] = new Note(
+                    (int)$note['id_note'],
+                    $note['notebook_title'],
+                    $note['content'],
+                    new \DateTime($note['date']),
+                    new Video(
+                        (int)$note['id_module'],
+                        (int)$note['class_order'],
+                        $note['videos_title'],
+                        $note['videoID'],
+                        (int)$note['length'],
+                        $note['description']
+                    )
+                );
+            }
         }
             
+        return $response;
+    }
+    
+    /**
+     * Creates a new note.
+     * 
+     * @param       int $id_module Module id to which the annotation was created
+     * @param       int $class_order Class order in the module
+     * @param       string $title Note's title
+     * @param       string $content Note's content
+     * 
+     * @return      int New note id or -1 if note has not been created
+     * 
+     * @throws      \InvalidArgumentException If title or content is empty or 
+     * if module id or class order or student id provided in the constructor is
+     * empty, less than or equal to zero
+     */
+    public function new(int $id_module, int $class_order, string $title, string $content) : int
+    {
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
+            
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
+            
+        if (empty($class_order) || $class_order <= 0)
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
+            
+        if (empty($title))
+            throw new \InvalidArgumentException("Title cannot be empty");
+            
+        if (empty($content))
+            throw new \InvalidArgumentException("Content cannot be empty");
+        
+        $response = -1;
+        
+        $sql = $this->db->prepare("
+            INSERT INTO notebook
+            (id_student, id_module, class_order, title, content, date)
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+        
+        $sql->execute(array(
+            $this->id_student, 
+            $id_module, 
+            $class_order, 
+            $title, 
+            $content
+        ));
+        
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = (int)$this->db->lastInsertId();
+        }
+        
         return $response;
     }
     
@@ -283,7 +340,7 @@ class NotebookDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll(true) as $note) {
+            foreach ($sql->fetchAll() as $note) {
                 $response[] = new Note(
                     (int)$note['id_note'],
                     $note['notebook_title'],

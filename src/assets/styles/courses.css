@@ -7,17 +7,21 @@
 	width:							100px;
 }
 
-/*
-.course_header {
+.content {
+	margin:							30px 0;
+}
+
+.content_desc {
 	display:						flex;
-	justify-content:				left;
-    background-color:				#eee;
-}*/
+	flex-direction:					row;
+	justify-content:				center;
+	align-items:					center;
+}
 
 .course_content {
-	display: flex;
-	background: white;
-	padding-right: 15px;
+	display: 						flex;
+	background:				        var(--class-area-background);
+	padding-right: 					15px;
 }
 
 .course_menu {
