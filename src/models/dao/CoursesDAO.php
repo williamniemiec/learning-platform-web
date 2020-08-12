@@ -297,7 +297,7 @@ class CoursesDAO
                 WHERE       class_order = 1 AND id_course = ?
                 UNION
                 SELECT      id_module, class_order, 'video' AS class_type
-                FROM        videos NATURAL JOIN course_module
+                FROM        videos NATURAL JOIN course_modules
                 WHERE       class_order = 1 AND id_course = ?
             ) AS tmp JOIN course_modules USING (id_module)
             WHERE       id_course = ?

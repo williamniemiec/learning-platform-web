@@ -32,7 +32,7 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
                 	<!-- Courses search -->
                 	<div class="search-bar">
             			<input type="text" class="search-bar-big" placeholder="Search course" />
-            			<button class="search-bar-btn" onClick="search(this)">S</button>
+            			<button class="search-bar-btn" onClick="search(this)">&#128270;</button>
             		</div>
                 
                 	<!-- Display student courses -->
