@@ -11,9 +11,14 @@ function update_profilePhoto(obj)
 		data: data,
 		contentType: false,
 		processData: false,
-		success: function() {
-			$(obj).closest(".modal").modal("toggle")
-			document.location.reload()
+		success: (response) => {
+			if (response == 1) {
+				$(obj).closest(".modal").modal("toggle")
+				document.location.reload()
+			}
+			else {
+				$("#changePhoto_error").show("fast")
+			}
 		}
 	})
 }
@@ -30,11 +35,12 @@ function update_password(obj)
 			new_password: newPassword,
 			current_password: currentPassword
 		},
-		success: function(response) {
+		success: (response) => {
 			if (response == 1) {
 				$(obj).closest(".modal").modal("toggle")
 				document.location.reload()
-			} else {
+			} 
+			else {
 				$("#changePassword_error").show("fast")
 			}
 		}
@@ -44,4 +50,9 @@ function update_password(obj)
 function changePassword_error()
 {
 	$("#changePassword_error").fadeToggle("fast")
+}
+
+function changePhoto_error()
+{
+	$("#changePhoto_error").fadeToggle("fast")
 }

@@ -320,7 +320,7 @@ class StudentsDAO
      * 
      * @param       array $photo New photo (from $_FILES)
      * 
-     * @return      boolean If photo has been successfully updated
+     * @return      bool If photo has been successfully updated
      * 
      * @throws      \InvalidArgumentException If photo is invalid
      * 
@@ -333,10 +333,10 @@ class StudentsDAO
         
         // Deletes photo
         if (!empty($imageName))
-            unlink("assets/images/profile_photos/".$imageName);
-        
+            unlink("assets/img/profile_photos/".$imageName);
+
         if (!empty($photo)) {
-            if (empty($photo['tmp_name']) || DataUtil::isPhoto($photo))
+            if (empty($photo['tmp_name']) || !DataUtil::isPhoto($photo))
                 throw new \InvalidArgumentException("Invalid photo");
             
             $extension = explode("/", $photo['type'])[1];
@@ -350,16 +350,16 @@ class StudentsDAO
             $filename = $filename."."."jpg";
             
             // Saves photo
-            move_uploaded_file($photo['tmp_name'], "assets/images/profile_photos/".$filename);
+            move_uploaded_file($photo['tmp_name'], "assets/img/profile_photos/".$filename);
         }
         
-        $filename = empty($filename) ? "'".$filename."'" : NULL;
+        $filename = empty($filename) ? null : "'".$filename."'";
         
         // Query construction
         $sql = $this->db->prepare("
             UPDATE students 
-            SET photo = ".$filename." 
-            WHERE id = ?
+            SET photo = ".$filename."
+            WHERE id_student = ?
         ");
         
         // Executes query
@@ -383,7 +383,7 @@ class StudentsDAO
         if (empty($currentPassword))
             throw new \InvalidArgumentException("Current password cannot be empty");
         
-        if (empty($currentPassword))
+        if (empty($newPassword))
             throw new \InvalidArgumentException("New password cannot be empty");
         
         $response = false;
@@ -399,9 +399,9 @@ class StudentsDAO
         $sql->execute(array($this->id_student));
         
         // Checks if current password is correct
-        if ($sql->fetch()['correctPassword'] > 0) {
+        if ($sql->fetch()['correctPassword'] > 0) {            
             // Query construction
-            $sql = $this->db->query("
+            $sql = $this->db->prepare("
                 UPDATE  students 
                 SET     password = '".md5($newPassword)."' 
                 WHERE   id_student = ?
@@ -572,5 +572,27 @@ class StudentsDAO
         $sql->execute(array($email));
 
         return $sql->fetch()['count'] > 0;
+    }
+    
+    /**
+     * Gets photo of the logged in student.
+     * 
+     * @return      string Photo filename or empty string if student does not
+     * have a photo
+     */
+    private function getPhoto()
+    {
+        $response = "";
+        
+        $sql = $this->db->query("
+            SELECT  photo
+            FROM    students
+            WHERE   id_student = ".Student::getLoggedIn($this->db)->getId()
+        );
+        
+        if (!empty($sql) && $sql->rowCount() > 0)
+            $response = $sql->fetch()['photo'];
+        
+        return $response;
     }
 }

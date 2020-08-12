@@ -46,5 +46,5 @@ use models\enum\GenreEnum;
 </div>
 
 <!-- Modals -->
-<?php $this->loadView('settings/modal_updateProfilePhoto'); ?>
-<?php $this->loadView('settings/modal_changePassword'); ?>
+<?php $this->loadView('settings/UpdateProfilePhotoModal'); ?>
+<?php $this->loadView('settings/ChangePasswordModal'); ?>

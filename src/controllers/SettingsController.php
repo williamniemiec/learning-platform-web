@@ -49,14 +49,14 @@ class SettingsController extends Controller
         
         $header = array(
             'title' => 'Settings - Learning platform',
-            'styles' => array('settings'),
+            'styles' => array('SettingsStyle'),
             'description' => "User settings",
             'robots' => 'noindex'
         );
         
         $viewArgs = array(
             'header' => $header,
-            'scripts' => array("settings"),
+            'scripts' => array("SettingsScript"),
             'username' => $student->getName(),
             'user' => $student,
             'notifications' => array(
@@ -64,7 +64,7 @@ class SettingsController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
-        $this->loadTemplate("settings/settings", $viewArgs);
+        $this->loadTemplate("settings/SettingsView", $viewArgs);
     }
     
     /**
@@ -79,7 +79,7 @@ class SettingsController extends Controller
         
         $header = array(
             'title' => 'Settings - Update - Learning platform',
-            'styles' => array('settings'),
+            'styles' => array('SettingsStyle'),
             'description' => "User settings",
             'robots' => 'noindex'
         );
@@ -104,52 +104,59 @@ class SettingsController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
-        $this->loadTemplate("settings/settings_edit", $viewArgs);
+        $this->loadTemplate("settings/SettingsEditView", $viewArgs);
     }
     
     
     //-------------------------------------------------------------------------
     //        Ajax
     //-------------------------------------------------------------------------
-//     /**
-//      * Updates student photo.
-//      * 
-//      * @param       array $_FILES['photo'] Photo information
-//      * 
-//      * @apiNote     Must be called using POST request method
-//      */
-//     public function update_profile_photo()
-//     {
-//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
-//             header("Location: ".BASE_URL);
+    /**
+     * Updates student photo.
+     * 
+     * @param       array $_FILES['photo'] Photo information
+     * 
+     * @return      bool If photo has been successfully updated
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function update_profile_photo()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
         
-//         $students = new Students($_SESSION['s_login']);
+        $dbConnection = new MySqlPDODatabase();
         
+        $studentsDAO = new StudentsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
         
-//         $students->updatePhoto($_FILES['photo']);
-//     }
+        echo $studentsDAO->updatePhoto($_FILES['photo']);
+    }
     
-//     /**
-//      * Updates student password.
-//      * 
-//      * @param       string $_POST['new_password'] New password
-//      * @param       string $_POST['current_password'] Current password
-//      * 
-//      * @return      bool If password was successfully updated
-//      * 
-//      * @apiNote     Must be called using POST request method
-//      */
-//     public function update_password()
-//     {
-//         if ($_SERVER['REQUEST_METHOD'] != 'POST')
-//             header("Location: ".BASE_URL);
+    /**
+     * Updates student password.
+     * 
+     * @param       string $_POST['new_password'] New password
+     * @param       string $_POST['current_password'] Current password
+     * 
+     * @return      bool If password has been successfully updated
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function update_password()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
         
-//         if (empty($_POST['new_password']) || empty($_POST['current_password']))
-//             echo false;
+        $dbConnection = new MySqlPDODatabase();
         
-//         $students = new Students($_SESSION['s_login']);
+        $studentsDAO = new StudentsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
         
-        
-//         echo $students->updatePassword($_POST['current_password'], $_POST['new_password']);
-//     }
+        echo $studentsDAO->updatePassword($_POST['current_password'], $_POST['new_password']);
+    }
 }

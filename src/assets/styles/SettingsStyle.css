@@ -1,5 +1,6 @@
 /* Settings */
-#changePassword_error {
+#changePassword_error,
+#changePhoto_error {
 	display:						none;
 }
 
