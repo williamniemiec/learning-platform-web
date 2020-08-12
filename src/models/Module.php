@@ -17,7 +17,7 @@ use database\Database;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Module
+class Module implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -116,5 +116,23 @@ class Module
     public function setDatabase(Database $db)
     {
         $this->db = $db;
+    }
+
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id_module' => $this->id_module,
+            'name' => $this->name
+        );
     }
 }

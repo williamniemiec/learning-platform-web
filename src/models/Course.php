@@ -16,7 +16,7 @@ use models\dao\CoursesDAO;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Course
+class Course implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -49,7 +49,7 @@ class Course
         $this->description = empty($description) ? "" : $description;
     }
     
-    
+  
     //-------------------------------------------------------------------------
     //        Getters
     //-------------------------------------------------------------------------
@@ -162,7 +162,7 @@ class Course
      *
      * @implNote    Lazy initialization
      */
-    public function getTotalLength(Database $db) : int
+    public function getTotalLength(?Database $db = null) : int
     {
         if (empty($this->total_length)) {
             if (empty($db))
@@ -209,5 +209,28 @@ class Course
                 "than or equal to zero");
             
         $this->total_length = $totalLength;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *  
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id_course,
+            'name' => $this->name,
+            'logo' => $this->logo,
+            'description' => $this->description,
+            'modules' => $this->modules,
+            'total_classes' => $this->total_classes,
+            'total_length' => $this->total_length
+        );
     }
 }

@@ -3,7 +3,14 @@
 	color:							var(--text-color);
 }
 
-.home .courses {
+.course_info {
+	display:						flex;
+    flex-direction:					row;
+    justify-content:				space-around;
+    align-items:					center;
+}
+
+.home #courses {
 	display:						flex;
 	color:							var(--text-dark);
 	flex-wrap:						wrap;
@@ -30,6 +37,11 @@
 	padding:						15px 20px;
 	margin-bottom:					30px;
 	height:							290px;
+	display:						block;
+}
+
+.course:focus {
+	outline:						0;
 }
 
 .home .course .progress {
@@ -47,19 +59,19 @@
 	background-color:				var(--color-success)!important;
 }
 
-.home .courses a {
+.home #courses a {
 	color:							var(--text-dark);
 	text-decoration:				none;
 }
 
-.home .courses .course {
+.home #courses .course {
 	transition:						100ms all ease-in;
 }
 
-.home .courses .course:hover {
+.home #courses .course:hover {
 	transform:						scale(1.08);
 }
 
-.home .courses a:hover {
+.home #courses a:hover {
 	color:							var(--text-dark);
 }

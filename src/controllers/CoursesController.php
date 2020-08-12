@@ -73,7 +73,7 @@ class CoursesController extends Controller
 		    'notifications' => array(
 		        'notifications' => $notificationsDAO->getNotifications(10),
 		        'total_unread' => $notificationsDAO->countUnreadNotification()),
-		    'scripts' => array('chart_progress'),
+		    'scripts' => array('chart_progress', 'MyCoursesScript'),
 		    'notebook' => $notebookDAO->getAll()
 		);
 
@@ -243,6 +243,32 @@ class CoursesController extends Controller
     //-------------------------------------------------------------------------
     //        Ajax
     //-------------------------------------------------------------------------
+    /**
+     * Searches for courses.
+     * 
+     * @param       string $_POST['text'] Name to be seearched
+     * 
+     * @return      string Courses with the specified name
+     */
+    public function search()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+        
+        if (empty($_POST['text']))
+            return;
+        
+        $dbConnection = new MySqlPDODatabase();
+            
+        $coursesDAO = new CoursesDAO($dbConnection);
+        
+        echo json_encode($coursesDAO->getMyCourses(
+            Student::getLoggedIn($dbConnection)->getId(), 
+            $_POST['text']
+        ));
+    }
+    
     /**
      * Gets answer from a quest.
      * 

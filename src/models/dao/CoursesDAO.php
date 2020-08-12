@@ -107,7 +107,7 @@ class CoursesDAO
         if (!empty($name)) {
             $query .= " HAVING      name LIKE ?";
             $sql = $this->db->prepare($query);
-            $sql->execute(array($id_student, $id_student, $name));
+            $sql->execute(array($id_student, $id_student, $name."%"));
         }
         else {
             $sql = $this->db->prepare($query);
@@ -126,6 +126,7 @@ class CoursesDAO
                     $course['description']
                 );
                 
+                $response[$i]['course']->getModules($this->db);
                 $response[$i]['course']->setTotalLength((int)$course['total_length']);
                 $response[$i]['course']->getTotalClasses($this->db);
                 $response[$i]['total_classes_watched'] = (int)$course['total_classes_watched'];
