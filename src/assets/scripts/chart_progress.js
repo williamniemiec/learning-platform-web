@@ -1,5 +1,11 @@
+/**
+ * Responsible for generating progress chart.
+ */
 class ChartProgress
 {
+	//-------------------------------------------------------------------------
+    //        Constructor
+    //-------------------------------------------------------------------------
 	constructor()
 	{
 		this.week = this._last7Days().reverse()
@@ -10,12 +16,23 @@ class ChartProgress
 		}	
 	}
 	
+	
+	//-------------------------------------------------------------------------
+    //        Methods
+    //-------------------------------------------------------------------------
+	/**
+	 * Generates progress chart.
+	 */
 	render()
 	{
 		this._getWeekProgress()
 		this._progressChart()
 	}
 	
+	/**
+	 * Gets total number of classes that the student has watched in the last 7
+     * days. The result will be saved in @{link #dataWeek}.
+	 */
 	_getWeekProgress()
 	{
 		$.ajax({
@@ -35,11 +52,19 @@ class ChartProgress
 		})
 	}
 	
+	/**
+	 * Gets a date and convert it to the following format: YYYY/MM/DD
+	 * 
+	 * @param		Date Date to be converted
+	 *
+	 * @return		String Data in the following format: YYYY/MM/DD
+	 */
 	_formatDate(date)
 	{
-	    var dd = date.getDate();
-	    var mm = date.getMonth()+1;
-	    var yyyy = date.getFullYear();
+	    const dd = date.getDate();
+	    const mm = date.getMonth()+1;
+	    const yyyy = date.getFullYear();
+
 	    if(dd<10) {dd='0'+dd}
 	    if(mm<10) {mm='0'+mm}
 	    
@@ -49,6 +74,12 @@ class ChartProgress
 		return date
 	 }
 	
+	/**
+	 * Gets dates between today and 7 days ago.
+	 * 
+	 * @return		array Dates between today and 7 days ago in the following
+	 * format: YYYY/MM/DD
+	 */
 	_last7Days () 
 	{
 	    let result = []
@@ -62,6 +93,9 @@ class ChartProgress
 	    return result
 	}
 	
+	/**
+	 * Creates progress chart.
+	 */
 	_progressChart()
 	{
 		const chart = document.getElementById('chart_progress').getContext('2d')
