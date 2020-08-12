@@ -6,6 +6,7 @@ use core\Controller;
 use database\pdo\MySqlPDODatabase;
 use models\Student;
 use models\dao\NotificationsDAO;
+use models\dao\StudentsDAO;
 
 
 /**
@@ -44,19 +45,18 @@ class PurchasesController extends Controller
         $dbConnection = new MySqlPDODatabase();
         $student = Student::getLoggedIn($dbConnection);
         $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+        $studentsDAO = new StudentsDAO($dbConnection, $student->getId());
         
         $header = array(
             'title' => 'Purchases - Learning Platform',
-            
-            //'styles' => array('home', 'gallery'),
             'description' => "Student purchases",
-            //'keywords' => array('learning platform', 'home'),
             'robots' => 'noindex'
         );
 
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
+            'purchases' => $studentsDAO->getPurchases(),
             'notifications' => array(
                 'notifications' => $notificationsDAO->getNotifications(10),
                 'total_unread' => $notificationsDAO->countUnreadNotification())

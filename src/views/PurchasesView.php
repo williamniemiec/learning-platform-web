@@ -11,21 +11,13 @@
 					</tr>
 				</thead>
 				<tbody>
+					<?php foreach ($purchases as $purchase): ?>
 					<tr>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
+						<td><?php echo $purchase->getBundle()->getName(); ?></td>
+						<td><?php echo $purchase->getDate()->format("m/d/Y H:m:s"); ?></td>
+						<td><?php echo number_format($purchase->getPrice(), 2); ?></td>
 					</tr>
-					<tr>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
+					<?php endforeach; ?>
 				</tbody>
 			</table>
 		</div>

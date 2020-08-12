@@ -10,6 +10,8 @@ use models\_Class;
 use models\enum\GenreEnum;
 use models;
 use models\util\DataUtil;
+use models\Bundle;
+use models\Purchase;
 
 
 /**
@@ -462,7 +464,8 @@ class StudentsDAO
      * @param       int $limit [Optional] Maximum bundles returned
      * @param       int $offset [Optional] Ignores first results from the return
      * 
-     * @return      models\Bundle[] Bundles purchased by the student
+     * @return      Purchase[] Bundles purchased by the student or empty array if
+     * student has not yet purchased a bundle
      * 
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor or bundle id is empty, less than or equal to zero
@@ -472,11 +475,15 @@ class StudentsDAO
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        
+        $response = null;
             
         // Query construction
         $query = "
-            SELECT  *
-            FROM    purchases NATURAL JOIN bundles
+            SELECT  *, 
+                    bundles.price AS price_bundle, 
+                    purchases.price AS price_purchase
+            FROM    purchases JOIN bundles USING (id_bundle)
             WHERE   id_student = ?    
         ";
         
@@ -492,7 +499,23 @@ class StudentsDAO
         // Executes query
         $sql->execute(array($this->id_student));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $purchase) {
+                $response[] = new Purchase(
+                    new Bundle(
+                        (int)$purchase['id_bundle'], 
+                        $purchase['name'], 
+                        (float)$purchase['price_bundle'],
+                        $purchase['logo'],
+                        $purchase['description']
+                    ),
+                    new \DateTime($purchase['date']),
+                    (float)$purchase['price_purchase']
+                );
+            }
+        }
+        
+        return $response;
     }
     
     /**
