@@ -184,7 +184,7 @@ class NotebookController extends Controller
         if ($_SERVER['REQUEST_METHOD'] != 'POST')
             header("Location: ".BASE_URL);
             
-            if (empty($_POST['title']) || empty($_POST['content']) || 
+        if (empty($_POST['title']) || empty($_POST['content']) || 
                 empty($_POST['id_module']) || empty($_POST['class_order']) || 
                 $_POST['id_module'] <= 0 || $_POST['class_order'] <= 0) {
             return;

@@ -6,6 +6,7 @@ use database\pdo\MySqlPDODatabase;
 use models\Student;
 use models\dao\CoursesDAO;
 use models\dao\NotificationsDAO;
+use models\dao\HistoricDAO;
 
 
 /**
@@ -85,34 +86,15 @@ class HomeController extends Controller
 	    header("Refresh: 0");
 	}
 	
-	/**
-	 * Opens student settings.
-	 */
-	/*public function settings()
+	
+	public function weekly_progress()
 	{
-	    $students = new Students($_SESSION['s_login']);
-	    $courses = new Courses($_SESSION['s_login']);
-	    $student = $students->get($_SESSION['s_login']);
+	    if ($_SERVER['REQUEST_METHOD'] != 'POST')
+	        header("Location: ".BASE_URL);
 	    
+	    $dbConnection = new MySqlPDODatabase();
+	    $historicDAO = new HistoricDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
 	    
-	    $header = array(
-	        'title' => 'Home - Learning platform',
-	        'styles' => array('settings'),
-	        'description' => "Start learning today",
-	        'keywords' => array('learning platform', 'home'),
-	        'robots' => 'index'
-	    );
-	    
-	    $viewArgs = array(
-	        'username' => $student->getName(),
-	        'genre' => $student->getGenre(),
-	        'birthdate' => explode(" ", $student->getBirthdate())[0],
-	        'email' => $student->getEmail(),
-	        'courses' => $courses->getMyCourses(),
-	        'totalCourses' => $courses->countCourses(),
-	        'header' => $header
-	    );
-	    
-	    $this->loadTemplate("settings", $viewArgs, true);
-	}*/
+	    echo json_encode($historicDAO->getWeeklyHistory());
+	}
 }

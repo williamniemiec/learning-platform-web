@@ -142,29 +142,42 @@ class HistoricDAO
      * Gets total classes that a student watched in the last 7 days.
      * 
      * @return      array Total classes that a student watched in the last 7
-     * days. The returned array has the following keys:
-     * <ul>
-     *  <li><b>date</b>: Date in the following format: YYYY-MM-DD</li>
-     *  <li><b>total_classes_watched</b>: Total classes watched by the student
-     *  on this date</li>
-     * </ul>
+     * days. Each key of the returned array has the following format: 
+     *  <ul>
+     *      <li><b>date</b>: Date in the following format: YYYY/MM/DD</li>
+     *      <li><b>total_classes_watched</b>: Total classes watched by the 
+     *      student on this date</li>
+     *  </ul>
      */
     public function getWeeklyHistory() : array
     {
         // Query construction
         $sql = $this->db->prepare("
-            SELECT      date, SUM(*) AS total_classes_watched
+            SELECT      date, COUNT(*) AS total_classes_watched
             FROM        student_historic
-            WHERE       id_student = ?
+            WHERE       id_student = ? AND 
+                        date >= DATE_ADD(CURDATE(), INTERVAL -7 DAY)
             GROUP BY    date
             ORDER BY    date DESC
             LIMIT 7
         ");
         
+        $response = array();
+        
         // Executes query
         $sql->execute(array($this->id_student));
         
-        return ($sql && $sql->rowCount() > 0) ?
-            $sql->fetchAll() : array();
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $i = 0;
+            
+            foreach ($sql->fetchAll() as $date) {
+                //$date = str_replace("-", "", $date['date']);
+                $response[$i]['date'] = str_replace("-", "/", $date['date']);
+                $response[$i]['total_classes_watched'] = $date['total_classes_watched'];
+                $i++;
+            }
+        }
+        
+        return $response;;
     }
 }
