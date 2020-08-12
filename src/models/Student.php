@@ -121,4 +121,22 @@ class Student extends User
     {
         return $this->photo;
     }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        $json = parent::jsonSerialize();
+        $json['photo'] = $this->photo;
+        
+        return $json;
+    }
 }

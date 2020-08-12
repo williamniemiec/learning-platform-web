@@ -19,7 +19,7 @@
 		</div>
 		<div class="form-group">
 			<button onClick="newNote(this, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" 
-					class="btn_theme btn_theme_full"
+					class="btn btn-outline-primary"
 			>
 				Save
 			</button>
@@ -43,15 +43,17 @@
 	<!-- Comments area -->
 	<div class="content content_comments">
     	<h3>Comments</h3>
-		<form method="POST">
-			<div class="form-group">
-    			<label for="question">Question</label>
-    			<textarea id="question" name="question" class="form-control"></textarea>
-			</div>
-			<div class="form-group">
-    			<input class="btn btn-outline-primary" type="submit" value="Send" />
-			</div>
-		</form>
+		<div class="form-group">
+			<label for="question">Question</label>
+			<textarea id="question" name="question" class="form-control"></textarea>
+		</div>
+		<div class="form-group">
+			<button	class="btn btn-outline-primary" 
+					onClick="newComment(<?php echo $id_course; ?>, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)"
+			>
+				Send
+			</button>
+		</div>
 		<hr />
 		
     	<!-- Comments -->
@@ -72,7 +74,7 @@
         						<div class="comment_reply_actions">
             						<button class="btn btn-primary" onclick="close_reply(this)">Cancel</button>
             						<button	class="btn btn-primary" 
-            								onclick="send_reply(this,<?php echo $comment['comment']->getId(); ?>,<?php echo $_SESSION['s_login']; ?>)"
+            								onclick="new_reply(this, <?php echo $comment['comment']->getId(); ?>)"
     								>
     									Send
 									</button>

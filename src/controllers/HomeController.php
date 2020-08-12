@@ -87,6 +87,9 @@ class HomeController extends Controller
 	}
 	
 	
+	//-------------------------------------------------------------------------
+	//        Ajax
+	//-------------------------------------------------------------------------
 	public function weekly_progress()
 	{
 	    if ($_SERVER['REQUEST_METHOD'] != 'POST')
@@ -96,5 +99,21 @@ class HomeController extends Controller
 	    $historicDAO = new HistoricDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
 	    
 	    echo json_encode($historicDAO->getWeeklyHistory());
+	}
+	
+	/**
+	 * Gets logged in student.
+	 *
+	 * @return      string Student logged in
+	 *
+	 * @apiNote     Must be called using POST request method
+	 */
+	public function get_student_logged_in()
+	{
+	    // Checks if it is an ajax request
+	    if ($_SERVER['REQUEST_METHOD'] != 'POST')
+	        header("Location: ".BASE_URL);
+	        
+	        echo json_encode(Student::getLoggedIn(new MySqlPDODatabase()));
 	}
 }

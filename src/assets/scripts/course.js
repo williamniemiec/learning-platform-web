@@ -118,7 +118,7 @@ function markAsWatched(id_module, class_order)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"class/mark_watched",
+		url:BASE_URL + "class/mark_watched",
 		data:{id_module, class_order, type:0}
 	})
 	
@@ -141,7 +141,7 @@ function removeWatched(id_module, class_order)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"class/remove_watched",
+		url:BASE_URL + "class/remove_watched",
 		data:{id_module, class_order, type:0}
 	})
 	
@@ -157,14 +157,12 @@ function removeWatched(id_module, class_order)
  */
 function newNote(obj, id_module, class_order)
 {
-	//let form = $(obj).closest("form")
-	const data = $(obj).closest(".class_content")
 	const title = $("#note_title").val()
 	const content = $("#note_content").val()
 	
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"notebook/new",
+		url:BASE_URL + "notebook/new",
 		data:{
 			id_module:id_module,
 			class_order:class_order,
@@ -188,11 +186,97 @@ function newNote(obj, id_module, class_order)
 				</li>
 			`
 			
-			$(obj).closest(".content_notes").find("ul.notebook").hide().prepend(newNote).fadeIn("fast")
+			$(obj).closest(".content_notes")
+				.find("ul.notebook")
+				.hide()
+				.prepend(newNote)
+				.fadeIn("fast")
 			$("#note_title").val("")
 			$("#note_content").val("")
 		}
 	})
+}
+
+/**
+ * Creates a new comment in a class.
+ * 
+ * @param		int id_course Course id to which the class belongs
+ * @param       int id_module Module id to which the class belongs
+ * @param		int class_order Class order in module
+ */
+function newComment(id_course, id_module, class_order)
+{
+	const commentArea = $("#question")
+	const content = commentArea.val()
+	
+	$.ajax({
+		type:'POST',
+		url:BASE_URL + "class/new_comment",
+		data:{id_course, id_module, class_order, content},
+		success:(id) => {
+			const creator = getStudentLoggedIn()
+			commentArea.val('')
+			$('.comments').prepend(`
+				<div class="comment">
+    				<img	class="img img-thumbnail" 
+    						src="${BASE_URL + "assets/img/profile_photos/" + creator.photo}" 
+					/>
+    				<div class="comment_content">
+    					<div class="comment_info">
+    						<!-- Comment info -->
+        					<h5>${creator.name}</h5>
+        					<p>${content}</p>
+        					<button class="btn btn-small" onclick="open_reply(this)">&ldca; Reply</button>
+        					<div class="comment_reply">
+        						<textarea class="form-control"></textarea>
+        						<div class="comment_reply_actions">
+            						<button class="btn btn-primary" onclick="close_reply(this)">Cancel</button>
+            						<button	class="btn btn-primary" 
+            								onclick="send_reply(this,${id},${creator.id})"
+    								>
+    									Send
+									</button>
+        						</div>
+        					</div>
+        					
+        					<!-- Comment replies -->
+        					<div class="comment_replies">
+            				</div>
+    					</div>
+    					<div class="comment_action">
+    						<button	class="btn btn-danger" 
+									onclick="deleteComment(this,${id})"
+							>
+								&times;
+							</button>
+    					</div>  					
+    				</div>
+    			</div>
+			`)
+		}
+	})
+}
+
+/**
+ * Gets logged in student.
+ *
+ * @return		JSON Student logged in
+ */
+function getStudentLoggedIn()
+{
+	let student = null
+	
+	$.ajax({
+		type:'POST',
+		url:BASE_URL + "home/get_student_logged_in",
+		async:false,
+		datatype:'json',
+		success:(s) => {
+			student = JSON.parse(s)
+		}
+	})
+	
+	return student
 }
 
 /**
@@ -207,8 +291,8 @@ function deleteComment(obj, id_comment)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"class/class_remove_comment",
-		data:{id_comment:id_comment},
+		url:BASE_URL + "class/delete_comment",
+		data:{id_comment},
 		success:function() {
 			$(obj).closest(".comment").hide("slow")
 		}
@@ -219,48 +303,46 @@ function deleteComment(obj, id_comment)
  * Adds a reply to a class comment.
  * 
  * @param       object obj Send reply button
- * @param       int id_doubt Doubt id to be replied
- * @param       int id_user User id that will reply the comment
+ * @param       int id_comment Comment id to be replied
  * 
  * @apiNote     It will make an ajax request using POST request method
  */
-function send_reply(obj, id_doubt, id_user)
+function new_reply(obj, id_comment)
 {
-	var text = $(obj).closest(".comment_info").find("textarea").val()
+	const content = $(obj).closest(".comment_info").find("textarea").val()
 	
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"class/class_add_reply",
-		data:{
-			id_doubt:id_doubt,
-			id_user:id_user,
-			text:text
-		},
-		success: function(id_reply) {
-			$.ajax({
-				type:"POST",
-				url:BASE_URL+"ajax/get_student_name",
-				data:{id_student:id_user},
-				success:function (studentName) {
-					var name = studentName
-					
-					var html_comment = `
-						<div class="comment comment_reply_content">
-								<img class="img img-thumbnail" src="https://media.gettyimages.com/photos/colorful-powder-explosion-in-all-directions-in-a-nice-composition-picture-id890147976?s=612x612" />
-								<div class="comment_content">
-		        					<div class="comment_info">
-		            					<h5>${name}</h5>
-		            					<p>${text}</p>
-		        					</div>
-		            					<div class="comment_action">
-		            						<button class="btn btn-danger" onclick="delete_reply(this,${id_reply})">&times;</button>
-		            					</div>
-		        				</div>
-							</div>
-					`
-					$(obj).closest(".comment_info").find(".comment_replies").fadeOut("fast").prepend(html_comment).fadeIn("fast")
-				}
-			})
+		url:BASE_URL+"class/add_reply",
+		data:{id_comment, content},
+		success: (id) => {
+			const creator = getStudentLoggedIn()
+			const html_comment = `
+				<div class="comment comment_reply_content">
+					<img 	class="img img-thumbnail" 
+							src="${creator.photo}" 
+					/>
+					<div class="comment_content">
+    					<div class="comment_info">
+        					<h5>${creator.name}</h5>
+        					<p>${content}</p>
+    					</div>
+    					<div class="comment_action">
+    						<button class="btn btn-danger" 
+    								onclick="delete_reply(this,${id})"
+							>
+								&times;
+							</button>
+    					</div>
+    				</div>
+				</div>
+			`
+			$(obj).closest(".comment_info")
+				.find(".comment_replies")
+				.fadeOut("fast")
+				.prepend(html_comment)
+				.fadeIn("fast")
+				
 		}
 	})
 }
@@ -277,7 +359,7 @@ function delete_reply(obj, id_reply)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"class/class_remove_reply",
+		url:BASE_URL+"class/remove_reply",
 		data:{id_reply:id_reply},
 		success:function() {
 			$(obj).closest(".comment_reply_content").hide("slow")

@@ -161,6 +161,7 @@ class CoursesController extends Controller
                 $name = $class->getTitle();
                 
                 $classContent = array(
+                    'id_course' => $id_course,
                     'class' => $class,
                     'comments' => $commentsDAO->getComments(
                         $class->getModuleId(), 

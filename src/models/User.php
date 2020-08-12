@@ -14,7 +14,7 @@ use models\enum\GenreEnum;
  * @version		1.0.0
  * @since		1.0.0
  */
-abstract class User
+abstract class User implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -116,5 +116,26 @@ abstract class User
     public function getEmail() : string
     {
         return $this->email;
+    }
+    
+
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id,
+            'name' => $this->name,
+            'genre' => $this->genre->get(),
+            'birthdate' => $this->birthdate->format("Y/m/d"),
+            'email' => $this->email
+        );
     }
 }

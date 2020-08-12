@@ -8,6 +8,7 @@ use models\Student;
 use models\dao\NotificationsDAO;
 use models\dao\QuestionnairesDAO;
 use models\dao\VideosDAO;
+use models\dao\CommentsDAO;
 
 
 /**
@@ -37,7 +38,7 @@ class ClassController extends Controller
     /**
      * Gets answer from a questionnaire.
      *
-     * @param       int $_POST['id_module'] Module id to which the class belongs.
+     * @param       int $_POST['id_module'] Module id to which the class belongs
      * @param       int $_POST['class_order'] Class order in module 
      *
      * @return      int Correct answer [1;4] or -1 if questionnaire class does
@@ -61,7 +62,7 @@ class ClassController extends Controller
     /**
      * Marks a class as watched.
      *
-     * @param       int $_POST['id_module'] Module id to which the class belongs.
+     * @param       int $_POST['id_module'] Module id to which the class belongs
      * @param       int $_POST['class_order'] Class order in module 
      * @param       int $_POST['type] Class type (0 for video and 1 for questionnaire)
      *
@@ -89,7 +90,7 @@ class ClassController extends Controller
     /**
      * Marks a class as unwatched.
      *
-     * @param       int $_POST['id_module'] Module id to which the class belongs.
+     * @param       int $_POST['id_module'] Module id to which the class belongs
      * @param       int $_POST['class_order'] Class order in module 
      * @param       int $_POST['type] Class type (0 for video and 1 for questionnaire)
      *
@@ -113,7 +114,37 @@ class ClassController extends Controller
             $_POST['class_order']
         );
     }
-                    
+
+    /**
+     * Creates a new comment in a class.
+     * 
+     * @param       int $_POST['id_course'] Course id to which the class belongs
+     * @param       int $_POST['id_module'] Module id to which the class belongs
+     * @param       int $_POST['class_order'] Class order in module 
+     * @param       int $_POST['content'] Comment content
+     * 
+     * @return      int Comment id or -1 if comment has not been added 
+     * 
+     * @apiNote     Must be called using POST request method
+     */
+    public function new_comment()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+            
+        $dbConnection = new MySqlPDODatabase();
+        
+        $commentsDAO = new CommentsDAO($dbConnection);
+        echo $commentsDAO->newComment(
+            Student::getLoggedIn($dbConnection)->getId(), 
+            (int)$_POST['id_course'],
+            (int)$_POST['id_module'],
+            (int)$_POST['class_order'],
+            $_POST['content']
+        );
+    }
+    
     /**
      * Removes a comment from a class.
      *
@@ -121,70 +152,48 @@ class ClassController extends Controller
      *
      * @apiNote     Must be called using POST request method
      */
-        //     public function class_remove_comment()
-        //     {
-        //         // Checks if it is an ajax request
-        //         if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            //             header("Location: ".BASE_URL);
+    public function delete_comment()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+                header("Location: ".BASE_URL);
+    
+        $dbConnection = new MySqlPDODatabase();
         
-            //         if (empty($_POST['id_comment']))
-                //             return;
-            
-            
-                //         $doubts = new Doubts();
-                //         $doubts->delete($_POST['id_comment']);
-                //     }
+        $commentsDAO = new CommentsDAO($dbConnection);
+        
+        $commentsDAO->deleteComment(
+            $_POST['id_comment'], 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
+    }
                             
     /**
      * Adds a reply to a class comment.
      *
-     * @param       int $_POST['id_doubt'] Doubt id to be replied
-     * @param       int $_POST['id_user'] User id that will reply the comment
-     * @param       int $_POST['text'] Reply text
-     *
-     * @return      bool If the reply was successfully added
-     *
+     * @param       int $_POST['id_comment'] Comment id to be replied
+     * @param       int $_POST['content'] Comment content
+     * 
+     * @return      int Reply id or -1 if reply has not been added 
+     * 
      * @apiNote     Must be called using POST request method
      */
-        //     public function class_add_reply()
-        //     {
-        //         // Checks if it is an ajax request
-        //         if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            //             header("Location: ".BASE_URL);
+    public function add_reply()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+
+        $dbConnection = new MySqlPDODatabase();
         
-            //         if (empty($_POST['id_doubt']) || $_POST['id_doubt'] <= 0)   { return false; }
-            //         if (empty($_POST['id_user']) || $_POST['id_user'] <= 0)     { return false; }
-            //         if (empty($_POST['text']))                                  { return false; }
+        $commentsDAO = new CommentsDAO($dbConnection);
         
-            //         $doubts = new Doubts();
-        
-        
-            //         echo $doubts->addReply($_POST['id_doubt'], $_POST['id_user'], $_POST['text']);
-            //     }
-                                
-        /**
-         * Gets student name.
-         *
-         * @param       int $_POST['id_student'] Student id
-         *
-         * @return      string Student name
-         *
-         * @apiNote     Must be called using POST request method
-         */
-            //     public function get_student_name()
-            //     {
-            //         // Checks if it is an ajax request
-            //         if ($_SERVER['REQUEST_METHOD'] != 'POST')
-                //             header("Location: ".BASE_URL);
-            
-                //         if (empty($_POST['id_student']) || $_POST['id_student'] <= 0)
-                    //             echo "";
-                
-                    //         $students = new Students();
-                
-                
-                    //         echo $students->get($_POST['id_student'])->getName();
-                    //     }
+        echo $commentsDAO->newReply(
+            Student::getLoggedIn($dbConnection)->getId(),
+            (int)$_POST['id_comment'],
+            $_POST['content']
+        );
+    }
                                         
     /**
      * Removes reply from a class comment.
@@ -193,18 +202,19 @@ class ClassController extends Controller
      *
      * @apiNote     Must be called using POST request method
      */
-        //     public function class_remove_reply()
-        //     {
-        //         // Checks if it is an ajax request
-        //         if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            //             header("Location: ".BASE_URL);
+    public function remove_reply()
+    {
+        // Checks if it is an ajax request
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            header("Location: ".BASE_URL);
+            
+        $dbConnection = new MySqlPDODatabase();
         
-            //         if (empty($_POST['id_reply']) || $_POST['id_reply'] <= 0)
-                //             return;
-            
-                //         $doubts = new Doubts();
-            
-            
-                //         $doubts->deleteReply($_POST['id_reply']);
-                //     }
+        $commentsDAO = new CommentsDAO($dbConnection);
+        
+        $commentsDAO->deleteReply(
+            $_POST['id_reply'],
+            Student::getLoggedIn($dbConnection)->getId()
+        );
+    }
 }

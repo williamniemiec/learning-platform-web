@@ -45,20 +45,26 @@ class CommentsDAO
      * Adds a new comment to a class.
      * 
      * @param       int $id_student Student id
+     * @param       int $id_course Course id to which the class belongs
      * @param       int $id_module Module id that the class belongs
      * @param       int $class_order Class order within the module
      * @param       string $text Comment content
      * 
-     * @return      bool If the comment has been successfully added
+     * @return      int Comment id or -1 if comment has not been added
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function newComment(int $id_student, int $id_module, int $class_order, string $text) : bool
+    public function newComment(int $id_student, int $id_course, int $id_module, 
+        int $class_order, string $text) : int
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
         
+        if (empty($id_course) || $id_course <= 0)
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
+            
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
@@ -70,17 +76,23 @@ class CommentsDAO
         if (empty($text))
             throw new \InvalidArgumentException("Invalid text");
         
+        $response = -1;
+            
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO comments 
-            (id_student, id_module, class_order, date, text) 
-            VALUES (?, ?, ?, NOW(), ?)
+            (id_student, id_course, id_module, class_order, date, text) 
+            VALUES (?, ?,  ?, ?, NOW(), ?)
         ");
         
         // Executes query
-        $sql->execute(array($id_student, $id_module, $class_order, $text));
+        $sql->execute(array($id_student, $id_course, $id_module, $class_order, $text));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = (int)$this->db->lastInsertId();
+        }
+        
+        return $response;
     }
     
     /**
@@ -187,6 +199,8 @@ class CommentsDAO
                 );
                 
                 $response[$i]['replies'] = $this->getReplies((int)$comment['id_comment']);
+                
+                $i++;
             }
         }
         
@@ -231,7 +245,7 @@ class CommentsDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $response = $this->db->lastInsertId();
+            $response = (int)$this->db->lastInsertId();
         }
         
         return $response;
