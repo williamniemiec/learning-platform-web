@@ -257,9 +257,6 @@ class CoursesController extends Controller
         if ($_SERVER['REQUEST_METHOD'] != 'POST')
             header("Location: ".BASE_URL);
         
-        if (empty($_POST['text']))
-            return;
-        
         $dbConnection = new MySqlPDODatabase();
             
         $coursesDAO = new CoursesDAO($dbConnection);

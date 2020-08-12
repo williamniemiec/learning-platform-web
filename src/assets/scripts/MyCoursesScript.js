@@ -1,10 +1,15 @@
+/**
+ * Searches courses that a student has.
+ *
+ * @param		object obj Search button 
+ */
 function search(obj)
 {
 	const text = $(obj).closest(".search-bar").find("input[type='text']").val()
 	
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"courses/search",
+		url:BASE_URL + "courses/search",
 		data:{text},
 		success:(json) => {
 			const courses = JSON.parse(json)
@@ -69,7 +74,4 @@ function search(obj)
 			$("#courses").fadeOut('fast').html(coursesHTML).fadeIn('fast')
 		}
 	})
-	/*
-	
-	*/
 }
