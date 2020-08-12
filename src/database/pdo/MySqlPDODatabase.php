@@ -21,12 +21,17 @@ class MySqlPDODatabase extends PDODatabase
      */
     protected function getInstance()
     {
-        return new \PDO(
+        $pdo = new \PDO(
             "mysql:dbname=".$this->getDatabase().";
             host=".$this->getHost().";
             charset=".$this->getCharset(),
             $this->getUsername(),
             $this->getPassword()
         );
+        
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+        
+        return $pdo;
     }
 }

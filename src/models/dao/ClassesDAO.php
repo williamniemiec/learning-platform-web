@@ -18,6 +18,12 @@ use models\_Class;
 abstract class ClassesDAO
 {
     //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    protected $db;
+    
+    
+    //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
     /**
@@ -42,7 +48,7 @@ abstract class ClassesDAO
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function markAsWatched(int $id_student, int $id_module, int $class_order, 
+    public function _markAsWatched(int $id_student, int $id_module, int $class_order, 
         ClassTypeEnum $class_type) : void
     {
         if (empty($id_student) || $id_student <= 0)
@@ -57,18 +63,18 @@ abstract class ClassesDAO
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
         
-        if (empty($class_type->get()))
+        if (empty($class_type) || (empty($class_type->get()) && $class_type->get() != 0))
             throw new \InvalidArgumentException("Class type cannot be empty ");
                     
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO student_historic
-            (id_student, id_module, class_order, ?, date)
-            VALUES (?, ?, ?, ?, NOW())
+            (id_student, id_module, class_order, class_type, date)
+            VALUES (?, ?, ?, ?, CURDATE())
         ");
-                    
+        
         // Executes query
-        $sql->execute(array($id_student, $id_module, $class_order, $class_type->get()));
+        $sql->execute(array($id_student, $id_module, $class_order, $class_type->get() == 1));
     }
     
     /**

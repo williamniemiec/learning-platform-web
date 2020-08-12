@@ -16,14 +16,8 @@ use models\Video;
  * @version		1.0.0
  * @since		1.0.0
  */
-class VideosDAO
+class VideosDAO extends ClassesDAO
 {
-    //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $db;
-    
-    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
@@ -178,12 +172,10 @@ class VideosDAO
      * @param       int $class_order Class order
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
-     * 
-     * @Override
      */
     public function markAsWatched(int $id_student, int $id_module, int $class_order) : void
     {
-        $this->markAsWatched($id_student, $id_module, $class_order,
+        $this->_markAsWatched($id_student, $id_module, $class_order,
             new ClassTypeEnum(ClassTypeEnum::VIDEO));
     }
 }

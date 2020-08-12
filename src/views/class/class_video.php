@@ -9,17 +9,21 @@
 	<div class="content content_notes">
     	<h3>Notebook</h3>
     	
-    		<div class="form-group">
-    			<label for="note_title">Title</label>
-    			<input id="note_title" type="text" name="note_title" placeholder="Title" class="form-control" required />
-			</div>
-			<div class="form-group">
-    			<label for="note_content">Content</label>
-    			<textarea id="note_content" placeholder="Content" name="note_content" class="form-control" required></textarea>
-    		</div>
-    		<div class="form-group">
-    			<button onClick="newNote(this, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" class="btn_theme btn_theme_full">Save</button>
-    		</div>
+		<div class="form-group">
+			<label for="note_title">Title</label>
+			<input id="note_title" type="text" name="note_title" placeholder="Title" class="form-control" required />
+		</div>
+		<div class="form-group">
+			<label for="note_content">Content</label>
+			<textarea id="note_content" placeholder="Content" name="note_content" class="form-control" required></textarea>
+		</div>
+		<div class="form-group">
+			<button onClick="newNote(this, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" 
+					class="btn_theme btn_theme_full"
+			>
+				Save
+			</button>
+		</div>
 		
 		<ul class="notebook">
 			<?php foreach($notebook as $note): ?>
@@ -54,8 +58,9 @@
 		<div class="comments">
 			<?php foreach ($comments as $comment): ?>
     			<div class="comment">
-    				<img class="img img-thumbnail" src="<?php echo BASE_URL."assets/img/profile_photos/".$comment['comment']->getCreator()->getPhoto(); ?>" />
-    				
+    				<img	class="img img-thumbnail" 
+    						src="<?php echo BASE_URL."assets/img/profile_photos/".$comment['comment']->getCreator()->getPhoto(); ?>" 
+					/>
     				<div class="comment_content">
     					<div class="comment_info">
     						<!-- Comment info -->
@@ -66,7 +71,11 @@
         						<textarea class="form-control"></textarea>
         						<div class="comment_reply_actions">
             						<button class="btn btn-primary" onclick="close_reply(this)">Cancel</button>
-            						<button class="btn btn-primary" onclick="send_reply(this,<?php echo $comment['comment']->getId(); ?>,<?php echo $_SESSION['s_login']; ?>)">Send</button>
+            						<button	class="btn btn-primary" 
+            								onclick="send_reply(this,<?php echo $comment['comment']->getId(); ?>,<?php echo $_SESSION['s_login']; ?>)"
+    								>
+    									Send
+									</button>
         						</div>
         					</div>
         					
@@ -74,15 +83,21 @@
         					<div class="comment_replies">
         						<?php foreach ($comment['replies'] as $reply): ?>
                 					<div class="comment comment_reply_content">
-                						<img class="img img-thumbnail" src="https://media.gettyimages.com/photos/colorful-powder-explosion-in-all-directions-in-a-nice-composition-picture-id890147976?s=612x612" />
+                						<img 	class="img img-thumbnail" 
+                								src="<?php echo BASE_URL."assets/img/profile_photos/".$reply->getCreator()->getPhoto(); ?>" 
+        								/>
                 						<div class="comment_content">
                         					<div class="comment_info">
-                            					<h5><?php echo $reply->getUser()->getName(); ?></h5>
+                            					<h5><?php echo $reply->getCreator()->getName(); ?></h5>
                             					<p><?php echo $reply->getContent(); ?></p>
                         					</div>
                         					<?php if ($reply->getCreator()->getId() == $_SESSION['s_login']): ?>
                             					<div class="comment_action">
-                            						<button class="btn btn-danger" onclick="delete_reply(this,<?php echo $reply->getId(); ?>)">&times;</button>
+                            						<button class="btn btn-danger" 
+                            								onclick="delete_reply(this,<?php echo $reply->getId(); ?>)"
+                    								>
+                    									&times;
+                									</button>
                             					</div>
                         					<?php endif; ?>
                         				</div>
@@ -92,7 +107,11 @@
     					</div>
     					<?php if ($comment['comment']->getCreator()->getId() == $_SESSION['s_login']): ?>
         					<div class="comment_action">
-        						<button class="btn btn-danger" onclick="deleteComment(this,<?php echo $comment['comment']->getId(); ?>)">&times;</button>
+        						<button	class="btn btn-danger" 
+    									onclick="deleteComment(this,<?php echo $comment['comment']->getId(); ?>)"
+								>
+									&times;
+								</button>
         					</div>
     					<?php endif; ?>    					
     				</div>

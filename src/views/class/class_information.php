@@ -6,8 +6,8 @@ use models\Video;
 	<!-- Mark as watched button -->
     <?php if ($class instanceof Video): ?>
     	<button class="btn btn-outline-primary btn_mark_watch" 
-    			onclick="<?php echo $wasWatched ? "markAsWatched" : "removeWatched"; ?>(<?php echo $class->getModuleId().",".$class->getClassOrder(); ?>)">
-    		Mark as watched
+    			onclick="<?php echo $wasWatched ? "removeWatched" : "markAsWatched"; ?>(<?php echo $class->getModuleId().",".$class->getClassOrder(); ?>)">
+    		<?php echo $wasWatched ? "Remove watched" : "Mark as watched"; ?>
     	</button>
 	<?php endif; ?>
 	

@@ -2,11 +2,8 @@
 //        Methods
 //-----------------------------------------------------------------------------
 $(function(){
-	updateScreen()
-	//setInterval(updateScreen, 200)
-	$(window).resize(updateScreen)
-	
-	
+	updateCourseContent()
+	$(window).resize(updateCourseContent)
 	// Course menu button
 	$(".course_menu_action").click(function() {
 		$(".course_menu_action #mobile_menu_button").toggleClass("active")
@@ -16,14 +13,15 @@ $(function(){
 	// When the student answers a question, informs him if he answered the
 	// question correctly and displays the answer
 	$(".question").click(function() {
-		var id_quest = $(".questions").attr("data-quest")
-		var selectedQuestion = $(this).attr("data-index")
+		const id_module = $(".questions").attr("data-id-module")
+		const class_order = $(".questions").attr("data-class-order")
+		const selectedQuestion = $(this).attr("data-index")
 		
 		// Shows answers
 		$.ajax({
 			type:"POST",
-			url:BASE_URL+"courses/class_getAnswer",
-			data:{id_quest:id_quest},
+			url:BASE_URL+"class/getAnswer",
+			data:{id_module, class_order},
 			success:function(ans) {
 				if (ans == selectedQuestion) {
 					alert("Correct!")
@@ -46,20 +44,11 @@ $(function(){
 		// Marks class as watched
 		$.ajax({
 			type:"POST",
-			url:BASE_URL+"ajax/class_mark_watched",
-			data:{id_class:$(".questions").attr("data-class")}
+			url:BASE_URL+"class/mark_watched",
+			data:{id_module, class_order, type:1}
 		})
 	})
 })
-
-/**
- * Fixes course menu height along with course content area. 
- */
-function updateScreen()
-{
-	updateCourseContent()
-	updateCourseMenu();
-}
 
 /**
  * Updates course content area.
@@ -119,44 +108,46 @@ function close_reply(obj)
 /**
  * Marks a class as watched.
  * 
- * @param       int id_class Class id to be added to logged 
- * student's watched class historic
+ * @param       int id_module Module id to which the class to be added to logged 
+ * student's watched class historic belongs
+ * @param		int class_order Class order in module
  * 
  * @implSpec     It will make an ajax request using POST request method
  */
-function markAsWatched(id_class)
+function markAsWatched(id_module, class_order)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/class_mark_watched",
-		data:{id_class:id_class}
+		url:BASE_URL+"class/mark_watched",
+		data:{id_module, class_order, type:0}
 	})
 	
 	$(".content_info").hide().append(`<small class="class_watched">Watched</small>`).fadeIn("fast")
-	$(`.module_class[data-id='${id_class}']`).hide().append(`<small class="class_watched">Watched</small>`).fadeIn("fast")
-	$(".btn_mark_watch").attr("onclick", "removeWatched("+id_class+")")
+	$(`.module_class[data-class='${id_module}/${class_order}']`).hide().append(`<small class="class_watched">Watched</small>`).fadeIn("fast")
+	$(".btn_mark_watch").attr("onclick", "removeWatched(" + id_module + "," + class_order + ")").html("Remove watched")
 }
 
 
 /**
  * Marks a class as unwatched.
  * 
- * @param       int id_class Class id to be removed from logged 
- * student's watched class historic
+ * @param       int id_module Module id to which the class to be removed to 
+ * logged student's watched class historic belongs
+ * @param		int class_order Class order in module
  * 
  * @implSpec     It will make an ajax request using POST request method
  */
-function removeWatched(id_class)
+function removeWatched(id_module, class_order)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/class_remove_watched",
-		data:{id_class:id_class}
+		url:BASE_URL+"class/remove_watched",
+		data:{id_module, class_order, type:0}
 	})
 	
 	$(".content_info").find(".class_watched").fadeOut("fast")
-	$(`.module_class[data-id='${id_class}']`).find(".class_watched").fadeOut("fast")
-	$(".btn_mark_watch").attr("onclick", "markAsWatched("+id_class+")")
+	$(`.module_class[data-class='${id_module}/${class_order}']`).find(".class_watched").fadeOut("fast")
+	$(".btn_mark_watch").attr("onclick", "markAsWatched(" + id_module + "," + class_order + ")").html("Mark as watched")
 }
 
 /**
@@ -216,7 +207,7 @@ function deleteComment(obj, id_comment)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/class_remove_comment",
+		url:BASE_URL+"class/class_remove_comment",
 		data:{id_comment:id_comment},
 		success:function() {
 			$(obj).closest(".comment").hide("slow")
@@ -239,7 +230,7 @@ function send_reply(obj, id_doubt, id_user)
 	
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/class_add_reply",
+		url:BASE_URL+"class/class_add_reply",
 		data:{
 			id_doubt:id_doubt,
 			id_user:id_user,
@@ -286,7 +277,7 @@ function delete_reply(obj, id_reply)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"ajax/class_remove_reply",
+		url:BASE_URL+"class/class_remove_reply",
 		data:{id_reply:id_reply},
 		success:function() {
 			$(obj).closest(".comment_reply_content").hide("slow")

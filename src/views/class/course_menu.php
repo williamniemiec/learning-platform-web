@@ -1,6 +1,4 @@
-<?php
-use models\Video;
-?>
+<?php use models\Video; ?>
 
 <div class="course_menu scrollbar_light">
 	<div class="course_banner_area">
@@ -13,7 +11,7 @@ use models\Video;
     		<div class="module_classes">
     			<?php $id = 0; ?>
     			<?php foreach ($module->getClasses() as $class): ?>
-    				<div class="module_class" data-id="<?php echo $class->getModuleId(); ?>">
+    				<div class="module_class" data-class="<?php echo $class->getModuleId()."/".$class->getClassOrder(); ?>">
     					<?php if ($class instanceof Video): ?>
     						<div class="module_title">
         						<a href="<?php echo BASE_URL."courses/open/".$id_course."/".$class->getModuleId()."/".$class->getClassOrder(); ?>">

@@ -16,14 +16,8 @@ use models\enum\ClassTypeEnum;
  * @version		1.0.0
  * @since		1.0.0
  */
-class QuestionnairesDAO
+class QuestionnairesDAO extends ClassesDAO
 {
-    //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $db;
-    
-    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
@@ -131,7 +125,7 @@ class QuestionnairesDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $response = $sql->fetch()['answer'];
+            $response = (int)$sql->fetch()['answer'];
         }
         
         return $response;
@@ -234,7 +228,7 @@ class QuestionnairesDAO
      */
     public function markAsWatched(int $id_student, int $id_module, int $class_order) : void
     {
-        $this->markAsWatched($id_student, $id_module, $class_order, 
+        $this->_markAsWatched($id_student, $id_module, $class_order, 
             new ClassTypeEnum(ClassTypeEnum::QUESTIONNAIRE));
     }
 }

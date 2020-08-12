@@ -325,8 +325,8 @@ class CommentsDAO
             
             // Query construction
             $sql = $this->db->prepare("
-            SELECT  student_name, student_photo, text, date
-            FROM    comment_replies NATURAL JOIN students
+            SELECT  *
+            FROM    comment_replies
             WHERE   id_comment = ?
         ");
             
@@ -336,15 +336,16 @@ class CommentsDAO
             // Parses results
             if ($sql && $sql->rowCount() > 0) {
                 $replies = $sql->fetchAll();
-                $students = new StudentsDAO($this->db);
                 
                 foreach ($replies as $reply) {
+                    $students = new StudentsDAO($this->db, (int)$reply['id_student']);
+                    
                     $response[] = new Message(
-                        (int)$students->get($reply['id_student']),
+                        $students->get(),
                         new \DateTime($reply['date']),
                         $reply['text'],
                         (int)$reply['id_reply']
-                        );
+                    );
                 }
             }
             
