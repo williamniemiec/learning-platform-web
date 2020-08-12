@@ -73,10 +73,11 @@ class NotificationsDAO
         
         // Query construction
         $sql = $this->db->prepare("
-            SELECT  *
-            FROM    notifications
-            WHERE   id_student = ?
-            LIMIT   ".$limit."
+            SELECT      *
+            FROM        notifications
+            WHERE       id_student = ?
+            ORDER BY    date DESC, `read` ASC
+            LIMIT       ".$limit."
         ");
         
         // Executes query

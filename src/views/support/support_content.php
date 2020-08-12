@@ -20,7 +20,7 @@
             				<span class="privilege_admin">Admin</span>
         				<?php endif; ?>
         			</div>
-            		<div class="view_widget_info"><?php echo $topic->getCreationDate()->format("m-d-Y H:m:s"); ?></div>
+            		<div class="view_widget_info"><?php echo $topic->getCreationDate()->format("m-d-Y H:i:s"); ?></div>
         		</div>
         		<div class="message_content"><?php echo $topic->getContent(); ?></div>
         	</div>

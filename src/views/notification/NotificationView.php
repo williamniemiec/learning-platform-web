@@ -19,7 +19,7 @@
     			<div class="notification_info">
     				<!-- Creation date -->
     				<div class="notification_date">
-    					<?php echo $notification->getDate()->format("m-d-Y H:m:s"); ?>
+    					<?php echo $notification->getDate()->format("m-d-Y H:i:s"); ?>
 					</div>
 					
 					<!-- Read / unread button -->

@@ -33,7 +33,7 @@
 					</div>
 					<div class="notebook-item-footer">
 						<div class="notebook-item-class"><?php echo $note->getClass()->getTitle(); ?></div>
-						<div class="notebook-item-date"><?php echo $note->getCreationDate()->format("m-d-Y H:m:s"); ?></div>
+						<div class="notebook-item-date"><?php echo $note->getCreationDate()->format("m-d-Y H:i:s"); ?></div>
 					</div>
 				</li>
 			<?php endforeach; ?>
