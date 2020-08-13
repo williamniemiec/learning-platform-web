@@ -52,28 +52,24 @@ class HomeController extends Controller
 	        'robots' => 'index'
 	    );
 	    
+	    $viewArgs = array(
+	        'header' => $header,
+	        'scripts' => array('gallery'),
+	        'total_bundles' => 10,
+	        'total_courses' => 100,
+	        'total_length' => 100000
+	    );
+	    
 	    if (Student::isLogged()) {
 	        $student = Student::getLoggedIn($dbConnection);
-	        $coursesDAO = new CoursesDAO($dbConnection);
 	        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
 	        
-    		$viewArgs = array(
-    		    'username' => $student->getName(),
-    		    'header' => $header,
-    		    'notifications' => array(
-    		        'notifications' => $notificationsDAO->getNotifications(10),
-    		        'total_unread' => $notificationsDAO->countUnreadNotification())
-    		);
+	        $viewArgs['username'] = $student->getName();
+	        $viewArgs['notifications'] = array(
+	            'notifications' => $notificationsDAO->getNotifications(10),
+	            'total_unread' => $notificationsDAO->countUnreadNotification());
 	    }
-	    else {
-	        $viewArgs = array(
-	            'header' => $header,
-	            'total_bundles' => 10,
-	            'total_courses' => 100,
-	            'total_length' => 100000
-	        );
-	    }
-
+	    
 		$this->loadTemplate("home", $viewArgs, Student::isLogged());
 	}
 	

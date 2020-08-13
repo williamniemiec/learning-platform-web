@@ -1,23 +1,4 @@
 /* Support */
-.search-filters {
-	display: 						flex;
-	flex-direction:					column;
-	justify-content: 				center;
-}
-
-.search-filter-options {
-	display: 						flex;
-	flex-direction:					row;
-	justify-content: 				space-around;
-	align-items:					center;
-	height:							40px;
-}
-
-.search-filter-options .form-group {
-	margin-bottom:					0;
-	height:							40px;
-	line-height:					40px;
-}
 
 .support_actions {
 	display:						flex;
