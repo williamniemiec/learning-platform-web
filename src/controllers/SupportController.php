@@ -50,7 +50,7 @@ class SupportController extends Controller
         
         $header = array(
             'title' => 'Support - Learning platform',
-            'styles' => array('support'),
+            'styles' => array('support', 'searchBar'),
             'description' => "Support page",
             'robots' => 'noindex'
         );

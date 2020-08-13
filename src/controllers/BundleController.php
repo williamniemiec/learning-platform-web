@@ -1,10 +1,13 @@
 <?php
 namespace controllers;
 
+
 use core\Controller;
 use database\pdo\MySqlPDODatabase;
 use models\Student;
 use models\dao\CoursesDAO;
+use models\dao\NotificationsDAO;
+use models\dao\BundlesDAO;
 
 
 /**
@@ -32,22 +35,33 @@ class BundleController extends Controller
 	{
 	    $dbConnection = new MySqlPDODatabase();
 	    
+	    $bundlesDAO = new BundlesDAO($dbConnection);
+	    $bundle = $bundlesDAO->get($id_bundle);
+	    
 	    $header = array(
-	        'title' => '<name_bundle> - Learning Platform',
+	        'title' => $bundle->getName().' - Learning Platform',
 	        'styles' => array('BundleStyle', 'gallery'),
-	        'description' => "<bundle_desc>",
-	        'keywords' => array('learning platform', 'bundle', '<name_bundle>'),
+	        'description' => $bundle->getDescription(),
+	        'keywords' => array('learning platform', 'bundle', $bundle->getName()),
 	        'robots' => 'index'
 	    );
 	    
+	    $viewArgs = array(
+	        'header' => $header,
+	        'bundle' => $bundle
+	    );
+	    
 	    if (Student::isLogged()) {
+	        $student = Student::getLoggedIn($dbConnection);
+	        
 	        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
-	        //....
-	    }
-	    else {
-	        $viewArgs = array(
-	            'header' => $header
-	        );
+	        
+	        $viewArgs['notifications'] = array(
+                'notifications' => $notificationsDAO->getNotifications(10),
+                'total_unread' => $notificationsDAO->countUnreadNotification()
+            );
+	        
+	        $viewArgs['username'] = $student->getName();
 	    }
 	    
 	    $this->loadTemplate("BundleView", $viewArgs, Student::isLogged());

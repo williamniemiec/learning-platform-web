@@ -1,22 +1,22 @@
 <div class="container">
 	<div class="view_panel">
-	<h1 class="view_header">Bundle name</h1>
+	<h1 class="view_header"><?php echo $bundle->getName(); ?></h1>
 	<div class="view_content">
     	<div class="bundle-info">
-    		<img class="bundle-info-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1280px-Google_2015_logo.svg.png" />
+    		<img class="bundle-info-logo" src="<?php echo BASE_URL."assets/img/logos/".$bundle->getLogo(); ?>" />
     		<div class="bundle-info-content">
-    			<p>Vestibulum ante eros, maximus eu risus vitae, volutpat laoreet leo. Nunc vel ipsum a magna convallis efficitur et vitae ex. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce dolor nulla, congue nec lacus gravida, tincidunt lobortis orci. Proin diam dolor, dapibus nec sagittis in, interdum sodales diam. Sed id nisl et eros tincidunt laoreet in vitae nisi. Etiam viverra velit et vulputate semper. Mauris tempor posuere metus, hendrerit ultricies nisl consequat in. Suspendisse laoreet porttitor ex vitae vehicula.</p>
+    			<p><?php echo $bundle->getDescription(); ?></p>
     		</div>
     	</div>
     	
     	<table class="bundle-details">
     		<tr>
     			<th>Name</th>
-    			<td>...</td>
+    			<td><?php echo $bundle->getName(); ?></td>
     		</tr>
     		<tr>
     			<th>Description</th>
-    			<td>...</td>
+    			<td><?php echo $bundle->getDescription(); ?></td>
     		</tr>
     		<tr>
     			<th>Total classes</th>

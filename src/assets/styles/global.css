@@ -201,10 +201,12 @@ li.dropdown-item a:hover {
 }
 
 .view_widget {
+	padding:						15px;
 	color:							var(--view-panel-text);
 	background-color:				var(--view-widget);
 	border:							1px solid var(--view-widget-accent);
 	border-radius:					5px;
+	margin:							30px 0;
 }
 
 .view_widget_info {
