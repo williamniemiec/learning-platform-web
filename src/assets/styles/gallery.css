@@ -17,6 +17,14 @@
 	width:200px;
 }
 
+img.gallery-item-thumbnail {
+	display:block;
+	width: 180px!important;
+	height: 105px!important;
+	margin:auto!important;
+	margin-top:10px!important;
+}
+
 .gallery-item {
 	background-color:purple;
 	display: flex;
@@ -86,12 +94,6 @@
 	justify-content:start;
 	overflow:hidden;
 	transition: all 1s;
-}
-
-.gallery-item-thumbnail {
-	display:block;
-	height:100px;
-	padding:10px;
 }
 
 .gallery-item-header, .gallery-item-footer {
