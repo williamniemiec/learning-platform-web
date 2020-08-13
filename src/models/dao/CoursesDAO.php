@@ -361,4 +361,17 @@ class CoursesDAO
         
         return $sql->fetch()['count'] > 0; 
     }
+    
+    /**
+     * Gets total of courses.
+     * 
+     * @return      int Total of courses
+     */
+    public function getTotal() : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    courses
+        ")->fetch()['total'];
+    }
 }

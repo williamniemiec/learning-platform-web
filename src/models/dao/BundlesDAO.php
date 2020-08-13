@@ -111,14 +111,15 @@ class BundlesDAO
         BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
+        $bindParams = array();
 
         if (empty($orderType))
             $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
         
         // Query construction
         $query = "
-            SELECT      id_bundle, name, price, description,
-                        COUNT(id_course) AS total_courses,
+            SELECT      id_bundle, name, bundles.price, logo, description,
+                        COUNT(id_course) AS courses,
         ";
         
         // If a student was provided, for each bundle add the information if he
@@ -130,57 +131,60 @@ class BundlesDAO
                             ELSE 0
                         END AS has_bundle,
             ";
+            
+            $bindParams[] = $id_student;
         }
         
         $query .= "
-                        COUNT(id_student) as total_students
+                        COUNT(id_student) AS sales
             FROM        bundles 
                         NATURAL JOIN bundle_courses
-                        NATURAL JOIN purchases
-            GROUP BY    id_bundle, name, price, description
+                        JOIN purchases USING (id_bundle)
+            GROUP BY    id_bundle, name, bundles.price, description
         ";
+        
+        // Limits the search to a specified name (if a name was specified)
+        if (!empty($name)) {
+            $query .= empty($orderBy) ? " HAVING name LIKE ?" : " HAVING name LIKE ?";
+            $bindParams[] = $name.'%';
+        }
         
         // Sets order by criteria (if any)
         if (!empty($orderBy)) {
             $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
         }
-        
-        // Limits the search to a specified name (if a name was specified)
-        if (!empty($name))
-            $query .= empty($orderBy) ? " HAVING name LIKE ?" : " HAVING name LIKE ?";
 
         // Limits the results (if a limit was given)
-        if ($limit > 0)
+        if ($limit > 0) 
             $query .= " LIMIT ".$limit;
         
         // Prepares query
         $sql = $this->db->prepare($query);
-        
+
         // Executes query
-        if (!empty($name))
-            $sql->execute(array($id_student, $name.'%'));
-        else
-            $sql->execute(array($id_student));
+        $sql->execute($bindParams);
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $bundles = $sql->fetchAll();
             $i = 0;
-            
+    
             foreach ($bundles as $bundle) {
                 $response[$i]['bundle'] = new Bundle(
                     (int)$bundle['id_bundle'],
                     $bundle['name'],
-                    $bundle['logo'],
                     (float)$bundle['price'],
+                    $bundle['logo'],
                     $bundle['description']
                 );
                 
                 if ($id_student > 0)
                     $response[$i]['has_bundle'] = $bundle['has_bundle'] > 0;
+                
+                $i++;
             }
         }
-        
+
         return $response;
     }
     
@@ -366,5 +370,18 @@ class BundlesDAO
         }
         
         return $response;
+    }
+    
+    /**
+     * Gets total of bundles.
+     *
+     * @return      int Total of bundles
+     */
+    public function getTotal() : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    bundles
+        ")->fetch()['total'];
     }
 }

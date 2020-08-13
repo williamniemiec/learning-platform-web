@@ -8,6 +8,8 @@ use models\Student;
 use models\dao\CoursesDAO;
 use models\dao\NotificationsDAO;
 use models\dao\BundlesDAO;
+use models\enum\BundleOrderTypeEnum;
+use models\enum\OrderDirectionEnum;
 
 
 /**
@@ -65,5 +67,51 @@ class BundleController extends Controller
 	    }
 	    
 	    $this->loadTemplate("BundleView", $viewArgs, Student::isLogged());
+	}
+	
+	
+	//-------------------------------------------------------------------------
+	//        Ajax
+	//-------------------------------------------------------------------------
+	/**
+	 * Searches bundles.
+	 *
+	 * @param       string $_POST['name'] Name to be searched
+	 * @param       string $_POST['filter']['type'] Ranking of results, which 
+	 * can be:
+	 * <ul>
+	 *     <li>price</li>
+	 *     <li>courses</li>
+	 *     <li>sales</li>
+	 * </ul>
+	 * @param       string $_POST['filter']['order'] Sort type, which can be:
+	 * <ul>
+	 *     <li>asc (Ascending)</li>
+	 *     <li>desc (Descending)</li>
+	 * </ul> 
+     * 
+     * @return      string Bundles
+	 * 
+	 * @apiNote     Must be called using POST request method
+	 */
+	public function search()
+	{
+	    if ($_SERVER['REQUEST_METHOD'] != 'POST')
+	        return;
+	        
+        $dbConnection = new MySqlPDODatabase();
+        
+        $bundlesDAO = new BundlesDAO($dbConnection);
+        
+        $student = Student::getLoggedIn($dbConnection);
+        $id_student = empty($student) ? -1 : $student->getId();
+        
+        echo json_encode($bundlesDAO->getAll(
+            $id_student, 
+            100, 
+            $_POST['name'], 
+            new BundleOrderTypeEnum($_POST['filter']['type']), 
+            new OrderDirectionEnum($_POST['filter']['order'])
+        ));
 	}
 }

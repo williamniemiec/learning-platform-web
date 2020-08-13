@@ -250,6 +250,8 @@ class CoursesController extends Controller
      * @param       string $_POST['text'] Name to be seearched
      * 
      * @return      string Courses with the specified name
+     * 
+     * @apiNote     Must be called using POST request method
      */
     public function search()
     {

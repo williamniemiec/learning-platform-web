@@ -1,13 +1,18 @@
+<?php 
+header("Content-type: text/css; charset: UTF-8");
+require('../../config.php');
+?>
+
 /* PARALLAX */
 .parallax {
 	margin-top:100px;
-	background-image: url('/assets/img/php.png');
-	background-color:#eee;
+	background-image: url('<?php echo BASE_URL; ?>assets/img/header/434949.jpg');
 	height:200px;
 	background-attachment: fixed;
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size:cover;
+	color: white;
 }
 
 .parallax-container {
@@ -16,6 +21,10 @@
 	flex:1;
 	flex-direction:column;
 	justify-content:space-around;
+}
+
+.parallax-title {
+	font-weight:bold;
 }
 
 .parallax-title, 
@@ -28,22 +37,26 @@
 .parallax-captions {
 	justify-content:space-around;
 	font-size:30px;
-	color:rgba(0,0,0,0.5);
+	font-weight:lighter;
 }
 
 .parallax-title {
 	justify-content:center;
 }
 
+body {
+	background-image:none!important;
+	background-color:#eee!important;
+}
+
+
 /* CENTRAL AREA */
 #area-central {
 	display:flex;
 	flex:1;
 	flex-direction:column;
-	background-color:#888;
 	height:100%;
 }
-
 
 
 /* AREA */
@@ -61,10 +74,7 @@
 	flex:1;
 	flex-direction:column;
 	height:100%;
-	background-color:red;
 }
-
-
 
 .search-results {
 	display: flex;
@@ -77,9 +87,12 @@
 	display: flex;
 	justify-content:space-between;
 	align-items:center;
-	
 }
 
 .order-by-options .form-group {
 	margin-bottom:0;	
+}
+
+#bundle-search-results {
+	display:none;
 }

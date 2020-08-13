@@ -16,7 +16,7 @@ use models\dao\BundlesDAO;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Bundle
+class Bundle implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -62,7 +62,7 @@ class Bundle
      *
      * @return      int Bundle id
      */
-    public function getBundleId() : int
+    public function getId() : int
     {
         return $this->id_bundle;
     }
@@ -172,5 +172,29 @@ class Bundle
         }
         
         return $this->totalClasses;
+    }
+
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id_bundle,
+            'name' => $this->name,
+            'price' => $this->price,
+            'logo' => $this->logo,
+            'description' => $this->description,
+            'courses' => $this->courses,
+            'totalClasses' => $this->totalClasses,
+            'totalLength' => $this->totalLength
+        );
     }
 }

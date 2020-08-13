@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace models\dao;
 
 
+use database\Database;
 use models\enum\ClassTypeEnum;
 use models\_Class;
 
@@ -127,5 +128,32 @@ abstract class ClassesDAO
         
         // Executes query
         $sql->execute(array($id_student, $id_module, $class_order));
+    }
+    
+    /**
+     * Gets total of classes.
+     *
+     * @param       Database $db Database
+     *
+     * @return      array Total of classes and length. The returned array has
+     * the following keys:
+     * <ul>
+     *  <li>total_classes</li>
+     *  <li>total_length</li>
+     * </ul>
+     */
+    public static function getTotal(Database $db) : array
+    {
+        return $db->getConnection()->query("
+            SELECT  SUM(total) AS total_classes, 
+                    SUM(length) AS total_length 
+            FROM (
+                SELECT  COUNT(*) AS total, length
+                FROM    videos
+                UNION
+                SELECT  COUNT(*) AS total, 5 AS length
+                FROM questionnaires
+            ) AS tmp
+        ")->fetch();
     }
 }

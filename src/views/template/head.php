@@ -31,3 +31,7 @@
 <?php if (!empty($styles)) foreach ($styles as $style): ?>
 	<link rel='stylesheet' href='<?php echo BASE_URL."assets/styles/".$style.".css"; ?>' />	
 <?php endforeach; ?>
+
+<?php if (!empty($stylesPHP)) foreach ($stylesPHP as $style): ?>
+	<link rel='stylesheet' href='<?php echo BASE_URL."assets/styles/".$style.".php"; ?>' />	
+<?php endforeach; ?>

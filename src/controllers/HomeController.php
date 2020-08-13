@@ -4,9 +4,13 @@ namespace controllers;
 use core\Controller;
 use database\pdo\MySqlPDODatabase;
 use models\Student;
+use models\dao\ClassesDAO;
 use models\dao\CoursesDAO;
 use models\dao\NotificationsDAO;
 use models\dao\HistoricDAO;
+use models\dao\BundlesDAO;
+use models\enum\BundleOrderTypeEnum;
+use models\enum\OrderDirectionEnum;
 
 
 /**
@@ -44,9 +48,13 @@ class HomeController extends Controller
 	{   
 	    $dbConnection = new MySqlPDODatabase();
 	    
+	    $bundlesDAO = new BundlesDAO($dbConnection);
+	    $coursesDAO = new CoursesDAO($dbConnection);
+	    
 	    $header = array(
 	        'title' => 'Home - Learning Platform',
-	        'styles' => array('home', 'gallery', 'searchBar'),
+	        'styles' => array('gallery', 'searchBar'),
+	        'stylesPHP' => array('home'),
 	        'description' => "Start learning today",
 	        'keywords' => array('learning platform', 'home'),
 	        'robots' => 'index'
@@ -54,12 +62,12 @@ class HomeController extends Controller
 	    
 	    $viewArgs = array(
 	        'header' => $header,
-	        'scripts' => array('gallery'),
-	        'total_bundles' => 10,
-	        'total_courses' => 100,
-	        'total_length' => 100000
+	        'scripts' => array('gallery', 'home'),
+	        'total_bundles' => $bundlesDAO->getTotal(),
+	        'total_courses' => $coursesDAO->getTotal(),
+	        'total_length' => number_format(ClassesDAO::getTotal($dbConnection)['total_length'] / 60, 2)
 	    );
-	    
+
 	    if (Student::isLogged()) {
 	        $student = Student::getLoggedIn($dbConnection);
 	        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
@@ -68,6 +76,18 @@ class HomeController extends Controller
 	        $viewArgs['notifications'] = array(
 	            'notifications' => $notificationsDAO->getNotifications(10),
 	            'total_unread' => $notificationsDAO->countUnreadNotification());
+	        $viewArgs['bundles'] = $bundlesDAO->getAll(
+	            $student->getId(), -1, '',
+	            new BundleOrderTypeEnum(BundleOrderTypeEnum::SALES),
+	            new OrderDirectionEnum(OrderDirectionEnum::DESCENDING)
+	            );
+	    }
+	    else {
+	        $viewArgs['bundles'] = $bundlesDAO->getAll(
+	            -1, -1, '',
+	            new BundleOrderTypeEnum(BundleOrderTypeEnum::SALES),
+	            new OrderDirectionEnum(OrderDirectionEnum::DESCENDING)
+            );
 	    }
 	    
 		$this->loadTemplate("home", $viewArgs, Student::isLogged());
