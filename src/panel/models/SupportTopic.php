@@ -15,7 +15,7 @@ use models\dao\SupportTopicDAO;
  * @version		1.0.0
  * @since		1.0.0
  */
-class SupportTopic
+class SupportTopic implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -149,5 +149,28 @@ class SupportTopic
         }
         
         return $this->replies;
+    }
+    
+
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id_topic,
+            'student' => $this->student,
+            'title' => $this->title,
+            'category' => $this->category,
+            'date' => $this->date->format("Y/m/d H:i:s"),
+            'closed' => $this->closed,
+            'replies' => $this->replies
+        );
     }
 }

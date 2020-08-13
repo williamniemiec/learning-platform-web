@@ -14,19 +14,22 @@
     				<h3>Filters</h3>
     				<div class="search-filter-options">
     					<div class="form-group">
-        					<input id="rd-price" type="radio" name="filter" />
-        					<label for="rd-price">All</label>
+        					<input id="rdo-type" type="radio" name="rdo-type" value="0" checked />
+        					<label for="rdo-type">All</label>
     					</div>
     					<div class="form-group">
-        					<input id="rd-course" type="radio" name="filter" />
-        					<label for="rd-course">Only answered</label>
+        					<input id="rdo-type2" type="radio" name="rdo-type" value="1" />
+        					<label for="rdo-type2">Only answered</label>
     					</div>
     					<div class="form-group">
-        					<select id="category" class="form-control">
+        					<select id="sel-category" name="sel-category" class="form-control">
         						<option value="0">All</option>
-        						<option value="2">Cat2</option>
+        						<?php foreach ($categories as $category): ?>
+        							<option value="<?php echo $category->getId(); ?>">
+        								<?php echo ucfirst(strtolower($category->getName())); ?>
+    								</option>
+        						<?php endforeach; ?>
         					</select>
-        					<label for="order"></label>
     					</div>
     				</div>
 				</div>
@@ -43,7 +46,7 @@
             			<th>Status</th>
             		</tr>
             	</thead>
-            	<tbody>
+            	<tbody id="topics">
             		<?php foreach ($supportTopics as $topic): ?>
             		<tr>
             			<td><a href="<?php echo BASE_URL."support/open/".$topic->getId(); ?>"><?php echo $topic->getTitle(); ?></a></td>

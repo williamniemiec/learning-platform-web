@@ -50,7 +50,7 @@ class SupportController extends Controller
         
         $header = array(
             'title' => 'Support - Learning platform',
-            'styles' => array('support', 'searchBar'),
+            'styles' => array('SupportStyle', 'searchBar'),
             'description' => "Support page",
             'robots' => 'noindex'
         );
@@ -58,13 +58,15 @@ class SupportController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
+            'scripts' => array('SupportScript'),
             'supportTopics' => $supportTopicDAO->getAll(),
             'notifications' => array(
                 'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification())
+                'total_unread' => $notificationsDAO->countUnreadNotification()),
+            'categories' => $supportTopicDAO->getCategories()
         );
         
-        $this->loadTemplate("support/support", $viewArgs);
+        $this->loadTemplate("support/SupportView", $viewArgs);
     }
     
     /**
@@ -95,7 +97,7 @@ class SupportController extends Controller
         
         $header = array(
             'title' => 'Support - Learning platform',
-            'styles' => array('support', 'message'),
+            'styles' => array('SupportStyle', 'message'),
             'description' => "Support topic",
             'robots' => 'noindex'
         );
@@ -109,7 +111,7 @@ class SupportController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
-        $this->loadTemplate("support/support_content", $viewArgs);
+        $this->loadTemplate("support/SupportContentView", $viewArgs);
     }
     
     /**
@@ -187,7 +189,7 @@ class SupportController extends Controller
         
         $header = array(
             'title' => 'New topic - Support - Learning platform',
-            'styles' => array('support'),
+            'styles' => array('SupportStyle'),
             'description' => "New support topic",
             'robots' => 'noindex'
         );
@@ -201,6 +203,41 @@ class SupportController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
-        $this->loadTemplate("support/support_new", $viewArgs);
+        $this->loadTemplate("support/SupportNewView", $viewArgs);
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Ajax
+    //-------------------------------------------------------------------------
+    /**
+     * Searches support topics that a student has.
+     *
+     * @param		string $_POST['name'] Topic title
+     * @param		string $_POST['filter']['type'] Topic type (0 for all and 1
+     * for only those who have been answered)
+     * @param		string $_POST['filter']['id_category'] Topic category
+     * 
+     * @return      string Support topics
+     */
+    public function search()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != "POST")
+            return;
+        
+        $dbConnection = new MySqlPDODatabase();
+        
+        $supportTopicDAO = new SupportTopicDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
+        
+        echo $_POST['filter']['type'] == 0 ?
+                json_encode($supportTopicDAO->search(
+                    $_POST['name'], 
+                    (int)$_POST['filter']['id_category'])) :
+                json_encode($supportTopicDAO->getAllAnsweredByCategory(
+                    $_POST['name'],
+                    (int)$_POST['filter']['id_category']));
     }
 }

@@ -90,13 +90,21 @@ class HomeController extends Controller
 	//-------------------------------------------------------------------------
 	//        Ajax
 	//-------------------------------------------------------------------------
+	/**
+	 * Gets student history of the last 7 days.
+	 *
+	 * @return      string Student historic
+	 */
 	public function weekly_progress()
 	{
 	    if ($_SERVER['REQUEST_METHOD'] != 'POST')
 	        header("Location: ".BASE_URL);
 	    
 	    $dbConnection = new MySqlPDODatabase();
-	    $historicDAO = new HistoricDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+	    $historicDAO = new HistoricDAO(
+	        $dbConnection, 
+	        Student::getLoggedIn($dbConnection)->getId()
+        );
 	    
 	    echo json_encode($historicDAO->getWeeklyHistory());
 	}

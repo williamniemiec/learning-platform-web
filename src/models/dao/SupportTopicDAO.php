@@ -374,51 +374,45 @@ class SupportTopicDAO
     /**
      * Gets all answered support topics from a user with a specific category.
      * 
-     * @param       int $id_student Student id
-     * @param       int $id_category Category id
+     * @param       string $name [Optional] Support topic title to be searched
+     * @param       int $id_category [Optional] Category id
      * 
      * @return      SupportTopic[] Support topics that have already been 
      * answered and that belongs to the category with the given id or empty
      * array if there are no matches
-     * 
-     * @throws      \InvalidArgumentException If topic id or category id is
-     * empty or less than or equal to zero
      */
-    public function getAllAnsweredByCategory(int $id_student, int $id_category) : array
+    public function getAllAnsweredByCategory(string $name = '', int $id_category = 0) : array
     {
-        if (empty($id_category) || $id_category <= 0)
-            throw new \InvalidArgumentException("Category id cannot be empty ".
-                "or less than or equal to zero");
-            
-        if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Student id cannot be empty ".
-                "or less than or equal to zero");
-        
         $response = array();
         
         // Query construction
-        $sql = $this->db->prepare("
+        $query = "
             SELECT  *
-            FROM    support_topic NATURAL JOIN support_category
+            FROM    support_topic NATURAL JOIN support_topic_category
             WHERE   id_student = ? AND
-                    id_category = ? AND
+                    title LIKE ? AND
                     id_topic IN (SELECT id_topic
                                  FROM   support_topic_replies)
-        ");
+        ";
+        
+        if ($id_category > 0)
+            $query .= " AND id_category = ".$id_category;
+        
+        $sql = $this->db->prepare($query);
         
         // Executes query
-        $sql->execute(array());
+        $sql->execute(array($this->id_student, $name."%"));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $students = new StudentsDAO($this->db);
-            
-            foreach ($sql->fetchAll() as $supportTopic) {
-                $response = new SupportTopicDAO(
+            foreach ($sql->fetchAll() as $supportTopic) {            
+                $students = new StudentsDAO($this->db, (int)$supportTopic['id_student']);
+                
+                $response[] = new SupportTopic(
                     (int)$supportTopic['id_topic'],
-                    $students->get((int)$supportTopic['id_student']),
+                    $students->get(),
                     $supportTopic['title'],
-                    $supportTopic['name'],
+                    new SupportTopicCategory((int)$supportTopic['id_category'], $supportTopic['name']),
                     new \DateTime($supportTopic['date']),
                     $supportTopic['message'],
                     (int)$supportTopic['closed']
@@ -432,46 +426,42 @@ class SupportTopicDAO
     /**
      * Searches for a topic with a given name.
      * 
-     * @param       int $id_student Student id
-     * @param       string $name Name to be searched
+     * @param       string $name [Optional] Support topic title to be searched
+     * @param       int $id_category [Optional] Searches for topics that belongs to a
+     * category
      * 
      * @return      SupportTopic[] Support topics that match with the provided
      * name or empty array if there are no matches
-     * 
-     * @throws      \InvalidArgumentException If name is empty or student id is
-     * empty or less than or equal to zero
      */
-    public function search(int $id_student, string $name) : array
+    public function search(string $name = '', int $id_category = 0) : array
     {
-        if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Student id cannot be empty ".
-                "or less than or equal to zero");
-        
-        if (empty($name))
-            throw new \InvalidArgumentException("Name cannot be empty");
-            
         $response = array();
         
         // Query construction
-        $sql = $this->db->prepare("
+        $query = "
             SELECT  *
-            FROM    support_topic NATURAL JOIN support_category
+            FROM    support_topic NATURAL JOIN support_topic_category
             WHERE   id_student = ? AND title LIKE ?
-        ");
+        ";
+        
+        if ($id_category > 0)
+            $query .= " AND id_category = ".$id_category;
+        
+        $sql = $this->db->prepare($query);
         
         // Executes query
-        $sql->execute(array($id_student, $name.'%'));
+        $sql->execute(array($this->id_student, $name.'%'));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $students = new StudentsDAO($this->db);
-            
             foreach ($sql->fetchAll() as $supportTopic) {
-                $response = new SupportTopicDAO(
+                $students = new StudentsDAO($this->db, (int)$supportTopic['id_student']);
+                
+                $response[] = new SupportTopic(
                     (int)$supportTopic['id_topic'],
-                    $students->get((int)$supportTopic['id_student']),
+                    $students->get(),
                     $supportTopic['title'],
-                    $supportTopic['name'],
+                    new SupportTopicCategory((int)$supportTopic['id_category'], $supportTopic['name']),
                     new \DateTime($supportTopic['date']),
                     $supportTopic['message'],
                     (int)$supportTopic['closed']

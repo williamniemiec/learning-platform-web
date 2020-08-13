@@ -11,7 +11,7 @@ namespace models;
  * @version		1.0.0
  * @since		1.0.0
  */
-class SupportTopicCategory
+class SupportTopicCategory implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -57,5 +57,23 @@ class SupportTopicCategory
     public function getName() : string
     { 
         return $this->name;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id_category,
+            'name' => $this->name
+        );
     }
 }

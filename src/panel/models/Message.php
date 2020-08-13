@@ -13,7 +13,7 @@ use DateTime;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Message
+class Message implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -85,5 +85,25 @@ class Message
     public function getId() : int
     {
         return $this->id;
+    }
+    
+
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id,
+            'message' => message,
+            'date' => $this->date->format("Y/m/d H:i:s"),
+            'user' => $this->user
+        );
     }
 }
