@@ -174,23 +174,27 @@ function newNote(obj, id_module, class_order)
 			const year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(d)
 			const month = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(d)
 			const day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d)
-			const newNote = `
+			const notebook = $(obj).closest(".content_notes").find("ul.notebook")
+			let newNote = ''
+			
+			notebook.hide()
+			
+			newNote = `
 				<li class="notebook-item">
 					<div class="notebook-item-header">
 						<a href="${BASE_URL}notebook/open/${id_note}">${title}</a>
 					</div>
 					<div class="notebook-item-footer">
 						<div class="notebook-item-class">${title}</div>
-						<div class="notebook-item-date">${month+'-'+day+"-"+year}</div>
+						<div class="notebook-item-date">${month+'-'+day+"-"+year+' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()}</div>
 					</div>
 				</li>
 			`
 			
-			$(obj).closest(".content_notes")
-				.find("ul.notebook")
-				.hide()
-				.prepend(newNote)
-				.fadeIn("fast")
+			if (notebook.find(".notebook-item").length == 2)
+				notebook.find(".notebook-item:last-of-type").remove()
+			
+			notebook.prepend(newNote).fadeIn("fast")
 			$("#note_title").val("")
 			$("#note_content").val("")
 		}

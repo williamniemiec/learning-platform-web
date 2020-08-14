@@ -519,6 +519,20 @@ class StudentsDAO
     }
     
     /**
+     * Gets total student purchases.
+     * 
+     * @return      int Total purchases
+     */
+    public function countPurchases() : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    purchases
+            WHERE   id_student = ".$this->id_student
+        )->fetch()['total'];
+    }
+    
+    /**
      * Adds a bundle to current student.
      * 
      * @param       int $id_bundle Bundle id to be added

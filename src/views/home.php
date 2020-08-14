@@ -28,7 +28,7 @@
                 			>
                 				<img	class="gallery-item-thumbnail" 
                 						src="<?php echo empty($bundle['bundle']->getLogo()) ? 
-                						    BASE_URL."assets/img/noImage.png" : 
+                						    BASE_URL."assets/img/default/noImage.png" : 
                 						    BASE_URL."assets/img/logos/bundles/".$bundle['bundle']->getLogo(); ?>" 
         						/>
                 				<div class="gallery-item-content">

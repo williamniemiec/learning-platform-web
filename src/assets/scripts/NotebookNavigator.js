@@ -74,7 +74,7 @@ class NotebookNavigator
 							</div>
 							<div class="notebook-item-footer">
 								<div class="notebook-item-class">${notes[i].class.title}</div>
-								<div class="notebook-item-date">${formatDate(new Date(notes[i].date), americanFormatter)}</div>
+								<div class="notebook-item-date">${formatDate(new Date(notes[i].date), true, americanFormatter)}</div>
 							</div>
 	    				</li>
 					`

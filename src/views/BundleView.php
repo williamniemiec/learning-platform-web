@@ -5,7 +5,7 @@
     	<div class="bundle-info">
     		<img	class="bundle-info-logo" 
 					src="<?php echo empty($bundle->getLogo()) ? 
-					    BASE_URL."assets/img/noImage.png" : 
+					    BASE_URL."assets/img/default/noImage.png" : 
 					    BASE_URL."assets/img/logos/bundles/".$bundle->getLogo(); ?>" 
 			/>
     		<div class="bundle-info-content">

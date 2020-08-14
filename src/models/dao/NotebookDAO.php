@@ -136,11 +136,12 @@ class NotebookDAO
             
         // Query construction
         $query = "
-            SELECT  *,
-                    notebook.title AS notebook_title,
-                    videos.title AS videos_title
-            FROM    notebook JOIN videos USING (id_module, class_order)
-            WHERE   id_student = ? AND id_module = ? AND class_order = ?
+            SELECT      *,
+                        notebook.title AS notebook_title,
+                        videos.title AS videos_title
+            FROM        notebook JOIN videos USING (id_module, class_order)
+            WHERE       id_student = ? AND id_module = ? AND class_order = ?
+            ORDER BY    date DESC
         ";
             
         if ($limit > 0) {

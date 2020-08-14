@@ -33,7 +33,7 @@
 					</div>
 					<div class="notebook-item-footer">
 						<div class="notebook-item-class"><?php echo $note->getClass()->getTitle(); ?></div>
-						<div class="notebook-item-date"><?php echo $note->getCreationDate()->format("m-d-Y H:i:s"); ?></div>
+						<div class="notebook-item-date"><?php echo $note->getCreationDate()->format("m/d/Y H:i:s"); ?></div>
 					</div>
 				</li>
 			<?php endforeach; ?>
@@ -42,12 +42,12 @@
 		<ul class="pagination pagination-sm justify-content-center">
 			<li class="page-item disabled"><button class="page-link" onClick="navigate('bef', -1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)">Before</button></li>
 			<li class="page-item active" data-index="1"><button onClick="navigate('go', 1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" class="page-link">1</button></li>
-			<?php for ($i=2; $i<=$totalNotes; $i++): ?>
+			<?php for ($i=2; $i<=$totalPages; $i++): ?>
 				<li class="page-item" data-index="<?php echo $i; ?>">
 					<button onClick="navigate('go', <?php echo $i; ?>, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" class="page-link"><?php echo $i; ?></button>
 				</li>
 			<?php endfor; ?>
-			<li class="page-item <?php echo $totalNotes == 1 ? "disabled" : "" ?>">
+			<li class="page-item <?php echo $totalPages == 1 ? "disabled" : "" ?>">
 				<button class="page-link" onClick="navigate('af', -1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)">After</button>
 			</li>
 		</ul>
@@ -74,7 +74,9 @@
 			<?php foreach ($comments as $comment): ?>
     			<div class="comment">
     				<img	class="img img-thumbnail" 
-    						src="<?php echo BASE_URL."assets/img/profile_photos/".$comment['comment']->getCreator()->getPhoto(); ?>" 
+    						src="<?php echo empty($comment['comment']->getCreator()->getPhoto()) ? 
+    						     BASE_URL."assets/img/default/noImage" : 
+    						     BASE_URL."assets/img/profile_photos/".$comment['comment']->getCreator()->getPhoto(); ?>" 
 					/>
     				<div class="comment_content">
     					<div class="comment_info">
@@ -99,7 +101,9 @@
         						<?php foreach ($comment['replies'] as $reply): ?>
                 					<div class="comment comment_reply_content">
                 						<img 	class="img img-thumbnail" 
-                								src="<?php echo BASE_URL."assets/img/profile_photos/".$reply->getCreator()->getPhoto(); ?>" 
+                								src="<?php echo empty($reply->getCreator()->getPhoto()) ? 
+                        						     BASE_URL."assets/img/default/noImage" : 
+                        						     BASE_URL."assets/img/profile_photos/".$reply->getCreator()->getPhoto(); ?>"
         								/>
                 						<div class="comment_content">
                         					<div class="comment_info">

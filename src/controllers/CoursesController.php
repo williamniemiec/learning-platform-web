@@ -78,7 +78,7 @@ class CoursesController extends Controller
 		    'scripts' => array('chart_progress'),
 		    'scriptsModule' => array('MyCoursesScript'),
 		    'notebook' => $notes,
-		    'totalNotes' => ceil($totNotes / 4)
+		    'totalPages' => ceil($totNotes / 4)
 		);
 
 		// Checks if it is student's birthdate
@@ -181,7 +181,7 @@ class CoursesController extends Controller
                         $class->getClassOrder(),
                         $limit
                     ),
-                    'totalNotes' => floor($notebookDAO->countAllFromClass(
+                    'totalPages' => floor($notebookDAO->countAllFromClass(
                         $class->getModuleId(),
                         $class->getClassOrder()
                     ) / $limit)

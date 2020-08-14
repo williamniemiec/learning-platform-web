@@ -43,8 +43,9 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
                 			>
                     			<!-- Course information -->
                 				<img	class="img img-responsive" 
-                						src="<?php echo empty($course['course']->getLogo()) ? BASE_URL."assets/img/default/noImage" : 
-                						          BASE_URL."assets/img/logos/courses/".$course['course']->getLogo(); ?>" 
+                						src="<?php echo empty($course['course']->getLogo()) ? 
+                						     BASE_URL."assets/img/default/noImage" : 
+                						     BASE_URL."assets/img/logos/courses/".$course['course']->getLogo(); ?>" 
                 				/>
                     			<h2><?php echo $course['course']->getName(); ?></h2>
                     			<p><?php echo $course['course']->getDescription(); ?></p>                			
@@ -107,12 +108,12 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
         			<ul class="pagination pagination-sm justify-content-center">
         				<li class="page-item disabled"><button class="page-link" onClick="navigate('bef')">Before</button></li>
         				<li class="page-item active" data-index="1"><button onClick="navigate('go', 1)" class="page-link">1</button></li>
-        				<?php for ($i=2; $i<=$totalNotes; $i++): ?>
+        				<?php for ($i=2; $i<=$totalPages; $i++): ?>
         					<li class="page-item" data-index="<?php echo $i; ?>">
         						<button onClick="navigate('go', <?php echo $i; ?>)" class="page-link"><?php echo $i; ?></button>
     						</li>
         				<?php endfor; ?>
-        				<li class="page-item <?php echo $totalNotes == 1 ? "disabled" : "" ?>">
+        				<li class="page-item <?php echo $totalPages == 1 ? "disabled" : "" ?>">
         					<button class="page-link" onClick="navigate('af')">After</button>
     					</li>
         			</ul>

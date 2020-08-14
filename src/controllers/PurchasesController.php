@@ -46,6 +46,13 @@ class PurchasesController extends Controller
         $student = Student::getLoggedIn($dbConnection);
         $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         $studentsDAO = new StudentsDAO($dbConnection, $student->getId());
+        $limit = 2;
+        $index = 1;
+        
+        // Checks whether an index has been sent
+        if (!empty($_GET['index'])) {
+            $index = (int)$_GET['index'];
+        }
         
         $header = array(
             'title' => 'Purchases - Learning Platform',
@@ -56,10 +63,12 @@ class PurchasesController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'purchases' => $studentsDAO->getPurchases(),
+            'purchases' => $studentsDAO->getPurchases($limit, $limit * ($index - 1)),
             'notifications' => array(
                 'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification())
+                'total_unread' => $notificationsDAO->countUnreadNotification()),
+            'totalPages' => ceil($studentsDAO->countPurchases() / $limit),
+            'currentIndex' => $index
         );
         
         $this->loadTemplate("PurchasesView", $viewArgs, Student::isLogged());
