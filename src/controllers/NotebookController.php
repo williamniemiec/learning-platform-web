@@ -169,8 +169,8 @@ class NotebookController extends Controller
     /**
      * Creates a new note.
      *
-     * @param       int $_POST['id_module'] Note's title
-     * @param       int $_POST['class_order'] Note's title
+     * @param       int $_POST['id_module'] Module id to which the class belongs
+     * @param       int $_POST['class_order'] Class order in module
      * @param       int $_POST['title'] Note's title
      * @param       int $_POST['content'] Note's content
      *
@@ -226,5 +226,37 @@ class NotebookController extends Controller
             $notebookDAO->getAll((int)$_GET['limit'], 
                 (int)$offset)
         );
+    }
+    
+    /**
+     * Gets user notes that belongs to a class.
+     * 
+     * @param       int $_GET['id_module'] Module id to which the class belongs
+     * @param       int $_GET['class_order'] Class order in module
+     * @param       int $_GET['index'] Pagination index
+     * @param       int $_GET['limit'] Maximum of annotations displayed on the
+     * screen
+     *
+     * @return      string Notes
+     *
+     * @apiNote     Must be called using GET request method
+     */
+    public function getAllFromClass()
+    {
+        // Checks if it is a GET request
+        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+            header("Location: ".BASE_URL);
+            
+            $dbConnection = new MySqlPDODatabase();
+            $notebookDAO = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+            $offset = $_GET['limit'] * ($_GET['index'] - 1);
+            
+            echo json_encode(
+                $notebookDAO->getAllFromClass(
+                    $_GET['id_module'],
+                    $_GET['class_order'],
+                    (int)$_GET['limit'],
+                    (int)$offset)
+                );
     }
 }

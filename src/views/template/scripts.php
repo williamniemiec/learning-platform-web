@@ -11,3 +11,7 @@
 <?php if (!empty($scripts)) foreach ($scripts as $script): ?>
 	<script src='<?php echo BASE_URL."assets/scripts/".$script.".js"; ?>'></script>	
 <?php endforeach; ?>
+
+<?php if (!empty($scriptsModule)) foreach ($scriptsModule as $script): ?>
+	<script type='module' src='<?php echo BASE_URL."assets/scripts/".$script.".js"; ?>'></script>	
+<?php endforeach; ?>

@@ -1,3 +1,6 @@
+import NotebookNavigator from './NotebookNavigator'
+
+
 /**
  * Searches courses that a student has.
  *
@@ -75,3 +78,21 @@ function search(obj)
 		}
 	})
 }
+
+/**
+ * Responsible for handling notebook pagination.
+ *
+ * @param		String action 'af' for go forward, 'bef' to move backward and 
+ * 'go' to go to a specific page
+ * @param		int goto Page to go
+ */
+function navigate(action, goto = -1)
+{
+	let nav = new NotebookNavigator(4, "notebook/getAll")
+	nav.navigate(action, goto)
+}
+
+
+// Exports
+window.search = search
+window.navigate = navigate

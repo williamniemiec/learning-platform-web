@@ -75,7 +75,8 @@ class CoursesController extends Controller
 		    'notifications' => array(
 		        'notifications' => $notificationsDAO->getNotifications(10),
 		        'total_unread' => $notificationsDAO->countUnreadNotification()),
-		    'scripts' => array('chart_progress', 'MyCoursesScript', 'NotebookScript'),
+		    'scripts' => array('chart_progress'),
+		    'scriptsModule' => array('MyCoursesScript'),
 		    'notebook' => $notes,
 		    'totalNotes' => ceil($totNotes / 4)
 		);
@@ -160,8 +161,9 @@ class CoursesController extends Controller
                 $commentsDAO = new CommentsDAO($dbConnection);
                 $videosDAO = new VideosDAO($dbConnection);
                 $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
-                
+  
                 $name = $class->getTitle();
+                $limit = 2;
                 
                 $classContent = array(
                     'id_course' => $id_course,
@@ -176,8 +178,13 @@ class CoursesController extends Controller
                     ),
                     'notebook' => $notebookDAO->getAllFromClass(
                         $class->getModuleId(),
+                        $class->getClassOrder(),
+                        $limit
+                    ),
+                    'totalNotes' => floor($notebookDAO->countAllFromClass(
+                        $class->getModuleId(),
                         $class->getClassOrder()
-                    )
+                    ) / $limit)
                 );
                 
                 $view = "class_video";
@@ -210,6 +217,7 @@ class CoursesController extends Controller
         $viewArgs = array(
             'header' => $header,
             'scripts' => array('course'),
+            'scriptsModule' => array('ClassNotebookScript'),
             'username' => $student->getName(),
             'view' => 'class/'.$view,
             'info_menu' => array(

@@ -19,10 +19,19 @@
     	</footer>
         
         <!-- Scripts -->
-        <?php if (!empty($scripts)): ?>
-        	<?php $this->loadView("template/scripts", array('scripts' => $scripts)); ?>
-    	<?php else: ?>
-    		<?php $this->loadView("template/scripts"); ?>
-    	<?php endif; ?>
+        <?php 
+            if (!empty($scripts)) {
+                if (!empty($scriptsModule))
+                    $this->loadView("template/scripts", array('scripts' => $scripts, 'scriptsModule' => $scriptsModule));
+                else
+                    $this->loadView("template/scripts", array('scripts' => $scripts));
+            }
+            else {
+                if (!empty($scriptsModule))
+                    $this->loadView("template/scripts", array('scriptsModule' => $scriptsModule));
+                else
+                    $this->loadView("template/scripts");
+            }
+        ?>
     </body>
 </html>

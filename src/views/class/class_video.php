@@ -38,6 +38,19 @@
 				</li>
 			<?php endforeach; ?>
 		</ul>
+		<!-- Pagination -->
+		<ul class="pagination pagination-sm justify-content-center">
+			<li class="page-item disabled"><button class="page-link" onClick="navigate('bef', -1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)">Before</button></li>
+			<li class="page-item active" data-index="1"><button onClick="navigate('go', 1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" class="page-link">1</button></li>
+			<?php for ($i=2; $i<=$totalNotes; $i++): ?>
+				<li class="page-item" data-index="<?php echo $i; ?>">
+					<button onClick="navigate('go', <?php echo $i; ?>, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" class="page-link"><?php echo $i; ?></button>
+				</li>
+			<?php endfor; ?>
+			<li class="page-item <?php echo $totalNotes == 1 ? "disabled" : "" ?>">
+				<button class="page-link" onClick="navigate('af', -1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)">After</button>
+			</li>
+		</ul>
 	</div>
 	
 	<!-- Comments area -->

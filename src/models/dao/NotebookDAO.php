@@ -135,14 +135,23 @@ class NotebookDAO
         $response = array();
             
         // Query construction
-        $sql = $this->db->prepare("
+        $query = "
             SELECT  *,
-                    notebook.title AS notebook_title, 
+                    notebook.title AS notebook_title,
                     videos.title AS videos_title
             FROM    notebook JOIN videos USING (id_module, class_order)
             WHERE   id_student = ? AND id_module = ? AND class_order = ?
-        ");
+        ";
             
+        if ($limit > 0) {
+            if ($offset > 0)
+                $query .= " LIMIT ".$offset.",".$limit;
+            else
+                $query .= " LIMIT ".$limit;
+        }
+        
+        $sql = $this->db->prepare($query);
+        
         // Executes query
         $sql->execute(array($this->id_student, $id_module, $class_order));
         
@@ -371,5 +380,24 @@ class NotebookDAO
             FROM    notebook
             WHERE   id_student = ".$this->id_student
         )->fetch()['total'];
+    }
+    
+    /**
+     * Gets total number of notes that a student created in a class.
+     *
+     * @param       int $id_module Module id to which the annotation belongs
+     * @param       int $class_order Class order in the module
+     *
+     * @return      int Total notes
+     */
+    public function countAllFromClass(int $id_module, int $class_order) : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    notebook JOIN videos USING (id_module, class_order)
+            WHERE   id_student = ".$this->id_student." AND 
+                    id_module = ".$id_module." AND 
+                    class_order = ".$class_order
+            )->fetch()['total'];
     }
 }

@@ -105,15 +105,15 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
         			</ul>
         			<!-- Pagination -->
         			<ul class="pagination pagination-sm justify-content-center">
-        				<li class="page-item disabled"><button class="page-link" onClick="navigation(this, 'bef')">Before</button></li>
-        				<li class="page-item active" data-index="1"><button onClick="navigation(this, 'go', 1)" class="page-link">1</button></li>
+        				<li class="page-item disabled"><button class="page-link" onClick="navigate('bef')">Before</button></li>
+        				<li class="page-item active" data-index="1"><button onClick="navigate('go', 1)" class="page-link">1</button></li>
         				<?php for ($i=2; $i<=$totalNotes; $i++): ?>
         					<li class="page-item" data-index="<?php echo $i; ?>">
-        						<button onClick="navigation(this, 'go', <?php echo $i; ?>)" class="page-link">2</button>
+        						<button onClick="navigate('go', <?php echo $i; ?>)" class="page-link"><?php echo $i; ?></button>
     						</li>
         				<?php endfor; ?>
         				<li class="page-item <?php echo $totalNotes == 1 ? "disabled" : "" ?>">
-        					<button class="page-link" onClick="navigation(this, 'af')">After</button>
+        					<button class="page-link" onClick="navigate('af')">After</button>
     					</li>
         			</ul>
             	</div>
