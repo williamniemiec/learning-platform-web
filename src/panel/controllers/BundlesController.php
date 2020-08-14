@@ -9,13 +9,13 @@ use models\dao\BundlesDAO;
 
 
 /**
- * Main controller. It will be responsible for admin's main page behavior.
- * 
+ * Responsible for the behavior of the view {@link bundlesManager/bundles_manager.php}.
+ *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
  * @version		1.0.0
  * @since		1.0.0
  */
-class HomeController extends Controller 
+class BundlesController extends Controller
 {
     //-------------------------------------------------------------------------
     //        Constructor
@@ -39,18 +39,24 @@ class HomeController extends Controller
     /**
      * @Override
      */
-	public function index ()
-	{
-	    // Redirects admin to bundles manager
-	    header("Location: ".BASE_URL."bundles");
-	}
-	
-	/**
-	 * Logout current admin and redirects him to login page. 
-	 */
-	public function logout()
-	{
-	    Admin::logout();
-	    header("Location: ".BASE_URL."login");
-	}
+    public function index ()
+    {
+        $dbConnection = new MySqlPDODatabase();
+        $admin = Admin::getLoggedIn($dbConnection);
+        $bundlesDAO = new BundlesDAO($dbConnection);
+        
+        $header = array(
+            'title' => 'Admin area - Learning platform',
+            'styles' => array('coursesManager'),
+            'robots' => 'noindex'
+        );
+        
+        $viewArgs = array(
+            'username' => $admin->getName(),
+            'bundles' => $bundlesDAO->getAll(),
+            'header' => $header
+        );
+        
+        $this->loadTemplate("bundlesManager/bundles_manager", $viewArgs);
+    }
 }
