@@ -39,6 +39,7 @@ class BundlesDAO
     public function __construct(Database $db, int $id_admin = -1)
     {
         $this->db = $db->getConnection();
+        $this->id_admin = $id_admin;
     }
     
     
@@ -90,99 +91,75 @@ class BundlesDAO
     }
     
     /**
-     * Gets all registered bundles. If a filter option is provided, it gets
+     * Gets all registered bundles. If a filter option is provided, it gets 
      * only those bundles that satisfy these filters.
-     *
-     * @param       int $id_student [Optional] Student id
+     * 
      * @param       int $limit [Optional] Maximum bundles returned
      * @param       string $name [Optional] Bundle name
-     * @param       BundleOrderTypeEnum $orderBy [Optional] Ordering criteria
-     * @param       OrderDirectionEnum $orderType [Optional] Order that the
-     * elements will be returned. Default is ascending.
-     *
-     * @return      array Bundles with the provided filters or empty array if
-     * no bundles are found. If a student id is provided, also returns, for
-     * each bundle, if this student has it. Each position of the returned array
-     * has the following keys:
-     * <ul>
-     *  <li><b>bundle</b>: Bundle information</li>
-     *  <li><b>has_bundle</b>: If the student with the given id has this
-     *  bundle</li>
-     * </ul>
+     * @param       BundleOrderTypeEnum $orderBy [Optional] Ordering criteria 
+     * @param       OrderDirectionEnum $orderType [Optional] Order that the 
+     * elements will be returned. Default is ascending
+     * 
+     * @return      Bundle[] Bundles with the provided filters or empty array if
+     * no bundles are found.
      */
-    public function getAll(int $id_student = -1, int $limit = -1, string $name = '',
+    public function getAll(int $limit = -1, string $name = '', 
         BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
-        
+        $bindParams = array();
+
         if (empty($orderType))
             $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
-            
+        
         // Query construction
         $query = "
-            SELECT      id_bundle, name, price, description,
-                        COUNT(id_course) AS total_courses,
+            SELECT      id_bundle, name, bundles.price, logo, description,
+                        COUNT(id_course) AS courses,
+                        COUNT(id_student) AS sales
+            FROM        bundles 
+                        NATURAL LEFT JOIN bundle_courses
+                        LEFT JOIN purchases USING (id_bundle)
+            GROUP BY    id_bundle, name, bundles.price, description
         ";
-        
-        // If a student was provided, for each bundle add the information if he
-        // has the bundle or not
-        if ($id_student > 0) {
-            $query .= "
-                CASE
-                    WHEN id_student = ? THEN 1
-                    ELSE 0
-                END AS has_bundle,
-            ";
-        }
-        
-        $query .= "
-                        COUNT(id_student) as total_students
-            FROM        bundles
-                        NATURAL JOIN bundle_courses
-                        NATURAL JOIN purchases
-            GROUP BY    id_bundle, name, price, description
-        ";
-        
-        // Sets order by criteria (if any)
-        if (!empty($orderBy))
-            $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
         
         // Limits the search to a specified name (if a name was specified)
-        if (!empty($name))
+        if (!empty($name)) {
             $query .= empty($orderBy) ? " HAVING name LIKE ?" : " HAVING name LIKE ?";
-            
+            $bindParams[] = $name.'%';
+        }
+        
+        // Sets order by criteria (if any)
+        if (!empty($orderBy)) {
+            $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
+        }
+
         // Limits the results (if a limit was given)
-        if ($limit > 0)
+        if ($limit > 0) 
             $query .= " LIMIT ".$limit;
-            
+        
         // Prepares query
         $sql = $this->db->prepare($query);
-        
+
         // Executes query
-        if (!empty($name))
-            $sql->execute(array($id_student, $name.'%'));
-        else
-            $sql->execute(array($id_student));
-            
+        $sql->execute($bindParams);
+        
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $bundles = $sql->fetchAll();
-            $i = 0;
-            
+
             foreach ($bundles as $bundle) {
-                $response[$i]['bundle'] = new Bundle(
-                    $bundle['id_bundle'],
+                $response[] = new Bundle(
+                    (int)$bundle['id_bundle'],
                     $bundle['name'],
-                    $bundle['price'],
+                    (float)$bundle['price'],
+                    (int)$bundle['sales'],
                     $bundle['logo'],
                     $bundle['description']
                 );
-                
-                if ($id_student > 0)
-                    $response[$i]['has_bundle'] = $bundle['has_bundle'] > 0;
             }
         }
-            
+
         return $response;
     }
     

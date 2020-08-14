@@ -51,6 +51,7 @@ class Bundle implements \JsonSerializable
         $this->id_bundle = $id_bundle;
         $this->name = $name;
         $this->price = $price;
+        $this->totalStudents = $totalStudents;
         $this->logo = empty($logo) ? '' : $logo;
         $this->description = empty($description) ? '' : $description;
     }

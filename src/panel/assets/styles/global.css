@@ -58,6 +58,10 @@ a:hover {
 	max-width:						80px!important;
 }
 
+td.actions {
+	width:							145px;
+}
+
 .course_logo img {
 	max-width:						100px;
 }

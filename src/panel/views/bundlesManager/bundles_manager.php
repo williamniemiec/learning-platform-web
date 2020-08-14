@@ -19,17 +19,17 @@
                 	<tbody>
                 		<?php foreach($bundles as $bundle): ?>
                     		<tr>
-                    			<?php if (empty($bundles->getLogo())): ?>
+                    			<?php if (empty($bundle->getLogo())): ?>
                     				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage"; ?>" /></td>
                     			<?php else: ?>
-                    				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/bundles/".$bundles->getLogo(); ?>" /></td>
+                    				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/bundles/".$bundle->getLogo(); ?>" /></td>
                     			<?php endif; ?>
-                    			<td><a href="<?php echo BASE_URL."courses/edit/".$course->getId(); ?>"><?php echo $course->getName(); ?></a></td>
-                    			<td><?php echo $bundles->getDescription(); ?></td>
-                    			<td><?php echo $bundles->getTotalStudents(); ?></td>
+                    			<td><a href="<?php echo BASE_URL."courses/edit/".$bundle->getId(); ?>"><?php echo $bundle->getName(); ?></a></td>
+                    			<td><?php echo $bundle->getDescription(); ?></td>
+                    			<td><?php echo $bundle->getTotalStudents(); ?></td>
                     			<td class="actions">
-                    				<a class="btn_theme" href="<?php echo BASE_URL."courses/edit/".$course->getId(); ?>">Edit</a>
-                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."courses/delete/".$course->getId(); ?>">Delete</a>
+                    				<a class="btn_theme" href="<?php echo BASE_URL."courses/edit/".$bundle->getId(); ?>">Edit</a>
+                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."courses/delete/".$bundle->getId(); ?>">Delete</a>
                 				</td>
                     		</tr>
                 		<?php endforeach; ?>
