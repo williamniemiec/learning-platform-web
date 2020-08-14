@@ -39,7 +39,7 @@ class NotFoundController extends Controller
 	    $student = Student::getLoggedIn($dbConnection);
 	    
 	    if (empty($student))
-	        $this->loadTemplate('errors/404', $viewArgs, false);
+	        $this->loadTemplate('error/404', $viewArgs, false);
 	    
         $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
 	        
@@ -49,6 +49,6 @@ class NotFoundController extends Controller
             'total_unread' => $notificationsDAO->countUnreadNotification()
         );
         
-        $this->loadTemplate('errors/404', $viewArgs, true);
+        $this->loadTemplate('error/404', $viewArgs, true);
 	}
 }
