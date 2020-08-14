@@ -64,7 +64,9 @@ class CoursesController extends Controller
         $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
         $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         $courses = $coursesDAO->getMyCourses($student->getId());
-
+        $notes = $notebookDAO->getAll(4);
+        $totNotes = $notebookDAO->count();
+        
 		$viewArgs = array(
 		    'username' => $student->getName(),
 		    'courses' => $courses,
@@ -73,8 +75,9 @@ class CoursesController extends Controller
 		    'notifications' => array(
 		        'notifications' => $notificationsDAO->getNotifications(10),
 		        'total_unread' => $notificationsDAO->countUnreadNotification()),
-		    'scripts' => array('chart_progress', 'MyCoursesScript'),
-		    'notebook' => $notebookDAO->getAll()
+		    'scripts' => array('chart_progress', 'MyCoursesScript', 'NotebookScript'),
+		    'notebook' => $notes,
+		    'totalNotes' => ceil($totNotes / 4)
 		);
 
 		// Checks if it is student's birthdate

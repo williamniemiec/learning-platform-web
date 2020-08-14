@@ -35,9 +35,16 @@ class NotebookDAO
      *
      * @param       Database $db Database
      * @param       int $id_student Student id
+     * 
+     * @throws      \InvalidArgumentException If student id is empty, less than
+     * or equal to zero
      */
     public function __construct(Database $db, int $id_student)
     {
+        if (empty($id_student) || $id_student <= 0)
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
+            
         $this->db = $db->getConnection();
         $this->id_student = $id_student;
     }
@@ -54,15 +61,11 @@ class NotebookDAO
      * @return      Note Information about the note or null if note does
      * not exist or it exists but does not belongs to the student
      *
-     * @throws      \InvalidArgumentException If note id or student id provided
-     * in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If note id is empty, less than or
+     * equal to zero
      */
     public function get(int $id_note) : ?Note
-    {
-        if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-            
+    {       
         if (empty($id_note) || $id_note <= 0)
             throw new \InvalidArgumentException("Note id cannot be empty ".
                 "or less than or equal to zero");
@@ -115,17 +118,12 @@ class NotebookDAO
      * @return      Note[] Notes that the student has or empty array if
      * the student does not have notes for the class.
      *
-     * @throws      \InvalidArgumentException If module id, class order or 
-     * student id provided in the constructor is empty, less than or equal to 
-     * zero
+     * @throws      \InvalidArgumentException If module id, class order is 
+     * empty, less than or equal to zero
      */
     public function getAllFromClass(int $id_module, int $class_order, 
         int $limit = -1, int $offset = -1) : array
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-            
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
@@ -359,5 +357,19 @@ class NotebookDAO
         }
         
         return $response;
+    }
+    
+    /**
+     * Gets total number of notes that a student has.
+     * 
+     * @return      int Total notes
+     */
+    public function count() : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    notebook
+            WHERE   id_student = ".$this->id_student
+        )->fetch()['total'];
     }
 }

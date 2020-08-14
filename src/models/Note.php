@@ -13,7 +13,7 @@ use DateTime;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Note
+class Note implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -99,5 +99,26 @@ class Note
     public function getClass() : Video
     {
         return $this->class;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     * @see \JsonSerializable::jsonSerialize()
+     *
+     * @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id_note,
+            'title' => $this->title,
+            'content' => $this->content,
+            'date' => $this->date->format("Y/m/d H:i:s"),
+            'class' => $this->class
+        );
     }
 }

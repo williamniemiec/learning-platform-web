@@ -338,3 +338,28 @@ input[type='file'] {
 .alert-danger .close {
 	color:							var(--alert-danger-close);
 }
+
+
+/* Pagination */
+.pagination {
+	margin-top:						30px;
+}
+
+.page-item.active .page-link {
+	background-color:				var(--color-primary);
+	border-color:					var(--color-primary);
+}
+
+.page-link:focus, 
+.page-item:focus {
+	outline:						0;
+	box-shadow:						none;
+}
+
+.page-link:hover {
+	color:							var(--color-primary);
+}
+
+.page-link {
+	color:							var(--color-primary);
+}

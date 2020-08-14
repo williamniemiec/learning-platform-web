@@ -116,4 +116,28 @@ class Questionnaire extends _Class
     {
         return $this->answer;
     }
+    
+
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     * @see \JsonSerializable::jsonSerialize()
+     *
+     * @Override
+     */
+    public function jsonSerialize()
+    {
+        $json = parent::jsonSerialize();
+        $json['type'] = 'questionnaire';
+        $json['question'] = $this->question;
+        $json['q1'] = $this->q1;
+        $json['q2'] = $this->q2;
+        $json['q3'] = $this->q3;
+        $json['q4'] = $this->q4;
+        $json['answer'] = $this->answer;
+        
+        return $json;
+    }
 }

@@ -103,6 +103,19 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
             				</li>
         				<?php endforeach; ?>
         			</ul>
+        			<!-- Pagination -->
+        			<ul class="pagination pagination-sm justify-content-center">
+        				<li class="page-item disabled"><button class="page-link" onClick="navigation(this, 'bef')">Before</button></li>
+        				<li class="page-item active" data-index="1"><button onClick="navigation(this, 'go', 1)" class="page-link">1</button></li>
+        				<?php for ($i=2; $i<=$totalNotes; $i++): ?>
+        					<li class="page-item" data-index="<?php echo $i; ?>">
+        						<button onClick="navigation(this, 'go', <?php echo $i; ?>)" class="page-link">2</button>
+    						</li>
+        				<?php endfor; ?>
+        				<li class="page-item <?php echo $totalNotes == 1 ? "disabled" : "" ?>">
+        					<button class="page-link" onClick="navigation(this, 'af')">After</button>
+    					</li>
+        			</ul>
             	</div>
 			</div>
     	<?php endif; ?>

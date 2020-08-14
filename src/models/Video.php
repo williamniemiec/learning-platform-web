@@ -96,4 +96,26 @@ class Video extends _Class
     {
         return $this->description;
     }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     * @see \JsonSerializable::jsonSerialize()
+     *
+     * @Override
+     */
+    public function jsonSerialize()
+    {
+        $json = parent::jsonSerialize();
+        $json['type'] = 'video';
+        $json['title'] = $this->title;
+        $json['description'] = $this->description;
+        $json['videoID'] = $this->videoID;
+        $json['length'] = $this->length;
+        
+        return $json;
+    }
 }

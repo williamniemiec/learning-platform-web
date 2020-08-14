@@ -180,7 +180,7 @@ class NotebookController extends Controller
      */
     public function new()
     {
-        // Checks if it is an ajax request
+        // Checks if it is a POST request
         if ($_SERVER['REQUEST_METHOD'] != 'POST')
             header("Location: ".BASE_URL);
             
@@ -198,6 +198,33 @@ class NotebookController extends Controller
             (int)$_POST['class_order'],
             $_POST['title'], 
             $_POST['content']
+        );
+    }
+    
+    /**
+     * Gets user notes.
+     * 
+     * @param       int $_GET['index'] Pagination index
+     * @param       int $_GET['limit'] Maximum of annotations displayed on the
+     * screen
+     * 
+     * @return      string Notes
+     * 
+     * @apiNote     Must be called using GET request method
+     */
+    public function getAll()
+    {
+        // Checks if it is a GET request
+        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+            header("Location: ".BASE_URL);
+        
+        $dbConnection = new MySqlPDODatabase();
+        $notebookDAO = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $offset = $_GET['limit'] * ($_GET['index'] - 1);
+        
+        echo json_encode(
+            $notebookDAO->getAll((int)$_GET['limit'], 
+                (int)$offset)
         );
     }
 }
