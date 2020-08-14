@@ -190,31 +190,28 @@ class BundlesDAO
     
     /**
      * Gets bundles that contain at least all courses that the bundle with the
-     * given id has, not including bundles that a student already has.
+     * given id has, not including bundles that a student already has (if 
+     * provided).
      * 
      *  @param      int $id_bundle Bundle id
-     *  @param      int $id_student Student id 
+     *  @param      int $id_student [Optional] Student id 
      *  
      *  @return     Bundle[] Bundles that are contained in the given bundle 
      *  disregarding those that the student already has
      *  
-     *  @throws      \InvalidArgumentException If bundle id or student id is 
-     * empty or less than or equal to zero
+     *  @throws      \InvalidArgumentException If bundle id is empty or less 
+     *  than or equal to zero
      */
-    public function extensionBundles(int $id_bundle, int $id_student) : array
+    public function extensionBundles(int $id_bundle, int $id_student = -1) : array
     {
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
-                "or less than or equal to zero");
-        
-        if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
             
         $response = array();
         
         // Query construction
-        $sql = $this->db->prepare("
+        $query = "
             SELECT  *
             FROM    bundles b
             WHERE   id_bundle != ? AND
@@ -222,12 +219,19 @@ class BundlesDAO
                 SELECT  *
                 FROM    bundle_courses JOIN purchases USING (id_bundle)
                 WHERE   id_bundle = ? AND
-                        id_student != ? AND
-                        id_course NOT IN (SELECT    id_course
+         ";
+        
+        if ($id_student > 0) {
+            $query .= " id_student != ? AND ";
+        }
+        
+        $query .= "      id_course NOT IN (SELECT    id_course
                                           FROM      bundle_courses
                                           WHERE     id_bundle = b.id_bundle)
-            )
-        ");
+                )
+        ";
+        
+        $sql = $this->db->prepare($query);
         
         // Executes query
         $sql->execute(array($id_bundle, $id_bundle, $id_student));
@@ -251,27 +255,23 @@ class BundlesDAO
     
     /**
      * Gets bundles that do not contain any courses in common with a
-     * supplied bundle, disregarding those that a student already has.
+     * supplied bundle, disregarding those that a student already has (if 
+     * provided).
      * 
      * @param       int $id_bundle Bundle id
-     * @param       int $id_student Student id
+     * @param       int $id_student [Optional] Student id
      * 
-     * @return      Bundle[] Bundles that does not have courses contained in the
-     * given bundle disregarding those that the student already has
+     * @return      Bundle[] Bundles that does not have courses contained in 
+     * the given bundle disregarding those that the student already has
      * 
-     * @throws      \InvalidArgumentException If bundle id or student id is 
-     * empty or less than or equal to zero
+     * @throws      \InvalidArgumentException If bundle id is empty or less than
+     * or equal to zero
      */
-    public function unrelatedBundles(int $id_bundle, int $id_student) : array
+    public function unrelatedBundles(int $id_bundle, int $id_student = -1) : array
     {
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
-            
-        if (empty($id_student) || $id_student <= 0)
-            throw new \InvalidArgumentException("Student id cannot be empty ".
-                "or less than or equal to zero");
-        
         $response = array(); 
         
         // Query construction
@@ -284,16 +284,14 @@ class BundlesDAO
                 FROM    bundle_courses
                 WHERE   id_bundle = ? AND
                         id_course IN (SELECT id_course
-                                      FROM   bundle_courses
+                                      FROM   bundle_courses JOIN purchases USING (id_bundle)
                                       WHERE  id_bundle = b.id_bundle AND
-                                             id_bundle NOT IN (SELECT   id_bundle
-                                                               FROM     purchases
-                                                               WHERE    id_student = ?))
-            )
+                                             id_student != ?)
+                    )
         ");
         
         // Executes query
-        $sql->execute(array($id_bundle ,$id_bundle, $id_student));
+        $sql->execute(array($id_bundle, $id_bundle, $id_student));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {

@@ -143,7 +143,7 @@ class Bundle implements \JsonSerializable
     {
         if (empty($this->totalLength)) {
             $bundles = new BundlesDAO($db);
-            $total = $bundles->countTotalClasses();
+            $total = $bundles->countTotalClasses($this->id_bundle);
             
             $this->totalLength = $total['total_length'];
             $this->totalClasses = $total['total_classes'];
@@ -165,7 +165,7 @@ class Bundle implements \JsonSerializable
     {
         if (empty($this->totalClasses)) {
             $bundles = new BundlesDAO($db);
-            $total = $bundles->countTotalClasses();
+            $total = $bundles->countTotalClasses($this->id_bundle);
             
             $this->totalLength = $total['total_length'];
             $this->totalClasses = $total['total_classes'];

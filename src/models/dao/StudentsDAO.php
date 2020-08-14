@@ -548,6 +548,38 @@ class StudentsDAO
     }
     
     /**
+     * Checks whether student has a bundle.
+     * 
+     * @param       int $id_bundle Bundle id
+     * 
+     * @return      bool If student has the bundle or not
+     * 
+     * @throws      \InvalidArgumentException If bundle id or if student id 
+     * provided in the constructor or bundle id is empty, less than or equal 
+     * to zero
+     */
+    public function hasBundle(int $id_bundle) : bool
+    {
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
+            
+            if (empty($id_bundle) || $id_bundle <= 0)
+                throw new \InvalidArgumentException("Bundle id cannot be less ".
+                    "than or equal to zero");
+        
+        $sql = $this->db->prepare("
+            SELECT  COUNT(*) AS has_bundle
+            FROM    purchases
+            WHERE   id_student = ? AND id_bundle = ?
+        ");
+        
+        $sql->execute(array($this->id_student, $id_bundle));
+        
+        return $sql->fetch()['has_bundle'] > 0;
+    }
+    
+    /**
      * Checks whether an email is already in use.
      *
      * @param       string $email Email to be analyzed

@@ -10,6 +10,7 @@ use models\dao\NotificationsDAO;
 use models\dao\BundlesDAO;
 use models\enum\BundleOrderTypeEnum;
 use models\enum\OrderDirectionEnum;
+use models\dao\StudentsDAO;
 
 
 /**
@@ -50,12 +51,17 @@ class BundleController extends Controller
 	    
 	    $viewArgs = array(
 	        'header' => $header,
-	        'bundle' => $bundle
+	        'bundle' => $bundle,
+	        'has_bundle' => false,
+	        'courses' => $bundle->getCourses($dbConnection),
+	        'total_classes' => $bundle->getTotalClasses($dbConnection),
+	        'total_length' => $bundle->getTotalLength($dbConnection),
+	        'scripts' => array('BundleScript')
 	    );
 	    
 	    if (Student::isLogged()) {
 	        $student = Student::getLoggedIn($dbConnection);
-	        
+	        $studentsDAO = new StudentsDAO($dbConnection, $student->getId());
 	        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
 	        
 	        $viewArgs['notifications'] = array(
@@ -64,6 +70,18 @@ class BundleController extends Controller
             );
 	        
 	        $viewArgs['username'] = $student->getName();
+	        $viewArgs['extensionBundles'] = $bundlesDAO->extensionBundles(
+	            $id_bundle, $student->getId()
+            );
+	        $viewArgs['unrelatedBundles'] = $bundlesDAO->unrelatedBundles(
+	            $id_bundle, 
+	            $student->getId()
+            );
+	        $viewArgs['has_bundle'] = !$studentsDAO->hasBundle($id_bundle);
+	    }
+	    else {
+	        $viewArgs['extensionBundles'] = $bundlesDAO->extensionBundles($id_bundle);
+	        $viewArgs['unrelatedBundles'] = $bundlesDAO->unrelatedBundles($id_bundle);
 	    }
 	    
 	    $this->loadTemplate("BundleView", $viewArgs, Student::isLogged());

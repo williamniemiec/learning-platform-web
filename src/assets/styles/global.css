@@ -209,6 +209,14 @@ li.dropdown-item a:hover {
 	margin:							30px 0;
 }
 
+.view_widget_central {
+	display:						flex;
+	flex-direction:					column;
+	justify-content:				central;
+	align-items:					center;
+	flex:							1;
+}
+
 .view_widget_info {
 	color:							var(--view-widget-info);
 	border:							1px solid var(--view-widget-info);

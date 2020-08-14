@@ -212,14 +212,20 @@ class CoursesDAO
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $courses = $sql->fetchAll();
+            $i = 0;
             
             foreach ($courses as $course) {
-                $response[] = new Course(
+                $response[$i] = new Course(
                     (int)$course['id_course'],
                     $course['name'],
                     $course['logo'],
                     $course['description']
                 );
+                
+                $total_classes = $this->countClasses($course['id_course']);
+                $response[$i]->setTotalClasses((int)$total_classes['total_classes']);
+                $response[$i]->setTotalLength((int)$total_classes['total_length']);
+                $i++;
             }
         }
         
