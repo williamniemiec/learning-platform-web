@@ -39,7 +39,7 @@ abstract class Controller
 	    
 	    if ($logged)
 	        require 'views/template/html_logged.php';
-	        else
-	            require 'views/template/html_no_logged.php';
+        else
+            require 'views/template/html_no_logged.php';
 	}
 }

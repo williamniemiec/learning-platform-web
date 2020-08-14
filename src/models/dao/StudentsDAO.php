@@ -83,7 +83,6 @@ class StudentsDAO
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $student = $sql->fetch();
-            var_dump($student);
             $response = new Student(
                 (int)$student['id_student'],
                 $student['name'],

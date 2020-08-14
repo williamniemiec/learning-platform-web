@@ -3,8 +3,11 @@ declare (strict_types=1);
 
 namespace models;
 
+
 use DateTime;
 use models\enum\GenreEnum;
+use models\dao\StudentsDAO;
+use database\Database;
 
 
 /**
@@ -36,7 +39,7 @@ class Student extends User
      * @param       string $photo [Optional] Name of the student photo file
      */
     public function __construct(int $id, string $name, GenreEnum $genre, 
-        DateTime $birthdate, string $email, string $photo = '')
+        DateTime $birthdate, string $email, ?string $photo = '')
     {
         $this->id = $id;
         $this->name = $name;
@@ -46,6 +49,67 @@ class Student extends User
         $this->photo = empty($photo) ? "" : $photo;
     }
 
+    
+    //-------------------------------------------------------------------------
+    //        Methods
+    //-------------------------------------------------------------------------
+    /**
+     * Checks whether a student is logged.
+     *
+     * @return      bool If student is logged
+     */
+    public static function isLogged() : bool
+    {
+        return !empty($_SESSION['s_login']);
+    }
+    
+    /**
+     * Checks if login has been successfully or failed.
+     *
+     * @param       string $email Student's email
+     * @param       string $password Student's password
+     *
+     * @return      Student Information about student logged in or null if 
+     * login failed
+     */
+    public static function login(Database $db, string $email, string $password) : ?Student
+    {
+        $studentsDAO = new StudentsDAO($db);
+        $student = $studentsDAO->login($email, $password);
+        
+        if (!empty($student))
+            $_SESSION['s_login'] = $student->getId();
+        
+        return $student;
+    }
+    
+    
+    /**
+     * Gets logged in student.
+     * 
+     * @param       Database $db Database
+     * 
+     * @return      Student Student logged in or null if there is no student 
+     * logged in
+     */
+    public static function getLoggedIn(Database $db) : ?Student
+    {
+        if (empty($_SESSION['s_login']))
+            return null;
+        
+        $studentsDAO = new StudentsDAO($db, $_SESSION['s_login']);
+        
+        return $studentsDAO->get();
+    }
+    
+    /**
+     * Logout current student.
+     */
+    public static function logout() : void
+    {
+        unset($_SESSION['s_login']);
+    }
+    
     
     //-------------------------------------------------------------------------
     //        Getters
@@ -59,5 +123,23 @@ class Student extends User
     public function getPhoto() : string
     {
         return $this->photo;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        $json = parent::jsonSerialize();
+        $json['photo'] = $this->photo;
+        
+        return $json;
     }
 }

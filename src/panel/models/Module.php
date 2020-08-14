@@ -4,9 +4,11 @@ declare (strict_types=1);
 namespace models;
 
 
-use database\Database;
 use models\dao\VideosDAO;
 use models\dao\QuestionnairesDAO;
+use models\util\IllegalStateException;
+use database\Database;
+
 
 /**
  * Responsible for representing modules.
@@ -15,13 +17,14 @@ use models\dao\QuestionnairesDAO;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Module
+class Module implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
     private $id_module;
     private $name;
+    private $db;
     
     
     //-------------------------------------------------------------------------
@@ -41,7 +44,7 @@ class Module
     
     
     //-------------------------------------------------------------------------
-    //        Getters
+    //        Getters & Setters
     //-------------------------------------------------------------------------
     /**
      * Gets Module id.
@@ -66,7 +69,8 @@ class Module
     /**
      * Gets all classes that belongs to the module.
      * 
-     * @param       Database $db Database
+     * @param       Database $db [Optional] Database (it is necessary to 
+     * provide a database, either by argument or by the method 'setDatabase')
      * 
      * @return      array Classes that belongs to this module. The returned
      * array is empty if there are no classes; otherwise, it has the following
@@ -76,10 +80,19 @@ class Module
      *  <li><b>Value</b>: Class</li>
      * </ul>
      * 
+     * @throws      IllegalStateException If no database has been set
+     * 
      * @implNote    Lazy initialization
      */
-    public function getClasses(Database $db) : array
+    public function getClasses(?Database $db = null) : array
     {
+        if (empty($db) && empty($this->db))
+            throw new IllegalStateException("No database has been set");
+        
+        // Sets database
+        if (empty($db))
+            $db = $this->db;
+            
         if (empty($this->classes)) {
             $this->classes = array();
             $videos = new VideosDAO($db);
@@ -98,5 +111,28 @@ class Module
         }
         
         return $this->classes;
+    }
+    
+    public function setDatabase(Database $db)
+    {
+        $this->db = $db;
+    }
+
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id_module' => $this->id_module,
+            'name' => $this->name
+        );
     }
 }

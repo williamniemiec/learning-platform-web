@@ -31,24 +31,24 @@ abstract class PDODatabase extends Database
      * {@inheritdoc}
      * @Override
      */
-    public function prepare(string $statement) : DatabaseStatement
+    public function prepare(string $statement) : ?DatabaseStatement
     {
         $statement = $this->conn->prepare($statement);
         
         
-        return $statement == false ? null : new PDODatabaseStatement($this->conn, $statement);
+        return $statement == false ? null : new PDODatabaseStatement($this, $statement);
     }
 
     /**
      * {@inheritdoc}
      * @Override
      */
-    public function query(string $statement) : DatabaseStatement
+    public function query(string $statement) : ?DatabaseStatement
     {
         $statement = $this->conn->query($statement);
         
         
-        return $statement == false ? null : new PDODatabaseStatement($this->conn, $statement);
+        return $statement == false ? null : new PDODatabaseStatement($this, $statement);
     }
 
     /**

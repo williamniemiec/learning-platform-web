@@ -17,12 +17,18 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/bootstrap/bootstrap.min.css' />
+<link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/bootstrap/bootstrap.min.css.map' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/scrollbar_light/jquery.mCustomScrollbar.min.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/scrollbar_light/scrollbar_light.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL."assets/styles/colors/".THEME.".css"; ?>' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/styles/btnTheme.css' />
+<link rel='stylesheet' href='<?php echo BASE_URL; ?>lib/password_strength/ps_style.css' />
 <link rel='stylesheet' href='<?php echo BASE_URL; ?>assets/styles/global.css' />
 
 <?php if (!empty($styles)) foreach ($styles as $style): ?>
 	<link rel='stylesheet' href='<?php echo BASE_URL."assets/styles/".$style.".css"; ?>' />	
+<?php endforeach; ?>
+
+<?php if (!empty($stylesPHP)) foreach ($stylesPHP as $style): ?>
+	<link rel='stylesheet' href='<?php echo BASE_URL."assets/styles/".$style.".php"; ?>' />	
 <?php endforeach; ?>

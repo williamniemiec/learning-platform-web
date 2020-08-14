@@ -1,13 +1,19 @@
 <?php
 namespace controllers;
 
+
 use core\Controller;
-use models\Admins;
-use models\Courses;
+use models\Admin;
+use database\pdo\MySqlPDODatabase;
+use models\dao\BundlesDAO;
 
 
 /**
  * Main controller. It will be responsible for admin's main page behavior.
+ * 
+ * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class HomeController extends Controller 
 {
@@ -15,12 +21,12 @@ class HomeController extends Controller
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * It will check if admin is logged; otherwise, redirects him to login 
+     * Checks whether admin is logged in. If he is not, redirects him to login 
      * page.
      */
     public function __construct()
     {
-        if (!Admins::isLogged()) {
+        if (!Admin::isLogged()) {
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -35,8 +41,9 @@ class HomeController extends Controller
      */
 	public function index ()
 	{
-	    $admins = new Admins($_SESSION['a_login']);
-	    $courses = new Courses();
+	    $dbConnection = new MySqlPDODatabase();
+	    $admin = Admin::getLoggedIn($dbConnection);
+	    $bundlesDAO = new BundlesDAO($dbConnection);
 	    
 	    $header = array(
 	        'title' => 'Admin area - Learning platform',
@@ -45,12 +52,12 @@ class HomeController extends Controller
 	    );
 	    
 		$viewArgs = array(
-		    'username' => $admins->getName(),
-		    'courses' => $courses->getCourses(),
+		    'username' => $admin->getName(),
+		    'bundles' => $bundlesDAO->getAll(),
 		    'header' => $header
 		);
 
-		$this->loadTemplate("coursesManager/courses_manager", $viewArgs);
+		$this->loadTemplate("bundlesManager/bundles_manager", $viewArgs);
 	}
 	
 	/**
@@ -58,7 +65,7 @@ class HomeController extends Controller
 	 */
 	public function logout()
 	{
-	    unset($_SESSION['a_login']);
+	    Admin::logout();
 	    header("Location: ".BASE_URL."login");
 	}
 }

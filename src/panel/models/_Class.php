@@ -12,7 +12,7 @@ namespace models;
  * @version		1.0.0
  * @since		1.0.0
  */
-abstract class _Class
+abstract class _Class implements \JsonSerializable
 {
     //-----------------------------------------------------------------------
     //        Attributes
@@ -42,5 +42,23 @@ abstract class _Class
     public function getClassOrder() : int
     {
         return $this->class_order;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     * @see \JsonSerializable::jsonSerialize()
+     *
+     * @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id_module,
+            'class_order' => $this->class_order
+        );
     }
 }

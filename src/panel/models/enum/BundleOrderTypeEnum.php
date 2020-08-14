@@ -19,7 +19,7 @@ class BundleOrderTypeEnum extends Enumeration
     //-------------------------------------------------------------------------
     //        Enumerations
     //-------------------------------------------------------------------------
-    public static const PRICE = 'price';
-    public static const COURSES = 'courses';
-    public static const SALES = 'sales';
+    public const PRICE = 'price';
+    public const COURSES = 'courses';
+    public const SALES = 'sales';
 }

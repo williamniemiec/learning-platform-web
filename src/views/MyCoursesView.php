@@ -13,7 +13,7 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
         <!-- Display error message (if any) -->
         <?php if ($totalCourses == 0): ?>
             <div class="error_msg">
-    			<h2>There are not registered courses for this account :/</h2>
+    			<h2>There are no registered courses for this account :/</h2>
     		</div>
         <?php else: ?>
         	<!-- Progress chart -->

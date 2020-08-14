@@ -7,8 +7,11 @@
 	--color-accent:					#7d4689;
 	--color-accent-strong:			#711757;
 	--color-light:					rgba(221,221,221,0.9);
+	--color-small:					#777;
 	--color-dark:					#3e4041;
-	--color-danger:					#e50000;/*#cc0000;*/
+	--color-dark-light:				#555;
+	--color-danger:					#e50000;
+	--color-success:				#52b86a;
 	--color-primary:				#7f5a83;
 	--color-secondary:				#0d324d;
 	--color-hover-link:				#9881aa;
@@ -16,13 +19,25 @@
 	--table-header-text:			white;
 	--table-header-background:		var(--color-accent);
 	--table-content-text:			var(--text-dark);
-	--table-content-background:		#eee;
+	--table-content-background:		var(--color-snow);
 	--view-header-text:				white;
 	--view-header-background:		rgba(93,13,107,0.7);
 	--view-header-accent:			#ae86b5;
 	--view-panel-text:				var(--text-dark);
-	--view-widget:					#ddd;
+	--view-widget:					var(--color-light);
 	--view-widget-accent:			#ccc;
-	--view-widget-info:				#888;
+	--view-widget-info:				var(--color-small);
 	--privilege-admin:				var(--color-accent);
+	--border-light:					var(--color-light);
+	--color-snow:					#eee;
+	--glass:						rgba(238,238,238,0.3);
+	--alert-danger-close:			white;
+	--alert-danger-text:			white;
+	--alert-danger:					#cc3441;
+	--alert-warning:				#e5c100;
+	--alert-warning-text:			black;
+	--alert-warning-close:			black;
+	--course-menu-text:				white;
+	--class-area-background:		white;
+	--class-hover:					#ccc;
 }

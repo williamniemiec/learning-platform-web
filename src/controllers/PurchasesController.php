@@ -46,7 +46,7 @@ class PurchasesController extends Controller
         $student = Student::getLoggedIn($dbConnection);
         $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
         $studentsDAO = new StudentsDAO($dbConnection, $student->getId());
-        $limit = 2;
+        $limit = 10;
         $index = 1;
         
         // Checks whether an index has been sent

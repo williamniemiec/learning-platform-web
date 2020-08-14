@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace models;
 
+
 use database\Database;
 use models\dao\CoursesDAO;
 use models\dao\BundlesDAO;
@@ -15,7 +16,7 @@ use models\dao\BundlesDAO;
  * @version		1.0.0
  * @since		1.0.0
  */
-class Bundle
+class Bundle implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -23,8 +24,10 @@ class Bundle
     private $id_bundle;
     private $name;
     private $price;
+    private $logo;
     private $description;
     private $courses;
+    private $totalStudents;
     private $totalClasses;
     private $totalLength;
     
@@ -38,13 +41,17 @@ class Bundle
      * @param       int $id_bundle Bundle id
      * @param       string $name Bundle name
      * @param       float $price Bundle price
+     * @param       int $totalStudents Total students who have this bundle
+     * @param       string $logo [Optional] Bundle logo
      * @param       string $description [Optional] Bundle description
      */
-    public function __construct(int $id_bundle, string $name, float $price, string $description = '')
+    public function __construct(int $id_bundle, string $name, float $price, 
+        int $totalStudents, ?string $logo = '', ?string $description = '')
     {
         $this->id_bundle = $id_bundle;
         $this->name = $name;
         $this->price = $price;
+        $this->logo = empty($logo) ? '' : $logo;
         $this->description = empty($description) ? '' : $description;
     }
     
@@ -57,7 +64,7 @@ class Bundle
      *
      * @return      int Bundle id
      */
-    public function getBundleId() : int
+    public function getId() : int
     {
         return $this->id_bundle;
     }
@@ -80,6 +87,17 @@ class Bundle
     public function getPrice() : float
     {
         return $this->price;
+    }
+    
+    /**
+     * Gets bundle logo.
+     * 
+     * @return      string Bundle logo file name or empty string if the bundle
+     * does not have a logo
+     */
+    public function getLogo() : string
+    {
+        return $this->logo;
     }
     
     /**
@@ -127,7 +145,7 @@ class Bundle
     {
         if (empty($this->totalLength)) {
             $bundles = new BundlesDAO($db);
-            $total = $bundles->countTotalClasses();
+            $total = $bundles->countTotalClasses($this->id_bundle);
             
             $this->totalLength = $total['total_length'];
             $this->totalClasses = $total['total_classes'];
@@ -138,9 +156,9 @@ class Bundle
     
     /**
      * Gets the total classes of the bundle.
-     *
+     * 
      * @param       Database $db Database
-     *
+     * 
      * @return      int Total classes of the bundle
      *
      * @implNote    Lazy initialization
@@ -149,12 +167,47 @@ class Bundle
     {
         if (empty($this->totalClasses)) {
             $bundles = new BundlesDAO($db);
-            $total = $bundles->countTotalClasses();
+            $total = $bundles->countTotalClasses($this->id_bundle);
             
             $this->totalLength = $total['total_length'];
             $this->totalClasses = $total['total_classes'];
         }
         
         return $this->totalClasses;
+    }
+    
+    /**
+     * Gets total students who have this bundle.
+     * 
+     * @return      int Total students
+     */
+    public function getTotalStudents() : int
+    {
+        return $this->totalStudents;
+    }
+
+    
+    //-------------------------------------------------------------------------
+    //        Serialization
+    //-------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     *  @see \JsonSerializable::jsonSerialize()
+     *
+     *  @Override
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->id_bundle,
+            'name' => $this->name,
+            'price' => $this->price,
+            'logo' => $this->logo,
+            'description' => $this->description,
+            'courses' => $this->courses,
+            'totalClasses' => $this->totalClasses,
+            'totalLength' => $this->totalLength,
+            'totalStudents' => $this->totalStudents
+        );
     }
 }

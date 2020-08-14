@@ -1,16 +1,18 @@
 <?php
 namespace controllers;
 
+
 use core\Controller;
-use models\Admins;
+use database\pdo\MySqlPDODatabase;
+use models\Admin;
 
 
 /**
  * Responsible for the behavior of the view {@link login.php}.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class LoginController extends Controller
 {      
@@ -36,9 +38,7 @@ class LoginController extends Controller
         
         // Checks whether the admin credentials are correct
         if (!empty($_POST['email'])) {
-            $admins = new Admins();
-            
-            if ($admins->login($_POST['email'], $_POST['password'])) {
+            if (!empty(Admin::login(new MySqlPDODatabase(), $_POST['email'], $_POST['password']))) {
                 header("Location: ".BASE_URL);
                 exit;
             }
@@ -48,6 +48,6 @@ class LoginController extends Controller
             $viewArgs['msg'] = "Email and / or password incorrect";
         }
         
-        $this->loadView("login", $viewArgs);
+        $this->loadTemplate("login", $viewArgs, false);
     }
 }

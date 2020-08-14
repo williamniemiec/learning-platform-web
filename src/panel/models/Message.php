@@ -31,8 +31,8 @@ class Message implements \JsonSerializable
      * Creates a representation of a message.
      *
      * @param       User $user User who answered the topic
-     * @param       string $date Message posting date
-     * @param       DateTime $message Message content
+     * @param       DateTime $date Message posting date
+     * @param       string $message Message content
      * @param       int $id [Optional] Message id
      */
     public function __construct(User $user, DateTime $date, string $message, int $id = -1)
@@ -49,12 +49,12 @@ class Message implements \JsonSerializable
     //-------------------------------------------------------------------------
     /**
      * Gets user who created the message.
-     *
+     * 
      * @return      User User who created the message
      */
-    public function getCreator() : int
+    public function getCreator() : User
     {
-        return $this->id_comment;
+        return $this->user;
     }
     
     /**
@@ -87,7 +87,7 @@ class Message implements \JsonSerializable
         return $this->id;
     }
     
-
+    
     //-------------------------------------------------------------------------
     //        Serialization
     //-------------------------------------------------------------------------

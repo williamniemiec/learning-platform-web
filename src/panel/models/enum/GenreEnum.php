@@ -19,6 +19,6 @@ class GenreEnum extends Enumeration
     //-------------------------------------------------------------------------
     //        Enumerations
     //-------------------------------------------------------------------------
-    public static const MALE = '0';
-    public static const FEMALE = '1';
+    public const MALE = '0';
+    public const FEMALE = '1';
 }

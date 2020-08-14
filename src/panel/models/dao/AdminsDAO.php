@@ -51,14 +51,15 @@ class AdminsDAO
     /**
      * Checks whether the supplied credentials are valid.
      *
-     * @param       string $email Student email
-     * @param       string $pass Student password
+     * @param       string $email Admin email
+     * @param       string $pass Admin password
      *
-     * @return      bool If credentials are correct
+     * @return      Admin Information about admin logged in or null if 
+     * credentials provided are incorrect
      * 
      * @throws      \InvalidArgumentException If email or password is empty
      */
-    public function login(string $email, string $pass) : bool
+    public function login(string $email, string $pass) : ?Admin
     {
         if (empty($email))
             throw new \InvalidArgumentException("Email cannot be empty");
@@ -66,12 +67,14 @@ class AdminsDAO
         if (empty($pass))
             throw new \InvalidArgumentException("Password cannot be empty");
         
-        $response = false;
+        $response = null;
         
         // Query construction
         $sql = $this->db->prepare("
-            SELECT  id_admin 
-            FROM    admins 
+            SELECT  *, 
+                    admins.name AS name_admin, 
+                    authorization.name AS name_authorization
+            FROM    admins JOIN authorization USING (id_authorization) 
             WHERE   email = ? AND password = ?
         ");
         
@@ -80,9 +83,16 @@ class AdminsDAO
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            $_SESSION['a_login'] = $sql->fetch()['id'];
-            $this->id_admin = $sql->fetch()['id'];
-            $response = true;
+            $admin = $sql->fetch();
+            
+            $response = new Admin(
+                (int)$admin['id_admin'], 
+                new Authorization($admin['name_authorization'], (int)$admin['level']),
+                $admin['name_admin'],
+                new GenreEnum((int)$admin['genre']),
+                new \DateTime($admin['birthdate']),
+                $admin['email']
+            );
         }
         
         return $response;
@@ -354,41 +364,40 @@ class AdminsDAO
      * 
      * @param       int $id_admin Admin id
      * 
-     * @return      Admin Admin with the given id or null if there us no admin
+     * @return      Admin Admin with the given id or null if there is no admin
      * with the given id
      * 
-     * @throws      \InvalidArgumentException If admin id is empty, less than
-     * or equal to zero
+     * @throws      \InvalidArgumentException If admin id provided in the 
+     * constructor is empty, less than or equal to zero
      */
-    public function get($id_admin) : Admin
+    public function get() : ?Admin
     {
-        if (empty($id_admin) || $id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id cannot be less than ".
-                "or equal to zero");
+        if (empty($this->id_admin) || $this->id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
         
         $response = null;
         
         // Query construction
-        $sql = $this->db->prepare("
-            SELECT  *
+        $sql = $this->db->query("
+            SELECT  *, 
+                    admins.name AS name_admin, 
+                    authorization.name AS name_authorization
             FROM    admins JOIN authorization USING (id_authorization)
-            WHERE   id_admin = ?
-        ");
-        
-        // Executes query
-        $sql->execute(array($id_admin));
+            WHERE   id_admin = ".$this->id_admin 
+        );
         
         // Parses result
         if ($sql->rowCount() > 0) {
-            $admin = $sql->fetch(true);
+            $admin = $sql->fetch();
             
             $response = new Admin(
-                $admin['admins.id_admin'], 
-                new Authorization($admin['authorization.name'], $admin['authorization.level']), 
-                $admin['admins.name'], 
-                $admin['admins.genre'], 
-                new \DateTime($admin['admins.birthdate']), 
-                $admin['admins.email']
+                $admin['id_admin'], 
+                new Authorization($admin['name_authorization'], (int)$admin['level']), 
+                $admin['name_admin'], 
+                new GenreEnum((int)$admin['genre']),
+                new \DateTime($admin['birthdate']),
+                $admin['email']
             );
         }
         
