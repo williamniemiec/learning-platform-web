@@ -138,8 +138,8 @@ class BundlesDAO
         $query .= "
                         COUNT(id_student) AS sales
             FROM        bundles 
-                        NATURAL JOIN bundle_courses
-                        JOIN purchases USING (id_bundle)
+                        NATURAL LEFT JOIN bundle_courses
+                        LEFT JOIN purchases USING (id_bundle)
             GROUP BY    id_bundle, name, bundles.price, description
         ";
         
