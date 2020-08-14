@@ -534,6 +534,10 @@ class StudentsDAO
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
         
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Bundle id cannot be less ".
+                "than or equal to zero");
+            
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO purchases
@@ -544,7 +548,7 @@ class StudentsDAO
         // Executes query
         $sql->execute(array($this->id_student, $id_bundle));
         
-        return $sql && $sql->rowCount() > 0;
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**
@@ -564,9 +568,9 @@ class StudentsDAO
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
             
-            if (empty($id_bundle) || $id_bundle <= 0)
-                throw new \InvalidArgumentException("Bundle id cannot be less ".
-                    "than or equal to zero");
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Bundle id cannot be less ".
+                "than or equal to zero");
         
         $sql = $this->db->prepare("
             SELECT  COUNT(*) AS has_bundle

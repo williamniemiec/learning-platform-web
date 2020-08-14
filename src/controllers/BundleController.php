@@ -77,7 +77,7 @@ class BundleController extends Controller
 	            $id_bundle, 
 	            $student->getId()
             );
-	        $viewArgs['has_bundle'] = !$studentsDAO->hasBundle($id_bundle);
+	        $viewArgs['has_bundle'] = $studentsDAO->hasBundle($id_bundle);
 	    }
 	    else {
 	        $viewArgs['extensionBundles'] = $bundlesDAO->extensionBundles($id_bundle);
@@ -131,5 +131,36 @@ class BundleController extends Controller
             new BundleOrderTypeEnum($_POST['filter']['type']), 
             new OrderDirectionEnum($_POST['filter']['order'])
         ));
+	}
+	
+	/**
+	 * Buys a course. If user is logged in, buys it and refresh page; otherwise,
+	 * redirects him to login page and, after this, redirects him to bundle page.
+	 * 
+	 * @param      int $_POST['id_bundle'] Bundle to be purchased
+	 * 
+	 * @return     string Link to redirect the user
+	 * 
+	 * @apiNote    Must be called using POST request method
+	 */
+	public function buy()
+	{
+	    if ($_SERVER['REQUEST_METHOD'] != 'POST' || empty($_POST['id_bundle']))
+	        return;
+	    
+        $link = '';
+	        
+        if (!Student::isLogged()) {
+            $_SESSION['redirect'] = BASE_URL."bundle/open/".$_POST['id_bundle'];
+            $link = BASE_URL."login";
+        }
+        else {
+            $dbConnection = new MySqlPDODatabase();
+            $studentsDAO = new StudentsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+            $studentsDAO->addBundle((int)$_POST['id_bundle']);
+            $link = BASE_URL."bundle/open/".$_POST['id_bundle'];
+        }
+        
+        echo $link;
 	}
 }

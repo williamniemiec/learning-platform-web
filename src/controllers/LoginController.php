@@ -57,11 +57,17 @@ class LoginController extends Controller
         
         // Checks if login form has been sent
         if (!empty($_POST['email'])) {
-            //$students = new StudentsDAO($dbConnection);
-            
-            //if ($students->login($_POST['email'], $_POST['password'])) {
             if (!empty(Student::login($dbConnection, $_POST['email'], $_POST['password']))) {
-                header("Location: ".BASE_URL."courses");
+                // If login was successful, redirects him
+                if (empty($_SESSION['redirect'])) {
+                    header("Location: ".BASE_URL."courses");
+                }
+                else {
+                    $redirect = $_SESSION['redirect'];
+                    unset($_SESSION['redirect']);
+                    header("Location: ".$redirect);
+                }
+                
                 exit;
             }
             
