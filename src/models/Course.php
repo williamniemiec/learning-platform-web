@@ -217,9 +217,9 @@ class Course implements \JsonSerializable
     //-------------------------------------------------------------------------
     /**
      * {@inheritDoc}
-     *  @see \JsonSerializable::jsonSerialize()
+     * @see \JsonSerializable::jsonSerialize()
      *  
-     *  @Override
+     * @Override
      */
     public function jsonSerialize()
     {

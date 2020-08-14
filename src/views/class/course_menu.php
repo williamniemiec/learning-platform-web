@@ -2,7 +2,11 @@
 
 <div class="course_menu scrollbar_light">
 	<div class="course_banner_area">
-    	<img class="img imr-responsive course_banner" src="<?php echo BASE_URL."assets/img/logos/".$logo; ?>" />
+    	<img	class="img imr-responsive course_banner" 
+    			src="<?php echo empty($logo) ? 
+    			    BASE_URL."assets/img/default/noImage" : 
+		            BASE_URL."assets/img/logos/courses/".$logo; ?>" 
+		/>
     </div>
     
     <?php foreach ($modules as $module): ?>

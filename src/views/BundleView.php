@@ -40,7 +40,7 @@
             		<div class="mosaic-item">
                 		<img	class="mosaic-item-thumbnail" 
                 				src="<?php echo empty($course->getLogo()) ?
-                				    BASE_URL."assets/img/noImage" :
+                				    BASE_URL."assets/img/default/noImage" :
                 				    BASE_URL."assets/img/logos/courses/".$course->getLogo(); ?>" 
         				/>
                 		<div class="mosaic-item-content">

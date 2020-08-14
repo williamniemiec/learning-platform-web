@@ -23,25 +23,12 @@ use models\enum\OrderDirectionEnum;
 class HomeController extends Controller 
 {
     //-------------------------------------------------------------------------
-    //        Constructor
-    //-------------------------------------------------------------------------
-    /**
-     * It will check if student is logged; otherwise, redirects him to home
-     * page.
-     */
-    public function __construct()
-    {
-//         if (Student::isLogged()) {
-//             header("Location: ".BASE_URL);
-//             exit;
-//         }
-    }
-    
-    
-    //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
     /**
+     * {@inheritDoc}
+     * @see Controller::index()
+     * 
      * @Override
      */
 	public function index ()
@@ -99,7 +86,7 @@ class HomeController extends Controller
 	public function logout()
 	{
 	    Student::logout();
-	    header("Refresh: 0");
+	    header("Location: ".BASE_URL);
 	}
 	
 	
