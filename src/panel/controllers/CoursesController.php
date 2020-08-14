@@ -1,21 +1,20 @@
 <?php
 namespace controllers;
 
+
 use core\Controller;
-use models\Admins;
-use models\Courses;
-use models\Classes;
-use models\Modules;
-use models\Videos;
-use models\Questionnaires;
+use models\Admin;
+use database\pdo\MySqlPDODatabase;
+use models\dao\BundlesDAO;
+use models\dao\CoursesDAO;
 
 
 /**
  * Responsible for the behavior of the view {@link coursesManager/courses_manager.php}.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class CoursesController extends Controller
 {
@@ -28,7 +27,7 @@ class CoursesController extends Controller
      */
     public function __construct()
     {
-        if (!Admins::isLogged()) {
+        if (!Admin::isLogged()) {
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -43,7 +42,23 @@ class CoursesController extends Controller
      */
     public function index ()
     { 
-        header("Location: ".BASE_URL); 
+        $dbConnection = new MySqlPDODatabase();
+        $admin = Admin::getLoggedIn($dbConnection);
+        $coursesDAO = new CoursesDAO($dbConnection);
+        
+        $header = array(
+            'title' => 'Admin area - Learning platform',
+            'styles' => array('coursesManager'),
+            'robots' => 'noindex'
+        );
+        
+        $viewArgs = array(
+            'username' => $admin->getName(),
+            'courses' => $coursesDAO->getAll(),
+            'header' => $header
+        );
+        
+        $this->loadTemplate("coursesManager/courses_manager", $viewArgs);
     }
     
     /**
@@ -53,13 +68,20 @@ class CoursesController extends Controller
      */
     public function delete($id_course)
     {
-        $courses = new Courses();
-        $courses->delete($id_course);
-        header("Location: ".BASE_URL);
+        $dbConnection = new MySqlPDODatabase();
+        
+        $coursesDAO = new CoursesDAO(
+            $dbConnection, 
+            Admin::getLoggedIn($dbConnection)->getId()
+        );
+        
+        $coursesDAO->delete($id_course);
+        
+        header("Location: ".BASE_URL."courses");
     }
     
     /**
-     * Adds a new course. If the course was successfully added, redirects
+     * Adds a new course. If the course has been successfully added, redirects
      * admin to the home page; otherwise, displays an error message.
      */
     public function add()
@@ -81,7 +103,7 @@ class CoursesController extends Controller
             'scripts' => array('coursesManager')
         );
         
-        // Checks if the new course was successfully added
+        // Checks if the new course has been successfully added
         if (!empty($_POST['name'])) {
             if ($courses->add($_POST['name'], $_POST['description'], $_FILES['logo'])) {
                 header("Location: ".BASE_URL);

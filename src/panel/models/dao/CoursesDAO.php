@@ -151,8 +151,8 @@ class CoursesDAO
      *  <li><b>total_students</b>: Total of students who have the course</li>
      * </ul>
      */
-    public function getAll(string $name = '', int $limit = -1, CourseOrderByEnum $orderBy = null, 
-        OrderDirectionEnum $orderType = null) : array
+    public function getAll(string $name = '', int $limit = -1, 
+        CourseOrderByEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
         

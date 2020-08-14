@@ -166,19 +166,16 @@ class BundlesDAO
     /**
      * Creates a new bundle.
      * 
-     * @param       string $name Bundle name
-     * @param       float $price Bundle price
-     * @param       string $description Bundle description
+     * @param       Bundle $bundle Bundle to be created
      * 
      * @return      bool If bundle has been successfully added
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to create bundles
-     * @throws      \InvalidArgumentException If name or price is empty or if 
-     * price or admin id provided in the constructor is empty, less than or 
-     * equal to zero
+     * @throws      \InvalidArgumentException If bundle is empty or if admin id
+     * provided in the constructor is empty, less than or equal to zero
      */
-    public function new(int $name, float $price, string $description = "") : bool
+    public function new(Bundle $bundle) : bool
     {
         if (empty($this->id_admin) || $this->id_admin <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
@@ -189,11 +186,13 @@ class BundlesDAO
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
         
-        if (empty($name))
-            throw new \InvalidArgumentException("Name cannot be empty");
+        if (empty($bundle))
+            throw new \InvalidArgumentException("Bundle cannot be empty");
         
-        if (empty($price) || $price < 0)
-            throw new \InvalidArgumentException("Invalid price");
+        $bindParams = array(
+            'name' => $bundle->getName(),
+            'price' => $bundle->getPrice()
+        );
             
         // Query construction
         $query = "
@@ -201,22 +200,23 @@ class BundlesDAO
             SET name = ?, price = ?
         ";
         
-        if (!empty($description)) {
+        if (!empty($bundle->getDescription())) {
             $query .= ", description = ?";
+            $bindParams[] = $bundle->getDescription();
+        }
+        
+        if (!empty($bundle->getLogo())) {
+            $query .= ", logo = ?";
+            $bindParams[] = $bundle->getLogo();
         }
         
         // Prepares query
         $sql = $this->db->prepare($query);
         
         // Executes query
-        if (!empty($description)) {
-            $sql->execute(array($name, $price, $description));
-        }
-        else {
-            $sql->execute(array($name, $price));
-        }
+        $sql->execute($bindParams);
         
-        return $sql->rowCount() > 0;
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**
@@ -245,6 +245,11 @@ class BundlesDAO
         if (empty($bundle))
             throw new \InvalidArgumentException("Bundle cannot be empty");
 
+        $bindParams = array(
+            'name' => $bundle->getName(),
+            'price' => $bundle->getPrice()
+        );
+            
         // Query construction
         $query = "
             UPDATE bundles
@@ -253,27 +258,21 @@ class BundlesDAO
         
         if (!empty($bundle->getDescription())) {
             $query .= ", description = ?";
+            $bindParams[] = $bundle->getDescription();
+        }
+        
+        if (!empty($bundle->getLogo())) {
+            $query .= ", logo = ?";
+            $bindParams[] = $bundle->getLogo();
         }
         
         // Prepares query
         $sql = $this->db->prepare($query);
         
         // Executes query
-        if (!empty($bundle->getDescription())) {
-            $sql->execute(array(
-                $bundle->getName(), 
-                $bundle->getPrice(), 
-                $bundle->getDescription()
-            ));
-        }
-        else {
-            $sql->execute(array(
-                $bundle->getName(),
-                $bundle->getPrice()
-            ));
-        }
-        
-        return $sql->rowCount() > 0;
+        $sql->execute($bindParams);
+
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**

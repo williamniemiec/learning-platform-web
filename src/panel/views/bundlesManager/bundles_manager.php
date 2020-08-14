@@ -5,7 +5,7 @@
             <?php if (count($bundles) == 0): ?>
             	<h2>There are no bundles</h2>
             <?php else: ?>
-            	<a class="btn_theme" href="<?php BASE_URL; ?>courses/add">Add</a>
+            	<a class="btn_theme" href="<?php BASE_URL; ?>bundles/add">Add</a>
                 <table class="table table-hover table-stripped text_centered">
                 	<thead>
                 		<tr>
@@ -24,12 +24,12 @@
                     			<?php else: ?>
                     				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/bundles/".$bundle->getLogo(); ?>" /></td>
                     			<?php endif; ?>
-                    			<td><a href="<?php echo BASE_URL."courses/edit/".$bundle->getId(); ?>"><?php echo $bundle->getName(); ?></a></td>
+                    			<td><a href="<?php echo BASE_URL."bundles/edit/".$bundle->getId(); ?>"><?php echo $bundle->getName(); ?></a></td>
                     			<td><?php echo $bundle->getDescription(); ?></td>
                     			<td><?php echo $bundle->getTotalStudents(); ?></td>
                     			<td class="actions">
-                    				<a class="btn_theme" href="<?php echo BASE_URL."courses/edit/".$bundle->getId(); ?>">Edit</a>
-                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."courses/delete/".$bundle->getId(); ?>">Delete</a>
+                    				<a class="btn_theme" href="<?php echo BASE_URL."bundles/edit/".$bundle->getId(); ?>">Edit</a>
+                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."bundles/delete/".$bundle->getId(); ?>">Delete</a>
                 				</td>
                     		</tr>
                 		<?php endforeach; ?>
