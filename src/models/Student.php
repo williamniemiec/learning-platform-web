@@ -94,6 +94,9 @@ class Student extends User
      */
     public static function getLoggedIn(Database $db) : ?Student
     {
+        if (empty($_SESSION['s_login']))
+            return null;
+        
         $studentsDAO = new StudentsDAO($db, $_SESSION['s_login']);
         
         return $studentsDAO->get();
