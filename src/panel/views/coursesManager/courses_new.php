@@ -14,7 +14,7 @@
             
             <form method="POST" enctype="multipart/form-data">
             	<div class="form-group">
-            		<label for="name">Course name</label>
+            		<label for="name">Course name*</label>
             		<input id="name" type="text" name="name" placeholder="Name" class="form-control" required />
             	</div>
             	
@@ -29,7 +29,7 @@
             	</div>
             	
             	<div class="form-group">
-            		<input type="submit" value="Register" class="form-control" />
+            		<input type="submit" value="Register" class="btn_theme btn_theme_full form-control" />
             	</div>
             </form>
         </div>

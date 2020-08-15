@@ -50,7 +50,7 @@ class BundlesController extends Controller
         $bundlesDAO = new BundlesDAO($dbConnection);
         
         $header = array(
-            'title' => 'Admin area - Learning platform',
+            'title' => 'Bundles - Learning platform',
             'styles' => array('coursesManager', 'manager'),
             'robots' => 'noindex'
         );
@@ -75,7 +75,7 @@ class BundlesController extends Controller
         $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
         
         $header = array(
-            'title' => 'Admin area - Learning platform',
+            'title' => 'New bundle - Learning platform',
             'styles' => array('coursesManager'),
             'robots' => 'noindex'
         );
@@ -152,7 +152,7 @@ class BundlesController extends Controller
         $bundle = $bundlesDAO->get((int)$id_bundle);
         
         $header = array(
-            'title' => 'Admin area - Learning platform',
+            'title' => 'Edit bundle - Learning platform',
             'styles' => array('bundlesManager', 'manager'),
             'robots' => 'noindex'
         );

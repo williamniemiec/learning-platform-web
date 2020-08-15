@@ -24,6 +24,8 @@ class Module implements \JsonSerializable
     //-------------------------------------------------------------------------
     private $id_module;
     private $name;
+    private $order;
+    private $totalClasses;
     private $db;
     
     
@@ -40,6 +42,7 @@ class Module implements \JsonSerializable
     {
         $this->id_module = $id_module;
         $this->name = $name;
+        $this->order = -1;
     }
     
     
@@ -51,7 +54,7 @@ class Module implements \JsonSerializable
      *
      * @return      int Module id
      */
-    public function getCourseId() : int
+    public function getId() : int
     {
         return $this->id_module;
     }
@@ -64,6 +67,31 @@ class Module implements \JsonSerializable
     public function getName() : string
     {
         return $this->name;
+    }
+    
+    /**
+     * Gets module order in a course.
+     * 
+     * @return      int Module order
+     */
+    public function getOrder() : int
+    {
+        return $this->order;
+    }
+    
+    /**
+     * Sets module order in a course.
+     * 
+     * @param       int $order Module order
+     * 
+     * @return      Module Itself to allow chained calls
+     */
+    public function setOrder(int $order) : Module
+    {
+        if ($order > 0)
+            $this->order = $order;
+        
+        return $this;
     }
     
     /**
@@ -118,6 +146,32 @@ class Module implements \JsonSerializable
         $this->db = $db;
     }
 
+    /**
+     * Gets total classes that the module has.
+     * 
+     * @return      int Total classes
+     */
+    public function getTotalClasses() : int
+    {
+        return $this->totalClasses;
+    }
+    
+    /**
+     * Sets total classes.
+     * 
+     * @param       int $totalClasses Total classes
+     * 
+     * @return      Module Itself to allow chained calls
+     */
+    public function setTotalClasses(int $totalClasses) : Module
+    {
+        if ($totalClasses >= 0)
+            $this->totalClasses = $totalClasses;
+        
+        return $this;
+    }
+    
+    
     
     //-------------------------------------------------------------------------
     //        Serialization
@@ -132,7 +186,9 @@ class Module implements \JsonSerializable
     {
         return array(
             'id_module' => $this->id_module,
-            'name' => $this->name
+            'name' => $this->name,
+            'order' => $this->order,
+            'totalClasses' => $this->totalClasses
         );
     }
 }

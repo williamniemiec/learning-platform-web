@@ -46,7 +46,7 @@ class ModulesController extends Controller
         $modulesDAO = new ModulesDAO($dbConnection);
         
         $header = array(
-            'title' => 'Admin area - Learning platform',
+            'title' => 'Modules manager - Learning platform',
             'styles' => array('coursesManager'),
             'robots' => 'noindex'
         );
@@ -57,6 +57,49 @@ class ModulesController extends Controller
             'header' => $header
         );
         
-        $this->loadTemplate("bundlesManager/bundles_manager", $viewArgs);
+        $this->loadTemplate("modulesManager/modules_manager", $viewArgs);
     }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Ajax
+    //-------------------------------------------------------------------------
+    /**
+     * Gets all registered modules.
+     *
+     * @return      string Modules
+     *
+     * @apiNote     Must be called using GET request method
+     */
+    public function getAll()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+            return;
+            
+        $dbConnection = new MySqlPDODatabase();
+        
+        $modulesDAO = new ModulesDAO($dbConnection);
+        echo json_encode($modulesDAO->getAll());
+    }
+    
+//     /**
+//      * Gets highest module order in use.
+//      *
+//      * @param       int $_GET['id_course'] Course id
+//      * @param       int $_GET['id_module'] Module id
+//      * 
+//      * @return      int Highest moddule order
+//      *
+//      * @apiNote     Must be called using GET request method
+//      */
+//     public function getMaxOrderInCourse()
+//     {
+//         if ($_SERVER['REQUEST_METHOD'] != 'GET')
+//             return;
+            
+//         $dbConnection = new MySqlPDODatabase();
+        
+//         $modulesDAO = new ModulesDAO($dbConnection);
+//         echo $modulesDAO->getHighestOrder((int)$_GET['id_course'], (int)$_GET['id_module']);
+//     }
 }

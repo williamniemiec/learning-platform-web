@@ -72,7 +72,11 @@ class CoursesDAO
         $sql = $this->db->prepare("
             SELECT  SUM(total) AS total_classes, 
                     SUM(length) as total_length
-            FROM    (SELECT      COUNT(*) AS total, 5 AS length
+            FROM    (SELECT      COUNT(*) AS total, 
+                                 CASE
+								    WHEN id_module > 0 THEN 5 
+								    ELSE 0
+								 END AS length
                      FROM        questionnaires NATURAL JOIN course_modules
                      WHERE       id_course = ?
                      UNION ALL
@@ -201,9 +205,9 @@ class CoursesDAO
                 );
                 
                 $total = $this->countClasses((int)$course['id_course']);
-                $response[$i]->setTotalStudents((int)$course['total_students']);
                 $response[$i]->setTotalClasses((int)$total['total_classes']);
                 $response[$i]->setTotalLength((int)$total['total_length']);
+                $response[$i]->setTotalStudents((int)$course['total_students']);
                 $i++;
             }
         }
@@ -218,13 +222,13 @@ class CoursesDAO
      *
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update courses
-     * @throws      \InvalidArgumentException If course id or admin id provided
-     * in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If course id is empty, less than
+     * or equal to zero or if admin id provided in the constructor is empty
      */
     public function delete(int $id_course) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 &&
@@ -300,13 +304,13 @@ class CoursesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have 
      * authorization to add courses
-     * @throws      \InvalidArgumentException If course is empty or admin id 
-     * provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If course is empty or admin 
+     * provided in the constructor is empty
      */
-    public function add(Course $course) : bool
+    public function new(Course $course) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 &&
@@ -323,19 +327,19 @@ class CoursesDAO
         
         // Query construction
         $data_keys[] = "name";
-        $data_values[] = $this->getName();
+        $data_values[] = $course->getName();
         $data_sql[] = "?";
         
-        if (!empty($this->getDescription())) {
+        if (!empty($course->getDescription())) {
             $data_keys[] = "description";
-            $data_values[] = $this->getDescription();
+            $data_values[] = $course->getDescription();
             $data_sql[] = "?";
         }
         
         // Parses course logo
-        if (!empty($this->getLogo())) {
+        if (!empty($course->getLogo())) {
             // Puts image file name in the query
-            $data_values[] = $this->getLogo();
+            $data_values[] = $course->getLogo();
             $data_sql[] = "?";
         }
         
@@ -360,13 +364,13 @@ class CoursesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update courses
-     * @throws      \InvalidArgumentException If course is empty or admin id 
-     * provided in the constructor is empty, less than or equal to zero 
+     * @throws      \InvalidArgumentException If course or admin provided in 
+     * the constructor is empty
      */
     public function edit(Course $course) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 &&
@@ -421,13 +425,14 @@ class CoursesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization update courses
-     * @throws      \InvalidArgumentException If course id, module id, order or
-     * admin id provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If course id, module id, order is
+     * empty, less than or equal to zero or if admin id provided in the 
+     * constructor is empty
      */
     public function addModule(int $id_course, int $id_module, int $order) : bool
     {   
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 &&
@@ -446,16 +451,16 @@ class CoursesDAO
         if (empty($order) || $order <= 0)
             throw new \InvalidArgumentException("Order cannot be empty or less ".
                 "than or equal to zero");
-        
+  
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO course_modules
-            (id_module, id_course, order)
+            (id_course, id_module, module_order)
             VALUES (?, ?, ?)
         ");
         
         // Executes query
-        $sql->execute($id_course, $id_module, $order);
+        $sql->execute(array($id_course, $id_module, $order));
         
         return $sql->rowCount() > 0;
     }
@@ -470,12 +475,13 @@ class CoursesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update courses
-     * @throws      \InvalidArgumentException If course id, module id or admin id
-     * provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If course id, module id is empty,
+     * less than or equal to zero or if admin id provided in the 
+     * constructor is empty
      */
     public function deleteModuleFromCourse(int $id_course, int $id_module) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
+        if (empty($this->admin) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
@@ -500,6 +506,23 @@ class CoursesDAO
         
         // Executes query
         $sql->execute(array($id_course, $id_module));
+        
+        return !empty($sql) && $sql->rowCount() > 0;
+    }
+    
+    /**
+     * Removes all modules from a course.
+     * 
+     * @param       int $id_course Course id
+     * 
+     * @return      bool If modules have been successfully removed
+     */
+    public function deleteAllModules(int $id_course) : bool
+    {
+        $sql = $this->db->query("
+            DELETE FROM course_modules
+            WHERE id_course = ".$id_course
+        );
         
         return !empty($sql) && $sql->rowCount() > 0;
     }

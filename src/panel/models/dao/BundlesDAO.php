@@ -176,13 +176,13 @@ class BundlesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to create bundles
-     * @throws      \InvalidArgumentException If bundle is empty or if admin id
-     * provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If bundle is empty or if admin
+     * provided in the constructor is empty
      */
     public function new(Bundle $bundle) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 && 
@@ -232,12 +232,12 @@ class BundlesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update bundles
-     * @throws      \InvalidArgumentException If bundle is empty or admin id 
-     * provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If bundle is empty or if admin  
+     * provided in the constructor is empty
      */
     public function update(Bundle $bundle) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
+        if (empty($this->admin) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
@@ -290,13 +290,13 @@ class BundlesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to remove bundles
-     * @throws      \InvalidArgumentException If bundle id is empty or admin id 
-     * provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If bundle id is empty, less than
+     * or equal to zero or if admin id provided in the constructor is empty
      */
     public function remove($id_bundle)
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 &&
@@ -329,13 +329,13 @@ class BundlesDAO
      *
      * @throws      IllegalAccessException If current admin does not have
      * authorization to remove bundles
-     * @throws      \InvalidArgumentException If bundle id is empty or admin id
-     * provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If bundle id is empty, less than
+     * or equal to zero or if admin id provided in the constructor is empty
      */
     public function removeLogo(int $id_bundle) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 &&
@@ -367,12 +367,13 @@ class BundlesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update bundles
-     * @throws      \InvalidArgumentException If bundle id, course id or admin
-     * id provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If bundle id, course id is empty,
+     * less than or equal to zero or if admin id provided in the
+     * constructor is empty
      */
     public function addCourse(int $id_bundle, int $id_course) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
+        if (empty($this->admin) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
@@ -412,13 +413,13 @@ class BundlesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update bundles
-     * @throws      \InvalidArgumentException If bundle id, course id or admin
-     * id provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If bundle id or course id  is 
+     * empty, less than or equal to zero
      */
     public function deleteCourseFromBundle(int $id_bundle, int $id_course) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 &&
@@ -456,13 +457,13 @@ class BundlesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update bundles
-     * @throws      \InvalidArgumentException If bundle id or admin id provided
-     * in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If bundle id is empty, less than 
+     * or equal to zero or if admin id provided in the constructor is empty
      */
     public function deleteAllCourses(int $id_bundle) : bool
     {
-        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if ($this->admin->getAuthorization()->getLevel() != 0 &&

@@ -137,7 +137,7 @@ class Course implements \JsonSerializable
      */
     public function getTotalClasses(?Database $db = null) : int
     {
-        if (empty($this->total_classes)) {
+        if (empty($this->total_classes) && $this->total_classes != 0) {
             if (empty($db))
                 throw new \InvalidArgumentException("Database cannot be empty");
             
@@ -164,7 +164,7 @@ class Course implements \JsonSerializable
      */
     public function getTotalLength(?Database $db = null) : int
     {
-        if (empty($this->total_length)) {
+        if (empty($this->total_length) && $this->total_length != 0) {
             if (empty($db))
                 throw new \InvalidArgumentException("Database cannot be empty");
             
@@ -187,9 +187,9 @@ class Course implements \JsonSerializable
      */
     public function setTotalClasses(int $totalClasses) : void
     {
-        if (empty($totalClasses) || $totalClasses < 0)
+        if ((empty($totalClasses) && $totalClasses != 0) || $totalClasses < 0)
             throw new \InvalidArgumentException("Total classes cannot be less ".
-                "than or equal to zero");
+                "than zero");
         
         $this->total_classes = $totalClasses;
     }
@@ -204,9 +204,9 @@ class Course implements \JsonSerializable
      */
     public function setTotalLength(int $totalLength) : void
     {
-        if (empty($totalLength) || $totalLength < 0)
+        if ((empty($totalLength) && $totalLength != 0) || $totalLength < 0)
             throw new \InvalidArgumentException("Total length cannot be less ".
-                "than or equal to zero");
+                "than zero");
             
         $this->total_length = $totalLength;
     }

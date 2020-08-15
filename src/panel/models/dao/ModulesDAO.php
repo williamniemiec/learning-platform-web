@@ -49,7 +49,8 @@ class ModulesDAO
      *
      * @param       int $id_course Course id
      *
-     * @return      Module[] Modules from this course
+     * @return      Module[] Modules from this course or empty array if course
+     * does not have any module
      * 
      * @throws      \InvalidArgumentException If course id is empty, less than
      * or equal to zero
@@ -64,11 +65,15 @@ class ModulesDAO
         
         // Query construction
         $sql = $this->db->prepare("
-            SELECT  *
-            FROM    modules
-            WHERE   id_module IN (SELECT    id_module
-                                  FROM      course_modules
-                                  WHERE     id_course = ?)
+            SELECT  *,
+                    (SELECT COUNT(*) 
+                     FROM videos 
+                     WHERE videos.id_module = modules.id_module) AS total_videos,
+                    (SELECT COUNT(*) 
+                     FROM questionnaires 
+                     WHERE questionnaires.id_module = modules.id_module) AS total_questionnaires
+            FROM    modules  NATURAL JOIN course_modules
+            WHERE   id_course = ?
         ");
         
         // Executes query
@@ -77,12 +82,17 @@ class ModulesDAO
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $modules = $sql->fetchAll();
+            $i = 0;
             
             foreach ($modules as $module) {
-                $response[] = new Module(
-                    $module['id_module'], 
+                $response[$i] = new Module(
+                    (int)$module['id_module'], 
                     $module['name']
                 );
+                
+                $response[$i]->setTotalClasses((int)$module['total_videos'] + (int)$module['total_questionnaires']);
+                $response[$i]->setOrder((int)$module['module_order']);
+                $i++;
             }
         }
         
@@ -228,6 +238,43 @@ class ModulesDAO
     }
     
     /**
+     * Gets all registered modules.
+     * 
+     * @return      Module[] Modules
+     */
+    public function getAll()
+    {
+        $response = array();
+        
+        $sql = $this->db->query("
+            SELECT  *,
+                    (SELECT COUNT(*) 
+                     FROM videos 
+                     WHERE videos.id_module = modules.id_module) AS total_videos,
+                    (SELECT COUNT(*) 
+                     FROM questionnaires 
+                     WHERE questionnaires.id_module = modules.id_module) AS total_questionnaires
+            FROM    modules
+        ");
+        
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $i = 0;
+            
+            foreach ($sql->fetchAll() as $module) {
+                $response[$i] = new Module(
+                    (int)$module['id_module'],
+                    $module['name']
+                );
+                
+                $response[$i]->setTotalClasses((int)$module['total_videos'] + (int)$module['total_questionnaires']);
+                $i++;
+            }
+        }
+        
+        return $response;
+    }
+    
+    /**
      * Gets informations about all classes from a module.
      *
      * @param       int $id_module Module id
@@ -259,4 +306,42 @@ class ModulesDAO
         
         return $response;
     }
+    
+//     /**
+//      * Gets highest module order in use.
+//      * 
+//      * @param       int $id_course Course id
+//      * @param       int $id_module Module id
+//      * 
+//      * @return      int Highest module order or -1 of module does not belongs 
+//      * to the course
+//      * 
+//      * @throws      \InvalidArgumentException If course id or module id is 
+//      * empty, less than or equal to zero
+//      */
+//     public function getHighestOrder(int $id_course, int $id_module) : int
+//     {
+//         if (empty($id_course) || $id_course <= 0)
+//             throw new \InvalidArgumentException("Course id cannot be empty ".
+//                 "or less than or equal to zero");
+            
+//         if (empty($id_module) || $id_module <= 0)
+//             throw new \InvalidArgumentException("Module id cannot be empty ".
+//                 "or less than or equal to zero");
+            
+//         $response = -1;
+        
+//         $sql = $this->db->query("
+//             SELECT      module_order
+//             FROM        course_modules
+//             WHERE       id_course = ".$id_course." AND id_module = ".$id_module."
+//             ORDER BY    module_order DESC
+//         ");
+        
+//         if (!empty($sql) && $sql->rowCount() > 0) {
+//             $response = (int)$sql->fetch()['module_order'];
+//         }
+        
+//         return $response;
+//     }
 }
