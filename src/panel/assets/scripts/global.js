@@ -13,4 +13,6 @@ $(function() {
 	
 	// Enables tooltip
 	$("[data-toggle='tooltip']").tooltip()
+	
+	$(".price").mask('#,##0.00', { reverse: true })
 })

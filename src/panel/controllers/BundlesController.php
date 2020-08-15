@@ -84,16 +84,17 @@ class BundlesController extends Controller
             'username' => $admin->getName(),
             'header' => $header,
             'error' => false,
-            'msg' => ''
+            'msg' => '',
+            'scripts' => array('bundlesManager')
         );
         
         // Checks if the new bundle has been successfully added
         if (!empty($_POST['name'])) {
             $description = empty($_POST['description']) ? null : $_POST['description'];
             $logo = null;
-            
+
             // Parses logo
-            if (!empty($_FILES['logo'])) {
+            if (!empty($_FILES['logo']['tmp_name'])) {
                 try {
                     $logo = FileUtil::storePhoto($_FILES['logo'], "../assets/img/logos/bundles/");
                 }
@@ -112,7 +113,7 @@ class BundlesController extends Controller
                     $response = $bundlesDAO->new(new Bundle(
                         -1,
                         $_POST['name'],
-                        (float)$_POST['price'],
+                        (float)preg_replace("/,/", "", $_POST['price']),
                         $logo,
                         $description
                     ));
@@ -172,7 +173,7 @@ class BundlesController extends Controller
             $logo = null;
             
             // Parses logo
-            if (!empty($_FILES['logo'])) {
+            if (!empty($_FILES['logo']['tmp_name'])) {
                 try {
                     $logo = FileUtil::storePhoto($_FILES['logo'], "../assets/img/logos/bundles/");
                     
@@ -195,7 +196,7 @@ class BundlesController extends Controller
                     $response = $bundlesDAO->update(new Bundle(
                         (int)$id_bundle,
                         $_POST['name'],
-                        (float)$_POST['price'],
+                        (float)preg_replace("/,/", "", $_POST['price']),
                         $logo,
                         $description
                     ));

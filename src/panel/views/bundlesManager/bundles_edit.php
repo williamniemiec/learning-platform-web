@@ -21,7 +21,7 @@
             	
             	<div class="form-group">
             		<label for="price">Price*</label>
-            		<input id="price" name="price" type="number" step="0.01" placeholder="Price" class="form-control" value="<?php echo number_format($bundle->getPrice(), 2); ?>" required />
+            		<input id="price" name="price" type="text" placeholder="Price" class="form-control price" value="<?php echo number_format($bundle->getPrice(), 2); ?>" required />
             	</div>
             	
             	<div class="form-group">

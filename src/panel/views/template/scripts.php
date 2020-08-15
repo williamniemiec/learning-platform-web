@@ -3,6 +3,7 @@
 <script src='<?php echo BASE_URL; ?>lib/scrollbar_light/jquery.mCustomScrollbar.concat.min.js'></script>
 <script src='<?php echo BASE_URL; ?>lib/scrollbar_light/scrollbar_light.js'></script>
 <script src='<?php echo BASE_URL; ?>lib/password_strength/ps_script.js'></script>
+<script src='<?php echo BASE_URL; ?>lib/mask/jquery.mask.js'></script>
 <script src='<?php echo BASE_URL; ?>assets/scripts/global.js'></script>
 <script>var BASE_URL = "<?php echo BASE_URL; ?>"</script>
 

@@ -20,7 +20,7 @@
             	
             	<div class="form-group">
             		<label for="price">Price*</label>
-            		<input id="price" name="price" type="number" step="0.01" placeholder="Price" class="form-control" required />
+            		<input id="price" name="price" type="text" placeholder="Price" class="form-control price" required />
             	</div>
             	
             	<div class="form-group">
