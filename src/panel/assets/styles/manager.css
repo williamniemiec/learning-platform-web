@@ -6,3 +6,18 @@
     margin:							auto;
     margin-bottom:					30px;
 }
+
+.manager-table-logo, 
+.manager-table-logo img {
+	width:							100px;
+	height:							70px;
+}
+
+.cbx-list ul {
+	list-style:						none;
+	padding:						0;
+}
+
+.cbx-list input[type='checkbox'] {
+	margin-right:					10px;
+}

@@ -9,6 +9,7 @@ use models\Course;
 use models\enum\CourseOrderByEnum;
 use models\enum\OrderDirectionEnum;
 use models\util\IllegalAccessException;
+use models\Admin;
 
 
 /**
@@ -24,7 +25,7 @@ class CoursesDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_admin;
+    private $admin;
     
     
     //-------------------------------------------------------------------------
@@ -34,12 +35,12 @@ class CoursesDAO
      * Creates courses manager.
      *
      * @param       Database $db Database
-     * @param       int $id_admin [Optional] Admin id logged in
+     * @param       Admin $admin [Optional] Admin logged in
      */
-    public function __construct(Database $db, int $id_admin = -1)
+    public function __construct(Database $db, Admin $admin = null)
     {
         $this->db = $db->getConnection();
-        $this->id_admin = $id_admin;
+        $this->admin = $admin;
     }
     
     
@@ -86,52 +87,52 @@ class CoursesDAO
         return $sql->fetch();
     }
     
-    /**
-     * Searches for courses that belongs to a bundle with a specific name.
-     * 
-     * @param       string $bundleName Bundle name
-     * 
-     * @return      Course[] Courses with the specified name or empty array if
-     * there are no courses that belongs to the specified bundle
-     * 
-     * @throws      \InvalidArgumentException If bundle name is empty 
-     */
-    public function getCoursesByBundle(string $bundleName) : array 
-    {
-        if (empty($bundleName))
-            throw new \InvalidArgumentException("Bundle name cannot be empty");
+//     /**
+//      * Searches for courses that belongs to a bundle with a specific name.
+//      * 
+//      * @param       string $bundleName Bundle name
+//      * 
+//      * @return      Course[] Courses with the specified name or empty array if
+//      * there are no courses that belongs to the specified bundle
+//      * 
+//      * @throws      \InvalidArgumentException If bundle name is empty 
+//      */
+//     public function getCoursesByBundle(string $bundleName) : array 
+//     {
+//         if (empty($bundleName))
+//             throw new \InvalidArgumentException("Bundle name cannot be empty");
         
-        $response = array();
+//         $response = array();
         
-        // Query construction
-        $sql = $this->db->prepare("
-            SELECT      id_course, courses.name, logo, courses.description,
-                        COUNT(id_student) AS tot_students
-            FROM		courses 
-                        NATURAL JOIN bundle_courses
-            			NATURAL JOIN purchases
-                        JOIN bundles USING (id_bundle)
-            WHERE       bundles.name LIKE ?
-            GROUP BY    id_course, name, logo, description
-        ");
+//         // Query construction
+//         $sql = $this->db->prepare("
+//             SELECT      id_course, courses.name, logo, courses.description,
+//                         COUNT(id_student) AS tot_students
+//             FROM		courses 
+//                         NATURAL JOIN bundle_courses
+//             			NATURAL JOIN purchases
+//                         JOIN bundles USING (id_bundle)
+//             WHERE       bundles.name LIKE ?
+//             GROUP BY    id_course, name, logo, description
+//         ");
         
-        // Executes query
-        $sql->execute(array($bundleName));
+//         // Executes query
+//         $sql->execute(array($bundleName));
         
-        // Parses results
-        if ($sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $course) {
-                $response[] = new Course(
-                    $course['id_course'],
-                    $course['name'],
-                    $course['logo'],
-                    $course['description']
-                );
-            }
-        }
+//         // Parses results
+//         if ($sql->rowCount() > 0) {
+//             foreach ($sql->fetchAll() as $course) {
+//                 $response[] = new Course(
+//                     (int)$course['id_course'],
+//                     $course['name'],
+//                     $course['logo'],
+//                     $course['description']
+//                 );
+//             }
+//         }
         
-        return $response;
-    }
+//         return $response;
+//     }
     
     /**
      * Gets informations about all registered courses.
@@ -155,6 +156,7 @@ class CoursesDAO
         CourseOrderByEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
+        $bindParams = array();
         
         if (empty($orderType))
             $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
@@ -164,41 +166,48 @@ class CoursesDAO
             SELECT      id_course, name, logo, description, 
                         COUNT(id_student) AS total_students
             FROM		courses 
-                        NATURAL JOIN bundle_courses 
-            			NATURAL JOIN purchases
+                        NATURAL LEFT JOIN bundle_courses 
+            			LEFT JOIN purchases USING (id_bundle)
 			GROUP BY    id_course, name, logo, description
         ";
         
-        if (!empty($orderBy)) {
-            $query .= "ORDER BY ".$orderBy->get()." ".$orderType->get();
-        }
-        
-        // Executes query
         if (!empty($name)) {
             $query .= " HAVING name LIKE ?";
-            $sql = $this->db->prepare($query);
-            $sql->execute(array($name.'%'));
+            $bindParams[] = $name.'%';
         }
-        else {
-            $sql = $this->db->query($query);
+        
+        if (!empty($orderBy)) {
+            $query .= "ORDER BY ".$orderBy->get()." ".$orderType->get();
         }
         
         // Limits the results (if a limit was given)
         if ($limit > 0)
             $query .= " LIMIT ".$limit;
         
+        // Executes query
+        $sql = $this->db->prepare($query);
+        $sql->execute($bindParams);
+        
         // Parses results
-        if ($sql->rowCount() > 0) {
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $i = 0;
+            
             foreach($sql->fetchAll() as $course) {
-                $response[] = new Course(
-                    $course['id_course'],
+                $response[$i] = new Course(
+                    (int)$course['id_course'],
                     $course['name'],
                     $course['logo'],
                     $course['description']
                 );
+                
+                $total = $this->countClasses((int)$course['id_course']);
+                $response[$i]->setTotalStudents((int)$course['total_students']);
+                $response[$i]->setTotalClasses((int)$total['total_classes']);
+                $response[$i]->setTotalLength((int)$total['total_length']);
+                $i++;
             }
         }
-        
+
         return $response;
     }
     
@@ -207,29 +216,26 @@ class CoursesDAO
      * 
      * @param       int $id_course Course id to be deleted
      *
-     * @throws      IllegalAccessException If current admin does not have root
-     * authorization
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update courses
      * @throws      \InvalidArgumentException If course id or admin id provided
      * in the constructor is empty, less than or equal to zero
      */
     public function delete(int $id_course) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
-        
-        // Delete image, if there is one
-        $imageName = $this->getImage($id_course);
-        
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM courses
@@ -239,12 +245,7 @@ class CoursesDAO
         // Executes query
         $sql->execute(array($id_course));
         
-        // Removes course logo
-        if (!empty($imageName)) {
-            unlink("../assets/images/logos/".$imageName);
-        }
-        
-        return $sql && $sql->rowCount() > 0;
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**
@@ -280,7 +281,7 @@ class CoursesDAO
             $course = $sql->fetch();
             
             $response = new Course(
-                $course['id_course'],
+                (int)$course['id_course'],
                 $course['name'],
                 $course['logo'],
                 $course['description']
@@ -293,68 +294,48 @@ class CoursesDAO
     /**
      * Adds a new course.
      * 
-     * @param       string $name Course name
-     * @param       string $description [Optional] Course description
-     * @param       string $logo [Optional] Course logo (obtained from $POST) 
+     * @param       Course $course Course to be added
      * 
      * @return      bool If course has been successfully added
      * 
-     * @throws      IllegalAccessException If current admin does not have root
-     * authorization
-     * @throws      \InvalidArgumentException If name is empty or admin id 
+     * @throws      IllegalAccessException If current admin does not have 
+     * authorization to add courses
+     * @throws      \InvalidArgumentException If course is empty or admin id 
      * provided in the constructor is empty, less than or equal to zero
      */
-    public function add(string $name, string $description = '', string $logo = array()) : bool
+    public function add(Course $course) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
         
-        if (empty($name))
-            throw new \InvalidArgumentException("Course name cannot be empty");
-        
+        if (empty($course))
+            throw new \InvalidArgumentException("Course cannot be empty");
+            
         $data_keys = array();
         $data_values = array();
         $data_sql = array();
         
         // Query construction
         $data_keys[] = "name";
-        $data_values[] = $name;
+        $data_values[] = $this->getName();
         $data_sql[] = "?";
         
-        if (!empty($description)) {
+        if (!empty($this->getDescription())) {
             $data_keys[] = "description";
-            $data_values[] = $description;
+            $data_values[] = $this->getDescription();
             $data_sql[] = "?";
         }
         
         // Parses course logo
-        if (!empty($logo)) {
-            if (empty($logo['tmp_name']) || $this->isPhoto($logo))
-                throw new \InvalidArgumentException("Invalid logo");
-            
-            $extension = explode("/", $logo['type'])[1];
-            
-            // Checks if photo extension has an accepted extension or not
-            if ($extension != "jpg" && $extension != "jpeg" && $extension != "png")
-                throw new \InvalidArgumentException("Invalid photo extension - must be .jpg, .jpeg or .png");
-            
-            $data_keys[] = "logo";
-            
-            // Generates photo name
-            $filename = md5(rand(1,9999).time().rand(1,9999));
-            $filename = $filename."."."jpg";
-            
-            // Saves photo
-            move_uploaded_file($logo['tmp_name'], "../assets/images/logos/".$filename);
-            
+        if (!empty($this->getLogo())) {
             // Puts image file name in the query
-            $data_values[] = $filename;
+            $data_values[] = $this->getLogo();
             $data_sql[] = "?";
         }
         
@@ -367,93 +348,59 @@ class CoursesDAO
         $sql = $this->db->prepare($sql);
         $sql->execute($data_values);
         
-        return $sql && $sql->rowCount() > 0;
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**
      * Edits a course.
      *
-     * @param       int $id_course Course id to be edited
-     * @param       string $name New course name
-     * @param       string $description [Optional] New course description
-     * @param       string $logo [Optional] New course banner (obtained from
-     * POST)
+     * @param       Course $course Course to be updated
      * 
      * @return      bool If course has been successfully edited
      * 
-     * @throws      IllegalAccessException If current admin does not have root
-     * authorization
-     * @throws      \InvalidArgumentException If course id or admin id provided
-     * in the constructor is empty, less than or equal to zero or if name is
-     * empty
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update courses
+     * @throws      \InvalidArgumentException If course is empty or admin id 
+     * provided in the constructor is empty, less than or equal to zero 
      */
-    public function edit(int $id_course, string $name, string $description = '',
-        array $logo = array()) : bool
+    public function edit(Course $course) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
-            
-        if (empty($id_course) || $id_course <= 0)
-            throw new \InvalidArgumentException("Course id cannot be empty ".
-                "or less than or equal to zero");
-        
-        if (empty($name))
-            throw new \InvalidArgumentException("Course name cannot be empty");
+
+        if (empty($course))
+            throw new \InvalidArgumentException("Course cannot be empty");
         
         $data_values = array();
         $data_sql = array();
         
         // Query construction
-        $data_values[] = $name;
+        $data_values[] = $course->getName();
         $data_sql[] = "name = ?";
         
-        if (!empty($description)) {
-            $data_values[] = $description;
+        if (!empty($course->getDescription())) {
+            $data_values[] = $course->getDescription();
             $data_sql[] = "description = ?";
         }
         
         // Parses course logo
-        if (!empty($logo)) {
-            if (empty($logo['tmp_name']) || $this->isPhoto($logo))
-                throw new \InvalidArgumentException("Invalid logo");
-                
-            $extension = explode("/", $logo['type'])[1];
-            
-            // Checks if photo extension has an accepted extension or not
-            if ($extension != "jpg" && $extension != "jpeg" && $extension != "png")
-                throw new \InvalidArgumentException("Invalid photo extension - must be .jpg, .jpeg or .png");
-    
-            // Generates photo name
-            $filename = md5(rand(1,9999).time().rand(1,9999));
-            $filename = $filename."."."jpg";
-            
-            // Saves photo
-            move_uploaded_file($logo['tmp_name'], "../assets/images/logos/".$filename);
-            
-            // Puts image file name in the query
-            $data_values[] = $filename;
+        if (!empty($course->getLogo())) {
+            $data_values[] = $course->getLogo();
             $data_sql[] = "logo = ?";
-            
-            // Deletes old image (if there is one)
-            $imageName = $this->getImage($id_course);
-            
-            if (!empty($imageName)) {
-                unlink("../assets/images/logos/".$imageName);
-            }
         }
 
-        $data_values[] = $id_course;
+        $data_values[] = $course->getId();
         
         $sql = "
-            UPDATE courses 
-            SET ".implode(",", $data_sql)." 
-            WHERE id = ?
+            UPDATE  courses 
+            SET     ".implode(",", $data_sql)." 
+            WHERE   id_course = ?
         ";
         
         // Executes query
@@ -472,19 +419,19 @@ class CoursesDAO
      * 
      * @return      bool If module has been successfully added
      * 
-     * @throws      IllegalAccessException If current admin does not have root
-     * authorization
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization update courses
      * @throws      \InvalidArgumentException If course id, module id, order or
      * admin id provided in the constructor is empty, less than or equal to zero
      */
     public function addModule(int $id_course, int $id_module, int $order) : bool
     {   
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -521,19 +468,19 @@ class CoursesDAO
      * 
      * @return      bool If module has been successfully removed from the course
      * 
-     * @throws      IllegalAccessException If current admin does not have root
-     * authorization
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update courses
      * @throws      \InvalidArgumentException If course id, module id or admin id
      * provided in the constructor is empty, less than or equal to zero
      */
     public function deleteModuleFromCourse(int $id_course, int $id_module) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -554,11 +501,66 @@ class CoursesDAO
         // Executes query
         $sql->execute(array($id_course, $id_module));
         
-        return $sql->rowCount() > 0;
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**
-     * Gets course banner.
+     * Gets courses that belongs to a bundle.
+     *
+     * @param       int $id_bundle Bundle id
+     *
+     * @return      Course[] Courses belonging to this bundle
+     *
+     * @throws      \InvalidArgumentException If bundle id is empty or less
+     * than or equal to zero
+     */
+    public function getFromBundle(int $id_bundle) : array
+    {
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
+            
+        $response = array();
+
+        // Query construction
+        $sql = $this->db->prepare("
+            SELECT      id_course, name, logo, description,
+                        COUNT(id_student) AS total_students
+            FROM        courses
+                        NATURAL LEFT JOIN bundle_courses
+                        LEFT JOIN purchases USING (id_bundle)
+            WHERE       id_course IN (SELECT    id_course
+                                      FROM      bundle_courses
+                                      WHERE     id_bundle = ?)
+            GROUP BY    id_course, name, logo, description
+        ");
+            
+        // Executes query
+        $sql->execute(array($id_bundle));
+        
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
+            $courses = $sql->fetchAll();
+            $i = 0;
+            
+            foreach ($courses as $course) {
+                $response[$i] = new Course(
+                    (int)$course['id_course'],
+                    $course['name'],
+                    $course['logo'],
+                    $course['description']
+                );
+                
+                $response[$i]->setTotalStudents((int)$course['total_students']);
+                $i++;
+            }
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Gets course logo.
      *
      * @param       int $id_course Course id
      *
@@ -568,7 +570,7 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If course id is empty, less than
      * or equal to zero
      */
-    private function getImage($id_course)
+    public function getImage(int $id_course) : string
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty ".
@@ -577,13 +579,11 @@ class CoursesDAO
         $response = "";
         
         $sql = $this->db->prepare("
-            SELECT logo
-            FROM courses
-            WHERE id_course = ?
-        ");
-        
-        $sql->execute(array($id_course));
-        
+            SELECT  logo
+            FROM    courses
+            WHERE   id_course = ".$id_course
+        );
+
         if ($sql->rowCount() > 0) {
             $response = $sql->fetch()['logo'];
             
@@ -592,26 +592,5 @@ class CoursesDAO
         }
         
         return $response;
-    }
-    
-    /**
-     * Checks if a submitted photo is really a photo.
-     *
-     * @param       array $photo Submitted photo (from $_FILES)
-     * 
-     * @return      boolean If the photo is really a photo
-     * 
-     * @throws      \InvalidArgumentException If photo is empty
-     */
-    private function isPhoto(array $photo) : bool
-    {
-        if (empty($photo))
-            throw new \InvalidArgumentException("Photo cannot be empty");
-        
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $photo['tmp_name']);
-        finfo_close($finfo);
-        
-        return explode("/", $mime)[0] == "image";
     }
 }

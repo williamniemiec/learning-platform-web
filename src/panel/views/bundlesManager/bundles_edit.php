@@ -1,6 +1,7 @@
 <div class="container">
+	<!-- Bundle information -->
 	<div class="view_panel">
-		<h1 class="view_header">Bundle update</h1>
+		<h1 class="view_header">Bundle info</h1>
 		<div class="view_content">
             <?php if ($error): ?>
             	<div class="alert alert-danger fade show" role="alert">
@@ -45,4 +46,39 @@
             </form>
     	</div>
 	</div>
+	
+	<!-- Bundle courses -->
+	<div class="view_panel">
+		<h1 class="view_header">Bundle courses</h1>
+		<div class="view_content">
+			<table class="table table-hover table-stripped text_centered">
+            	<thead>
+            		<tr>
+            			<th></th>
+                		<th>Name</th>
+                		<th>Description</th>
+                		<th>Students</th>
+            		</tr>
+            	</thead>
+            	<tbody>
+            		<?php foreach($courses as $course): ?>
+                		<tr>
+                			<?php if (empty($course->getLogo())): ?>
+                				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage"; ?>" /></td>
+                			<?php else: ?>
+                				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/courses/".$course->getLogo(); ?>" /></td>
+                			<?php endif; ?>
+                			<td><?php echo $course->getName(); ?></td>
+                			<td><?php echo $course->getDescription(); ?></td>
+                			<td><?php echo $course->getTotalStudents(); ?></td>
+                		</tr>
+            		<?php endforeach; ?>
+            	</tbody>
+            </table>
+            <button class="btn_theme" onclick="show_updateBundle(<?php echo $bundle->getId(); ?>)">Include courses</button>
+		</div>
+	</div>
+	
+	<!-- Modals -->
+	<?php $this->loadView("bundlesManager/modal_includeCourses", array('id_bundle' => $bundle->getId())); ?>
 </div>

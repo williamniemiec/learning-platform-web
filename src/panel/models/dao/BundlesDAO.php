@@ -445,4 +445,40 @@ class BundlesDAO
         
         return $sql->rowCount() > 0;
     }
+    
+    /**
+     * Removes all courses from a bundle.
+     * 
+     * @param       int $id_bundle Bundle id
+     * 
+     * @return      bool If all courses have been successfully removed from the 
+     * bundle
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update bundles
+     * @throws      \InvalidArgumentException If bundle id or admin id provided
+     * in the constructor is empty, less than or equal to zero
+     */
+    public function deleteAllCourses(int $id_bundle) : bool
+    {
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
+                
+        $sql = $this->db->query("
+            DELETE FROM bundle_courses
+            WHERE id_bundle = ".$id_bundle
+        );
+        
+        return !empty($sql) && $sql->rowCount() > 0;
+    }
 }

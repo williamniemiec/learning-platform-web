@@ -26,8 +26,9 @@ class Course implements \JsonSerializable
     private $logo;
     private $description;
     private $modules;
-    private $total_classes;
-    private $total_length;
+    private $totalStudents;
+    private $totalClasses;
+    private $totalLength;
     
     
     //-------------------------------------------------------------------------
@@ -41,7 +42,8 @@ class Course implements \JsonSerializable
      * @param       string $logo [Optional] Name of the course logo file
      * @param       string $description [Optional] Course description
      */
-    public function __construct(int $id_course, string $name, ?string $logo = '', ?string $description = '')
+    public function __construct(int $id_course, string $name, 
+        ?string $logo = '', ?string $description = '')
     {
         $this->id_course = $id_course;
         $this->name = $name;
@@ -137,17 +139,17 @@ class Course implements \JsonSerializable
      */
     public function getTotalClasses(?Database $db = null) : int
     {
-        if (empty($this->total_classes)) {
+        if (empty($this->totalClasses)) {
             if (empty($db))
                 throw new \InvalidArgumentException("Database cannot be empty");
             
             $courses = new CoursesDAO($db);
             $total = $courses->countClasses($this->id_course);
             
-            $this->total_classes = (int)$total['total_classes'];
+            $this->totalClasses = (int)$total['total_classes'];
         }
         
-        return $this->total_classes;
+        return $this->totalClasses;
     }
     
     /**
@@ -164,17 +166,17 @@ class Course implements \JsonSerializable
      */
     public function getTotalLength(?Database $db = null) : int
     {
-        if (empty($this->total_length)) {
+        if (empty($this->totalLength)) {
             if (empty($db))
                 throw new \InvalidArgumentException("Database cannot be empty");
             
             $courses = new CoursesDAO($db);
             $total = $courses->countClasses($this->id_course);
             
-            $this->total_length = (int)$total['total_length'];
+            $this->totalLength = (int)$total['total_length'];
         }
         
-        return $this->total_length;
+        return $this->totalLength;
     }
     
     /**
@@ -191,7 +193,7 @@ class Course implements \JsonSerializable
             throw new \InvalidArgumentException("Total classes cannot be less ".
                 "than or equal to zero");
         
-        $this->total_classes = $totalClasses;
+        $this->totalClasses = $totalClasses;
     }
     
     /**
@@ -208,7 +210,32 @@ class Course implements \JsonSerializable
             throw new \InvalidArgumentException("Total length cannot be less ".
                 "than or equal to zero");
             
-        $this->total_length = $totalLength;
+        $this->totalLength = $totalLength;
+    }
+    
+    /**
+     * Gets total students who have this course.
+     *
+     * @return      int Total students
+     */
+    public function getTotalStudents() : int
+    {
+        return $this->totalStudents;
+    }
+    
+    /**
+     * Sets total students who have this course.
+     *
+     * @param       int $totalStudents Total students who have this course
+     *
+     * @return      Course Itself to allow chained calls
+     */
+    public function setTotalStudents(int $totalStudents) : Course
+    {
+        if ($totalStudents >= 0)
+            $this->totalStudents = $totalStudents;
+            
+        return $this;
     }
     
     
@@ -229,8 +256,9 @@ class Course implements \JsonSerializable
             'logo' => $this->logo,
             'description' => $this->description,
             'modules' => $this->modules,
-            'total_classes' => $this->total_classes,
-            'total_length' => $this->total_length
+            'totalStudents' => $this->totalStudents,
+            'totalClasses' => $this->totalClasses,
+            'totalLength' => $this->totalLength
         );
     }
 }

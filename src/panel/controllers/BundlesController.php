@@ -9,6 +9,7 @@ use models\dao\BundlesDAO;
 use models\Bundle;
 use models\util\FileUtil;
 use models\util\IllegalAccessException;
+use models\dao\CoursesDAO;
 
 
 /**
@@ -50,7 +51,7 @@ class BundlesController extends Controller
         
         $header = array(
             'title' => 'Admin area - Learning platform',
-            'styles' => array('coursesManager'),
+            'styles' => array('coursesManager', 'manager'),
             'robots' => 'noindex'
         );
         
@@ -144,6 +145,7 @@ class BundlesController extends Controller
     public function edit($id_bundle)
     {
         $dbConnection = new MySqlPDODatabase();
+        
         $admin = Admin::getLoggedIn($dbConnection);
         $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
         $bundle = $bundlesDAO->get((int)$id_bundle);
@@ -157,7 +159,9 @@ class BundlesController extends Controller
         $viewArgs = array(
             'username' => $admin->getName(),
             'bundle' => $bundle,
+            'courses' => $bundle->getCourses($dbConnection),
             'header' => $header,
+            'scripts' => array('bundlesManager'),
             'error' => false,
             'msg' => ''
         );
@@ -225,7 +229,11 @@ class BundlesController extends Controller
         $dbConnection = new MySqlPDODatabase();
         
         $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $bundle = $bundlesDAO->get((int)$id_bundle);
         $bundlesDAO->remove((int)$id_bundle);
+        
+        if (!empty($bundle->getLogo()))
+            unlink("../assets/img/logos/bundles/".$bundle->getLogo());
         
         header("Location: ".BASE_URL."bundles");
         exit;
@@ -250,5 +258,56 @@ class BundlesController extends Controller
         
         header("Location: ".BASE_URL."bundles/edit/".$bundle->getId());
         exit;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Ajax
+    //-------------------------------------------------------------------------
+    /**
+     * Gets all courses that a bundle has.
+     * 
+     * @param       int $_GET['id_bundle'] Bundle id
+     * 
+     * @return      string Courses
+     * 
+     * @apiNote     Must be called using GET request method
+     */
+    public function getCourses()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+            return;
+        
+        $dbConnection = new MySqlPDODatabase();
+        
+        $coursesDAO = new CoursesDAO($dbConnection);
+        
+        echo json_encode($coursesDAO->getFromBundle((int)$_GET['id_bundle']));
+    }
+    
+    /**
+     * Sets courses that a bundle has.
+     *
+     * @param       int $_POST['id_bundle'] Bundle id
+     * @param       array $_POST['courseIds'] Course ids
+     *
+     * @return      string Courses
+     *
+     * @apiNote     Must be called using POST request method
+     */
+    public function setCourses()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            return;
+            
+        $dbConnection = new MySqlPDODatabase();
+        
+        $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        
+        $bundlesDAO->deleteAllCourses((int)$_POST['id_bundle']);
+        
+        foreach ($_POST['courseIds'] as $id_course) {
+            $bundlesDAO->addCourse((int)$_POST['id_bundle'], (int)$id_course);
+        }
     }
 }
