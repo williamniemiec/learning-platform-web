@@ -194,7 +194,7 @@ class Bundle implements \JsonSerializable
      */
     public function setTotalStudents(int $totalStudents) : Bundle
     {
-        if ($totalStudents > 0)
+        if ($totalStudents >= 0)
             $this->totalStudents = $totalStudents;
         
         return $this;

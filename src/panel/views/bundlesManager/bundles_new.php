@@ -20,7 +20,7 @@
             	
             	<div class="form-group">
             		<label for="price">Price*</label>
-            		<input id="price" name="price" type="number" placeholder="Price" class="form-control" required />
+            		<input id="price" name="price" type="number" step="0.01" placeholder="Price" class="form-control" required />
             	</div>
             	
             	<div class="form-group">
@@ -34,7 +34,7 @@
             	</div>
             	
             	<div class="form-group">
-            		<input type="submit" value="Register" class="form-control btn_theme btn_theme_full" />
+            		<input type="submit" value="Create" class="form-control btn_theme btn_theme_full" />
             	</div>
             </form>
         </div>

@@ -20,7 +20,7 @@
             	
             	<div class="form-group">
             		<label for="price">Price*</label>
-            		<input id="price" name="price" type="number" placeholder="Price" class="form-control" value="<?php echo number_format($bundle->getPrice(), 2); ?>" required />
+            		<input id="price" name="price" type="number" step="0.01" placeholder="Price" class="form-control" value="<?php echo number_format($bundle->getPrice(), 2); ?>" required />
             	</div>
             	
             	<div class="form-group">
@@ -35,11 +35,12 @@
         			            BASE_URL."../assets/img/default/noImage" : 
         			            BASE_URL."../assets/img/logos/bundles/".$bundle->getLogo(); ?>"
 		            />
+		            <a href="<?php echo BASE_URL."bundles/deleteLogo/".$bundle->getId(); ?>" class="btn_theme btn_full btn_theme_danger">Remove logo</a>
             		<input id="logo" name="logo" type="file" accept=".jpeg,.png,.jpg" class="form-control" />
             	</div>
             	
             	<div class="form-group">
-            		<input type="submit" value="Register" class="form-control btn_theme btn_theme_full" />
+            		<input type="submit" value="Update" class="form-control btn_theme btn_theme_full" />
             	</div>
             </form>
     	</div>

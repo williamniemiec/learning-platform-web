@@ -6,6 +6,7 @@ namespace models\dao;
 
 use database\Database;
 use models\enum\OrderDirectionEnum;
+use models\Admin;
 use models\Bundle;
 use models\enum\BundleOrderTypeEnum;
 use models\util\IllegalAccessException;
@@ -24,7 +25,7 @@ class BundlesDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_admin;
+    private $admin;
     
     
     //-------------------------------------------------------------------------
@@ -34,12 +35,12 @@ class BundlesDAO
      * Creates 'bundles' table manager.
      *
      * @param       Database $db Database
-     * @param       int $id_admin [Optional] Admin id logged in
+     * @param       Admin $admin [Optional] Admin logged in
      */
-    public function __construct(Database $db, int $id_admin = -1)
+    public function __construct(Database $db, Admin $admin = null)
     {
         $this->db = $db->getConnection();
-        $this->id_admin = $id_admin;
+        $this->admin = $admin;
     }
     
     
@@ -180,12 +181,12 @@ class BundlesDAO
      */
     public function new(Bundle $bundle) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 && 
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 && 
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
         
@@ -193,8 +194,8 @@ class BundlesDAO
             throw new \InvalidArgumentException("Bundle cannot be empty");
         
         $bindParams = array(
-            'name' => $bundle->getName(),
-            'price' => $bundle->getPrice()
+            $bundle->getName(),
+            $bundle->getPrice()
         );
             
         // Query construction
@@ -212,7 +213,7 @@ class BundlesDAO
             $query .= ", logo = ?";
             $bindParams[] = $bundle->getLogo();
         }
-        
+
         // Prepares query
         $sql = $this->db->prepare($query);
         
@@ -236,12 +237,12 @@ class BundlesDAO
      */
     public function update(Bundle $bundle) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -249,8 +250,8 @@ class BundlesDAO
             throw new \InvalidArgumentException("Bundle cannot be empty");
 
         $bindParams = array(
-            'name' => $bundle->getName(),
-            'price' => $bundle->getPrice()
+            $bundle->getName(),
+            $bundle->getPrice()
         );
             
         // Query construction
@@ -268,6 +269,8 @@ class BundlesDAO
             $query .= ", logo = ?";
             $bindParams[] = $bundle->getLogo();
         }
+
+        $query .= " WHERE id_bundle = ".$bundle->getId();
         
         // Prepares query
         $sql = $this->db->prepare($query);
@@ -292,12 +295,12 @@ class BundlesDAO
      */
     public function remove($id_bundle)
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -318,6 +321,43 @@ class BundlesDAO
     }
     
     /**
+     * Removes logo from a bundle.
+     *
+     * @param       int $id_bundle Bundle id
+     *
+     * @return      bool If bundle logo has been successfully removed
+     *
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to remove bundles
+     * @throws      \InvalidArgumentException If bundle id is empty or admin id
+     * provided in the constructor is empty, less than or equal to zero
+     */
+    public function removeLogo(int $id_bundle) : bool
+    {
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin id logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($id_bundle) || $id_bundle <= 0)
+            throw new \InvalidArgumentException("Bundle id cannot be empty ".
+                "or less than or equal to zero");
+                    
+        // Query construction
+        $sql = $this->db->query("
+            UPDATE  bundles
+            SET     logo = NULL
+            WHERE   id_bundle = ".$id_bundle
+        );
+        
+        return !empty($sql) && $sql->rowCount() > 0;
+    }
+    
+    /**
      * Adds a course to a bundle.
      * 
      * @param       int $id_bundle Bundle id
@@ -332,12 +372,12 @@ class BundlesDAO
      */
     public function addCourse(int $id_bundle, int $id_course) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -377,12 +417,12 @@ class BundlesDAO
      */
     public function deleteCourseFromBundle(int $id_bundle, int $id_course) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
+        if (empty($this->admin->getId()) || $this->admin->getId() <= 0)
             throw new \InvalidArgumentException("Admin id logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             

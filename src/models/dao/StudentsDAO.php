@@ -8,8 +8,7 @@ use database\Database;
 use models\Student;
 use models\_Class;
 use models\enum\GenreEnum;
-use models;
-use models\util\DataUtil;
+use models\util\FileUtil;
 use models\Bundle;
 use models\Purchase;
 
@@ -335,21 +334,7 @@ class StudentsDAO
             unlink("assets/img/profile_photos/".$imageName);
 
         if (!empty($photo)) {
-            if (empty($photo['tmp_name']) || !DataUtil::isPhoto($photo))
-                throw new \InvalidArgumentException("Invalid photo");
-            
-            $extension = explode("/", $photo['type'])[1];
-            
-            // Checks if photo extension has an accepted extension or not
-            if ($extension != "jpg" && $extension != "jpeg" && $extension != "png")
-                throw new \InvalidArgumentException("Invalid photo extension - must be .jpg, .jpeg or .png");
-            
-            // Generates photo name
-            $filename = md5(rand(1,9999).time().rand(1,9999));
-            $filename = $filename."."."jpg";
-            
-            // Saves photo
-            move_uploaded_file($photo['tmp_name'], "assets/img/profile_photos/".$filename);
+            $filename = FileUtil::storePhoto($photo, "../assets/img/profile_photos/");
         }
         
         $filename = empty($filename) ? null : "'".$filename."'";

@@ -5,7 +5,7 @@
             <?php if (count($bundles) == 0): ?>
             	<h2>There are no bundles</h2>
             <?php else: ?>
-            	<a class="btn_theme" href="<?php BASE_URL; ?>bundles/add">Add</a>
+            	<a class="btn_theme" href="<?php BASE_URL; ?>bundles/new">New</a>
                 <table class="table table-hover table-stripped text_centered">
                 	<thead>
                 		<tr>
