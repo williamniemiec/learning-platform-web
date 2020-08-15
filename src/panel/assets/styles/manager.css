@@ -1,0 +1,8 @@
+.manager-logo {
+	display:						block;
+    height: 						200px;
+    border: 						1px solid var(--border-light);
+    border-radius: 					5px;
+    margin:							auto;
+    margin-bottom:					30px;
+}

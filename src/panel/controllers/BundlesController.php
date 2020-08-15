@@ -121,14 +121,16 @@ class BundlesController extends Controller
         
         $header = array(
             'title' => 'Admin area - Learning platform',
-            'styles' => array('coursesManager'),
+            'styles' => array('bundlesManager', 'manager'),
             'robots' => 'noindex'
         );
         
         $viewArgs = array(
             'username' => $admin->getName(),
-            'bundles' => $bundlesDAO->getAll(),
-            'header' => $header
+            'bundle' => $bundlesDAO->get((int)$id_bundle),
+            'header' => $header,
+            'error' => false,
+            'msg' => ''
         );
         
         $this->loadTemplate("bundlesManager/bundles_edit", $viewArgs);

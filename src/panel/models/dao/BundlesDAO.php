@@ -79,9 +79,9 @@ class BundlesDAO
         if ($sql && $sql->rowCount() > 0) {
             $bundle = $sql->fetch();
             $response = new Bundle(
-                $bundle['id_bundle'],
+                (int)$bundle['id_bundle'],
                 $bundle['name'],
-                $bundle['price'],
+                (float)$bundle['price'],
                 $bundle['logo'],
                 $bundle['description']
             );
@@ -147,16 +147,19 @@ class BundlesDAO
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $bundles = $sql->fetchAll();
-
+            $i = 0;
+            
             foreach ($bundles as $bundle) {
-                $response[] = new Bundle(
+                $response[$i] = new Bundle(
                     (int)$bundle['id_bundle'],
                     $bundle['name'],
                     (float)$bundle['price'],
-                    (int)$bundle['sales'],
                     $bundle['logo'],
                     $bundle['description']
                 );
+                
+                $response[$i]->setTotalStudents((int)$bundle['sales']);
+                $i++;
             }
         }
 

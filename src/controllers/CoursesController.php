@@ -128,15 +128,6 @@ class CoursesController extends Controller
         }
         else
             $class = $students->getLastClassWatched($id_course);
-        
-        // Checks if a comment has been sent
-//         if (!empty($_POST['question'])) {
-//             $doubts = new Doubts();
-            
-            
-//             $doubts->sendDoubt($_SESSION['s_login'], $id_class, $_POST['question']);
-//             header("Refresh:0");
-//         }
             
         // Gets class to be opened
         if (empty($class))

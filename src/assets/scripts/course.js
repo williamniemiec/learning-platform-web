@@ -2,8 +2,8 @@
 //        Methods
 //-----------------------------------------------------------------------------
 $(function(){
-	updateCourseContent()
-	$(window).resize(updateCourseContent)
+	updateScreen()
+	$(window).resize(updateScreen)
 	// Course menu button
 	$(".course_menu_action").click(function() {
 		$(".course_menu_action #mobile_menu_button").toggleClass("active")
@@ -51,9 +51,18 @@ $(function(){
 })
 
 /**
+ * Updates course content area and video dimensions.
+ */
+function updateScreen()
+{
+	updateVideo()
+	updateCourseContent()
+}
+
+/**
  * Updates course content area.
  */
-function updateCourseContent()
+function updateVideo()
 {
 	// Updates video dimensions
 	const ratio = 1920/1080
@@ -65,20 +74,12 @@ function updateCourseContent()
 }
 
 /**
- * Updates course menu height.
+ * Updates course content height.
  */
-function updateCourseMenu()
+function updateCourseContent()
 {
-	const hCourseRight = $(".class_area").height()
-	const hMain = $("main").height()
-
-	
-	// Updates course menu height
-	if (hMain > hCourseRight) {
-		$(".course_menu").css("height", hMain)
-	} else {
-		$(".course_menu").css("height", hCourseRight)
-	}
+	if ($("body").hasClass("mCS_no_scrollbar") || $("#mCSB_1_container").hasClass("mCS_no_scrollbar_y"))
+		$(".course_content").height($('footer').offset().top-50)
 }
 
 /**

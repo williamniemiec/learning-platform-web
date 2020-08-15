@@ -24,7 +24,7 @@
             	</div>
             	
             	<div class="form-group">
-            		<label for="description">Description name</label>
+            		<label for="description">Description</label>
             		<textarea id="description" name="description" placeholder="Description" class="form-control"></textarea>
             	</div>
             	

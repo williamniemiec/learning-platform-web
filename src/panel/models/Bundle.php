@@ -41,24 +41,22 @@ class Bundle implements \JsonSerializable
      * @param       int $id_bundle Bundle id
      * @param       string $name Bundle name
      * @param       float $price Bundle price
-     * @param       int $totalStudents Total students who have this bundle
      * @param       string $logo [Optional] Bundle logo
      * @param       string $description [Optional] Bundle description
      */
     public function __construct(int $id_bundle, string $name, float $price, 
-        int $totalStudents, ?string $logo = '', ?string $description = '')
+        ?string $logo = '', ?string $description = '')
     {
         $this->id_bundle = $id_bundle;
         $this->name = $name;
         $this->price = $price;
-        $this->totalStudents = $totalStudents;
         $this->logo = empty($logo) ? '' : $logo;
         $this->description = empty($description) ? '' : $description;
     }
     
     
     //-------------------------------------------------------------------------
-    //        Getters
+    //        Getters & Setters
     //-------------------------------------------------------------------------
     /**
      * Gets bundle id.
@@ -185,6 +183,21 @@ class Bundle implements \JsonSerializable
     public function getTotalStudents() : int
     {
         return $this->totalStudents;
+    }
+    
+    /**
+     * Sets total students who have this bundle.
+     * 
+     * @param       int $totalStudents Total students who have this bundle
+     * 
+     * @return      Bundle Itself to allow chained calls
+     */
+    public function setTotalStudents(int $totalStudents) : Bundle
+    {
+        if ($totalStudents > 0)
+            $this->totalStudents = $totalStudents;
+        
+        return $this;
     }
 
     
