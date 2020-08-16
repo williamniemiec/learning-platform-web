@@ -91,6 +91,10 @@ body nav a {
 	color:							var(--text-light);
 }
 
+ul.nav-pages {
+	padding-left:					0;
+}
+
 .nav-item {
 	height:							50px;
 	line-height:					50px;
@@ -153,7 +157,7 @@ li.dropdown-item a:hover {
 	display:						flex;
 	align-items:					center;
 	height:							100%;
-	padding: 						0 20px;
+	padding: 						0 10px;
 }
 
 .nav-pages li a {

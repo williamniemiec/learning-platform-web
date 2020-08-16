@@ -64,5 +64,41 @@ abstract class PDODatabase extends Database
      * {@inheritdoc}
      * @Override
      */
+    public function beginTransaction() : bool
+    {
+        return $this->conn->beginTransaction();
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @Override
+     */
+    public function commit() : bool
+    {
+        return $this->conn->commit();
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @Override
+     */
+    public function inTransaction() : bool
+    {
+        return $this->conn->inTransaction();
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @Override
+     */
+    public function rollback() : bool
+    {
+        return $this->conn->rollBack();
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @Override
+     */
     protected abstract function getInstance();
 }

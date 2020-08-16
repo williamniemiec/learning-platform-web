@@ -1,35 +1,27 @@
 <div class="container">
 	<div class="view_panel">
-    	<h1 class="view_header">Courses</h1>
+    	<h1 class="view_header">Modules manager</h1>
     	<div class="view_content">
             <?php if (count($modules) == 0): ?>
-            	<h2>There are no registered courses</h2>
+            	<h2>There are no registered modules</h2>
             <?php else: ?>
-            	<a class="btn_theme" href="<?php BASE_URL; ?>courses/add">Add</a>
+            	<a class="btn_theme" href="<?php BASE_URL; ?>modules/new">New</a>
                 <table class="table table-hover table-stripped text_centered">
                 	<thead>
                 		<tr>
-                			<th></th>
                     		<th>Name</th>
-                    		<th>Description</th>
-                    		<th>Students</th>
+                    		<th>Total classes</th>
                     		<th>Actions</th>
                 		</tr>
                 	</thead>
                 	<tbody>
-                		<?php foreach($courses as $course): ?>
+                		<?php foreach($modules as $module): ?>
                     		<tr>
-                    			<?php if (empty($course['logo'])): ?>
-                    				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../resources/images/noImage"; ?>" /></td>
-                    			<?php else: ?>
-                    				<td class="course_logo"><img class="img img-responsive" src="<?php echo BASE_URL."../resources/images/logos/".$course['logo']; ?>" /></td>
-                    			<?php endif; ?>
-                    			<td><a href="<?php echo BASE_URL."courses/edit/".$course['id']; ?>"><?php echo $course['name']; ?></a></td>
-                    			<td><?php echo $course['description']; ?></td>
-                    			<td><?php echo $course['total_students']; ?></td>
+                    			<td><a href="<?php echo BASE_URL."modules/edit/".$module->getId(); ?>"><?php echo $module->getName(); ?></a></td>
+                    			<td><?php echo $module->getTotalClasses(); ?></td>
                     			<td class="actions">
-                    				<a class="btn_theme" href="<?php echo BASE_URL."courses/edit/".$course['id']; ?>">Edit</a>
-                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."courses/delete/".$course['id']; ?>">Delete</a>
+                    				<a class="btn_theme" href="<?php echo BASE_URL."modules/edit/".$module->getId(); ?>">Edit</a>
+                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."modules/delete/".$module->getId(); ?>">Delete</a>
                 				</td>
                     		</tr>
                 		<?php endforeach; ?>

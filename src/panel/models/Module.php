@@ -138,6 +138,10 @@ class Module implements \JsonSerializable
             }
         }
         
+        uasort($this->classes, function($a, $b) {
+            return $a->getClassOrder() - $b->getClassOrder();
+        });
+        
         return $this->classes;
     }
     
@@ -185,9 +189,9 @@ class Module implements \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'id_module' => $this->id_module,
+            'id' => $this->id_module,
             'name' => $this->name,
-            'order' => $this->order,
+            'courseOrder' => $this->order,
             'totalClasses' => $this->totalClasses
         );
     }

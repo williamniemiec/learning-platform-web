@@ -1,6 +1,6 @@
 <div class="container">
 	<div class="view_panel">
-    	<h1 class="view_header">Bundles</h1>
+    	<h1 class="view_header">Bundles manager</h1>
     	<div class="view_content">
             <?php if (count($bundles) == 0): ?>
             	<h2>There are no registered bundles</h2>

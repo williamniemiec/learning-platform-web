@@ -7,6 +7,7 @@ namespace models\dao;
 use database\Database;
 use models\Video;
 use models\util\IllegalAccessException;
+use models\Module;
 
 
 /**
@@ -71,7 +72,7 @@ class VideosDAO
         // Query construction
         $sql = $this->db->prepare("
             SELECT  * 
-            FROM    videos 
+            FROM    videos  NATURAL JOIN modules
             WHERE   id_module = ? AND class_order = ?
         ");
         
@@ -83,16 +84,93 @@ class VideosDAO
             $class = $sql->fetch();
             
             $response = new Video(
-                $class['id_module'],
-                $class['class_order'],
+                new Module((int)$class['id_module'], $class['name']),
+                (int)$class['class_order'],
                 $class['title'],
                 $class['videoID'],
-                $class['length'],
+                (int)$class['length'],
                 $class['description']
             ); 
         }
         
         return $response; 
+    }
+    
+    /**
+     * Gets all registered video classes.
+     * 
+     * @return      Video[] Registered video classes or empty array if there are
+     * no registered video classes
+     */
+    public function getAll() : array
+    {
+        $response = array();
+        
+        $sql = $this->db->query("
+            SELECT  *
+            FROM    videos NATURAL JOIN modules
+        ");
+        
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $class) {
+                $response[] = new Video(
+                    new Module((int)$class['id_module'], $class['name']),
+                    (int)$class['class_order'],
+                    $class['title'],
+                    $class['videoID'],
+                    (int)$class['length'],
+                    $class['description']
+                );
+            }
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Gets all video classes from a module.
+     *
+     * @param       int $id_module Module id
+     *
+     * @return      Video[] Classes that belongs to the module
+     *
+     * @throws      \InvalidArgumentException If module id is empty or less
+     * than or equal to zero
+     *
+     * @Override
+     */
+    public function getAllFromModule(int $id_module) : array
+    {
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
+            
+        $response = array();
+        
+        $sql = $this->db->prepare("
+            SELECT  *
+            FROM    videos NATURAL JOIN modules
+            WHERE   id_module = ?
+        ");
+            
+        $sql->execute(array($id_module));
+        
+        if ($sql->rowCount() > 0) {
+            $classes =  $sql->fetchAll();
+            
+            foreach ($classes as $class) {
+                $response[] = new Video(
+                    new Module((int)$class['id_module'], $class['name']),
+                    (int)$class['class_order'],
+                    $class['title'],
+                    $class['videoID'],
+                    (int)$class['length'],
+                    $class['description']
+                );
+            }
+        }
+        
+        return $response;
     }
     
     /**
@@ -130,7 +208,7 @@ class VideosDAO
             
             // Executes query
             $sql->execute(array(
-                $video->getModuleId(), 
+                $video->getModule()->getId(), 
                 $video->getClassOrder(), 
                 $video->getTitle(), 
                 $video->getVideoId(), 
@@ -146,7 +224,7 @@ class VideosDAO
             
             // Executes query
             $sql->execute(array(
-                $video->getModuleId(),
+                $video->getModule()->getId(),
                 $video->getClassOrder(),
                 $video->getTitle(), 
                 $video->getVideoId(),
@@ -197,7 +275,7 @@ class VideosDAO
                 $video->getTitle(), 
                 $video->getVideoId(),
                 $video->getLength(),
-                $video->getModuleId(),
+                $video->getModule()->getId(),
                 $video->getClassOrder()
             ));
         }

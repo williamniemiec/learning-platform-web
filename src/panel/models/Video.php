@@ -28,7 +28,7 @@ class Video extends _Class
     /**
      * Creates a representation of a video-type class.
      * 
-     * @param       int $id_module Module id that the class belongs to
+     * @param       Module $module Module that the class belongs to
      * @param       int $class_order Class order inside the module to which the
      * class belongs
      * @param       string $title Class title
@@ -41,10 +41,10 @@ class Video extends _Class
      * @param       int $length Video length
      * @param       string $description [Optional] Class description
      */
-    public function __construct(int $id_module, int $class_order, string $title,
+    public function __construct(Module $module, int $class_order, string $title,
         string $videoID, int $length, ?string $description = '')
     {
-        $this->id_module = $id_module;
+        $this->module = $module;
         $this->class_order = $class_order;
         $this->title = $title;
         $this->videoID = $videoID;

@@ -85,7 +85,7 @@ class CoursesController extends Controller
             'scripts' => array('coursesManager')
         );
         
-        // Checks if the new bundle has been successfully added
+        // Checks if the new course has been successfully added
         if (!empty($_POST['name'])) {
             $description = empty($_POST['description']) ? null : $_POST['description'];
             $logo = null;
@@ -140,6 +140,7 @@ class CoursesController extends Controller
         $admin = Admin::getLoggedIn($dbConnection);
         $coursesDAO = new CoursesDAO($dbConnection, $admin);
         $course = $coursesDAO->get($id_course);
+        
         $header = array(
             'title' => 'Edit course - Learning platform',
             'styles' => array('coursesManager', 'manager'),
@@ -155,6 +156,57 @@ class CoursesController extends Controller
             'msg' => '',
             'scripts' => array('coursesManager')
         );
+        
+        // Checks if the course has been successfully updated
+        if (!empty($_POST['name'])) {
+            $description = empty($_POST['description']) ? null : $_POST['description'];
+            $logo = null;
+            
+            // Parses logo
+            if (!empty($_FILES['logo']['tmp_name'])) {
+                try {
+                    $logo = FileUtil::storePhoto($_FILES['logo'], "../assets/img/logos/courses/");
+                    
+                    if (!empty($course->getLogo())) {
+                        unlink("../assets/img/logos/courses/".$course->getLogo());
+                    }
+                        
+                }
+                catch (\InvalidArgumentException $e) {
+                    $viewArgs['error'] = true;
+                    $viewArgs['msg'] = 'Invalid photo';
+                }
+            }
+            
+            if (!$viewArgs['error']) {
+                $response = false;
+                
+                // Tries create new bundle. If an error occurs, removes stored
+                // logo
+                try {
+                    $response = $coursesDAO->update(new Course(
+                        $course->getId(),
+                        $_POST['name'],
+                        $logo,
+                        $description
+                    ));
+                }
+                catch (\InvalidArgumentException | IllegalAccessException $e) {
+                    if (!empty($logo))
+                        unlink("../assets/img/logos/courses/".$logo);
+                }
+                
+                
+                if ($response) {
+                    header("Location: ".BASE_URL."courses");
+                    exit;
+                }
+                
+                // If an error occurred, display it
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = "The course could not be added!";
+            }
+        }
         
         $this->loadTemplate("coursesManager/courses_edit", $viewArgs);
     }

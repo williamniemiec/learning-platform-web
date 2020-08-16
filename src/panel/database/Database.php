@@ -79,9 +79,37 @@ abstract class Database
      * inserted into the database. If a sequence name was specified for the
      * name parameter, returns a string representing the last value retrieved
      * from the specified name.
-     
      */
     public abstract function lastInsertId(string $name = '') : string;
+    
+    /**
+     * Initiates a transaction.
+     * 
+     * @return      bool True on success or false on failure
+     */
+    public abstract function beginTransaction() : bool;
+    
+    /**
+     * Commits a transaction.
+     * 
+     * @return      bool True on success or false on failure
+     */
+    public abstract function commit() : bool;
+    
+    /**
+     * Rolls back a transaction.
+     * 
+     * @return      bool True on success or false on failure
+     */
+    public abstract function rollback() : bool;
+    
+    /**
+     * Checks if inside a transaction.
+     * 
+     * @return      bool True if a transaction is currently active, and false 
+     * if not.
+     */
+    public abstract function inTransaction() : bool;
     
     /**
      * Gets database instance that will be used to connect to the database.

@@ -1,0 +1,12 @@
+#include_classes table {
+	width:							100%;
+}
+
+#include_classes table td.name {
+	text-align:						left;
+	padding-left:					10px;
+}
+
+#classes-questionnaire {
+	margin-top:						30px;
+}

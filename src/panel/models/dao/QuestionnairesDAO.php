@@ -7,6 +7,7 @@ namespace models\dao;
 use database\Database;
 use models\Questionnaire;
 use models\util\IllegalAccessException;
+use models\Module;
 
 
 /**
@@ -72,7 +73,7 @@ class QuestionnairesDAO
         // Query construction
         $sql = $this->db->prepare("
             SELECT  * 
-            FROM    questionnaires 
+            FROM    questionnaires NATURAL JOIN modules
             WHERE   id_module = ? AND class_order = ?
         ");
         
@@ -84,15 +85,99 @@ class QuestionnairesDAO
             $class = $sql->fetch();
             
             $response = new Questionnaire(
-                $class['id_module'],
-                $class['class_order'],
+                new Module((int)$class['id_module'], $class['name']),
+                (int)$class['class_order'],
                 $class['question'],
                 $class['q1'],
                 $class['q2'],
                 $class['q3'],
                 $class['q4'],
-                $class['answer']
+                (int)$class['answer']
             ); 
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Gets all registered questionnaire classes.
+     *
+     * @return      Questionnaire[] Registered questionnaire classes or empty
+     * array if there are no registered questionnaire classes
+     */
+    public function getAll() : array
+    {
+        $response = array();
+        
+        $sql = $this->db->query("
+            SELECT  *
+            FROM    questionnaires NATURAL JOIN modules
+        ");
+        
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $class) {
+                $response[] = new Questionnaire(
+                    new Module((int)$class['id_module'], $class['name']),
+                    (int)$class['class_order'],
+                    $class['question'],
+                    $class['q1'],
+                    $class['q2'],
+                    $class['q3'],
+                    $class['q4'],
+                    (int)$class['answer']
+                );
+            }
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Gets all questionnaire classes from a module.
+     *
+     * @param       int $id_module Module id
+     *
+     * @return      Questionnaire[] Classes that belongs to the module
+     *
+     * @throws      \InvalidArgumentException If module id is empty or less
+     * than or equal to zero
+     *
+     * @Override
+     */
+    public function getAllFromModule(int $id_module) : array
+    {
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
+            
+        $response = array();
+        
+        // Query construction
+        $sql = $this->db->prepare("
+            SELECT  *
+            FROM    questionnaires NATURAL JOIN modules
+            WHERE   id_module = ?
+        ");
+            
+        // Executes query
+        $sql->execute(array($id_module));
+        
+        // Parses results
+        if ($sql && $sql->rowCount() > 0) {
+            $classes = $sql->fetchAll();
+            
+            foreach ($classes as $class) {
+                $response[] = new Questionnaire(
+                    new Module((int)$class['id_module'], $class['name']),
+                    (int)$class['class_order'],
+                    $class['question'],
+                    $class['q1'],
+                    $class['q2'],
+                    $class['q3'],
+                    $class['q4'],
+                    (int)$class['answer']
+                );
+            }
         }
         
         return $response;
@@ -134,7 +219,7 @@ class QuestionnairesDAO
         
         // Executes query
         $sql->execute(array(
-            $questionnaire->getModuleId(), 
+            $questionnaire->getModule()->getId(), 
             $questionnaire->getClassOrder(), 
             $questionnaire->getQuestion(), 
             $questionnaire->getQ1(), 
@@ -190,7 +275,7 @@ class QuestionnairesDAO
         
         // Executes query
         $sql->execute(array(
-            $questionnaire->getModuleId(),
+            $questionnaire->getModule()->getId(),
             $questionnaire->getClassOrder(),
             $questionnaire->getQuestion(),
             $questionnaire->getQ1(),

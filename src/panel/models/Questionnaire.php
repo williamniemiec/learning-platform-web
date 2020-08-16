@@ -30,7 +30,7 @@ class Questionnaire extends _Class
     /**
      * Creates a representation of a questionnaire-type class.
      * 
-     * @param       int $id_module Module id that the class belongs to
+     * @param       Module $module Module that the class belongs to
      * @param       int $class_order Class order inside the module to which the
      * class belongs
      * @param       string $question Questionnaire question
@@ -40,10 +40,10 @@ class Questionnaire extends _Class
      * @param       string $q4 Fourth response option
      * @param       int $answer Questionnaire answer (number between [1;4])
      */
-    public function __construct(int $id_module, int $class_order, string $question, 
+    public function __construct(Module $module, int $class_order, string $question, 
         string $q1, string $q2, string $q3, string $q4, int $answer)
     {
-        $this->id_module = $id_module;
+        $this->module = $module;
         $this->class_order = $class_order;
         $this->question = $question;
         $this->q1 = $q1;

@@ -39,7 +39,7 @@ function show_updateCourses(id_course)
 			
 			for (let i in courseModules) {
 				modules.get(courseModules[i].name).first = true
-				modules.get(courseModules[i].name).second.order = courseModules[i].order
+				modules.get(courseModules[i].name).second.courseOrder = courseModules[i].courseOrder
 			}
 		}
 	})
@@ -53,7 +53,7 @@ function show_updateCourses(id_course)
 		
 		for (let i = 1; i <= modules.size; i++) {
 			selectOptions += `
-				<option value='${i}' ${i == value.second.order ? "selected" : ""}>${i}</option>
+				<option value='${i}' ${i == value.second.courseOrder ? "selected" : ""}>${i}</option>
 			`
 		}
 		

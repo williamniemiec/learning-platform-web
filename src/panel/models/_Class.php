@@ -17,7 +17,7 @@ abstract class _Class implements \JsonSerializable
     //-----------------------------------------------------------------------
     //        Attributes
     //-----------------------------------------------------------------------
-    protected $id_module;
+    protected $module;
     protected $class_order;
     
     
@@ -25,13 +25,13 @@ abstract class _Class implements \JsonSerializable
     //        Getters
     //-----------------------------------------------------------------------
     /**
-     * Gets module id to which the class belongs.
+     * Gets module to which the class belongs.
      * 
-     * @return      int Module id
+     * @return      Module Module to which the class belongs
      */
-    public function getModuleId() : int
+    public function getModule() : Module
     {
-        return $this->id_module;
+        return $this->module;
     }
     
     /**
@@ -57,7 +57,7 @@ abstract class _Class implements \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'id' => $this->id_module,
+            'module' => $this->module,
             'class_order' => $this->class_order
         );
     }

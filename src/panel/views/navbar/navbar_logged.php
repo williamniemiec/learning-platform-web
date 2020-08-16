@@ -9,6 +9,8 @@
 				<ul class="nav-pages">
     				<li><a class="nav-item nav-link" href="<?php echo BASE_URL; ?>bundles">Bundles</a></li>
     				<li><a class="nav-item nav-link" href="<?php echo BASE_URL; ?>courses">Courses</a></li>
+    				<li><a class="nav-item nav-link" href="<?php echo BASE_URL; ?>modules">Modules</a></li>
+    				<li><a class="nav-item nav-link" href="<?php echo BASE_URL; ?>classes">Classes</a></li>
     				<li><a class="nav-item nav-link" href="<?php echo BASE_URL; ?>students">Students</a></li>
     				<li><a class="nav-item nav-link" href="<?php echo BASE_URL; ?>support">Support</a></li>
     				<li><a class="nav-item nav-link" href="<?php echo BASE_URL; ?>admins">Admins</a></li>
