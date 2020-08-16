@@ -8,6 +8,7 @@ use database\Database;
 use models\Questionnaire;
 use models\util\IllegalAccessException;
 use models\Module;
+use models\Admin;
 
 
 /**
@@ -23,7 +24,7 @@ class QuestionnairesDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_admin;
+    private $admin;
     
     
     //-------------------------------------------------------------------------
@@ -33,12 +34,12 @@ class QuestionnairesDAO
      * Creates 'questionnaires' table manager.
      *
      * @param       Database $db Database
-     * @param       int $id_admin [Optional] Admin id logged in
+     * @param       Admin $admin [Optional] Admin logged in
      */
-    public function __construct(Database $db, int $id_admin = -1)
+    public function __construct(Database $db, Admin $admin = null)
     {
         $this->db = $db->getConnection();
-        $this->id_admin = $id_admin;
+        $this->admin = $admin;
     }
     
     
@@ -58,7 +59,7 @@ class QuestionnairesDAO
      * @throws      \InvalidArgumentException If module id or class order is 
      * empty, less than or equal to zero
      */
-    public function get(int $id_module, int $class_order) : Questionnaire
+    public function get(int $id_module, int $class_order) : ?Questionnaire
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be empty ".
@@ -110,8 +111,9 @@ class QuestionnairesDAO
         $response = array();
         
         $sql = $this->db->query("
-            SELECT  *
-            FROM    questionnaires NATURAL JOIN modules
+            SELECT      *
+            FROM        questionnaires NATURAL JOIN modules
+            ORDER BY    question
         ");
         
         if (!empty($sql) && $sql->rowCount() > 0) {
@@ -192,18 +194,17 @@ class QuestionnairesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to create new classes
-     * @throws      \InvalidArgumentException If questionnaire is empty or if 
-     * admin id provided in the constructor is empty, less than or equal to 
-     * zero
+     * @throws      \InvalidArgumentException If questionnaire or admin 
+     * provided in the constructor is empty
      */
     public function add(Questionnaire $questionnaire) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -243,22 +244,21 @@ class QuestionnairesDAO
      * @param       string $op4 New option 4
      * @param       string $answer New answer
      * 
-     * @return      boolean If class has been successfully edited
+     * @return      bool If class has been successfully edited
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update classes
-     * @throws      \InvalidArgumentException If questionnaire is empty or if 
-     * admin id provided in the constructor is empty, less than or equal to 
-     * zero
+     * @throws      \InvalidArgumentException If questionnaire or admin 
+     * provided in the constructor is empty
      */
-    public function update(Questionnaire $questionnaire)
+    public function update(Questionnaire $questionnaire) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -267,24 +267,28 @@ class QuestionnairesDAO
         
         // Query construction
         $sql = $this->db->prepare("
-            UPDATE questionnaires 
-            (question, op1, op2, op3, op4, answer)
-            VALUES (?, ?, ?, ?, ?, ?)
+            UPDATE  questionnaires
+            SET     question = ?,
+                    q1 = ?,
+                    q2 = ?,
+                    q3 = ?,
+                    q4 = ?,
+                    answer = ?
             WHERE id_module = ? AND class_order = ?
         ");
         
         // Executes query
         $sql->execute(array(
-            $questionnaire->getModule()->getId(),
-            $questionnaire->getClassOrder(),
             $questionnaire->getQuestion(),
             $questionnaire->getQ1(),
             $questionnaire->getQ2(),
             $questionnaire->getQ3(),
             $questionnaire->getQ4(),
-            $questionnaire->getAnswer()
+            pack('n', $questionnaire->getAnswer()),
+            $questionnaire->getModule()->getId(),
+            $questionnaire->getClassOrder(),
         ));
-            
+        
         return $sql->rowCount() > 0;
     }
     
@@ -298,17 +302,18 @@ class QuestionnairesDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to delete classes
-     * @throws      \InvalidArgumentException If module id, class order or admin
-     * id provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If module id or class order is
+     * empty, less than or equal to zero or if admin provided in the 
+     * constructor is empty
      */
     public function delete(int $id_module, int $class_order) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -330,5 +335,71 @@ class QuestionnairesDAO
         $sql->execute(array($id_module, $class_order));
         
         return $sql->rowCount() > 0;
+    }
+    
+    /**
+     * Changes module ans class order of a class.
+     *
+     * @param       Questionnaire $questionnaire Class to be updated
+     * @param       int $newIdModule New module id
+     * @param       int $newClassOrder New class order
+     *
+     * @return      bool If chass has been successfully updated
+     *
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update classes
+     * @throws      \InvalidArgumentException If video or admin provided in the
+     * constructor is empty or if module id or class order is empty or less
+     * than or equal to zero
+     */
+    public function updateModule(Questionnaire $questionnaire, int $newIdModule, int $newClassOrder) : bool
+    {
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+            
+        if (empty($newIdModule) || $newIdModule <= 0)
+            throw new \InvalidArgumentException("New module id cannot be empty ".
+                "or less than or equal to zero");
+            
+        if (empty($newClassOrder) || $newClassOrder <= 0)
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
+            
+            if (empty($questionnaire))
+            throw new \InvalidArgumentException("Questionnaire cannot be empty");
+            
+        // class_order = 0 temporary to avoid constraint error
+        $this->db->prepare("
+            UPDATE  questionnaires
+            SET     class_order = 0
+            WHERE   id_module = ? AND class_order = ?
+        ")->execute(array($questionnaire->getModule()->getId(), $questionnaire->getClassOrder()));
+                            
+        // Moves class to new module
+        $this->db->prepare("
+            UPDATE  questionnaires
+            SET     id_module = ?
+            WHERE   id_module = ? AND class_order = 0
+        ")->execute(array($newIdModule, $questionnaire->getModule()->getId()));
+                            
+        // Sets class order
+        $sql = $this->db->prepare("
+            UPDATE  questionnaires
+            SET     class_order = ?
+            WHERE   id_module = ? AND class_order = 0
+        ");
+                            
+        $sql->execute(array(
+            $newClassOrder,
+            $newIdModule
+        ));
+        
+        return !empty($sql) && $sql->rowCount() > 0;
     }
 }

@@ -1,0 +1,9 @@
+.class-type-rdo {
+	display:						flex;
+	flex-direction:					row;
+	justify-content:				space-around;
+}
+
+.class-type-rdo .form-group {
+	margin-bottom:					0;
+}

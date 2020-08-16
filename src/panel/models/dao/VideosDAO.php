@@ -5,6 +5,7 @@ namespace models\dao;
 
 
 use database\Database;
+use models\Admin;
 use models\Video;
 use models\util\IllegalAccessException;
 use models\Module;
@@ -23,7 +24,7 @@ class VideosDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_admin;
+    private $admin;
     
     
     //-------------------------------------------------------------------------
@@ -33,12 +34,12 @@ class VideosDAO
      * Creates 'videos' table manager.
      *
      * @param       Database $db Database
-     * @param       int $id_admin [Optional] Admin id logged in
+     * @param       Admin $admin [Optional] Admin logged in
      */
-    public function __construct(Database $db, int $id_admin = -1)
+    public function __construct(Database $db, Admin $admin = null)
     {
         $this->db = $db->getConnection();
-        $this->id_admin = $id_admin;
+        $this->admin = $admin;
     }
     
     
@@ -57,7 +58,7 @@ class VideosDAO
      * @throws      \InvalidArgumentException If module id or class order is 
      * empty or less than or equal to zero
      */
-    public function get(int $id_module, int $class_order) : Video
+    public function get(int $id_module, int $class_order) : ?Video
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be empty ".
@@ -107,8 +108,9 @@ class VideosDAO
         $response = array();
         
         $sql = $this->db->query("
-            SELECT  *
-            FROM    videos NATURAL JOIN modules
+            SELECT      *
+            FROM        videos NATURAL JOIN modules
+            ORDER BY    title
         ");
         
         if (!empty($sql) && $sql->rowCount() > 0) {
@@ -182,17 +184,17 @@ class VideosDAO
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to create new classes
-     * @throws      \InvalidArgumentException If video is empty or if admin id
-     * provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If video or admin provided in the
+     * constructor is empty
      */
     public function add(Video $video) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getid() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -243,21 +245,21 @@ class VideosDAO
      * 
      * @param       Video $video Video to be added
      * 
-     * @return      boolean If class has been successfully updated
+     * @return      bool If class has been successfully updated
      * 
      * @throws      IllegalAccessException If current admin does not have
      * authorization to update classes
-     * @throws      \InvalidArgumentException If video is empty or if admin id
-     * provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If video or admin provided in the
+     * constructor is empty
      */
-    public function update(Video $video)
+    public function update(Video $video) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -309,18 +311,18 @@ class VideosDAO
      *
      * @throws      IllegalAccessException If current admin does not have
      * authorization to delete classes
-     * @throws      \InvalidArgumentException If module id, class order or 
-     * admin id provided in the constructor is empty, less than or equal to
-     * zero
+     * @throws      \InvalidArgumentException If module id or class order is 
+     * empty, less than or equal to zero or if admin id provided in the 
+     * constructor is empty
      */
     public function delete(int $id_module, int $class_order) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 1)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -342,5 +344,71 @@ class VideosDAO
         $sql->execute(array($id_module, $class_order));
         
         return $sql->rowCount() > 0;
+    }
+    
+    /**
+     * Changes module ans class order of a class.
+     * 
+     * @param       Video $video Class to be updated
+     * @param       int $newIdModule New module id
+     * @param       int $newClassOrder New class order
+     * 
+     * @return      bool If chass has been successfully updated
+     * 
+     * @throws      IllegalAccessException If current admin does not have
+     * authorization to update classes
+     * @throws      \InvalidArgumentException If video or admin provided in the
+     * constructor is empty or if module id or class order is empty or less 
+     * than or equal to zero
+     */
+    public function updateModule(Video $video, int $newIdModule, int $newClassOrder) : bool
+    {
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 1)
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
+                
+        if (empty($newIdModule) || $newIdModule <= 0)
+            throw new \InvalidArgumentException("New module id cannot be empty ".
+                "or less than or equal to zero");
+            
+        if (empty($newClassOrder) || $newClassOrder <= 0)
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                "or less than or equal to zero");
+        
+        if (empty($video))
+            throw new \InvalidArgumentException("Video cannot be empty");
+                
+        // class_order = 0 temporary to avoid constraint error
+        $this->db->prepare("
+            UPDATE  videos
+            SET     class_order = 0
+            WHERE   id_module = ? AND class_order = ?
+        ")->execute(array($video->getModule()->getId(), $video->getClassOrder()));
+        
+        // Moves class to new module
+        $this->db->prepare("
+            UPDATE  videos
+            SET     id_module = ?
+            WHERE   id_module = ? AND class_order = 0
+        ")->execute(array($newIdModule, $video->getModule()->getId()));
+        
+        // Sets class order
+        $sql = $this->db->prepare("
+            UPDATE  videos
+            SET     class_order = ?
+            WHERE   id_module = ? AND class_order = 0
+        ");
+        
+        $sql->execute(array(
+            $newClassOrder,
+            $newIdModule
+        ));
+        
+        return !empty($sql) && $sql->rowCount() > 0;
     }
 }

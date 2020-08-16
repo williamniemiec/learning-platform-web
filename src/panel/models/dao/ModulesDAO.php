@@ -8,6 +8,7 @@ use database\Database;
 use models\Admin;
 use models\Module;
 use models\util\IllegalAccessException;
+use models\enum\ClassTypeEnum;
 
 
 /**
@@ -611,6 +612,45 @@ class ModulesDAO
         return $sql->fetch()['existClass'] > 0;
     }
     
+    /**
+     * Gets highest class order in use from a module.
+     *
+     * @param       int $id_module Module id
+     *
+     * @return      int Highest module order or -1 of module does not belongs
+     * to the course
+     *
+     * @throws      \InvalidArgumentException if module id is empty, less than 
+     * or equal to zero
+     */
+    public function getHighestOrderInModule(int $id_module) : int
+    {
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
+                
+        $response = -1;
+        
+        $sql = $this->db->query("
+            SELECT      MAX(class_order) AS max_class_order
+            FROM (
+                SELECT      class_order
+                FROM        videos
+                WHERE       id_module = ".$id_module."
+                UNION
+                SELECT      class_order
+                FROM        questionnaires
+                WHERE       id_module = ".$id_module."
+            ) AS tmp
+        ");
+                
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = (int)$sql->fetch()['max_class_order'];
+        }
+        
+        return $response;
+    }
+    
 //     /**
 //      * Gets highest module order in use.
 //      * 
@@ -623,7 +663,7 @@ class ModulesDAO
 //      * @throws      \InvalidArgumentException If course id or module id is 
 //      * empty, less than or equal to zero
 //      */
-//     public function getHighestOrder(int $id_course, int $id_module) : int
+//     public function getHighestOrderInCourse(int $id_course, int $id_module) : int
 //     {
 //         if (empty($id_course) || $id_course <= 0)
 //             throw new \InvalidArgumentException("Course id cannot be empty ".
