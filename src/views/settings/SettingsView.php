@@ -1,8 +1,16 @@
-<?php
-use models\enum\GenreEnum;
-?>
+<?php use models\enum\GenreEnum; ?>
 
 <div class="container">
+	<?php if (!empty($msg)): ?>
+    	<div class="alert alert-success fade show" role="alert">
+    		<button class="close" data-dismiss="alert" aria-label="close">
+    			<span aria-hidden="true">&times;</span>
+    		</button>
+    		<h4 class="alert-heading">Success!</h4>
+    		<?php echo $msg; ?>
+    	</div>
+    <?php endif; ?>
+	
 	<div class="view_panel">
     	<h1 class="view_header">Settings</h1>
     	<div class="view_content">
@@ -41,6 +49,8 @@ use models\enum\GenreEnum;
         	</div>
         	
         	<button class="btn_theme" data-toggle="modal" data-target="#changePassword">Change password</button>
+        	<a href="<?php echo BASE_URL."settings/clear"; ?>" class="btn_theme btn_theme_danger">Clear history</a>
+        	<a href="<?php echo BASE_URL."settings/delete"; ?>" class="btn_theme btn_theme_danger">Delete account</a>
         	
         	<div class="form-group">
         		<a class="btn_theme btn_full" href="<?php echo BASE_URL."settings/edit"; ?>">Change</a>

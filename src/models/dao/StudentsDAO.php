@@ -609,6 +609,28 @@ class StudentsDAO
     }
     
     /**
+     * Clears student history.
+     * 
+     * @return      bool If historic has been successfully removed
+     * 
+     * @throws      \InvalidArgumentException If student id provided in the 
+     * constructor is empty, less than or equal to zero
+     */
+    public function clearHistory()
+    {
+        if (empty($this->id_student) || $this->id_student <= 0)
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                "provided in the constructor");
+            
+        $sql = $this->db->query("
+            DELETE FROM student_historic
+            WHERE id_student = ".$this->id_student
+        );
+        
+        return !empty($sql) && $sql->rowCount() > 0;
+    }
+    
+    /**
      * Gets photo of the logged in student.
      * 
      * @return      string Photo filename or empty string if student does not

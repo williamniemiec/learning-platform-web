@@ -64,6 +64,11 @@ class SettingsController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
+        if (isset($_SESSION['cleared'])) {
+            $viewArgs['msg'] = "Session has been successfully cleared!";
+            unset($_SESSION['cleared']);
+        }
+        
         $this->loadTemplate("settings/SettingsView", $viewArgs);
     }
     
@@ -76,7 +81,7 @@ class SettingsController extends Controller
         
         $student = Student::getLoggedIn($dbConnection);
         $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
-        
+
         $header = array(
             'title' => 'Settings - Update - Learning platform',
             'styles' => array('SettingsStyle'),
@@ -101,10 +106,45 @@ class SettingsController extends Controller
             'user' => $student,
             'notifications' => array(
                 'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification())
+                'total_unread' => $notificationsDAO->countUnreadNotification()),
+            'msg' => ''
         );
         
         $this->loadTemplate("settings/SettingsEditView", $viewArgs);
+    }
+    
+    public function clear()
+    {
+        $dbConnection = new MySqlPDODatabase();
+        
+        $studentsDAO = new StudentsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
+        
+        $_SESSION['cleared'] = $studentsDAO->clearHistory();
+        
+        header("Location: ".BASE_URL."settings");
+        exit;
+    }
+    
+    public function delete()
+    {
+        $dbConnection = new MySqlPDODatabase();
+        
+        $studentsDAO = new StudentsDAO(
+            $dbConnection,
+            Student::getLoggedIn($dbConnection)->getId()
+        );
+        
+        if ($studentsDAO->delete()) {
+            header("Location: ".BASE_URL);            
+        }
+        else {
+            header("Location: ".BASE_URL."settings");
+        }
+        
+        exit;
     }
     
     

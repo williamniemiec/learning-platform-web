@@ -67,15 +67,17 @@ abstract class ClassesDAO
         if (empty($class_type) || (empty($class_type->get()) && $class_type->get() != 0))
             throw new \InvalidArgumentException("Class type cannot be empty ");
                     
+        $classType = $class_type->get() == 1 ? "b'1'" : "b'0'";
+        
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO student_historic
             (id_student, id_module, class_order, class_type, date)
-            VALUES (?, ?, ?, ?, CURDATE())
+            VALUES (?, ?, ?, ".$classType.", CURDATE())
         ");
-        
+
         // Executes query
-        $sql->execute(array($id_student, $id_module, $class_order, $class_type->get() == 1));
+        $sql->execute(array($id_student, $id_module, $class_order));
     }
     
     /**
