@@ -371,3 +371,34 @@ input[type='file'] {
 .page-link {
 	color:							var(--color-primary);
 }
+
+
+/* Filters */
+.search-filters {
+	display: 						flex;
+	flex-direction:					column;
+	justify-content: 				center;
+}
+
+.search-filter-options {
+	display: 						flex;
+	flex-direction:					row;
+	justify-content: 				space-around;
+	align-items:					center;
+	height:							40px;
+}
+
+.search-filter-options .form-group {
+	margin-bottom:					0;
+	height:							40px;
+	line-height:					40px;
+}
+
+.form-group-select {
+	display:						flex;
+	flex-direction:					row;
+}
+
+.form-group-select label {
+	margin-right:					20px;
+}

@@ -7,6 +7,7 @@ use models\Student;
 use models\Admin;
 use database\pdo\MySqlPDODatabase;
 use models\dao\StudentsDAO;
+use models\dao\CoursesDAO;
 
 
 /**
@@ -45,7 +46,16 @@ class StudentsController extends Controller
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
         $studentsDAO = new StudentsDAO($dbConnection);
-        $students = $studentsDAO->getAll();
+        $coursesDAO = new CoursesDAO($dbConnection);
+        $selectedCourse = 0;
+        
+        if (!empty($_GET['filter-course'])) {
+            $students = $studentsDAO->getAll($_GET['filter-course']);
+            $selectedCourse = $_GET['filter-course'];
+        }
+        else {
+            $students = $studentsDAO->getAll();
+        }
         
         foreach ($students as $student) {
             $student->setDatabase($dbConnection);
@@ -61,7 +71,9 @@ class StudentsController extends Controller
             'username' => $admin->getName(),
             'students' => $students,
             'header' => $header,
-            'scripts' => array('studentsManager')
+            'scripts' => array('studentsManager'),
+            'courses' => $coursesDAO->getAll(),
+            'selectedCourse' => $selectedCourse
         );
         
         $this->loadTemplate("studentsManager/students_manager", $viewArgs);

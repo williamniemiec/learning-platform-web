@@ -10,6 +10,8 @@ use models\dao\CoursesDAO;
 use models\util\FileUtil;
 use models\util\IllegalAccessException;
 use models\dao\ModulesDAO;
+use models\enum\CourseOrderByEnum;
+use models\enum\OrderDirectionEnum;
 
 
 /**
@@ -51,14 +53,15 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => 'Courses - Learning platform',
-            'styles' => array('coursesManager', 'manager'),
+            'styles' => array('coursesManager', 'manager', 'searchBar'),
             'robots' => 'noindex'
         );
         
         $viewArgs = array(
             'username' => $admin->getName(),
             'courses' => $coursesDAO->getAll(),
-            'header' => $header
+            'header' => $header,
+            'scripts' => array('CoursesHomeScript')
         );
         
         $this->loadTemplate("coursesManager/courses_manager", $viewArgs);
@@ -78,7 +81,7 @@ class CoursesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
-            'courses' => $coursesDAO->getAll(),
+            'courses' => $coursesDAO->getAll('', 100),
             'header' => $header,
             'error' => false,
             'msg' => '',
@@ -234,6 +237,43 @@ class CoursesController extends Controller
     //-------------------------------------------------------------------------
     //        Ajax
     //-------------------------------------------------------------------------
+    /**
+     * Searches courses.
+     *
+     * @param       string $_POST['name'] Name to be searched
+     * @param       string $_POST['filter']['type'] Ranking of results, which
+     * can be:
+     * <ul>
+     *     <li>price</li>
+     *     <li>sales</li>
+     * </ul>
+     * @param       string $_POST['filter']['order'] Sort type, which can be:
+     * <ul>
+     *     <li>asc (Ascending)</li>
+     *     <li>desc (Descending)</li>
+     * </ul>
+     *
+     * @return      string Json containing courses
+     *
+     * @apiNote     Must be called using POST request method
+     */
+    public function search()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+            return;
+            
+        $dbConnection = new MySqlPDODatabase();
+        
+        $coursesDAO = new CoursesDAO($dbConnection);
+        
+        echo json_encode($coursesDAO->getAll(
+            $_POST['name'],
+            100,
+            new CourseOrderByEnum($_POST['filter']['type']),
+            new OrderDirectionEnum($_POST['filter']['order'])
+        ));
+    }
+    
     /**
      * Gets all registered courses.
      * 

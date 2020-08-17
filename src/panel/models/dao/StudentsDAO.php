@@ -134,14 +134,14 @@ class StudentsDAO
     /**
      * Gets all registered students.
      * 
-     * @param       string $courseName [Optional] Filters students who have a 
-     * course with a certain name
+     * @param       int $id_course [Optional] Filters students who have a 
+     * course with the provided id
      * @param       int $limit [Optional] Maximum results that will be returned
      * 
      * @return      \models\Student[] All registered students or empty 
      * array if there are no registered students
      */
-    public function getAll($courseName = '', $limit = -1)
+    public function getAll(int $id_course = -1, int $limit = -1) : array
     {
         $response = array();
 
@@ -151,23 +151,18 @@ class StudentsDAO
             FROM    students
         ";
         
-        if (!empty($courseName)) {
+        if ($id_course > 0) {
             $query .= " 
                 WHERE id_student IN (SELECT id_student
                                      FROM   purchases 
                                             NATURAL JOIN bundle_courses
                                             NATURAL JOIN courses
-                                     WHERE  name LIKE ?)
+                                     WHERE  id_course = ".$id_course.")
             ";
-            
-            // Executes query
-            $sql = $this->db->prepare($query);
-            $sql->execute(array($courseName));
         }
-        else {
-            // Executes query
-            $sql = $this->db->query($query);
-        }
+        
+        // Executes query
+        $sql = $this->db->query($query);
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {

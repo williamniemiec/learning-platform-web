@@ -5,6 +5,34 @@
             <?php if (count($courses) == 0): ?>
             	<h2>There are no registered courses</h2>
             <?php else: ?>
+            	<!-- Filters -->
+            		<div class="search-bar">
+            			<input type="text" class="search-bar-big" placeholder="Search course" />
+            			<button class="search-bar-btn" onClick="search(this)">&#128270;</button>
+            		</div>
+        		<div class="view_widget">
+        			<!-- Filters -->
+        			<div class="search-filters">
+        				<h3>Filters</h3>
+        				<div class="search-filter-options">
+        					<div class="form-group">
+            					<input id="rdo-price" type="radio" name="filter" value="name" checked />
+            					<label for="rdo-price">Name</label>
+        					</div>
+        					<div class="form-group">
+            					<input id="rdo-course" type="radio" name="filter" value="sales" />
+            					<label for="rdo-course">Total students</label>
+        					</div>
+        					<div class="form-group">
+            					<select id="order" class="form-control">
+            						<option value="asc" selected>Ascending</option>
+            						<option value="desc">Descending</option>
+            					</select>
+        					</div>
+        				</div>
+        			</div>
+        		</div>
+            
             	<a class="btn_theme" href="<?php BASE_URL; ?>courses/new">New</a>
                 <table class="table table-hover table-stripped text_centered">
                 	<thead>
@@ -18,7 +46,7 @@
                     		<th>Actions</th>
                 		</tr>
                 	</thead>
-                	<tbody>
+                	<tbody id="courses">
                 		<?php foreach($courses as $course): ?>
                     		<tr>
                     			<?php if (empty($course->getLogo())): ?>

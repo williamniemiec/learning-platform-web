@@ -10,6 +10,8 @@ use models\Bundle;
 use models\util\FileUtil;
 use models\util\IllegalAccessException;
 use models\dao\CoursesDAO;
+use models\enum\BundleOrderTypeEnum;
+use models\enum\OrderDirectionEnum;
 
 
 /**
@@ -48,6 +50,21 @@ class BundlesController extends Controller
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
         $bundlesDAO = new BundlesDAO($dbConnection);
+        $selectedOrderBy = 'courses';
+        $selectedOrderByDirection = 'asc';
+        
+        if (isset($_GET['order-by']) && isset($_GET['order-by-direction'])) {
+            $bundles = $bundlesDAO->getAll(
+                -1, '', 
+                new BundleOrderTypeEnum($_GET['order-by']), 
+                new OrderDirectionEnum($_GET['order-by-direction'])
+            );
+            $selectedOrderBy = $_GET['order-by'];
+            $selectedOrderByDirection = $_GET['order-by-direction'];
+        }
+        else {
+            $bundles = $bundlesDAO->getAll();
+        }
         
         $header = array(
             'title' => 'Bundles - Learning platform',
@@ -57,8 +74,10 @@ class BundlesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
-            'bundles' => $bundlesDAO->getAll(),
-            'header' => $header
+            'bundles' => $bundles,
+            'header' => $header,
+            'selectedOrderBy' => $selectedOrderBy,
+            'selectedOrderByDirection' => $selectedOrderByDirection
         );
         
         $this->loadTemplate("bundlesManager/bundles_manager", $viewArgs);

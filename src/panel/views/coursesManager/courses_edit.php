@@ -28,10 +28,10 @@
             	
             	<div class="form-group">
             		<label for="logo">Current logo</label><br />
-            		<img	class="img img-responsive img-thumbnail img_courseEdit" 
+            		<img	class="img img-responsive img-thumbnail manager-logo" 
             				src="<?php echo empty($course->getLogo()) ? 
             				    BASE_URL."../assets/img/default/noImage.png" : 
-            				    BASE_URL."../assets/img/logos/".$course->getLogo(); ?>" 
+            				    BASE_URL."../assets/img/logos/courses/".$course->getLogo(); ?>" 
     				/><br /><br />
             		<input id="logo" name="logo" type="file" accept=".jpeg,.png,.jpg" class="form-control" />
             	</div>

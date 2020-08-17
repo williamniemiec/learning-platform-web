@@ -2,6 +2,27 @@
 	<div class="view_panel">
     	<h1 class="view_header">Students manager</h1>
     	<div class="view_content">
+    		<!-- Filters -->
+			<div class="view_widget">
+				<h3>Filter by course</h3>
+				<div class="search-filter-options">
+					<form method="GET">
+    					<div class="form-group">
+        					<select id="sel-course" name="filter-course" class="form-control">
+        						<option value="0" <?php echo $selectedCourse == 0 ? "selected" : "" ?>>All</option>
+        						<?php foreach ($courses as $course): ?>
+        							<option value="<?php echo $course->getId(); ?>" <?php echo $selectedCourse == $course->getId() ? "selected" : ""; ?>>
+        								<?php echo $course->getName(); ?>
+    								</option>
+        						<?php endforeach; ?>
+        					</select>
+    					</div>
+    					<div class="form-group">
+    						<input type="submit" value="Filter" class="btn_theme btn_full" />
+    					</div>
+					</form>
+				</div>
+			</div>
         	<table class="table table-hover table-sm">
         		<thead>
         			<tr>

@@ -168,7 +168,7 @@ class CoursesDAO
         // Query construction
         $query = "
             SELECT      id_course, name, logo, description, 
-                        COUNT(id_student) AS total_students
+                        COUNT(id_student) AS sales
             FROM		courses 
                         NATURAL LEFT JOIN bundle_courses 
             			LEFT JOIN purchases USING (id_bundle)
@@ -181,7 +181,7 @@ class CoursesDAO
         }
         
         if (!empty($orderBy)) {
-            $query .= "ORDER BY ".$orderBy->get()." ".$orderType->get();
+            $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
         }
         
         // Limits the results (if a limit was given)
@@ -189,9 +189,9 @@ class CoursesDAO
             $query .= " LIMIT ".$limit;
         
         // Executes query
+
         $sql = $this->db->prepare($query);
         $sql->execute($bindParams);
-        
         // Parses results
         if (!empty($sql) && $sql->rowCount() > 0) {
             $i = 0;
@@ -207,7 +207,7 @@ class CoursesDAO
                 $total = $this->countClasses((int)$course['id_course']);
                 $response[$i]->setTotalClasses((int)$total['total_classes']);
                 $response[$i]->setTotalLength((int)$total['total_length']);
-                $response[$i]->setTotalStudents((int)$course['total_students']);
+                $response[$i]->setTotalStudents((int)$course['sales']);
                 $i++;
             }
         }

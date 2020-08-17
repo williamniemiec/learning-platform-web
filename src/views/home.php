@@ -48,7 +48,7 @@
     	<div class="area bundles-search">
     		<h3 class="area-title">Discover new possibilities</h3>
     		<div class="search-bar">
-    			<input type="text" class="search-bar-big" placeholder="Search course" />
+    			<input type="text" class="search-bar-big" placeholder="Search bundle" />
     			<button class="search-bar-btn" onClick="search(this)">&#128270;</button>
     		</div>
 		</div>

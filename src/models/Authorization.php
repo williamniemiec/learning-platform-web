@@ -16,7 +16,6 @@ class Authorization
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_authorization;
     private $name;
     private $level;
     
@@ -27,13 +26,11 @@ class Authorization
     /**
      * Creates a representation of a admin-type user.
      *
-     * @param       int $id_authorization Authorization id
      * @param       string $name Authorization's name
      * @param       int $level Authorization's level
      */
-    public function __construct(int $id_authorization, string $name, int $level)
+    public function __construct(string $name, int $level)
     {
-        $this->id_authorization = $id_authorization;
         $this->name = $name;
         $this->level = $level;
     }
@@ -42,16 +39,6 @@ class Authorization
     //-------------------------------------------------------------------------
     //        Getters
     //-------------------------------------------------------------------------
-    /**
-     * Gets authorization id.
-     * 
-     * @return      int Authorization id
-     */
-    public function getId() : int
-    {
-        return $this->id_authorization;
-    }
-    
     /**
      * Gets authorization name.
      *

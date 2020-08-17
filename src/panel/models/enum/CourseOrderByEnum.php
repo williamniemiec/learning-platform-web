@@ -19,6 +19,6 @@ class CourseOrderByEnum extends Enumeration
     //-------------------------------------------------------------------------
     //        Enumerations
     //-------------------------------------------------------------------------
-    public static const NAME = 'name';
-    public static const TOTAL_STUDENTS = 'total_students';
+    public const NAME = 'name';
+    public const TOTAL_STUDENTS = 'total_students';
 }

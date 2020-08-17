@@ -21,10 +21,9 @@ function search(obj)
 		},
 		success:(bundles) => {
 			bundles = JSON.parse(bundles)
-			$("#bundle-search-results").fadeIn('fast')
+			$("#bundle-search-results").fadeOut('fast')
 			const resultArea = $("#bundle-search-results .gallery-items")
 			let resultHTML = ""
-			console.log(bundles)
 			
 			resultArea.html('').fadeOut('fast')
 			
