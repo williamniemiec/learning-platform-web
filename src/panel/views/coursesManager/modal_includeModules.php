@@ -1,4 +1,4 @@
-<div id="includeModules" class="modal fade">
+<div id="includeModules" class="modal fade scrollbar_light">
 	<div class="modal-dialog modal-dialog-centered modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">

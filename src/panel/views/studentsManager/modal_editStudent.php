@@ -37,9 +37,9 @@
             	</div>
             	
             	<div class="form-group">
-            		<label>Courses</label><br />
+            		<label>Bundles</label><br />
             		
-            		<div id="edit_courses">
+            		<div id="edit_bundles">
             		</div>
             	</div>
 			</div>

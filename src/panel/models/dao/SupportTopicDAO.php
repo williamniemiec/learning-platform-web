@@ -5,6 +5,7 @@ namespace models\dao;
 
 
 use database\Database;
+use models\Admin;
 use models\Message;
 use models\SupportTopic;
 use models\util\IllegalAccessException;
@@ -25,7 +26,7 @@ class SupportTopicDAO
     //-------------------------------------------------------------------------
     private $db;
     private $id_topic;
-    private $id_admin;
+    private $admin;
     
     
     //-------------------------------------------------------------------------
@@ -36,23 +37,23 @@ class SupportTopicDAO
      *
      * @param       Database $db Database
      * @param       int $id_topic Topic id
-     * @param       int $id_admin Admin id logged in
+     * @param       Admin $_admin Admin logged in
      * 
      * @throws      \InvalidArgumentException If topic id is empty, less than 
-     * or equal to zero
+     * or equal to zero or if admin is empty
      */
-    public function __construct(Database $db, int $id_topic, int $id_admin)
+    public function __construct(Database $db, int $id_topic, Admin $admin)
     {
         if (empty($id_topic) || $id_topic <= 0)
             throw new \InvalidArgumentException("Topic id cannot be empty ".
                 "or less than or equal to zero");
             
-        if (empty($id_admin) || $id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id cannot be empty ".
+        if (empty($admin))
+            throw new \InvalidArgumentException("Admin cannot be empty ".
                 "or less than or equal to zero");
             
         $this->id_topic = $id_topic;
-        $this->id_admin = $id_admin;
+        $this->admin = $admin;
         $this->db = $db->getConnection();
     }
     
@@ -68,8 +69,8 @@ class SupportTopicDAO
      */
     public function get() : ?SupportTopic
     {            
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -111,8 +112,8 @@ class SupportTopicDAO
      */
     public function close() : bool
     {
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -136,8 +137,8 @@ class SupportTopicDAO
      */
     public function open() : bool
     {
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -167,8 +168,8 @@ class SupportTopicDAO
      */
     public function newReply(int $id_admin, string $text) : bool
     {
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -203,8 +204,8 @@ class SupportTopicDAO
      */
     public function getReplies()
     {
-        if ($this->getAuthorization()->getLevel() != 0 &&
-            $this->getAuthorization()->getLevel() != 2)
+        if ($this->admin->getAuthorization()->getLevel() != 0 &&
+            $this->admin->getAuthorization()->getLevel() != 2)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             

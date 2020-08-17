@@ -8,6 +8,7 @@ use DateTime;
 use models\enum\GenreEnum;
 use models\dao\StudentsDAO;
 use database\Database;
+use models\dao\BundlesDAO;
 
 
 /**
@@ -23,6 +24,8 @@ class Student extends User
     //        Attributes
     //-------------------------------------------------------------------------
     private $photo;
+    private $bundles;
+    private $db;
     
 
     //-------------------------------------------------------------------------
@@ -83,7 +86,6 @@ class Student extends User
         return $student;
     }
     
-    
     /**
      * Gets logged in student.
      * 
@@ -112,7 +114,7 @@ class Student extends User
     
     
     //-------------------------------------------------------------------------
-    //        Getters
+    //        Getters & Setters
     //-------------------------------------------------------------------------
     /**
      * Gets the name of the student photo file.
@@ -123,6 +125,39 @@ class Student extends User
     public function getPhoto() : string
     {
         return $this->photo;
+    }
+    
+    /**
+     * Gets bundles that the student has.
+     *
+     * @param       Database $db [Optional] Database to get all purchases from
+     * the student
+     *
+     * @return      Bundle[] Bundles that the student has
+     *
+     * @throws      \InvalidArgumentException If bundles has not yet been
+     * set and a database is not provided to obtain this information
+     *
+     * @implNote    Lazy initialization
+     */
+    public function getBundles(?Database $db = null)
+    {
+        if (empty($this->bundles)) {
+            if (empty($db) && empty($this->db))
+                throw new \InvalidArgumentException("Database cannot be empty");
+            else if (empty($db))
+                $db = $this->db;
+            
+            $studentsDAO = new StudentsDAO($db);
+            $this->bundles = $studentsDAO->getBundles($this->id);
+        }
+        
+        return $this->bundles;
+    }
+    
+    public function setDatabase(Database $db)
+    {
+        $this->db = $db;
     }
     
     

@@ -1,54 +1,17 @@
+//-------------------------------------------------------------------------
+//        Global variables
+//-------------------------------------------------------------------------
 var current_id_student = -1
 
 
-function show_addStudent(obj)
+//-------------------------------------------------------------------------
+//        Methods
+//-------------------------------------------------------------------------
+function show_editStudent(id_student)
 {
-	$("#addStudent").modal("toggle")
-}
-
-function addStudent(obj)
-{
-	var name = $("#add_student_name").val()
-	
-	$.ajax({
-		type:"POST",
-		url:BASE_URL+"students/add_student",
-		data:{
-			name: name,
-			genre: $("input[name='genre']:checked").val(),
-			birthdate: $("#add_student_birthdate").val(),
-			email: $("#add_student_email").val(),
-			password:$("#add_student_pass").val() 
-		},
-		success: function(id) {
-			$("#addStudent").modal("toggle")
-			
-			var newStudent = `
-				<tr data-id_student="${id}">
-					<td class="student_name">${name}</td>
-					<td class="student_courses"></td>
-					<td class="student_totalCourses">0</td>
-					<td class="actions">
-						<button class="btn btn-warning" onclick="show_editStudent(this,${id})">Edit</button>
-    					<button class="btn btn-danger" onclick="deleteStudent(this,${id})">Delete</button>
-					</td>
-				</tr>
-			`
-			
-			// Clears fields of modal
-			$("#add_student_name").val("")
-			$("input[name='genre']").eq(0).attr("checked", "checked")
-			$("#add_student_birthdate").val("")
-			$("#add_student_email").val("")
-			$("#add_student_pass").val("") 
-			
-			$("tbody").append(newStudent)
-		}
-	})
-}
-
-function show_editStudent(obj, id_student)
-{
+	const div_bundles = $("#edit_bundles")
+	let bundles = new Map()
+	let cbx_bundles = ''
 	current_id_student = id_student
 	
 	// Gets student info
@@ -63,53 +26,67 @@ function show_editStudent(obj, id_student)
 				$("#edit_student_male").attr("checked", 'checked')
 			else
 				$("#edit_student_female").attr("checked", 'checked')
-			$("#edit_student_birthdate").val(student.birthdate.split(" ")[0])
+			$("#edit_student_birthdate").val(student.birthdate.split("/").join("-"))
 			$("#edit_student_email").val(student.email)
 			$("#edit_student_pass").val("")
+
 		}
 	})
 	
-	// Gets course info
+	// Gets all bundles
 	$.ajax({
-		type:'POST',
-		url:BASE_URL+"students/get_courses",
-		dataType:'json',
-		data: {id_student: id_student},
-		success: function(courses) {
-			var div_courses = $("#edit_courses")
-			div_courses.html("")
-
-			for (var course of courses) {
-				if (course.hasCourse > 0) {
-					var cbx_course = `
-						<input id="edit_c${course.id}" type="checkbox" name="${course.name}" value="${course.id}" checked />
-	            		<label for="edit_c${course.id}">${course.name}</label><br />
-					`
-				} else {
-					var cbx_course = `
-						<input id="edit_c${course.id}" type="checkbox" name="${course.name}" value="${course.id}" />
-	            		<label for="edit_c${course.id}">${course.name}</label><br />
-					`
-				}
-				
-				div_courses.append(cbx_course)
+		type:'GET',
+		url:BASE_URL + "bundles/getAll",
+		async:false,
+		success: (allBundles) => {
+			allBundles = JSON.parse(allBundles)
+			
+			for (let bundle of allBundles) {
+				bundles.set(bundle.name, {first: false, second: bundle})
 			}
 		}
 	})
+
+	// Gets bundles that a student has
+	$.ajax({
+		type:'POST',
+		url:BASE_URL+"students/get_bundles",
+		data: {id_student: id_student},
+		async:false,
+		success: function(studentBundles) {
+			studentBundles = JSON.parse(studentBundles)
+			div_bundles.html("")
+
+			for (let bundle of studentBundles) {
+				bundles.get(bundle.name).first = true
+			}
+		}
+	})
+	
+	// Displays bundles
+	for (const [key, value] of bundles.entries()) {
+		cbx_bundles = `
+			<input id="edit_b${value.second.id}" type="checkbox" ${value.first ? "checked disabled" : "name='bundles[]' value='"+value.second.id+"' data-name='"+value.second.name+"'"} />
+    		<label for="edit_b${value.second.id}">${value.second.name}</label><br />
+		`
+		
+		div_bundles.append(cbx_bundles)
+	}
 	
 	$("#editStudent").modal("toggle")
 }
 
 function editStudent(obj)
 {
-	var name = $("#edit_student_name").val()
-	var pass = $("#edit_student_pass").val()
+	const name = $("#edit_student_name").val()
+	const pass = $("#edit_student_pass").val()
 	
 	if (pass == "") {
 		$.ajax({
 			type:'POST',
 			url:BASE_URL+"students/edit_student",
 			data: {
+				id_student:current_id_student,
 				name: name,
 				genre: $(obj).closest(".modal-content").find("input[name='genre']:checked").val(),
 				birthdate: $("#edit_student_birthdate").val(),
@@ -119,7 +96,8 @@ function editStudent(obj)
 				edit_student_success(obj)
 			}
 		})
-	} else {
+	} 
+	else {
 		$.ajax({
 			type:'POST',
 			url:BASE_URL+"students/edit_student",
@@ -139,49 +117,42 @@ function editStudent(obj)
 	$("#editStudent").modal("toggle")
 }
 
+
+
 function edit_student_success(obj) 
 {
-	var student_td = $(`tr[data-id_student=${current_id_student}]`)
-	var courses = $(obj).closest(".modal-content").find("input[type='checkbox']:checked")
-	var tr_student = $(`tr[data-id_student='${current_id_student}']`)
-	var student_courses = tr_student.find(".student_courses")
-	student_courses.html("")
+	const student_td = $(`tr[data-id_student=${current_id_student}]`)
+	const bundles = $(obj).closest(".modal-content").find("input:checkbox[name='bundles[]']:checked")
+	const tr_student = $(`tr[data-id_student='${current_id_student}']`)
+	const student_bundles = tr_student.find(".student_bundles")
 	
-	// Removes all relationships
-	$.ajax({
-		type:'POST',
-		url:BASE_URL+"students/clear_student_course",
-		data:{
-			id_student:current_id_student
-		}
-	})
 	
-	for (var course of courses) {
-		// Add course in student_course
+	for (let bundle of bundles) {
+		// Add bundle in student purchases
 		$.ajax({
 			type:'POST',
-			url:BASE_URL+"students/add_student_course",
+			url:BASE_URL+"students/add_student_bundle",
 			data:{
 				id_student:current_id_student,
-				id_course:course.value
+				id_bundle:bundle.value
 			}
 		})
-
-		if (student_courses.html() == "")
-			student_courses.html(student_courses.html() + course.name)
+	console.log(bundle)
+		if (isBlank(student_bundles.html()))
+			student_bundles.html(" | " + $(bundle).attr('data-name') + " | ")
 		else
-			student_courses.html(student_courses.html() + ", " + course.name)
+			student_bundles.html(student_bundles.html() + $(bundle).attr('data-name') + " | ")
 	}
 	
-	// Updates courses counter
-	var td_totalCourses = tr_student.find(".student_totalCourses")
-	td_totalCourses.html(courses.length)
+	// Updates bundles counter
+	const td_totalBundles = tr_student.find(".student_totalBundles")
+	td_totalBundles.html(bundles.length)
 
 	student_td.find(".student_name").val(name)
-	student_td.find(".student_courses").val(courses)
+	student_td.find(".student_bundles").val(bundles)
 }
 
-function deleteStudent(obj,id)
+function deleteStudent(obj, id)
 {	
 	$.ajax({
 		type:'POST',
@@ -191,4 +162,8 @@ function deleteStudent(obj,id)
 			$(obj).closest("tr").fadeOut("fast");
 		}
 	})
+}
+
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
 }

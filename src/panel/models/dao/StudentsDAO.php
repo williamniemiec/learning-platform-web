@@ -5,9 +5,12 @@ namespace models\dao;
 
 
 use database\Database;
+use models\Admin;
+use models\Bundle;
 use models\Student;
 use models\Course;
 use models\util\IllegalAccessException;
+use models\enum\GenreEnum;
 
 
 /**
@@ -22,7 +25,7 @@ class StudentsDAO
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_admin;
+    private $admin;
     private $db;
     
     
@@ -33,12 +36,12 @@ class StudentsDAO
      * Creates 'students' table manager.
      *
      * @param       Database $db Database
-     * @param       int $id_admin [Optional] Admin id logged in
+     * @param       int $admin [Optional] Admin logged in
      */
-    public function __construct(Database $db, int $id_admin = -1)
+    public function __construct(Database $db, Admin $admin = null)
     {
         $this->db = $db->getConnection();
-        $this->id_admin = $id_admin;
+        $this->admin = $admin;
     }
 
 
@@ -93,13 +96,13 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id is empty, less than
      * or equal to zero
      */
-    public function get(int $id_student) : array
+    public function get(int $id_student) : ?Student
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
         
-        $response = NULL;
+        $response = null;
         
         // Query construction
         $sql = $this->db->prepare("
@@ -109,15 +112,16 @@ class StudentsDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student));
+        $sql->execute(array($id_student));
         
         // Parses results
-        if ($sql && $sql->rowCount() > 0) {
+        if (!empty($sql) && $sql->rowCount() > 0) {
             $student = $sql->fetch();
             
             $response = new Student(
+                (int)$student['id_student'],
                 $student['name'], 
-                $student['genre'], 
+                new GenreEnum($student['genre']), 
                 new \DateTime($student['birthdate']), 
                 $student['email'],
                 $student['photo'] 
@@ -169,9 +173,9 @@ class StudentsDAO
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $student) {
                 $response[] = new Student(
-                    $student['id'],
+                    (int)$student['id_student'],
                     $student['name'], 
-                    $student['genre'], 
+                    new GenreEnum($student['genre']), 
                     new \DateTime($student['birthdate']), 
                     $student['email']
                 );
@@ -182,43 +186,44 @@ class StudentsDAO
     }
     
     /**
-     * Gets all courses that a student has.
-     * 
+     * Gets all bundles that a student has.
+     *
      * @param       int $id_student Student id
-     * 
-     * @return      Course[] Courses that this student has
-     * 
+     *
+     * @return      Bundle[] Bundles that the student has
+     *
      * @throws      \InvalidArgumentException If student id is empty, less than
      * or equal to zero
      */
-    public function getCourses(int $id_student) : array
+    public function getBundles(int $id_student) : array
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
-        
-        $response = array();
-        
-        // Query construction
-        $sql = $this->db->query("
-            SELECT  *
-            FROM    courses
-            WHERE   id_course IN (SELECT id_course
-                                  FROM bundle_courses
-                                  WHERE id_bundle IN (SELECT  id_bundle
-                                                      FROM    purchases
-                                                      WHERE   id_student = ?))
+            
+            $response = array();
+            
+            // Query construction
+            $sql = $this->db->query("
+            SELECT      bundles.id_bundle, bundles.name, 
+                        bundles.price, bundles.logo, bundles.description
+            FROM        bundles
+                        NATURAL LEFT JOIN bundle_courses 
+                        LEFT JOIN purchases USING (id_bundle)
+            WHERE       id_student = ".$id_student."
+            GROUP BY    bundles.id_bundle, bundles.name, 
+                        bundles.price, bundles.logo, bundles.description
         ");
         
-        // Executes query
-        $sql->execute(array($id_student));
-
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $course) {
-                $response[] = new Course(
-                    $course['id_course'], 
-                    $course['name']
+            foreach ($sql->fetchAll() as $bundle) {
+                $response[] = new Bundle(
+                    (int)$bundle['id_bundle'],
+                    $bundle['name'],
+                    (float)$bundle['price'],
+                    $bundle['logo'],
+                    $bundle['description']
                 );
             }
         }
@@ -233,17 +238,17 @@ class StudentsDAO
      * 
      * @return      bool If student has been successfully removed 
      * 
-     * @throws      \InvalidArgumentException If student id or admin id provided
-     * in the constructor is empty, less than or equal to zerois empty, less than
-     * or equal to zero
+     * @throws      \InvalidArgumentException If student id is empty, less than
+     * or equal to zerois empty, less than or equal to zero or if admin provided
+     * in the constructor is empty
      */
     public function delete(int $id_student) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0)
+            if ($this->admin->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -272,17 +277,17 @@ class StudentsDAO
      * 
      * @return      bool If student has been successfully edited
      * 
-     * @throws      \InvalidArgumentException If student id or admin id provided
-     * in the constructor is empty, less than or equal to zerois empty, less than
-     * or equal to zero or if email is empty
+     * @throws      \InvalidArgumentException If student id is empty, less than
+     * or equal to zero or if email, password or admin id provided
+     * in the constructor is empty
      */
     public function update(int $id_student, string $newEmail, string $newPassword = '') : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0)
+        if ($this->admin->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
         
@@ -317,17 +322,17 @@ class StudentsDAO
      *
      * @return      bool If password has been successfully updated
      *
-     * @throws      \InvalidArgumentException If student id or admin id provided
-     * in the constructor is empty, less than or equal to zerois empty, less than
-     * or equal to zero or if password is empty
+     * @throws      \InvalidArgumentException If student id is empty, less than
+     * or equal to zero or if password or admin id provided in the constructor
+     * is empty
      */
     public function updatePassword(int $id_student, string $newPassword) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0)
+        if ($this->admin->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -359,16 +364,16 @@ class StudentsDAO
      * 
      * @return      bool If bundle has been successfully added
      * 
-     * @throws      \InvalidArgumentException If student id, bundle id or admin
-     * id provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If student id, bundle id is empty,
+     * less than or equal to zero or admin provided in the constructor is empty
      */
     public function addBundle(int $id_student, int $id_bundle) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0)
+        if ($this->admin->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -401,16 +406,17 @@ class StudentsDAO
      *
      * @return      bool If bundle has been successfully added
      *
-     * @throws      \InvalidArgumentException If student id, bundle id or admin
-     * id provided in the constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If student id, bundle id is 
+     * empty, less than or equal to zero or admin provided in the 
+     * constructor is empty
      */
     public function removeBundle(int $id_student, int $id_bundle) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-        if ($this->getAuthorization()->getLevel() != 0)
+        if ($this->admin->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             

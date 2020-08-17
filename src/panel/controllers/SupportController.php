@@ -20,9 +20,9 @@ class SupportController extends Controller
     //        Constructor
     //-----------------------------------------------------------------------
     /**
-    * It will check if admin is logged; otherwise, redirects him to login
-    * page.
-    */
+     * Checks whether admin is logged in. If he is not, redirects him to login 
+     * page.
+     */
     public function __construct()
     {
         if (!Students::isLogged() && !Admins::isLogged()){

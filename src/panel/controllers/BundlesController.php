@@ -311,4 +311,23 @@ class BundlesController extends Controller
             $bundlesDAO->addCourse((int)$_POST['id_bundle'], (int)$id_course);
         }
     }
+    
+    /**
+     * Gets all registered bundles.
+     * 
+     * @return      string Json containing all registered bundles
+     * 
+     * @apiNote     Must be called using GET request method
+     */
+    public function getAll()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+            return;
+            
+        $dbConnection = new MySqlPDODatabase();
+        
+        $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        
+        echo json_encode($bundlesDAO->getAll());
+    }
 }
