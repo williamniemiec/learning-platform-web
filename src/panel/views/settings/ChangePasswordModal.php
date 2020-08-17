@@ -15,7 +15,7 @@
 				</div>
 				<div class="form-group">
 					<label for="new_password">New password</label>
-					<input id="new_password" type="password" class="form-control pass_input" />
+					<input id="new_password" type="password" class="form-control pass_input" required />
 					<div id="pass_strength_box">
             			<h5 class='pass_strength_header'>Password strengh</h5>
             			<div class='progress'>

@@ -195,18 +195,34 @@ class AdminsDAO
         if (!empty($newPassword))
             $this->changePassword($id_admin, $newPassword);
         
+        $admin = $this->get($id_admin);
+        $bindParams = array($newId_authorization);
+        
         // Query construction
-        $sql = $this->db->prepare("
-            UPDATE  admins
-            SET     id_authorization = ?,
-                    email = ?
-            WHERE id_admin = ?
-        ");
-
+        if ($admin->getEmail() == $newEmail) {
+            $query = "
+                UPDATE  admins
+                SET     id_authorization = ?
+                WHERE   id_admin = ?
+            ";
+        }
+        else {
+            $query = "
+                UPDATE  admins
+                SET     id_authorization = ?,
+                        email = ?
+                WHERE id_admin = ?
+            ";
+            $bindParams[] = $newEmail;
+        }
+        
+        $bindParams[] = $id_admin;
+        $sql = $this->db->prepare($query);
+        
         // Executes query
-        $sql->execute(array($newId_authorization, $newEmail, $id_admin));
-
-        return $sql && $sql->rowCount() > 0;
+        $sql->execute($bindParams);
+        
+        return !empty($sql) && $sql->rowCount() > 0;
     }
 
     /**

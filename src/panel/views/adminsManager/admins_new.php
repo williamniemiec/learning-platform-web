@@ -20,13 +20,13 @@
         	
         		<!-- Name -->
         		<div class="form-group">
-            		<label for="register_name">Name</label>
-            		<input id="register_name" type="text" name="name" placeholder="Name" class="form-control" />
+            		<label for="register_name">Name*</label>
+            		<input id="register_name" type="text" name="name" placeholder="Name" class="form-control" required />
             	</div>
             	
             	<!-- Genre -->
             	<div class="form-group">
-            		<label>Genre</label><br />
+            		<label>Genre*</label><br />
             		
             		<input id="register_male" type="radio" name="genre" value="0" checked value="Male" />
             		<label for="register_male">Male</label>
@@ -37,20 +37,20 @@
             	
             	<!-- Birthdate -->
             	<div class="form-group">
-            		<label for="register_birthdate">Birthdate</label>
-            		<input id="register_birthdate" type="date" name="birthdate" class="form-control" />
+            		<label for="register_birthdate">Birthdate*</label>
+            		<input id="register_birthdate" type="date" name="birthdate" class="form-control" required />
             	</div>
             	
             	<!-- Email -->
             	<div class="form-group">
-            		<label for="register_email">Email</label>
-            		<input id="register_email" type="email" name="email" placeholder="Email" class="form-control" />
+            		<label for="register_email">Email*</label>
+            		<input id="register_email" type="email" name="email" placeholder="Email" class="form-control" required />
             	</div>
             	
             	<!-- Password -->
             	<div class="form-group">
-            		<label for="register_pass">Password</label>
-            		<input id="register_pass" type="password" name="password" placeholder="Password" class="form-control pass_input" />
+            		<label for="register_pass">Password*</label>
+            		<input id="register_pass" type="password" name="password" placeholder="Password" class="form-control pass_input" required />
             		<div id="pass_strength_box">
             			<h5 class='pass_strength_header'>Password strengh</h5>
             			<div class='progress'>

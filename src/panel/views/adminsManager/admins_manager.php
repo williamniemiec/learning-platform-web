@@ -7,18 +7,17 @@
         		<thead>
         			<tr>
         				<th>Name</th>
-        				<th>Privileges</th>
+        				<th>Authorization</th>
         				<th>Actions</th>
         			</tr>
         		</thead>
         		<tbody>
         			<?php foreach ($admins as $admin): ?>
             			<tr>
-            				<td class="admin_name">Admin name 1</td>
-            				<td class="admin_privileges">root, supporter, manager</td>
+            				<td class="admin_name"><?php echo $admin->getName(); ?></td>
+            				<td class="admin_privileges"><?php echo ucfirst(strtolower($admin->getAuthorization()->getName())); ?></td>
             				<td class="actions">
-            					<button class="btn_theme">Edit</button>
-            					<button class="btn_theme btn_theme_danger">Delete</button>
+            					<a href="<?php echo BASE_URL."admins/edit/".$admin->getId(); ?>" class="btn_theme">Edit</a>
             				</td>
             			</tr>
         			<?php endforeach; ?>

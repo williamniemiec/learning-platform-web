@@ -117,20 +117,53 @@ class AdminsController extends Controller
         $this->loadTemplate("adminsManager/admins_new", $viewArgs);
     }
     
-    
-    
     public function edit($id_admin)
     {
+        $dbConnection = new MySqlPDODatabase();
         
-    }
-    
-    
-    public function delete($id_admin)
-    {
+        $admin = Admin::getLoggedIn($dbConnection);
+        $authorizationsDAO = new AuthorizationDAO($dbConnection);
+        $adminsDAO = new AdminsDAO($dbConnection, $admin);
         
+        $header = array(
+            'title' => 'New admin - Learning platform',
+            'styles' => array(),
+            'description' => "New admin",
+            'robots' => 'noindex'
+        );
+        
+        $viewArgs = array(
+            'username' => $admin->getName(),
+            'header' => $header,
+            'scripts' => array(),
+            'error' => false,
+            'msg' => '',
+            'admin' => $adminsDAO->get((int)$id_admin),
+            'authorizations' => $authorizationsDAO->getAll()
+        );
+        
+        if (!empty($_POST['email']) && !empty($_POST['authorization'])) {            
+            $password = empty($_POST['password']) ? "" : $_POST['password'];
+            
+            $response = $adminsDAO->updateAdmin(
+                (int)$id_admin,
+                (int)$_POST['authorization'],
+                $_POST['email'], 
+                $password
+            );
+            
+            if ($response) {
+                header("Location: ".BASE_URL."admins");
+                exit;
+            }
+            
+            $viewArgs['error'] = true;
+            $viewArgs['msg'] = "Error while updating";
+        }
+        
+        $this->loadTemplate("adminsManager/admins_edit", $viewArgs);
     }
-    
-    
+
     /**
      * Checks if all required fields are filled. The required fields are:
      * <ul>
@@ -169,9 +202,4 @@ class AdminsController extends Controller
             !empty($_POST['password'])
             );
     }
-    
-    
-    //-------------------------------------------------------------------------
-    //        Ajax
-    //-------------------------------------------------------------------------
 }
