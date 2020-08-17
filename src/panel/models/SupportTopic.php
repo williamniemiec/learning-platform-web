@@ -155,7 +155,7 @@ class SupportTopic implements \JsonSerializable
         }
             
         if (empty($this->replies)) {
-            $topic = new SupportTopicDAO($db, Student::getLoggedIn($db)->getId());
+            $topic = new SupportTopicDAO($db, Admin::getLoggedIn($db));
             $this->replies = $topic->getReplies($this->id_topic);
         }
         

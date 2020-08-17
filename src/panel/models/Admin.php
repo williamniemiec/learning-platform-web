@@ -96,9 +96,9 @@ class Admin extends User
         if (empty($_SESSION['a_login']))
             return null;
             
-        $adminsDAO = new AdminsDAO($db, $_SESSION['a_login']);
+        $adminsDAO = new AdminsDAO($db);
         
-        return $adminsDAO->get();
+        return $adminsDAO->get((int)$_SESSION['a_login']);
     }
     
     /**

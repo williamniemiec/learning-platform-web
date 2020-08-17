@@ -91,6 +91,7 @@ class SupportController extends Controller
         // Checks whether a reply has been sent
         if (!empty($_POST['topic_message'])) {
             $supportTopicDAO->newReply($id_topic, $student->getId(), $_POST['topic_message']);
+            unset($_POST['topic_message']);
             header("Refresh: 0");
             exit;
         }

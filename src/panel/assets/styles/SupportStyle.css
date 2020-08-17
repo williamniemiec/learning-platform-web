@@ -20,6 +20,14 @@
 	
 }
 
+.search-filter-options {
+	margin-top:						10px;
+}
+
+.search-filter-options .form-group {
+	width:							100%;
+}
+
 
 /* Topic */
 .support_date {

@@ -1,4 +1,4 @@
-<div id="changePassword" class="modal fade">
+<div id="changePassword" class="modal fade scrollbar_light">
 	<div class="modal-dialog modal-dialog-centered modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -11,14 +11,8 @@
                 		<span aria-hidden="true">&times;</span>
                 	</button>
                 	<h4 class="alert-heading">Error</h4>
-                	Current password is incorrect
+                	<span id='error-msg'></span>
 				</div>
-				
-				<div class="form-group">
-					<label for="current_password">Current password</label>
-					<input id="current_password" type="password" class="form-control" />
-				</div>
-				
 				<div class="form-group">
 					<label for="new_password">New password</label>
 					<input id="new_password" type="password" class="form-control pass_input" />

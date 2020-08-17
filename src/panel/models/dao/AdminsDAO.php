@@ -24,7 +24,7 @@ class AdminsDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_admin;
+    private $admin;
     
     
     //-------------------------------------------------------------------------
@@ -34,14 +34,14 @@ class AdminsDAO
      * Creates 'admins' table manager.
      *
      * @param       Database $db Database
-     * @param       int $id_user [Optional] Admin id
+     * @param       Admin $admin [Optional] Admin logged in
      *
      * @apiNote     It will connect to the database when it is instantiated
      */
-    public function __construct(Database $db, int $id_admin = -1)
+    public function __construct(Database $db, Admin $admin = null)
     {
         $this->db = $db->getConnection();
-        $this->id_admin = $id_admin;
+        $this->admin = $admin;
     }
     
     
@@ -87,7 +87,11 @@ class AdminsDAO
             
             $response = new Admin(
                 (int)$admin['id_admin'], 
-                new Authorization($admin['name_authorization'], (int)$admin['level']),
+                new Authorization(
+                    (int)$admin['id_authorization'], 
+                    $admin['name_authorization'], 
+                    (int)$admin['level']
+                ),
                 $admin['name_admin'],
                 new GenreEnum((int)$admin['genre']),
                 new \DateTime($admin['birthdate']),
@@ -108,11 +112,16 @@ class AdminsDAO
      *
      * @throws      IllegalAccessException If current admin does not have 
      * authorization to add new admins
-     * @throws      \InvalidArgumentException If admin or password is empty
+     * @throws      \InvalidArgumentException If admin or password is empty or
+     * if admin provided in the constructor is empty
      */
     public function new(Admin $admin, string $password)
     {
-        if ($this->getAuthorization()->getLevel() != 0)
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
+                "provided in the constructor");
+            
+        if ($this->admin->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
         
@@ -133,9 +142,10 @@ class AdminsDAO
         
         // Executes query
         $sql->execute(array(
+            $admin->getAuthorization()->getId(),
             $admin->getName(),
-            $admin->getGenre(),
-            $admin->getBirthdate(),
+            $admin->getGenre()->get() == 1,
+            $admin->getBirthdate()->format("Y-m-d"),
             $admin->getEmail(),
             md5($password)
         ));
@@ -160,14 +170,14 @@ class AdminsDAO
      * authorization to update admins
      * @throws      \InvalidArgumentException If any argument is invalid
      */
-    public function edit(int $id_admin, int $newId_authorization, string $newEmail,
+    public function updateAdmin(int $id_admin, int $newId_authorization, string $newEmail,
         string $newPassword='') : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
         
-        if ($this->getAuthorization()->getLevel() != 0)
+        if ($this->admin->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -188,8 +198,8 @@ class AdminsDAO
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  admins
-            (id_authorization, email)
-            VALUES (?, ?)
+            SET     id_authorization = ?,
+                    email = ?
             WHERE id_admin = ?
         ");
 
@@ -200,65 +210,27 @@ class AdminsDAO
     }
 
     /**
-     * Removes an admin.
-     * 
-     * @param       int $id_admin Admin to be removed
-     * 
-     * @return      bool If admin has been successfully removed
-     * 
-     * @throws      IllegalAccessException If current admin does not have 
-     * authorization to remove admins
-     * @throws      \InvalidArgumentException If admin id or admin id provided
-     * in the constructor is empty, less than or equal to zero
-     */
-    public function remove(int $id_admin) : bool
-    {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
-                "provided in the constructor");
-            
-        if ($this->getAuthorization()->getLevel() != 0)
-            throw new IllegalAccessException("Current admin does not have ".
-                "authorization to perform this action");
-        
-        if (empty($id_admin)  || ($id_admin <= 0))
-            throw new \InvalidArgumentException("Admin id cannot be ".
-                "empty or less than or equal to zero");
-        
-        // Query construction
-        $sql = $this->db->prepare("
-            DELETE FROM admins
-            WHERE id_admin = ?
-        ");
-        
-        // Executes query
-        $sql->execute(array($id_admin));
-        
-        return $sql && $sql->rowCount() > 0;
-    }
-
-    /**
-     * Updates current admin information.
+     * Updates admin provided in the constructor.
      *
      * @param       string $name New name
      * @param       GenreEnum $genre New genre
      * @param       string $birthdate New birthdate
      *
-     * @return      bool If student information has been successfully updated
+     * @return      bool If admin has been successfully updated
      *
      * @throws      \InvalidArgumentException If any argument is empty or admin
-     * id provided in the constructor is empty, less than or equal to zero 
+     * provided in the constructor is empty
      */
     public function update(string $name, GenreEnum $genre, string $birthdate) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if (empty($this->admin) || $this->admin->getId() <= 0)
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
         if (empty($name))
             throw new \InvalidArgumentException("Name cannot be empty");
             
-        if (empty($genre) || empty($genre->get()))
+        if (empty($genre) || (empty($genre->get()) && $genre->get() != 0))
             throw new \InvalidArgumentException("Genre cannot be empty");
             
         if (empty($birthdate))
@@ -267,44 +239,19 @@ class AdminsDAO
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  admins
-            (id_authorization, name, genre, birthdate)
-            VALUES (?, ?, ?, ?)
+            SET     name = ?,
+                    genre = ?,
+                    birthdate = ?
             WHERE id_admin = ?
         ");
 
         // Executes query
         $sql->execute(array(
             $name, 
-            $genre->get(), 
+            $genre->get() == 1, 
             $birthdate,
-            $this->id_admin
+            $this->admin->getId()
         ));
-        
-        return $sql && $sql->rowCount() > 0;
-    }
-
-    /**
-     * Deletes current admin.
-     *
-     * @return      bool If admin has been successfully deleted
-     *
-     * @throws      \InvalidArgumentException If admin id provided in the 
-     * constructor is empty, less than or equal to zero
-     */
-    public function delete() : bool
-    {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
-                "provided in the constructor");
-            
-        // Query construction
-        $sql = $this->db->query("
-            DELETE FROM admins
-            WHERE id_admin = ?
-        ");
-            
-        // Executes query
-        $sql->execute(array($this->id_admin));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -312,27 +259,33 @@ class AdminsDAO
     /**
      * Changes admin password.
      * 
-     * @param       int $id_admin Admin id to be updated
      * @param       string $newPassword New password
+     * @param       int $id_admin [Optional] Admin id to be updated. If it is
+     * not provided, it will change admin provided in the constructor
      * 
      * @return      bool If password has been successfully updated
      * 
-     * @throws      \InvalidArgumentException If admin id or admin id provided
-     * in the constructor is empty, less than or equal to zero or password is 
+     * @throws      IllegalAccessException If current admin does not have 
+     * authorization to update admins and he is not updating itself
+     * @throws      \InvalidArgumentException If password is empty or admin 
+     * provided in the constructor and admin id are empty 
      * empty
      */
-    public function changePassword(int $id_admin, string $newPassword) : bool
+    public function changePassword(string $newPassword, int $id_admin = -1) : bool
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if ($id_admin <= 0 && (empty($this->admin) || $this->admin->getId() <= 0))
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
-            
-        if (empty($id_admin) || $id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id cannot be less than ".
-                "or equal to zero");
+
+        if ($this->admin->getAuthorization()->getLevel() != 0 && $id_admin != $this->admin->getId())
+            throw new IllegalAccessException("Current admin does not have ".
+                "authorization to perform this action");
             
         if (empty($newPassword))
             throw new \InvalidArgumentException("Password cannot be empty");
+        
+        if ($id_admin <= 0)
+            $id_admin = $this->admin->getId();
             
         // Query construction
         $sql = $this->db->prepare("
@@ -346,37 +299,28 @@ class AdminsDAO
         
         return $sql && $sql->rowCount() > 0;
     }
-
-    /**
-     * Gets admin authorization.
-     * 
-     * @return      \models\Authorization Admin authorization
-     */
-    public function getAuthorization() : Authorization
-    {
-        $authorization = new Authorization();
-        
-        return $authorization->getAuthorization($this->id_admin);
-    }
     
     /**
-     * Gets information about an admin.
+     * Gets information about an admin or about logged in admin.
      * 
-     * @param       int $id_admin Admin id
+     * @param       int $id_admin [Optional] Admin id
      * 
      * @return      Admin Admin with the given id or null if there is no admin
      * with the given id
      * 
-     * @throws      \InvalidArgumentException If admin id provided in the 
-     * constructor is empty, less than or equal to zero
+     * @throws      \InvalidArgumentException If admin id is empty, less than
+     * or equal to zero and admin provided in the constructor is empty
      */
-    public function get() : ?Admin
+    public function get(int $id_admin = -1) : ?Admin
     {
-        if (empty($this->id_admin) || $this->id_admin <= 0)
-            throw new \InvalidArgumentException("Admin id logged in must be ".
+        if ($id_admin <= 0 && (empty($this->admin) || $this->admin->getId() <= 0))
+            throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
-        
+            
         $response = null;
+        
+        if ($id_admin <= 0)
+            $id_admin = $this->admin->getId();
         
         // Query construction
         $sql = $this->db->query("
@@ -384,7 +328,7 @@ class AdminsDAO
                     admins.name AS name_admin, 
                     authorization.name AS name_authorization
             FROM    admins JOIN authorization USING (id_authorization)
-            WHERE   id_admin = ".$this->id_admin 
+            WHERE   id_admin = ".$id_admin 
         );
         
         // Parses result
@@ -392,13 +336,56 @@ class AdminsDAO
             $admin = $sql->fetch();
             
             $response = new Admin(
-                $admin['id_admin'], 
-                new Authorization($admin['name_authorization'], (int)$admin['level']), 
+                (int)$admin['id_admin'], 
+                new Authorization(
+                    (int)$admin['id_authorization'], 
+                    $admin['name_authorization'], 
+                    (int)$admin['level']
+                ), 
                 $admin['name_admin'], 
                 new GenreEnum((int)$admin['genre']),
                 new \DateTime($admin['birthdate']),
                 $admin['email']
             );
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Gets all registered admins (not include admin provided in the 
+     * constructor).
+     *
+     * @return      Admin[] Admins
+     */
+    public function getAll() : array
+    {
+        $response = array();
+            
+        // Query construction
+        $sql = $this->db->query("
+            SELECT  *,
+                    admins.name AS name_admin,
+                    authorization.name AS name_authorization
+            FROM    admins JOIN authorization USING (id_authorization)
+        ");
+            
+        // Parses result
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $admin) {
+                $response[] = new Admin(
+                    (int)$admin['id_admin'],
+                    new Authorization(
+                        (int)$admin['id_authorization'],
+                        $admin['name_authorization'],
+                        (int)$admin['level']
+                    ),
+                    $admin['name_admin'],
+                    new GenreEnum((int)$admin['genre']),
+                    new \DateTime($admin['birthdate']),
+                    $admin['email']
+                );
+            }
         }
         
         return $response;

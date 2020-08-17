@@ -43,13 +43,17 @@ function update_password(obj)
 			else {
 				$("#changePassword_error").show("fast")
 			}
-		}
+		},
+		error: (e) => { changePassword_error(e.responseText) }
 	})
 }
 
-function changePassword_error()
+function changePassword_error(msg = '')
 {
 	$("#changePassword_error").fadeToggle("fast")
+	
+	if (msg != '')
+		$("#error-msg").html(msg)
 }
 
 function changePhoto_error()

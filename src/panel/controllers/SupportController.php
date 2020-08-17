@@ -1,18 +1,18 @@
 <?php
 namespace controllers;
 
-use core\Controller;
-use models\Students;
-use models\Admins;
-use models\Courses;
 
+use core\Controller;
+use models\Admin;
+use database\pdo\MySqlPDODatabase;
+use models\dao\SupportTopicDAO;
 
 /**
  * Responsible for the behavior of the view {@link support/support.php}.
  *
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class SupportController extends Controller
 {
@@ -25,7 +25,7 @@ class SupportController extends Controller
      */
     public function __construct()
     {
-        if (!Students::isLogged() && !Admins::isLogged()){
+        if (!Admin::isLogged()) {
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -40,44 +40,146 @@ class SupportController extends Controller
      */
     public function index ()
     {
-        $admins = new Admins($_SESSION['a_login']);
-        $courses = new Courses();
+        $dbConnection = new MySqlPDODatabase();
+        $admin = Admin::getLoggedIn($dbConnection);
+        $supportDAO = new SupportTopicDAO($dbConnection, $admin);
         
         $header = array(
             'title' => 'Support - Learning platform',
-            'styles' => array('support'),
+            'styles' => array('SupportStyle', 'searchBar'),
             'robots' => 'index'
         );
         
         $viewArgs = array(
-            'username' => $admins->getName(),
-            'courses' => $courses->getCourses(),
-            'header' => $header
+            'username' => $admin->getName(),
+            'header' => $header,
+            'topics' => $supportDAO->getAllOpened(),
+            'categories' => $supportDAO->getCategories(),
+            'scripts' => array('SupportScript')
         );
         
-        $this->loadTemplate("support/support", $viewArgs);
+        $this->loadTemplate("support/SupportView", $viewArgs);
     }
     
     /**
-     * Opens a topic from support.
+     * Opens a support topic to read.
      */
-    public function open()
+    public function open($id_topic)
     {
-        $admins = new Admins($_SESSION['a_login']);
-        $courses = new Courses();
+        $dbConnection = new MySqlPDODatabase();
+        
+        $admin = Admin::getLoggedIn($dbConnection);
+        $supportTopicDAO = new SupportTopicDAO($dbConnection, $admin);
+        $topic = $supportTopicDAO->get((int)$id_topic);
+        
+        // If topic does not exist or it exists but does not belongs to the 
+        // student logged in, redirects him to courses page
+        if (empty($topic)) {
+            header("Location: ".BASE_URL."support");
+            exit;
+        }
+        
+        // Checks whether a reply has been sent
+        if (!empty($_POST['topic_message'])) {
+            $supportTopicDAO->newReply($id_topic, $_POST['topic_message']);
+            
+            unset($_POST['topic_message']);
+            
+            header("Refresh: 0");
+            exit;
+        }
         
         $header = array(
             'title' => 'Support - Learning platform',
-            'styles' => array('support'),
-            'robots' => 'index'
+            'styles' => array('SupportStyle', 'message'),
+            'description' => "Support topic",
+            'robots' => 'noindex'
         );
         
         $viewArgs = array(
-            'username' => $admins->getName(),
-            'courses' => $courses->getCourses(),
-            'header' => $header
+            'header' => $header,
+            'username' => $admin->getName(),
+            'topic' => $topic->setDatabase($dbConnection),
         );
         
-        $this->loadTemplate("supports/support_content", $viewArgs);
+        $this->loadTemplate("support/SupportContentView", $viewArgs);
+    }
+    
+    /**
+     * Opens a support topic.
+     */
+    public function unlock($id_topic)
+    {
+        $dbConnection = new MySqlPDODatabase();
+        
+        $admin = Admin::getLoggedIn($dbConnection);
+        $supportTopicDAO = new SupportTopicDAO($dbConnection, $admin);
+        $topic = $supportTopicDAO->get($id_topic);
+        
+        // If topic does not exist or it exists but does not belongs to the
+        // student logged in, redirects him to courses page
+        if (empty($topic)) {
+            header("Location: ".BASE_URL."support");
+            exit;
+        }
+        
+        $supportTopicDAO->open($id_topic);
+        
+        header("Location: ".BASE_URL."support");
+        exit;
+    }
+    
+    /**
+     * Closes a support topic.
+     */
+    public function lock($id_topic)
+    {
+        $dbConnection = new MySqlPDODatabase();
+        
+        $admin = Admin::getLoggedIn($dbConnection);
+        $supportTopicDAO = new SupportTopicDAO($dbConnection, $admin);
+        $topic = $supportTopicDAO->get($id_topic);
+        
+        // If topic does not exist or it exists but does not belongs to the
+        // student logged in, redirects him to courses page
+        if (empty($topic)) {
+            header("Location: ".BASE_URL."support");
+            exit;
+        }
+        
+        $supportTopicDAO->close($id_topic);
+        
+        header("Location: ".BASE_URL."support");
+        exit;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //        Ajax
+    //-------------------------------------------------------------------------
+    /**
+     * Searches support topics that a student has.
+     *
+     * @param		string $_POST['name'] Topic title
+     * @param		string $_POST['filter']['id_category'] Topic category id
+     *
+     * @return      string Support topics
+     */
+    public function search()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != "POST")
+            return;
+            
+        $dbConnection = new MySqlPDODatabase();
+        
+        $supportTopicDAO = new SupportTopicDAO(
+            $dbConnection,
+            Admin::getLoggedIn($dbConnection)
+        );
+        
+        echo json_encode($supportTopicDAO->search(
+            $_POST['name'],
+            (int)$_POST['filter']['id_category']
+        ));
     }
 }

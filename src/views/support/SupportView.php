@@ -51,7 +51,7 @@
             		<tr>
             			<td><a href="<?php echo BASE_URL."support/open/".$topic->getId(); ?>"><?php echo $topic->getTitle(); ?></a></td>
             			<td><?php echo ucfirst(strtolower($topic->getCategory()->getName())); ?></td>
-            			<td><?php echo $topic->getCreationDate()->format("m-d-Y H:m:s"); ?></td>
+            			<td><?php echo $topic->getCreationDate()->format("m/d/Y H:m:s"); ?></td>
             			<td><?php echo $topic->isClosed() ? "Closed" : "Open" ?></td>
             		</tr>
             		<?php endforeach; ?>

@@ -6,15 +6,6 @@ use models\enum\GenreEnum;
 	<div class="view_panel">
     	<h1 class="view_header">Settings</h1>
     	<div class="view_content">
-    		<div class="user_photo">
-    			<img	class="img rounded-circle" 
-    					src="<?php echo empty($user->getPhoto()) ? 
-    					    BASE_URL."assets/img/default/user.png" : 
-    					    BASE_URL."assets/img/profile_photos/".$user->getPhoto(); ?>"
-			    />
-    			<button id="btn_photo_update" class="btn_theme" data-toggle="modal" data-target="#changeProfilePhoto">&#8634;</button>
-			</div>
-    		
     		<div class="form-group">
         		<label for="name">Name</label>
         		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $user->getName(); ?>" readonly />
@@ -47,8 +38,7 @@ use models\enum\GenreEnum;
         	</div>
     	</div>
 	</div>
+	
+	<!-- Modals -->
+	<?php $this->loadView('settings/ChangePasswordModal'); ?>
 </div>
-
-<!-- Modals -->
-<?php $this->loadView('settings/UpdateProfilePhotoModal'); ?>
-<?php $this->loadView('settings/ChangePasswordModal'); ?>

@@ -137,7 +137,7 @@ class Course implements \JsonSerializable
      */
     public function getTotalClasses(?Database $db = null) : int
     {
-        if (empty($this->total_classes) && $this->total_classes != 0) {
+        if (empty($this->total_classes)) {
             if (empty($db))
                 throw new \InvalidArgumentException("Database cannot be empty");
             

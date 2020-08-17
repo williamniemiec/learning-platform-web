@@ -2,7 +2,7 @@
 	<div class="view_panel">
 		<h1 class="view_header">Admins manager</h1>
 		<div class="view_content">
-			<button class="btn_theme">New admin</button>
+			<a href="<?php echo BASE_URL."admins/new"; ?>" class="btn_theme">New admin</a>
         	<table class="table table-hover">
         		<thead>
         			<tr>
@@ -12,26 +12,18 @@
         			</tr>
         		</thead>
         		<tbody>
-        			<tr data-id_admin="1">
-        				<td class="admin_name">Admin name 1</td>
-        				<td class="admin_privileges">root, supporter, manager</td>
-        				<td class="actions">
-        					<button class="btn_theme">Edit</button>
-        					<button class="btn_theme btn_theme_danger">Delete</button>
-        				</td>
-        			</tr>
-        			<tr data-id_admin="2">
-        				<td class="admin_name">Admin name 2</td>
-        				<td class="admin_privileges">supporter</td>
-        				<td class="actions">
-        					<button class="btn_theme">Edit</button>
-        					<button class="btn_theme btn_theme_danger">Delete</button>
-        				</td>
-        			</tr>
+        			<?php foreach ($admins as $admin): ?>
+            			<tr>
+            				<td class="admin_name">Admin name 1</td>
+            				<td class="admin_privileges">root, supporter, manager</td>
+            				<td class="actions">
+            					<button class="btn_theme">Edit</button>
+            					<button class="btn_theme btn_theme_danger">Delete</button>
+            				</td>
+            			</tr>
+        			<?php endforeach; ?>
         		</tbody>
         	</table>
-        	
-        	<!-- Modals -->
 		</div>
 	</div>
 </div>

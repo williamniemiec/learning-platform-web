@@ -11,7 +11,7 @@
                 		<span aria-hidden="true">&times;</span>
                 	</button>
                 	<h4 class="alert-heading">Error</h4>
-                	Current password is incorrect
+                	<span id='error-msg'></span>
 				</div>
 				
 				<div class="form-group">

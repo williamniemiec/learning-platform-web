@@ -238,8 +238,8 @@ class StudentsDAO
         // Executes query
         $sql->execute(array(
             $student->getName(),
-            $student->getGenre(),
-            $student->getBirthdate(),
+            $student->getGenre()->get() == 1,
+            $student->getBirthdate()->format("Y-m-d"),
             $student->getEmail(),
             md5($password)
         ));

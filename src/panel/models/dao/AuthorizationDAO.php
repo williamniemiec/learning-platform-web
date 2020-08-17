@@ -43,38 +43,59 @@ class AuthorizationDAO
     /**
      * Gets admin authorization.
      * 
-     * @param       int $id_admin Admin id
+     * @param       int $id_admin [Optional] Admin id
      * 
-     * @return      \models\Authorization Admin authorization 
+     * @return      \models\Authorization Admin authorization
      * 
-     * @throws      \InvalidArgumentException If admin id is empty, less than 
+     * @throws      \InvalidArgumentException If admin id is empty, less than
      * or equal to zero
      */
-    public function getAuthorization(int $id_admin) : Authorization
+    public function get(int $id_admin) : Authorization
     {
-        if (empty($id_admin)  || ($id_admin <= 0))
-            throw new \InvalidArgumentException("Admin id cannot be empty ".
-                "or less than or equal to zero");
+        if (empty($id_admin) || $id_admin <= 0)
+            throw new \InvalidArgumentException("Admin id cannot be empty, ".
+                "less than or equal to zero");
         
-        // Query construction
-        $sql = $this->db->prepare("
-            SELECT  *
-            FROM    authorization
-            WHERE   id_authorization = (select  id_authorization
-                                        from    admins
-                                        where   id_admin = ?)
-        ");
+        $sql = $this->db->query("
+            SELECT  id_authorization, authorization.name, level
+            FROM    authorization JOIN admins USING (id_authorization)
+            WHERE   id_admin = ".$id_admin
+        );
         
-        // Executes query
-        $sql->execute(array($id_admin));
+        $authorization = $sql->fetch();
         
-        $sql = $sql->fetch();
-        
-        return new AuthorizationDAO(
-            $sql['id_authorization'],
-            $sql['name'], 
-            $sql['level']
+        return new Authorization(
+            (int)$authorization['id_authorization'], 
+            $authorization['name'], 
+            (int)$authorization['level']
         );
     }
     
+    /**
+     * Gets all registered authorizations.
+     * 
+     * @return      Authorization[] Authorizations or empty array if there are
+     * no registered authorizations
+     */
+    public function getAll() : array
+    {
+        $response = array();
+        
+        $sql = $this->db->query("
+            SELECT  *
+            FROM    authorization
+        ");
+        
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            foreach ($sql->fetchAll() as $authorization) {
+                $response[] = new Authorization(
+                    $authorization['id_authorization'],
+                    $authorization['name'], 
+                    (int)$authorization['level']
+                );
+            }
+        }
+        
+        return $response;
+    }
 }

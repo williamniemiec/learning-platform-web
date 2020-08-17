@@ -1,16 +1,22 @@
 <?php
 namespace controllers;
 
+
 use core\Controller;
-use models\Admins;
+use models\Admin;
+use database\pdo\MySqlPDODatabase;
+use models\dao\AdminsDAO;
+use models\Authorization;
+use models\dao\AuthorizationDAO;
+use models\enum\GenreEnum;
 
 
 /**
  * Responsible for the behavior of the view {@link adminsManager/admins_manager.php}.
  * 
  * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0
- * @since		1.0
+ * @version		1.0.0
+ * @since		1.0.0
  */
 class AdminsController extends Controller
 {
@@ -19,7 +25,7 @@ class AdminsController extends Controller
     //-----------------------------------------------------------------------
     public function __construct()
     {
-        if (!Admins::isLogged()){
+        if (!Admin::isLogged()) {
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -34,7 +40,9 @@ class AdminsController extends Controller
      */
     public function index ()
     {
-        $admins = new Admins($_SESSION['a_login']);
+        $dbConnection = new MySqlPDODatabase();
+        $admin = Admin::getLoggedIn($dbConnection);
+        $adminsDAO = new AdminsDAO($dbConnection, $admin);
         
         $header = array(
             'title' => 'Admins manager - Learning platform',
@@ -42,11 +50,124 @@ class AdminsController extends Controller
         );
         
         $viewArgs = array(
-            'username' => $admins->getName(),
-            'header' => $header
+            'username' => $admin->getName(),
+            'header' => $header,
+            'admins' => $adminsDAO->getAll()
         );
         
         $this->loadTemplate("adminsManager/admins_manager", $viewArgs);
+    }
+    
+    public function new()
+    {
+        $dbConnection = new MySqlPDODatabase();
+        
+        $admin = Admin::getLoggedIn($dbConnection);
+        $authorizationsDAO = new AuthorizationDAO($dbConnection);
+        
+        $header = array(
+            'title' => 'New admin - Learning platform',
+            'styles' => array(),
+            'description' => "New admin",
+            'robots' => 'noindex'
+        );
+        
+        $viewArgs = array(
+            'username' => $admin->getName(),
+            'header' => $header,
+            'scripts' => array(),
+            'error' => false,
+            'msg' => '',
+            'authorizations' => $authorizationsDAO->getAll()
+        );
+        
+        // Checks if registration form has been sent
+        if ($this->wasRegistrationFormSent()) {
+            // Checks if all fields are filled
+            if ($this->isAllFieldsFilled()) {
+                $adminsDAO = new AdminsDAO(
+                    new MySqlPDODatabase(), 
+                    $admin
+                );
+                
+                $admin = new Admin(
+                    -1,
+                    $authorizationsDAO->get((int)$_POST['authorization']),
+                    $_POST['name'],
+                    new GenreEnum($_POST['genre']),
+                    new \DateTime($_POST['birthdate']),
+                    $_POST['email']
+                );
+                
+                if ($adminsDAO->new($admin, $_POST['password'])) {
+                    header("Location: ".BASE_URL."admins");
+                    exit;
+                }
+                
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = "Admin already registered!";
+            }
+            else {
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = "Fill in all fields!";
+            }
+            
+        }
+        
+        $this->loadTemplate("adminsManager/admins_new", $viewArgs);
+    }
+    
+    
+    
+    public function edit($id_admin)
+    {
+        
+    }
+    
+    
+    public function delete($id_admin)
+    {
+        
+    }
+    
+    
+    /**
+     * Checks if all required fields are filled. The required fields are:
+     * <ul>
+     *  <li>Name</li>
+     *  <li>Genre</li>
+     *  <li>Birthdate</li>
+     *  <li>Email</li>
+     *  <li>Password</li>
+     * </ul>
+     *
+     * @return      boolean If all required fields are filled
+     */
+    private function isAllFieldsFilled()
+    {
+        return (
+            isset($_POST['name']) &&
+            isset($_POST['genre']) &&
+            isset($_POST['birthdate']) &&
+            isset($_POST['email']) &&
+            isset($_POST['password'])
+            );
+    }
+    
+    /**
+     * Checks if registration form was sent.
+     *
+     * @return      boolean If registration form was sent
+     */
+    private function wasRegistrationFormSent()
+    {
+        return (
+            !empty($_POST['name']) ||
+            !empty($_POST['genre']) ||
+            !empty($_POST['birthdate']) ||
+            !empty($_POST['email']) ||
+            !empty($_POST['password'])
+            );
     }
     
     

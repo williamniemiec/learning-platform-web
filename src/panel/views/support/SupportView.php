@@ -1,26 +1,18 @@
 <div class="container">
 	<div class="view_panel">
-    	<h1 class="view_header">My support</h1>
+    	<h1 class="view_header">Support manager</h1>
 		<div class="view_content">
         	<!-- Search -->
         	<div class="search-bar">
-    			<input type="text" class="search-bar-big" placeholder="Search course" />
+    			<input type="text" class="search-bar-big" placeholder="Search bundle" />
     			<button class="search-bar-btn" onClick="search(this)">&#128270;</button>
     		</div>
     		
 			<div class="view_widget">
 			    <!-- Filters -->
 				<div class="search-filters">
-    				<h3>Filters</h3>
+    				<h3>Filter by category</h3>
     				<div class="search-filter-options">
-    					<div class="form-group">
-        					<input id="rdo-type" type="radio" name="rdo-type" value="0" checked />
-        					<label for="rdo-type">All</label>
-    					</div>
-    					<div class="form-group">
-        					<input id="rdo-type2" type="radio" name="rdo-type" value="1" />
-        					<label for="rdo-type2">Only answered</label>
-    					</div>
     					<div class="form-group">
         					<select id="sel-category" name="sel-category" class="form-control">
         						<option value="0">All</option>
@@ -36,7 +28,6 @@
 			</div>
         	
         	<!-- Topics -->
-        	<a class="btn_theme" href="<?php echo BASE_URL; ?>support/new">New</a>
             <table class="table table-hover table-bordered table-stripped">
             	<thead>
             		<tr class="support_header">
@@ -47,11 +38,11 @@
             		</tr>
             	</thead>
             	<tbody id="topics">
-            		<?php foreach ($supportTopics as $topic): ?>
+            		<?php foreach ($topics as $topic): ?>
             		<tr>
             			<td><a href="<?php echo BASE_URL."support/open/".$topic->getId(); ?>"><?php echo $topic->getTitle(); ?></a></td>
             			<td><?php echo ucfirst(strtolower($topic->getCategory()->getName())); ?></td>
-            			<td><?php echo $topic->getCreationDate()->format("m-d-Y H:m:s"); ?></td>
+            			<td><?php echo $topic->getCreationDate()->format("m/d/Y H:m:s"); ?></td>
             			<td><?php echo $topic->isClosed() ? "Closed" : "Open" ?></td>
             		</tr>
             		<?php endforeach; ?>
