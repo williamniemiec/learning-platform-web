@@ -51,12 +51,22 @@ class ClassesController extends Controller
         $classes = array();
         $videosDAO = new VideosDAO($dbConnection);
         $questionnairesDAO = new QuestionnairesDAO($dbConnection);
+        $limit = 10;
+        $limitVideos = $limit/2;
+        $limitQuestionnaires = $limit/2;
+        $index = 1;
+        $totalClasses = $videosDAO->getTotal($dbConnection)['total_classes'];
         
-        foreach ($videosDAO->getAll() as $class) {
+        // Checks whether an index has been sent
+        if (!empty($_GET['index'])) {
+            $index = (int)$_GET['index'];
+        }
+        
+        foreach ($videosDAO->getAll($limitVideos, $limitVideos * ($index - 1)) as $class) {
             $classes[$class->getTitle()] = $class;
         }
         
-        foreach ($questionnairesDAO->getAll() as $class) {
+        foreach ($questionnairesDAO->getAll($limitQuestionnaires, $limitQuestionnaires * ($index - 1)) as $class) {
             $classes[$class->getQuestion()] = $class;
         }
         
@@ -73,7 +83,9 @@ class ClassesController extends Controller
         $viewArgs = array(
             'username' => $admin->getName(),
             'classes' => $classes,
-            'header' => $header
+            'header' => $header,
+            'totalPages' => ceil($totalClasses / $limit),
+            'currentIndex' => $index
         );
         
         $this->loadTemplate("classesManager/classes_manager", $viewArgs);

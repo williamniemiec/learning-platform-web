@@ -18,7 +18,7 @@ use models\Admin;
  * @version		1.0.0
  * @since		1.0.0
  */
-class QuestionnairesDAO
+class QuestionnairesDAO extends ClassesDAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -103,18 +103,31 @@ class QuestionnairesDAO
     /**
      * Gets all registered questionnaire classes.
      *
+     * @param       int $limit [Optional] Maximum classes returned
+     * @param       int $offset [Optional] Ignores first results from the return
+     *
      * @return      Questionnaire[] Registered questionnaire classes or empty
      * array if there are no registered questionnaire classes
      */
-    public function getAll() : array
+    public function getAll(int $limit = -1, int $offset = -1) : array
     {
         $response = array();
         
-        $sql = $this->db->query("
+        $query = "
             SELECT      *
             FROM        questionnaires NATURAL JOIN modules
             ORDER BY    question
-        ");
+        ";
+        
+        // Limits the results (if a limit was given)
+        if ($limit > 0) {
+            if ($offset > 0)
+                $query .= " LIMIT ".$offset.",".$limit;
+            else
+                $query .= " LIMIT ".$limit;
+        }
+        
+        $sql = $this->db->query($query);
         
         if (!empty($sql) && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $class) {

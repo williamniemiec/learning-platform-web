@@ -44,17 +44,30 @@ class ModulesController extends Controller
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
         $modulesDAO = new ModulesDAO($dbConnection);
+        $limit = 10;
+        $index = 1;
+        
+        // Checks whether an index has been sent
+        if (!empty($_GET['index'])) {
+            $index = (int)$_GET['index'];
+        }
+        
+        $offset = $limit * ($index - 1);
+        
+        $modules = $modulesDAO->getAll($limit, $offset);
         
         $header = array(
             'title' => 'Modules manager - Learning platform',
-            'styles' => array('coursesManager'),
+            'styles' => array('manager'),
             'robots' => 'noindex'
         );
         
         $viewArgs = array(
             'username' => $admin->getName(),
-            'modules' => $modulesDAO->getAll(),
-            'header' => $header
+            'modules' => $modules,
+            'header' => $header,
+            'totalPages' => ceil($modulesDAO->count() / $limit),
+            'currentIndex' => $index
         );
         
         $this->loadTemplate("modulesManager/modules_manager", $viewArgs);

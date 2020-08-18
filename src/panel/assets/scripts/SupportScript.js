@@ -19,6 +19,9 @@ function search(obj)
 			const topicsTable = $("#topics")
 			let newTopicsTable = ''
 			
+			// Hides pagination
+			$(".pagination").fadeOut('fast')
+			
 			topics = JSON.parse(topics)
 			
 			for (let i in topics) {

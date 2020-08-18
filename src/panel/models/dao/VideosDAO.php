@@ -18,7 +18,7 @@ use models\Module;
  * @version		1.0.0
  * @since		1.0.0
  */
-class VideosDAO
+class VideosDAO extends ClassesDAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -100,18 +100,31 @@ class VideosDAO
     /**
      * Gets all registered video classes.
      * 
+     * @param       int $limit [Optional] Maximum classes returned
+     * @param       int $offset [Optional] Ignores first results from the return
+     * 
      * @return      Video[] Registered video classes or empty array if there are
      * no registered video classes
      */
-    public function getAll() : array
+    public function getAll(int $limit = -1, int $offset = -1) : array
     {
         $response = array();
         
-        $sql = $this->db->query("
+        $query = "
             SELECT      *
             FROM        videos NATURAL JOIN modules
             ORDER BY    title
-        ");
+        ";
+        
+        // Limits the results (if a limit was given)
+        if ($limit > 0) {
+            if ($offset > 0)
+                $query .= " LIMIT ".$offset.",".$limit;
+            else
+                $query .= " LIMIT ".$limit;
+        }
+        
+        $sql = $this->db->query($query);
         
         if (!empty($sql) && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $class) {

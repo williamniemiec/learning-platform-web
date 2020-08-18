@@ -52,10 +52,19 @@ class BundlesController extends Controller
         $bundlesDAO = new BundlesDAO($dbConnection);
         $selectedOrderBy = 'courses';
         $selectedOrderByDirection = 'asc';
+        $limit = 10;
+        $index = 1;
+        
+        // Checks whether an index has been sent
+        if (!empty($_GET['index'])) {
+            $index = (int)$_GET['index'];
+        }
+        
+        $offset = $limit * ($index - 1);
         
         if (isset($_GET['order-by']) && isset($_GET['order-by-direction'])) {
             $bundles = $bundlesDAO->getAll(
-                -1, '', 
+                $limit, $offset, '', 
                 new BundleOrderTypeEnum($_GET['order-by']), 
                 new OrderDirectionEnum($_GET['order-by-direction'])
             );
@@ -63,7 +72,7 @@ class BundlesController extends Controller
             $selectedOrderByDirection = $_GET['order-by-direction'];
         }
         else {
-            $bundles = $bundlesDAO->getAll();
+            $bundles = $bundlesDAO->getAll($limit, $offset);
         }
         
         $header = array(
@@ -77,7 +86,9 @@ class BundlesController extends Controller
             'bundles' => $bundles,
             'header' => $header,
             'selectedOrderBy' => $selectedOrderBy,
-            'selectedOrderByDirection' => $selectedOrderByDirection
+            'selectedOrderByDirection' => $selectedOrderByDirection,
+            'totalPages' => ceil($bundlesDAO->count() / $limit),
+            'currentIndex' => $index
         );
         
         $this->loadTemplate("bundlesManager/bundles_manager", $viewArgs);

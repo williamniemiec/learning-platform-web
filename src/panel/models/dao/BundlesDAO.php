@@ -96,6 +96,7 @@ class BundlesDAO
      * only those bundles that satisfy these filters.
      * 
      * @param       int $limit [Optional] Maximum bundles returned
+     * @param       int $offset [Optional] Ignores first results from the return           
      * @param       string $name [Optional] Bundle name
      * @param       BundleOrderTypeEnum $orderBy [Optional] Ordering criteria 
      * @param       OrderDirectionEnum $orderType [Optional] Order that the 
@@ -104,7 +105,7 @@ class BundlesDAO
      * @return      Bundle[] Bundles with the provided filters or empty array if
      * no bundles are found.
      */
-    public function getAll(int $limit = -1, string $name = '', 
+    public function getAll(int $limit = -1, int $offset = -1, string $name = '', 
         BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
@@ -136,8 +137,12 @@ class BundlesDAO
         }
 
         // Limits the results (if a limit was given)
-        if ($limit > 0) 
-            $query .= " LIMIT ".$limit;
+        if ($limit > 0) {
+            if ($offset > 0)    
+                $query .= " LIMIT ".$offset.",".$limit;
+            else
+                $query .= " LIMIT ".$limit;
+        }
         
         // Prepares query
         $sql = $this->db->prepare($query);
@@ -481,5 +486,18 @@ class BundlesDAO
         );
         
         return !empty($sql) && $sql->rowCount() > 0;
+    }
+    
+    /**
+     * Gets total of bundles.
+     *
+     * @return      int Total of bundles
+     */
+    public function count() : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    bundles
+        ")->fetch()['total'];
     }
 }

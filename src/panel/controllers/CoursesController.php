@@ -48,8 +48,20 @@ class CoursesController extends Controller
     public function index ()
     {
         $dbConnection = new MySqlPDODatabase();
+        
         $admin = Admin::getLoggedIn($dbConnection);
         $coursesDAO = new CoursesDAO($dbConnection);
+        $limit = 10;
+        $index = 1;
+        
+        // Checks whether an index has been sent
+        if (!empty($_GET['index'])) {
+            $index = (int)$_GET['index'];
+        }
+        
+        $offset = $limit * ($index - 1);
+        
+        $courses = $coursesDAO->getAll('', $limit, $offset);
         
         $header = array(
             'title' => 'Courses - Learning platform',
@@ -59,9 +71,11 @@ class CoursesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
-            'courses' => $coursesDAO->getAll(),
+            'courses' => $courses,
             'header' => $header,
-            'scripts' => array('CoursesHomeScript')
+            'scripts' => array('CoursesHomeScript'),
+            'totalPages' => ceil($coursesDAO->count() / $limit),
+            'currentIndex' => $index
         );
         
         $this->loadTemplate("coursesManager/courses_manager", $viewArgs);

@@ -47,6 +47,15 @@ class SupportController extends Controller
         $student = Student::getLoggedIn($dbConnection);
         $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
         $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+        $limit = 10;
+        $index = 1;
+        
+        // Checks whether an index has been sent
+        if (!empty($_GET['index'])) {
+            $index = (int)$_GET['index'];
+        }
+        
+        $offset = $limit * ($index - 1);
         
         $header = array(
             'title' => 'Support - Learning platform',
@@ -59,11 +68,13 @@ class SupportController extends Controller
             'header' => $header,
             'username' => $student->getName(),
             'scripts' => array('SupportScript'),
-            'supportTopics' => $supportTopicDAO->getAll(),
+            'supportTopics' => $supportTopicDAO->getAll($limit, $offset),
             'notifications' => array(
                 'notifications' => $notificationsDAO->getNotifications(10),
                 'total_unread' => $notificationsDAO->countUnreadNotification()),
-            'categories' => $supportTopicDAO->getCategories()
+            'categories' => $supportTopicDAO->getCategories(),
+            'totalPages' => ceil($supportTopicDAO->count() / $limit),
+            'currentIndex' => $index
         );
         
         $this->loadTemplate("support/SupportView", $viewArgs);

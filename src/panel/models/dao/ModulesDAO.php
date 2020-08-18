@@ -434,13 +434,16 @@ class ModulesDAO
     /**
      * Gets all registered modules.
      * 
+     * @param       int $limit [Optional] Maximum modules returned
+     * @param       int $offset [Optional] Ignores first results from the return    
+     * 
      * @return      Module[] Modules
      */
-    public function getAll()
+    public function getAll(int $limit = -1, int $offset = -1)
     {
         $response = array();
         
-        $sql = $this->db->query("
+        $query = "
             SELECT  *,
                     (SELECT COUNT(*) 
                      FROM videos 
@@ -449,7 +452,17 @@ class ModulesDAO
                      FROM questionnaires 
                      WHERE questionnaires.id_module = modules.id_module) AS total_questionnaires
             FROM    modules
-        ");
+        ";
+        
+        // Limits the results (if a limit was given)
+        if ($limit > 0) {
+            if ($offset > 0)
+                $query .= " LIMIT ".$offset.",".$limit;
+            else
+                $query .= " LIMIT ".$limit;
+        }
+        
+        $sql = $this->db->query($query);
         
         if (!empty($sql) && $sql->rowCount() > 0) {
             $i = 0;
@@ -499,6 +512,58 @@ class ModulesDAO
         }
         
         return $response;
+    }
+    
+    /**
+     * Gets highest class order in use from a module.
+     *
+     * @param       int $id_module Module id
+     *
+     * @return      int Highest module order or -1 of module does not belongs
+     * to the course
+     *
+     * @throws      \InvalidArgumentException if module id is empty, less than
+     * or equal to zero
+     */
+    public function getHighestOrderInModule(int $id_module) : int
+    {
+        if (empty($id_module) || $id_module <= 0)
+            throw new \InvalidArgumentException("Module id cannot be empty ".
+                "or less than or equal to zero");
+            
+        $response = -1;
+            
+        $sql = $this->db->query("
+            SELECT      MAX(class_order) AS max_class_order
+            FROM (
+                SELECT      class_order
+                FROM        videos
+                WHERE       id_module = ".$id_module."
+                UNION
+                SELECT      class_order
+                FROM        questionnaires
+                WHERE       id_module = ".$id_module."
+            ) AS tmp
+        ");
+            
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = (int)$sql->fetch()['max_class_order'];
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Gets total of modules.
+     *
+     * @return      int Total of modules
+     */
+    public function count() : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    modules
+        ")->fetch()['total'];
     }
     
     /**
@@ -611,81 +676,4 @@ class ModulesDAO
         
         return $sql->fetch()['existClass'] > 0;
     }
-    
-    /**
-     * Gets highest class order in use from a module.
-     *
-     * @param       int $id_module Module id
-     *
-     * @return      int Highest module order or -1 of module does not belongs
-     * to the course
-     *
-     * @throws      \InvalidArgumentException if module id is empty, less than 
-     * or equal to zero
-     */
-    public function getHighestOrderInModule(int $id_module) : int
-    {
-        if (empty($id_module) || $id_module <= 0)
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-                
-        $response = -1;
-        
-        $sql = $this->db->query("
-            SELECT      MAX(class_order) AS max_class_order
-            FROM (
-                SELECT      class_order
-                FROM        videos
-                WHERE       id_module = ".$id_module."
-                UNION
-                SELECT      class_order
-                FROM        questionnaires
-                WHERE       id_module = ".$id_module."
-            ) AS tmp
-        ");
-                
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = (int)$sql->fetch()['max_class_order'];
-        }
-        
-        return $response;
-    }
-    
-//     /**
-//      * Gets highest module order in use.
-//      * 
-//      * @param       int $id_course Course id
-//      * @param       int $id_module Module id
-//      * 
-//      * @return      int Highest module order or -1 of module does not belongs 
-//      * to the course
-//      * 
-//      * @throws      \InvalidArgumentException If course id or module id is 
-//      * empty, less than or equal to zero
-//      */
-//     public function getHighestOrderInCourse(int $id_course, int $id_module) : int
-//     {
-//         if (empty($id_course) || $id_course <= 0)
-//             throw new \InvalidArgumentException("Course id cannot be empty ".
-//                 "or less than or equal to zero");
-            
-//         if (empty($id_module) || $id_module <= 0)
-//             throw new \InvalidArgumentException("Module id cannot be empty ".
-//                 "or less than or equal to zero");
-            
-//         $response = -1;
-        
-//         $sql = $this->db->query("
-//             SELECT      module_order
-//             FROM        course_modules
-//             WHERE       id_course = ".$id_course." AND id_module = ".$id_module."
-//             ORDER BY    module_order DESC
-//         ");
-        
-//         if (!empty($sql) && $sql->rowCount() > 0) {
-//             $response = (int)$sql->fetch()['module_order'];
-//         }
-        
-//         return $response;
-//     }
 }

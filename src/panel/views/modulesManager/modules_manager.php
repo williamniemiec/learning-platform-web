@@ -10,7 +10,7 @@
                 	<thead>
                 		<tr>
                     		<th>Name</th>
-                    		<th>Total classes</th>
+                    		<th class="counter">Total classes</th>
                     		<th>Actions</th>
                 		</tr>
                 	</thead>
@@ -27,6 +27,20 @@
                 		<?php endforeach; ?>
                 	</tbody>
                 </table>
+                <!-- Pagination -->
+    			<ul class="pagination pagination-sm justify-content-center">
+    				<li class="page-item <?php echo ($currentIndex - 1 <= 0) ? "disabled" : ""; ?>">
+    					<a href="<?php echo BASE_URL."modules?index=".($currentIndex - 1); ?>" class="page-link">Before</a>
+    				</li>
+    				<?php for ($i=1; $i<=$totalPages; $i++): ?>
+        				<li class="page-item <?php echo $i == $currentIndex ? "active" : "" ?>" data-index="<?php echo $i; ?>">
+        					<a href="<?php echo BASE_URL."modules?index=".$i; ?>" class="page-link"><?php echo $i; ?></a>
+    					</li>
+    				<?php endfor; ?>
+    				<li class="page-item <?php echo ($currentIndex + 1 > $totalPages) ? "disabled" : ""; ?>">
+    					<a href="<?php echo BASE_URL."modules?index=".($currentIndex + 1); ?>" class="page-link">After</a>
+    				</li>
+    			</ul>
             <?php endif; ?>
         </div>
     </div>

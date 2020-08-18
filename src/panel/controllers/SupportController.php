@@ -7,6 +7,7 @@ use models\Admin;
 use database\pdo\MySqlPDODatabase;
 use models\dao\SupportTopicDAO;
 
+
 /**
  * Responsible for the behavior of the view {@link support/support.php}.
  *
@@ -43,6 +44,16 @@ class SupportController extends Controller
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
         $supportDAO = new SupportTopicDAO($dbConnection, $admin);
+        $limit = 10;
+        $index = 1;
+        
+        // Checks whether an index has been sent
+        if (!empty($_GET['index'])) {
+            $index = (int)$_GET['index'];
+        }
+        
+        $offset = $limit * ($index - 1);
+        $topics = $supportDAO->getAllOpened($limit, $offset);
         
         $header = array(
             'title' => 'Support - Learning platform',
@@ -53,9 +64,11 @@ class SupportController extends Controller
         $viewArgs = array(
             'username' => $admin->getName(),
             'header' => $header,
-            'topics' => $supportDAO->getAllOpened(),
+            'topics' => $topics,
             'categories' => $supportDAO->getCategories(),
-            'scripts' => array('SupportScript')
+            'scripts' => array('SupportScript'),
+            'totalPages' => ceil($supportDAO->count() / $limit),
+            'currentIndex' => $index
         );
         
         $this->loadTemplate("support/SupportView", $viewArgs);

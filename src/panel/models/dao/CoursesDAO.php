@@ -143,6 +143,7 @@ class CoursesDAO
      * 
      * @param       string $name [Optional] Course name
      * @param       int $limit [Optional] Maximum courses returned
+     * @param       int $offset [Optional] Ignores first results from the return    
      * @param       CourseOrderByEnum [Optional] $orderBy Ordering criteria 
      * @param       OrderDirectionEnum [Optional] $orderType Order that the 
      * elements will be returned. Default is ascending.
@@ -156,7 +157,7 @@ class CoursesDAO
      *  <li><b>total_students</b>: Total of students who have the course</li>
      * </ul>
      */
-    public function getAll(string $name = '', int $limit = -1, 
+    public function getAll(string $name = '', int $limit = -1, int $offset = -1,
         CourseOrderByEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
@@ -185,8 +186,12 @@ class CoursesDAO
         }
         
         // Limits the results (if a limit was given)
-        if ($limit > 0)
-            $query .= " LIMIT ".$limit;
+        if ($limit > 0) {
+            if ($offset > 0)
+                $query .= " LIMIT ".$offset.",".$limit;
+            else
+                $query .= " LIMIT ".$limit;
+        }
         
         // Executes query
 
@@ -615,5 +620,18 @@ class CoursesDAO
         }
         
         return $response;
+    }
+    
+    /**
+     * Gets total of courses.
+     *
+     * @return      int Total of courses
+     */
+    public function count() : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    courses
+        ")->fetch()['total'];
     }
 }

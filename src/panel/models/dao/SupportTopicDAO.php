@@ -122,11 +122,21 @@ class SupportTopicDAO
     {
         $response = array();
         
-        $sql = $this->db->query("
+        $query = "
             SELECT  *
             FROM    support_topic NATURAL JOIN support_topic_category
             WHERE   closed = 0
-        ");
+        ";
+        
+        // Limits the results (if a limit was given)
+        if ($limit > 0) {
+            if ($offset > 0)
+                $query .= " LIMIT ".$offset.",".$limit;
+            else
+                $query .= " LIMIT ".$limit;
+        }
+        
+        $sql = $this->db->query($query);
         
         if (!empty($sql) && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $topic) {
@@ -400,6 +410,20 @@ class SupportTopicDAO
         }
             
         return $response;
+    }
+    
+    /**
+     * Gets total of support topics opened.
+     *
+     * @return      int Total of bundles
+     */
+    public function count() : int
+    {
+        return (int)$this->db->query("
+            SELECT  COUNT(*) AS total
+            FROM    support_topic
+            WHERE   closed = 0
+        ")->fetch()['total'];
     }
     
     /**

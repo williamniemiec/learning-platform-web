@@ -21,6 +21,8 @@ function search(obj)
 			const topicsTable = $("#topics")
 			let newTopicsTable = ''
 			
+			// Hides pagination
+			$(".pagination").fadeOut('fast')
 			
 			for (let i in topics) {
 				newTopicsTable += `
