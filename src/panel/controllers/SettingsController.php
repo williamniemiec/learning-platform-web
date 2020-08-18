@@ -56,6 +56,7 @@ class SettingsController extends Controller
             'header' => $header,
             'scripts' => array("SettingsScript"),
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'user' => $admin
         );
         
@@ -90,6 +91,7 @@ class SettingsController extends Controller
         $viewArgs = array(
             'header' => $header,
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'user' => $admin
         );
         

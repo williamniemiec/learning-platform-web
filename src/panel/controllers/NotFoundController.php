@@ -42,6 +42,7 @@ class NotFoundController extends Controller
             $this->loadTemplate('error/404', $viewArgs, false);
             
         $viewArgs['username'] = $admin->getName();
+        $viewArgs['authorization'] = $admin->getAuthorization();
         
         $this->loadTemplate('error/404', $viewArgs, true);
     }

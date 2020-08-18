@@ -21,8 +21,8 @@ class HomeController extends Controller
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Checks whether admin is logged in. If he is not, redirects him to login 
-     * page.
+     * Checks whether admin is logged in and if he has authorization to access 
+     * the page. If he is not, redirects him to login page.
      */
     public function __construct()
     {

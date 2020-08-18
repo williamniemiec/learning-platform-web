@@ -23,9 +23,14 @@ class AdminsController extends Controller
     //-----------------------------------------------------------------------
     //        Constructor
     //-----------------------------------------------------------------------
+    /**
+     * Checks whether admin is logged in and if he has authorization to access
+     * the page. If he is not, redirects him to login page.
+     */
     public function __construct()
     {
-        if (!Admin::isLogged()) {
+        if (!Admin::isLogged() || 
+            !(Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() == 0)) {
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -51,6 +56,7 @@ class AdminsController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'header' => $header,
             'admins' => $adminsDAO->getAll()
         );

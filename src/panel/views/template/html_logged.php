@@ -6,7 +6,7 @@
 
     <body class="scrollbar_light">
     	<!-- Menu -->
-    	<?php $this->loadView("navbar/navbar_logged", array('username' => $username)); ?>
+    	<?php $this->loadView("navbar/navbar_logged", array('username' => $username, 'authorization' => $authorization)); ?>
     	
     	<!-- Content -->
 		<main>

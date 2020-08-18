@@ -27,12 +27,13 @@ class CoursesController extends Controller
     //        Constructor
     //-------------------------------------------------------------------------
     /**
-     * Checks whether admin is logged in. If he is not, redirects him to login 
-     * page.
+     * Checks whether admin is logged in and if he has authorization to access 
+     * the page. If he is not, redirects him to login page.
      */
     public function __construct()
     {
-        if (!Admin::isLogged()) {
+        if (!Admin::isLogged() ||
+            !(Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() <= 1)) {
             header("Location: ".BASE_URL."login");
             exit;
         }
@@ -71,6 +72,7 @@ class CoursesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'courses' => $courses,
             'header' => $header,
             'scripts' => array('CoursesHomeScript'),
