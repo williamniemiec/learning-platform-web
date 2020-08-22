@@ -282,7 +282,7 @@ class CommentsDAO
         // Executes query
         $sql->execute(array($id_comment));
         
-        return $sql && $sql->rowCount() > 0;
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**

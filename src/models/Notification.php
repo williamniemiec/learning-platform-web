@@ -22,9 +22,8 @@ class Notification
     private $id_notification;
     private $id_student;
     private $date;
-    private $id_reference;
+    private $reference;
     private $type;
-    private $ref_text;
     private $message;
     private $read;
     

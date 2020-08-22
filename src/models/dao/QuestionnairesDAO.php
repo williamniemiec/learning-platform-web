@@ -222,13 +222,15 @@ class QuestionnairesDAO extends ClassesDAO
      * @param       int $id_module Module id
      * @param       int $class_order Class order
      *
+     * @return      bool If class has been successfully added to student history
+     *
      * @throws      \InvalidArgumentException If any argument is invalid
      *
      * @Override
      */
-    public function markAsWatched(int $id_student, int $id_module, int $class_order) : void
+    public function markAsWatched(int $id_student, int $id_module, int $class_order) : bool
     {
-        $this->_markAsWatched($id_student, $id_module, $class_order, 
+        return $this->_markAsWatched($id_student, $id_module, $class_order, 
             new ClassTypeEnum(ClassTypeEnum::QUESTIONNAIRE));
     }
 }

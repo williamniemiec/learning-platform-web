@@ -424,16 +424,20 @@ class StudentsDAO
         
         // Query construction
         $sql = $this->db->prepare("
-            SELECT      SUM(length) AS total_length_watched,
-                        COUNT(id_module) AS total_classes_watched
-            FROM        vw_student_historic_watched_length
-            WHERE       id_student = ?
-            GROUP BY    id_module
-            HAVING      id_module IN (SELECT    id_module
-            			        	  FROM      course_modules 
-                                                NATURAL JOIN bundle_courses 
-                                                NATURAL JOIN purchases
-            					      WHERE     id_student = ?)
+            SELECT      SUM(total_length_watched) AS total_length_watched,
+                        COUNT(total_classes_watched) AS total_classes_watched
+            FROM (
+                SELECT      SUM(length) AS total_length_watched,
+                            COUNT(id_module) AS total_classes_watched
+                FROM        vw_student_historic_watched_length
+                WHERE       id_student = ?
+                GROUP BY    id_module
+                HAVING      id_module IN (SELECT    id_module
+                			        	  FROM      course_modules 
+                                                    NATURAL JOIN bundle_courses 
+                                                    NATURAL JOIN purchases
+                					      WHERE     id_student = ?)
+            ) AS tmp
         ");
         
         // Executes query

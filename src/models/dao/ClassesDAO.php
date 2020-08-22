@@ -47,10 +47,12 @@ abstract class ClassesDAO
      * @param       int $class_order Class order
      * @param       ClassTypeEnum $class_type Class type
      * 
+     * @return      bool If class has been successfully added to student history
+     * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
     public function _markAsWatched(int $id_student, int $id_module, int $class_order, 
-        ClassTypeEnum $class_type) : void
+        ClassTypeEnum $class_type) : bool
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".
@@ -78,6 +80,8 @@ abstract class ClassesDAO
 
         // Executes query
         $sql->execute(array($id_student, $id_module, $class_order));
+        
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**
@@ -105,10 +109,12 @@ abstract class ClassesDAO
      * @param       int $id_module Module id
      * @param       int $class_order Class order
      * 
+     * @return      bool If class has been successfully removed from student history
+     * 
      * @throws      \InvalidArgumentException If student id, module id or 
      * class order is empty or less than or equal to zero
      */
-    public function removeWatched(int $id_student, int $id_module, int $class_order) : void
+    public function removeWatched(int $id_student, int $id_module, int $class_order) : bool
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".
@@ -130,6 +136,8 @@ abstract class ClassesDAO
         
         // Executes query
         $sql->execute(array($id_student, $id_module, $class_order));
+        
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**

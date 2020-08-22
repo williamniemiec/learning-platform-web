@@ -162,43 +162,6 @@ class NotificationsDAO
     }
     
     /**
-     * Creates a new notification.
-     * 
-     * @param       int $id_reference Reference id (comment id or support topic id)
-     * @param       NotificationTypeEnum $type Notification type
-     * @param       string $message Notification content
-     * 
-     * @return      bool If the notification has been successfully created
-     * 
-     * @throws \InvalidArgumentException If any argument is invalid 
-     */
-    public function new(int $id_reference, NotificationTypeEnum $type, 
-        string $message) : bool
-    {
-        if (empty($id_reference) || $id_reference <= 0)
-            throw new \InvalidArgumentException("Reference id cannot be empty ".
-                "or less than or equal to zero");
-        
-        if (empty($type) || ($type != 0 && $type != 1))
-            throw new \InvalidArgumentException("Invalid type");
-            
-        if (empty($message))
-            throw new \InvalidArgumentException("Message cannot be empty");
-        
-        // Query construction
-        $sql = $this->db->prepare("
-            INSERT INTO notifications
-            (id_student, date, id_reference, type, message)
-            VALUES (?, NOW(), ?, ?, ?)
-        ");
-        
-        // Executes query
-        $sql->execute(array($this->id_student, $id_reference, $type->get(), $message));
-        
-        return $sql && $sql->rowCount() > 0;
-    }
-    
-    /**
      * Mark a notification as read.
      * 
      * @param       int $id_notification Notification id
