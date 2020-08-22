@@ -590,7 +590,7 @@ class StudentsDAO
      * 
      * @throws      \InvalidArgumentException If email is empty
      */
-    public function existStudent(string $email) : bool
+    public function isEmailInUse(string $email) : bool
     {
         if (empty($email))
             throw new \InvalidArgumentException("Email cannot be empty");

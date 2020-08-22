@@ -209,6 +209,7 @@ class BundlesDAO
                 "or less than or equal to zero");
             
         $response = array();
+        $bindParams = array($id_bundle, $id_bundle);
         
         // Query construction
         $query = "
@@ -217,12 +218,13 @@ class BundlesDAO
             WHERE   id_bundle != ? AND
                     NOT EXISTS (
                 SELECT  *
-                FROM    bundle_courses JOIN purchases USING (id_bundle)
+                FROM    bundle_courses LEFT JOIN purchases USING (id_bundle)
                 WHERE   id_bundle = ? AND
          ";
         
         if ($id_student > 0) {
             $query .= " id_student != ? AND ";
+            $bindParams[] = $id_student;
         }
         
         $query .= "      id_course NOT IN (SELECT    id_course
@@ -234,7 +236,7 @@ class BundlesDAO
         $sql = $this->db->prepare($query);
         
         // Executes query
-        $sql->execute(array($id_bundle, $id_bundle, $id_student));
+        $sql->execute($bindParams);
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {

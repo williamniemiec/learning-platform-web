@@ -102,23 +102,29 @@ class LoginController extends Controller
         if ($this->wasRegistrationFormSent()) {
             // Checks if all fields are filled
             if ($this->isAllFieldsFilled()) {
-                $students = new StudentsDAO(new MySqlPDODatabase());
+                $studentsDAO = new StudentsDAO(new MySqlPDODatabase());
                 
-                $student = new Student(
-                    $_POST['name'],
-                    $_POST['genre'],
-                    $_POST['birthdate'],
-                    $_POST['email'],
-                    $_POST['password']
-                );
-                
-                if ($students->register($student)) {
-                    header("Location: ".BASE_URL);
-                    exit;
+                if ($studentsDAO->isEmailInUse($_POST['email'])) {
+                    $viewArgs['error'] = true;
+                    $viewArgs['msg'] = "Email is already being used";
                 }
-                
-                $viewArgs['error'] = true;
-                $viewArgs['msg'] = "User already registered!";
+                else {
+                    $student = new Student(
+                        $_POST['name'],
+                        $_POST['genre'],
+                        $_POST['birthdate'],
+                        $_POST['email'],
+                        $_POST['password']
+                    );
+                    
+                    if ($studentsDAO->register($student)) {
+                        header("Location: ".BASE_URL);
+                        exit;
+                    }
+                    
+                    $viewArgs['error'] = true;
+                    $viewArgs['msg'] = "Error when registering";
+                }
             } 
             else {
                 $viewArgs['error'] = true;

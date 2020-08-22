@@ -286,7 +286,7 @@ class StudentsDAO
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
         
-            if (empty($id_student) || $id_student <= 0)
+        if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
         

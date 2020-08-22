@@ -91,53 +91,6 @@ class CoursesDAO
         return $sql->fetch();
     }
     
-//     /**
-//      * Searches for courses that belongs to a bundle with a specific name.
-//      * 
-//      * @param       string $bundleName Bundle name
-//      * 
-//      * @return      Course[] Courses with the specified name or empty array if
-//      * there are no courses that belongs to the specified bundle
-//      * 
-//      * @throws      \InvalidArgumentException If bundle name is empty 
-//      */
-//     public function getCoursesByBundle(string $bundleName) : array 
-//     {
-//         if (empty($bundleName))
-//             throw new \InvalidArgumentException("Bundle name cannot be empty");
-        
-//         $response = array();
-        
-//         // Query construction
-//         $sql = $this->db->prepare("
-//             SELECT      id_course, courses.name, logo, courses.description,
-//                         COUNT(id_student) AS tot_students
-//             FROM		courses 
-//                         NATURAL JOIN bundle_courses
-//             			NATURAL JOIN purchases
-//                         JOIN bundles USING (id_bundle)
-//             WHERE       bundles.name LIKE ?
-//             GROUP BY    id_course, name, logo, description
-//         ");
-        
-//         // Executes query
-//         $sql->execute(array($bundleName));
-        
-//         // Parses results
-//         if ($sql->rowCount() > 0) {
-//             foreach ($sql->fetchAll() as $course) {
-//                 $response[] = new Course(
-//                     (int)$course['id_course'],
-//                     $course['name'],
-//                     $course['logo'],
-//                     $course['description']
-//                 );
-//             }
-//         }
-        
-//         return $response;
-//     }
-    
     /**
      * Gets informations about all registered courses.
      * 
