@@ -48,7 +48,7 @@ class Comment
      * @param       Message[] $replies [Optional] Comment replies
      */
     public function __construct(int $id_comment, int $id_course, int $id_module, 
-        int $class_order, Student $student, DateTime $date, string $text, 
+        int $class_order, ?Student $student, DateTime $date, string $text, 
         ?array $replies = array())
     {
         $this->id_comment = $id_comment;
@@ -110,7 +110,7 @@ class Comment
      *
      * @return      Student Student who created the comment
      */
-    public function getCreator() : Student
+    public function getCreator() : ?Student
     {
         return $this->student;
     }

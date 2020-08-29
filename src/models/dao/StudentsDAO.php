@@ -104,13 +104,13 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor is empty, less than or equal to zero
      */
-    public function get() : Student
+    public function get() : ?Student
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
         
-        $response = NULL;
+        $response = null;
         
         // Query construction
         $sql = $this->db->prepare("

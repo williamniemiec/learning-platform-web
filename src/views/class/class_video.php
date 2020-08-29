@@ -74,14 +74,14 @@
 			<?php foreach ($comments as $comment): ?>
     			<div class="comment">
     				<img	class="img img-thumbnail" 
-    						src="<?php echo empty($comment['comment']->getCreator()->getPhoto()) ? 
+    						src="<?php echo empty($comment['comment']->getCreator()) || empty($comment['comment']->getCreator()->getPhoto()) ? 
     						     BASE_URL."assets/img/default/noImage" : 
     						     BASE_URL."assets/img/profile_photos/".$comment['comment']->getCreator()->getPhoto(); ?>" 
 					/>
     				<div class="comment_content">
     					<div class="comment_info">
     						<!-- Comment info -->
-        					<h5><?php echo $comment['comment']->getCreator()->getName(); ?></h5>
+        					<h5><?php echo empty($comment['comment']->getCreator()) ? "Deleted user" : $comment['comment']->getCreator()->getName(); ?></h5>
         					<p><?php echo $comment['comment']->getContent(); ?></p>
         					<button class="btn btn-small" onclick="open_reply(this)">&ldca; Reply</button>
         					<div class="comment_reply">
@@ -101,16 +101,16 @@
         						<?php foreach ($comment['replies'] as $reply): ?>
                 					<div class="comment comment_reply_content">
                 						<img 	class="img img-thumbnail" 
-                								src="<?php echo empty($reply->getCreator()->getPhoto()) ? 
+                								src="<?php echo empty($reply->getCreator()) || empty($reply->getCreator()->getPhoto()) ? 
                         						     BASE_URL."assets/img/default/noImage" : 
                         						     BASE_URL."assets/img/profile_photos/".$reply->getCreator()->getPhoto(); ?>"
         								/>
                 						<div class="comment_content">
                         					<div class="comment_info">
-                            					<h5><?php echo $reply->getCreator()->getName(); ?></h5>
+                            					<h5><?php echo empty($reply->getCreator()) ? "Deleted user" : $reply->getCreator()->getName(); ?></h5>
                             					<p><?php echo $reply->getContent(); ?></p>
                         					</div>
-                        					<?php if ($reply->getCreator()->getId() == $_SESSION['s_login']): ?>
+                        					<?php if (!empty($reply->getCreator()) && $reply->getCreator()->getId() == $_SESSION['s_login']): ?>
                             					<div class="comment_action">
                             						<button class="btn btn-danger" 
                             								onclick="delete_reply(this,<?php echo $reply->getId(); ?>)"
@@ -124,7 +124,7 @@
             					<?php endforeach; ?>
             				</div>
     					</div>
-    					<?php if ($comment['comment']->getCreator()->getId() == $_SESSION['s_login']): ?>
+    					<?php if (!empty($reply->getCreator()) && $comment['comment']->getCreator()->getId() == $_SESSION['s_login']): ?>
         					<div class="comment_action">
         						<button	class="btn btn-danger" 
     									onclick="deleteComment(this,<?php echo $comment['comment']->getId(); ?>)"

@@ -509,10 +509,7 @@ class CoursesDAO
                         COUNT(id_student) AS total_students
             FROM        courses
                         NATURAL LEFT JOIN bundle_courses
-                        LEFT JOIN purchases USING (id_bundle)
-            WHERE       id_course IN (SELECT    id_course
-                                      FROM      bundle_courses
-                                      WHERE     id_bundle = ?)
+            WHERE       id_bundle = ?
             GROUP BY    id_course, name, logo, description
         ");
             
