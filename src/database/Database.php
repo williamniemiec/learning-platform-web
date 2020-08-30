@@ -93,20 +93,11 @@ abstract class Database
      */
     private function connect() : void
     {
-        if (ENVIRONMENT == "development") {
-            $this->host = "127.0.0.1";
-            $this->charset = "utf8";
-            $this->username = "root";
-            $this->password = "";
-            $this->database = "learning_platform";
-        }
-        else {
-            $this->host = "";
-            $this->charset = "";
-            $this->username = "";
-            $this->password = "";
-            $this->database = "";
-        }
+        $this->host = DB['host'];
+        $this->charset = DB['charset'];
+        $this->username = DB['username'];
+        $this->password = DB['password'];
+        $this->database = DB['database'];
         
         $this->conn = $this->getInstance();
     }
