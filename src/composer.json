@@ -4,7 +4,7 @@
 			"controllers\\" : "controllers/",
 			"core\\" : "core/",
 			"models\\" : "models/",
-			"database\\": "database/"
+			"database\\" : "database/"
 		}
 	}
 }
