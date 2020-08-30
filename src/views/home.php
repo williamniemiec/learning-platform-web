@@ -86,7 +86,9 @@
         			<div class="gallery-control gallery-control-left">&larr;</div>
         			<div class="gallery-control gallery-control-right">&rarr;</div>
     			</div>
-    			<div class="gallery-items"></div>
+    			<div class="gallery-items">
+    				<div class="gallery-items-area"></div>
+    			</div>
     		</div>
 		</div>
     </div>

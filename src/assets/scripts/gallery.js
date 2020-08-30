@@ -1,4 +1,10 @@
 $(() => {
+	setInterval(update_galleries, 500)
+})
+
+
+function update_galleries()
+{
 	$.each($(".gallery"), (index, item) => {
 		const items = $(item).find(".gallery-item")
 		
@@ -31,4 +37,4 @@ $(() => {
 			})
 		}
 	})
-})
+}
