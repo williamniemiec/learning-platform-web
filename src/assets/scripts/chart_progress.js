@@ -10,6 +10,7 @@ class ChartProgress
 	{
 		this.week = this._last7Days().reverse()
 		this.dataWeek = new Map()
+		this.weekUS = this._last7Days("US")
 		
 		for (let i=0; i<7; i++) {
 			this.dataWeek.set(this.week[i], 0)
@@ -59,7 +60,7 @@ class ChartProgress
 	 *
 	 * @return		String Data in the following format: YYYY/MM/DD
 	 */
-	_formatDate(date)
+	_formatDate(date, format="INT")
 	{
 	    let dd = date.getDate();
 	    let mm = date.getMonth()+1;
@@ -68,8 +69,12 @@ class ChartProgress
 	    if(dd<10) {dd='0'+dd}
 	    if(mm<10) {mm='0'+mm}
 	    
-		//date = mm+'/'+dd+'/'+yyyy;
-		date = yyyy+'/'+mm+'/'+dd;
+		if (format == "INT") {
+			date = yyyy+'/'+mm+'/'+dd;			
+		}
+		else if (format == "US") {
+			date = mm+'/'+dd+'/'+yyyy;
+		}
 	    
 		return date
 	 }
@@ -80,14 +85,14 @@ class ChartProgress
 	 * @return		array Dates between today and 7 days ago in the following
 	 * format: YYYY/MM/DD
 	 */
-	_last7Days () 
+	_last7Days (format = "INT") 
 	{
 	    let result = []
 	
 		for (let i=0; i<7; i++) {  
 			let d = new Date()      
 	        d.setDate(d.getDate() - i)
-	        result.push(this._formatDate(d))
+	        result.push(this._formatDate(d, format))
 	    }
 	
 	    return result
@@ -103,7 +108,7 @@ class ChartProgress
 		return new Chart(chart, {
 		    type: 'line',
 		    data: {
-		        labels: [...this.week],
+		        labels: [...this.weekUS],
 		        datasets: [{
 		            label: 'Watched classes',
 		            data: [
