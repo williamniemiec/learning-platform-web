@@ -1,6 +1,6 @@
 <div class="class_content">
 	<!-- Video frame -->
-	<iframe id="class_video" frameborder="0" src="http://www.youtube.com/embed/<?php echo $class->getVideoID(); ?>"></iframe>
+	<iframe id="class_video" frameborder="0" src="https://www.youtube.com/embed/<?php echo $class->getVideoID(); ?>"></iframe>
 	
 	<!-- Video description -->
 	<div class="content content_desc"><?php echo $class->getDescription(); ?></div>
