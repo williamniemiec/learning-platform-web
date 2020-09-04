@@ -224,7 +224,9 @@ function newComment(id_course, id_module, class_order)
 			$('.comments').prepend(`
 				<div class="comment">
     				<img	class="img img-thumbnail" 
-    						src="${BASE_URL + "assets/img/profile_photos/" + creator.photo}" 
+    						src="${creator.photo == "" ? 
+								BASE_URL + "assets/img/default/noImage.png" : 
+								BASE_URL + "assets/img/profile_photos/" + creator.photo}" 
 					/>
     				<div class="comment_content">
     					<div class="comment_info">
@@ -325,7 +327,9 @@ function new_reply(obj, id_comment)
 			const html_comment = `
 				<div class="comment comment_reply_content">
 					<img 	class="img img-thumbnail" 
-							src="${creator.photo}" 
+							src="${creator.photo == "" ? 
+								BASE_URL + "assets/img/default/noImage.png" : 
+								BASE_URL + "assets/img/profile_photos/" + creator.photo}" 
 					/>
 					<div class="comment_content">
     					<div class="comment_info">
