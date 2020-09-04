@@ -13,7 +13,7 @@ if (ENVIRONMENT == 'development') {
 	));
 } 
 else {
-	define("BASE_URL", "https://wp-learningplatform.azurewebsites.net/panel/");
+	define("BASE_URL", "http://wp-lp.infinityfreeapp.com/panel/");
 	define("DB", array(
 	    'host' => "learning-platform.mysql.database.azure.com",
 	    'charset' => "utf8",

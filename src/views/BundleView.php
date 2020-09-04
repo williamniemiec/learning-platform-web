@@ -40,7 +40,7 @@
             		<div class="mosaic-item">
                 		<img	class="mosaic-item-thumbnail" 
                 				src="<?php echo empty($course->getLogo()) ?
-                				    BASE_URL."assets/img/default/noImage" :
+                				    BASE_URL."assets/img/default/noImage.png" :
                 				    BASE_URL."assets/img/logos/courses/".$course->getLogo(); ?>" 
         				/>
                 		<div class="mosaic-item-content">
@@ -87,7 +87,7 @@
                     			>
                     				<img	class="gallery-item-thumbnail" 
                     						src="<?php echo empty($bundle->getLogo()) ? 
-                    						    BASE_URL."assets/img/noImage.png" : 
+                    						    BASE_URL."assets/img/default/noImage.png" : 
                     						    BASE_URL."assets/img/logos/bundles/".$bundle->getLogo(); ?>" 
             						/>
                     				<div class="gallery-item-content">
@@ -124,7 +124,7 @@
                     			>
                     				<img	class="gallery-item-thumbnail" 
                     						src="<?php echo empty($bundle->getLogo()) ? 
-                    						    BASE_URL."assets/img/noImage.png" : 
+                    						    BASE_URL."assets/img/default/noImage.png" : 
                     						    BASE_URL."assets/img/logos/bundles/".$bundle->getLogo(); ?>" 
             						/>
                     				<div class="gallery-item-content">
