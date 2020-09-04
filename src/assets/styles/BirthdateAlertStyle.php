@@ -1,6 +1,6 @@
 <?php 
 header("Content-type: text/css; charset: UTF-8");
-require('../../resources/config.php');
+require('../../config.php');
 ?>
 
 .alert-birthdate {

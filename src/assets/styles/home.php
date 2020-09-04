@@ -6,7 +6,7 @@ require('../../config.php');
 /* PARALLAX */
 .parallax {
 	margin-top:100px;
-	background-image: url('<?php echo BASE_URL; ?>assets/img/header/434949.jpg');
+	background-image: url(<?php echo BASE_URL; ?>assets/img/header/434949.jpg);
 	height:200px;
 	background-attachment: fixed;
 	background-position: center;

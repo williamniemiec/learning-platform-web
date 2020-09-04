@@ -1,4 +1,4 @@
-import NotebookNavigator from './NotebookNavigator'
+import NotebookNavigator from './NotebookNavigator.js'
 
 
 /**

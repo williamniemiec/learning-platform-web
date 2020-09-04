@@ -1,4 +1,4 @@
-import NotebookNavigator from './NotebookNavigator'
+import NotebookNavigator from './NotebookNavigator.js'
 
 
 /**
@@ -26,7 +26,9 @@ function search(obj)
         			>
             			<!-- Course information -->
         				<img	class="img img-responsive" 
-        						src="${BASE_URL + "assets/img/logos/" + courses[index].course.logo}" 
+        						src="${courses[index].course.logo == "" ? 
+									BASE_URL + "assets/img/default/noImage" : 
+									BASE_URL + "assets/img/logos/courses/" + courses[index].course.logo}" 
         				/>
             			<h2>${courses[index].course.name}</h2>
             			<p>${courses[index].course.description}</p>                			
