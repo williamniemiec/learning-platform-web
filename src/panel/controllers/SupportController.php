@@ -116,6 +116,7 @@ class SupportController extends Controller
             'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
+            'authorization' => $admin->getAuthorization(),
             'topic' => $topic->setDatabase($dbConnection),
         );
         

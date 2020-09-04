@@ -80,6 +80,7 @@ class AdminsController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'header' => $header,
             'scripts' => array(),
             'error' => false,
@@ -140,6 +141,7 @@ class AdminsController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'header' => $header,
             'scripts' => array(),
             'error' => false,

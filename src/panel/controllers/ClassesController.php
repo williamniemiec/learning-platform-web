@@ -110,6 +110,7 @@ class ClassesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'header' => $header,
             'modules' => $modulesDAO->getAll(),
             'error' => false,
@@ -206,6 +207,7 @@ class ClassesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'header' => $header,
             'modules' => $modulesDAO->getAll(),
             'class' => $class,

@@ -114,6 +114,7 @@ class BundlesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'header' => $header,
             'error' => false,
             'msg' => '',
@@ -191,6 +192,7 @@ class BundlesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'bundle' => $bundle,
             'courses' => $bundle->getCourses($dbConnection),
             'header' => $header,

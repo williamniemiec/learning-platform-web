@@ -13,7 +13,7 @@ if (ENVIRONMENT == 'development') {
     ));
 }
 else {
-    define("BASE_URL", "/");
+    define("BASE_URL", "http://wp-learning-platform.azurewebsites.net/");
     define("DB", array(
         'host' => "learning-platform.mysql.database.azure.com",
         'charset' => "utf8",

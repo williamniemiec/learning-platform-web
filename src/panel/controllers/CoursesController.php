@@ -97,6 +97,7 @@ class CoursesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'courses' => $coursesDAO->getAll('', 100),
             'header' => $header,
             'error' => false,
@@ -168,6 +169,7 @@ class CoursesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'course' => $course,
             'modules' => $course->getModules($dbConnection),
             'header' => $header,

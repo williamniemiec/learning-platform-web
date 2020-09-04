@@ -50,7 +50,7 @@
                 		<?php foreach($courses as $course): ?>
                     		<tr>
                     			<?php if (empty($course->getLogo())): ?>
-                    				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage"; ?>" /></td>
+                    				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage.png"; ?>" /></td>
                     			<?php else: ?>
                     				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/courses/".$course->getLogo(); ?>" /></td>
                     			<?php endif; ?>

@@ -52,7 +52,7 @@
                 		<?php foreach($bundles as $bundle): ?>
                     		<tr>
                     			<?php if (empty($bundle->getLogo())): ?>
-                    				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage"; ?>" /></td>
+                    				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage.png"; ?>" /></td>
                     			<?php else: ?>
                     				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/bundles/".$bundle->getLogo(); ?>" /></td>
                     			<?php endif; ?>

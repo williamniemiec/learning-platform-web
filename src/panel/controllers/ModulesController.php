@@ -91,6 +91,7 @@ class ModulesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'header' => $header,
             'error' => false,
             'msg' => ''
@@ -131,6 +132,7 @@ class ModulesController extends Controller
         
         $viewArgs = array(
             'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
             'header' => $header,
             'module' => $module,
             'classes' => $module->getClasses($dbConnection),
