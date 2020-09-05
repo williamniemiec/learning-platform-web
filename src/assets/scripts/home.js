@@ -33,7 +33,7 @@ function search(obj)
         			>
         				<img	class="gallery-item-thumbnail" 
         						src="${bundles[i].bundle.logo.length == 0 ? 
-									BASE_URL + "assets/img/noImage.png" : 
+									BASE_URL + "assets/img/default/noImage.png" : 
 									BASE_URL + "assets/img/logos/bundles/" + bundles[i].bundle.logo}" 
 						/>
         				<div class="gallery-item-content">
