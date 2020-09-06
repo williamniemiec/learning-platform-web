@@ -396,8 +396,8 @@ class SupportTopicDAO
                     $user = $students->get((int)$reply['id_user']);
                 }
                 else {
-                    $admins = new AdminsDAO($this->db, (int)$reply['id_user']);
-                    $user = $admins->get();
+                    $admins = new AdminsDAO($this->db);
+                    $user = $admins->get((int)$reply['id_user']);
                 }
                 
                 $response[] = new Message(

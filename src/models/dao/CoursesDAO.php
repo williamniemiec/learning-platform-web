@@ -74,7 +74,7 @@ class CoursesDAO
         $query = "
             SELECT      id_course, name, logo, description, 
                         CASE 
-                        	WHEN total_length_watched IS NULL THEN 0
+                        	WHEN SUM(total_length_watched) IS NULL THEN 0
                         	ELSE SUM(total_length_watched)
                         END AS total_length_watched, 
                         CASE 
@@ -82,7 +82,7 @@ class CoursesDAO
                         	ELSE total_length
                         END AS total_length,
                         CASE
-                            WHEN total_classes_watched IS NULL THEN 0
+                            WHEN SUM(total_classes_watched) IS NULL THEN 0
                             ELSE SUM(total_classes_watched) 
                         END AS total_classes_watched
             FROM        courses 
@@ -164,11 +164,11 @@ class CoursesDAO
         $sql = $this->db->prepare("
             SELECT  SUM(total) AS total_classes, 
                     SUM(length) as total_length
-            FROM    (SELECT      COUNT(*) AS total, 5 AS length
+            FROM    (SELECT      COUNT(*) AS total, SUM(5) AS length
                      FROM        questionnaires NATURAL JOIN course_modules
                      WHERE       id_course = ?
                      UNION ALL
-                     SELECT      COUNT(*) AS total, length
+                     SELECT      COUNT(*) AS total, SUM(length) AS length
                      FROM        videos NATURAL JOIN course_modules
                      WHERE       id_course = ?) AS tmp
         ");
