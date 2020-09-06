@@ -74,13 +74,13 @@ class CoursesDAO
                     SUM(length) as total_length
             FROM    (SELECT      COUNT(*) AS total, 
                                  CASE
-								    WHEN id_module > 0 THEN 5 
+								    WHEN id_module > 0 THEN SUM(5) 
 								    ELSE 0
 								 END AS length
                      FROM        questionnaires NATURAL JOIN course_modules
                      WHERE       id_course = ?
                      UNION ALL
-                     SELECT      COUNT(*) AS total, length
+                     SELECT      COUNT(*) AS total, SUM(length) AS length
                      FROM        videos NATURAL JOIN course_modules
                      WHERE       id_course = ?) AS tmp
         ");

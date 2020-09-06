@@ -45,13 +45,13 @@ abstract class ClassesDAO
     public static function getTotal(Database $db) : array
     {
         return $db->getConnection()->query("
-            SELECT  SUM(total) AS total_classes,
-                    SUM(length) AS total_length
+            SELECT  SUM(total) AS total_classes, 
+                    SUM(length) AS total_length 
             FROM (
-                SELECT  COUNT(*) AS total, length
+                SELECT  COUNT(*) AS total, SUM(length) as length
                 FROM    videos
                 UNION
-                SELECT  COUNT(*) AS total, 5 AS length
+                SELECT  COUNT(*) AS total, SUM(5) AS length
                 FROM questionnaires
             ) AS tmp
         ")->fetch();
