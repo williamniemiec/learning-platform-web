@@ -144,8 +144,6 @@ class CoursesController extends Controller
                 'message' => 'There are no registered classes'
             );
             $view = "noClasses";
-            //$class['watched'] = false;
-            //$class['id'] = -1;
         } 
         else {
             if ($class instanceof Video) {
@@ -199,9 +197,8 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => $course->getName().' - Learning platform',
-            'styles' => array('courses', 'mobile_menu_button', 'notebook'),
+            'styles' => array('courses', 'mobile_menu_button', 'NotebookStyle'),
             'description' => $name,
-            //'keywords' => array('learning platform', 'course', $course['name']),
             'robots' => 'noindex'
         );
         
