@@ -158,10 +158,10 @@ abstract class ClassesDAO
             SELECT  SUM(total) AS total_classes, 
                     SUM(length) AS total_length 
             FROM (
-                SELECT  COUNT(*) AS total, length
+                SELECT  COUNT(*) AS total, SUM(length) as length
                 FROM    videos
                 UNION
-                SELECT  COUNT(*) AS total, 5 AS length
+                SELECT  COUNT(*) AS total, SUM(5) AS length
                 FROM questionnaires
             ) AS tmp
         ")->fetch();
