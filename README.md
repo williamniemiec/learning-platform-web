@@ -1,5 +1,5 @@
 # [Website Project] Learning platform
-![logo](https://github.com/williamniemiec/wp_learningPlatform/blob/master/media/img/logo/logo.jpg)
+![logo](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/logo/logo.jpg?raw=true)
 
 <p align='center'>Projeto de website para uma plataforma de ensino. Esse projeto usa o [padrão de projeto MVC](https://github.com/williamniemiec/MVC-in-PHP), feito em PHP.</p>
 
