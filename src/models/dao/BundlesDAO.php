@@ -281,26 +281,53 @@ class BundlesDAO
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
-        $response = array(); 
+        
+        $response = array();
+        $bindParams = array($id_bundle);
         
         // Query construction
-        $sql = $this->db->prepare("
-            SELECT  *
-            FROM    bundles b
-            WHERE   id_bundle != ? AND
-                    NOT EXISTS (
+        if ($id_student > 0) {
+            $query = "
                 SELECT  *
-                FROM    bundle_courses
-                WHERE   id_bundle = ? AND
-                        id_course IN (SELECT id_course
-                                      FROM   bundle_courses JOIN purchases USING (id_bundle)
-                                      WHERE  id_bundle = b.id_bundle AND
-                                             id_student != ?)
-                    )
-        ");
+                FROM    bundles b
+                WHERE   id_bundle != ? AND
+                        NOT EXISTS (
+                    SELECT  *
+                    FROM    bundle_courses
+                    WHERE   id_bundle = ? AND
+                            id_course IN (SELECT id_course
+                                          FROM   bundle_courses
+                                          WHERE  id_bundle = b.id_bundle)
+                )
+            ";
+            
+            $bindParams[] = $id_student;
+        }
+        else {
+            $query = "
+                SELECT  *
+                FROM    bundles b
+                WHERE   id_bundle != ? AND
+            ";
+        }
+        
+        $query .= "
+                NOT EXISTS (
+                    SELECT  *
+                    FROM    bundle_courses
+                    WHERE   id_bundle = ? AND
+                            id_course IN (SELECT id_course
+                                          FROM   bundle_courses
+                                          WHERE  id_bundle = b.id_bundle)
+                )
+        ";
+        
+        $bindParams[] = $id_bundle;
+        
+        $sql = $this->db->prepare($query);
         
         // Executes query
-        $sql->execute(array($id_bundle, $id_bundle, $id_student));
+        $sql->execute($bindParams);
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {

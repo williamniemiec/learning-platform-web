@@ -61,7 +61,7 @@ class AdminsController extends Controller
             'admins' => $adminsDAO->getAll()
         );
         
-        $this->loadTemplate("adminsManager/admins_manager", $viewArgs);
+        $this->loadTemplate("adminsManager/AdminsManagerView", $viewArgs);
     }
     
     public function new()
@@ -121,7 +121,7 @@ class AdminsController extends Controller
             
         }
         
-        $this->loadTemplate("adminsManager/admins_new", $viewArgs);
+        $this->loadTemplate("adminsManager/AdminsManagerNewView", $viewArgs);
     }
     
     public function edit($id_admin)
@@ -169,7 +169,7 @@ class AdminsController extends Controller
             $viewArgs['msg'] = "Error while updating";
         }
         
-        $this->loadTemplate("adminsManager/admins_edit", $viewArgs);
+        $this->loadTemplate("adminsManager/AdminsManagerEditView", $viewArgs);
     }
 
     /**

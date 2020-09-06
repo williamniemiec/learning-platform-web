@@ -79,7 +79,7 @@ class NotebookController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification()),
         );
         
-        $this->loadTemplate("notebook_content", $viewArgs);
+        $this->loadTemplate("notebook/NotebookContentView", $viewArgs);
     }
     
     /**
@@ -120,7 +120,7 @@ class NotebookController extends Controller
         
         $header = array(
             'title' => 'Notebook - Learning platform',
-            'styles' => array('message', 'notebook'),
+            'styles' => array('message', 'NotebookStyle'),
             'description' => "Notebook",
             'robots' => 'noindex'
         );
@@ -134,7 +134,7 @@ class NotebookController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification()),
         );
         
-        $this->loadTemplate("notebook_edit", $viewArgs);
+        $this->loadTemplate("notebook/NotebookEditView", $viewArgs);
     }
     
     /**

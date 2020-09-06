@@ -64,7 +64,7 @@ class StudentsController extends Controller
         
         $header = array(
             'title' => 'Students manager - Learning platform',
-            'styles' => array('studentsManager'),
+            'styles' => array('StudentsManagerStyle'),
             'robots' => 'index'
         );
         
@@ -73,12 +73,12 @@ class StudentsController extends Controller
             'authorization' => $admin->getAuthorization(),
             'students' => $students,
             'header' => $header,
-            'scripts' => array('studentsManager'),
+            'scripts' => array('StudentsManagerScript'),
             'courses' => $coursesDAO->getAll(),
             'selectedCourse' => $selectedCourse
         );
         
-        $this->loadTemplate("studentsManager/students_manager", $viewArgs);
+        $this->loadTemplate("studentsManager/StudentsManagerView", $viewArgs);
     }
     
     

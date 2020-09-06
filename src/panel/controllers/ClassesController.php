@@ -77,7 +77,7 @@ class ClassesController extends Controller
         
         $header = array(
             'title' => 'Classes manager - Learning platform',
-            'styles' => array('manager'),
+            'styles' => array('ManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -90,7 +90,7 @@ class ClassesController extends Controller
             'currentIndex' => $index
         );
         
-        $this->loadTemplate("classesManager/classes_manager", $viewArgs);
+        $this->loadTemplate("classesManager/ClassesManagerView", $viewArgs);
     }
     
     /**
@@ -104,7 +104,7 @@ class ClassesController extends Controller
             
         $header = array(
             'title' => 'New class - Learning platform',
-            'styles' => array('manager', 'classesManager'),
+            'styles' => array('ManagerStyle', 'ClassesManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -115,7 +115,7 @@ class ClassesController extends Controller
             'modules' => $modulesDAO->getAll(),
             'error' => false,
             'msg' => '',
-            'scripts' => array('classesManager')
+            'scripts' => array('ClassesManagerScript')
         );
         
         // Checks if form has been sent
@@ -178,7 +178,7 @@ class ClassesController extends Controller
             }
         }
         
-        $this->loadTemplate("classesManager/classes_new", $viewArgs);
+        $this->loadTemplate("classesManager/ClassesManagerNewView", $viewArgs);
     }
     
     /**
@@ -201,7 +201,7 @@ class ClassesController extends Controller
         
         $header = array(
             'title' => 'Edit class - Learning platform',
-            'styles' => array('manager', 'classesManager'),
+            'styles' => array('ManagerStyle', 'ClassesManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -213,7 +213,7 @@ class ClassesController extends Controller
             'class' => $class,
             'error' => false,
             'msg' => '',
-            'scripts' => array('classesManager')
+            'scripts' => array('ClassesManagerScript')
         );
         
         // Checks if form has been sent
@@ -296,9 +296,9 @@ class ClassesController extends Controller
         }
         
         if ($type == 'v')
-            $this->loadTemplate("classesManager/classes_edit_video", $viewArgs);
+            $this->loadTemplate("classesManager/ClassesManagerEditVideoView", $viewArgs);
         else
-            $this->loadTemplate("classesManager/classes_edit_questionnaire", $viewArgs);
+            $this->loadTemplate("classesManager/ClassesManagerEditQuestionnaireView", $viewArgs);
     }
     
     /**

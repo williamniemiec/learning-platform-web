@@ -66,7 +66,7 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => 'Courses - Learning platform',
-            'styles' => array('coursesManager', 'manager', 'searchBar'),
+            'styles' => array('CoursesManagerStyle', 'ManagerStyle', 'searchBar'),
             'robots' => 'noindex'
         );
         
@@ -80,7 +80,7 @@ class CoursesController extends Controller
             'currentIndex' => $index
         );
         
-        $this->loadTemplate("coursesManager/courses_manager", $viewArgs);
+        $this->loadTemplate("coursesManager/CoursesManagerView", $viewArgs);
     }
     
     public function new()
@@ -91,7 +91,7 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => 'New course - Learning platform',
-            'styles' => array('coursesManager', 'manager'),
+            'styles' => array('CoursesManagerStyle', 'ManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -102,7 +102,7 @@ class CoursesController extends Controller
             'header' => $header,
             'error' => false,
             'msg' => '',
-            'scripts' => array('coursesManager')
+            'scripts' => array('CoursesManagerScript')
         );
         
         // Checks if the new course has been successfully added
@@ -151,7 +151,7 @@ class CoursesController extends Controller
             }
         }
         
-        $this->loadTemplate("coursesManager/courses_new", $viewArgs);
+        $this->loadTemplate("coursesManager/CoursesManagerNewView", $viewArgs);
     }
     
     public function edit($id_course)
@@ -163,7 +163,7 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => 'Edit course - Learning platform',
-            'styles' => array('coursesManager', 'manager'),
+            'styles' => array('CoursesManagerStyle', 'ManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -175,7 +175,7 @@ class CoursesController extends Controller
             'header' => $header,
             'error' => false,
             'msg' => '',
-            'scripts' => array('coursesManager')
+            'scripts' => array('CoursesManagerScript')
         );
         
         // Checks if the course has been successfully updated
@@ -229,7 +229,7 @@ class CoursesController extends Controller
             }
         }
         
-        $this->loadTemplate("coursesManager/courses_edit", $viewArgs);
+        $this->loadTemplate("coursesManager/CoursesManagerEditView", $viewArgs);
     }
     
     /**

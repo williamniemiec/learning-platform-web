@@ -53,7 +53,7 @@ class CoursesController extends Controller
         
         $header = array(
             'title' => 'My courses - Learning Platform',
-            'styles' => array('home', 'MyCoursesStyle', 'searchBar', 'notebook'),
+            'styles' => array('MyCoursesStyle', 'searchBar', 'NotebookStyle'),
             'description' => "Start learning today",
             'keywords' => array('learning platform', 'courses'),
             'robots' => 'noindex'
@@ -75,7 +75,7 @@ class CoursesController extends Controller
 		    'notifications' => array(
 		        'notifications' => $notificationsDAO->getNotifications(10),
 		        'total_unread' => $notificationsDAO->countUnreadNotification()),
-		    'scripts' => array('chart_progress'),
+		    'scripts' => array('ProgressChart'),
 		    'scriptsModule' => array('MyCoursesScript'),
 		    'notebook' => $notes,
 		    'totalPages' => ceil($totNotes / 4)
@@ -207,7 +207,7 @@ class CoursesController extends Controller
         
         $viewArgs = array(
             'header' => $header,
-            'scripts' => array('course'),
+            'scripts' => array('ClassScript'),
             'scriptsModule' => array('ClassNotebookScript'),
             'username' => $student->getName(),
             'view' => 'class/'.$view,

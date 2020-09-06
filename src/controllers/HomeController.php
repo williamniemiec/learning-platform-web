@@ -41,7 +41,7 @@ class HomeController extends Controller
 	    $header = array(
 	        'title' => 'Home - Learning Platform',
 	        'styles' => array('gallery', 'searchBar'),
-	        'stylesPHP' => array('home'),
+	        'stylesPHP' => array('HomeStyle'),
 	        'description' => "Start learning today",
 	        'keywords' => array('learning platform', 'home'),
 	        'robots' => 'index'
@@ -49,7 +49,7 @@ class HomeController extends Controller
 	    
 	    $viewArgs = array(
 	        'header' => $header,
-	        'scripts' => array('gallery', 'home'),
+	        'scripts' => array('gallery', 'HomeScript'),
 	        'total_bundles' => $bundlesDAO->getTotal(),
 	        'total_courses' => $coursesDAO->getTotal(),
 	        'total_length' => number_format(ClassesDAO::getTotal($dbConnection)['total_length'] / 60, 2)
@@ -77,7 +77,7 @@ class HomeController extends Controller
             );
 	    }
 	    
-		$this->loadTemplate("home", $viewArgs, Student::isLogged());
+		$this->loadTemplate("HomeView", $viewArgs, Student::isLogged());
 	}
 	
 	/**

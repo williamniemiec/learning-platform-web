@@ -78,7 +78,7 @@ class BundlesController extends Controller
         
         $header = array(
             'title' => 'Bundles - Learning platform',
-            'styles' => array('coursesManager', 'manager'),
+            'styles' => array('CoursesManagerStyle', 'manager'),
             'robots' => 'noindex'
         );
         
@@ -93,7 +93,7 @@ class BundlesController extends Controller
             'currentIndex' => $index
         );
         
-        $this->loadTemplate("bundlesManager/bundles_manager", $viewArgs);
+        $this->loadTemplate("bundlesManager/BundlesManagerView", $viewArgs);
     }
     
     
@@ -108,7 +108,7 @@ class BundlesController extends Controller
         
         $header = array(
             'title' => 'New bundle - Learning platform',
-            'styles' => array('coursesManager'),
+            'styles' => array('CoursesManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -118,7 +118,7 @@ class BundlesController extends Controller
             'header' => $header,
             'error' => false,
             'msg' => '',
-            'scripts' => array('bundlesManager')
+            'scripts' => array('BundlesManagerScript')
         );
         
         // Checks if the new bundle has been successfully added
@@ -168,7 +168,7 @@ class BundlesController extends Controller
             }
         }
         
-        $this->loadTemplate("bundlesManager/bundles_new", $viewArgs);
+        $this->loadTemplate("bundlesManager/BundlesManagerNewView", $viewArgs);
     }
     
     /**
@@ -186,7 +186,7 @@ class BundlesController extends Controller
         
         $header = array(
             'title' => 'Edit bundle - Learning platform',
-            'styles' => array('bundlesManager', 'manager'),
+            'styles' => array('bundlesManager', 'ManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -196,7 +196,7 @@ class BundlesController extends Controller
             'bundle' => $bundle,
             'courses' => $bundle->getCourses($dbConnection),
             'header' => $header,
-            'scripts' => array('bundlesManager'),
+            'scripts' => array('BundlesManagerScript'),
             'error' => false,
             'msg' => ''
         );
@@ -251,7 +251,7 @@ class BundlesController extends Controller
             }
         }
         
-        $this->loadTemplate("bundlesManager/bundles_edit", $viewArgs);
+        $this->loadTemplate("bundlesManager/BundlesManagerEditView", $viewArgs);
     }
     
     /**

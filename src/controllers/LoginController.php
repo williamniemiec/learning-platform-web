@@ -43,7 +43,7 @@ class LoginController extends Controller
         
         $header = array(
             'title' => 'Login - Learning platform',
-            'styles' => array('login'),
+            'styles' => array('LoginStyle'),
             'description' => "Start learning today",
             'keywords' => array('learning platform', 'login'),
             'robots' => 'index'
@@ -75,7 +75,7 @@ class LoginController extends Controller
             $viewArgs['msg'] = "Email and / or password incorrect";
         }
         
-        $this->loadTemplate("login", $viewArgs, false);
+        $this->loadTemplate("LoginView", $viewArgs, false);
     }
     
     /**
@@ -133,7 +133,7 @@ class LoginController extends Controller
             
         }
         
-        $this->loadTemplate("register", $viewArgs, false);
+        $this->loadTemplate("RegisterView", $viewArgs, false);
     }
     
     /**

@@ -59,7 +59,7 @@ class ModulesController extends Controller
         
         $header = array(
             'title' => 'Modules manager - Learning platform',
-            'styles' => array('manager'),
+            'styles' => array('ManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -72,7 +72,7 @@ class ModulesController extends Controller
             'currentIndex' => $index
         );
         
-        $this->loadTemplate("modulesManager/modules_manager", $viewArgs);
+        $this->loadTemplate("modulesManager/ModulesManagerView", $viewArgs);
     }
     
     /**
@@ -111,7 +111,7 @@ class ModulesController extends Controller
             $viewArgs['msg'] = "The module could not be added!";
         }
         
-        $this->loadTemplate("modulesManager/modules_new", $viewArgs);
+        $this->loadTemplate("modulesManager/ModulesManagerNewView", $viewArgs);
     }
     
     /**
@@ -126,7 +126,7 @@ class ModulesController extends Controller
         
         $header = array(
             'title' => 'Modules manager - New - Learning platform',
-            'styles' => array('modulesManager'),
+            'styles' => array('ModulesManagerStyle'),
             'robots' => 'noindex'
         );
         
@@ -138,7 +138,7 @@ class ModulesController extends Controller
             'classes' => $module->getClasses($dbConnection),
             'error' => false,
             'msg' => '',
-            'scripts' => array('modulesManager')
+            'scripts' => array('ModulesManagerStyle')
         );
         
         // Checks if course has been successfully updated
@@ -155,7 +155,7 @@ class ModulesController extends Controller
             $viewArgs['msg'] = "The module could not be added!";
         }
         
-        $this->loadTemplate("modulesManager/modules_edit", $viewArgs);
+        $this->loadTemplate("modulesManager/ModulesManagerEditView", $viewArgs);
     }
     
     /**
