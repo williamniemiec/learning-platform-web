@@ -78,7 +78,7 @@ class BundlesController extends Controller
         
         $header = array(
             'title' => 'Bundles - Learning platform',
-            'styles' => array('CoursesManagerStyle', 'manager'),
+            'styles' => array('CoursesManagerStyle', 'ManagerStyle'),
             'robots' => 'noindex'
         );
         
