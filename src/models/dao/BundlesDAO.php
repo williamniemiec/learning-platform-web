@@ -209,30 +209,37 @@ class BundlesDAO
                 "or less than or equal to zero");
             
         $response = array();
-        $bindParams = array($id_bundle, $id_bundle);
+        $bindParams = array($id_bundle);
         
         // Query construction
         $query = "
-            SELECT  *
+            SELECT  b.id_bundle, b.name, b.price, b.logo, b.description
             FROM    bundles b
+                    LEFT JOIN purchases USING (id_bundle)
             WHERE   id_bundle != ? AND
-                    NOT EXISTS (
-                SELECT  *
-                FROM    bundle_courses LEFT JOIN purchases USING (id_bundle)
-                WHERE   id_bundle = ? AND
-         ";
+        ";
         
         if ($id_student > 0) {
-            $query .= " id_student != ? AND ";
+            $query .= " 
+                    (id_student IS NULL OR id_student != ?) AND 
+            ";
+            
             $bindParams[] = $id_student;
         }
         
-        $query .= "      id_course NOT IN (SELECT    id_course
-                                          FROM      bundle_courses
-                                          WHERE     id_bundle = b.id_bundle)
-                )
-        ";
+        $bindParams[] = $id_bundle;
         
+        $query .= "
+                    NOT EXISTS (
+                        SELECT  *
+                        FROM    bundle_courses 
+                        WHERE   id_bundle = ? AND
+                                id_course NOT IN (SELECT    id_course
+                                                  FROM      bundle_courses
+                                                  WHERE     id_bundle = b.id_bundle)
+                    )
+         ";
+
         $sql = $this->db->prepare($query);
         
         // Executes query
@@ -250,7 +257,7 @@ class BundlesDAO
                 );
             }
         }
-        
+
         return $response;
     }
     
