@@ -9,6 +9,7 @@ use models\Questionnaire;
 use models\util\IllegalAccessException;
 use models\Module;
 use models\Admin;
+use models\Action;
 
 
 /**
@@ -224,6 +225,8 @@ class QuestionnairesDAO extends ClassesDAO
         if (empty($questionnaire))
             throw new \InvalidArgumentException("Questionnaire cannot be empty");
         
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO questionnaires 
@@ -243,7 +246,15 @@ class QuestionnairesDAO extends ClassesDAO
             $questionnaire->getAnswer()
         ));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->addClass($questionnaire->getModuleId(), $questionnaire->getClassOrder());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -278,6 +289,8 @@ class QuestionnairesDAO extends ClassesDAO
         if (empty($questionnaire))
             throw new \InvalidArgumentException("Questionnaire cannot be empty");
         
+        $response = false;
+        
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  questionnaires
@@ -302,7 +315,15 @@ class QuestionnairesDAO extends ClassesDAO
             $questionnaire->getClassOrder(),
         ));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateClass($questionnaire->getModuleId(), $questionnaire->getClassOrder());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -338,6 +359,8 @@ class QuestionnairesDAO extends ClassesDAO
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
             
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM questionnaires
@@ -347,7 +370,15 @@ class QuestionnairesDAO extends ClassesDAO
         // Executes query
         $sql->execute(array($id_module, $class_order));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->deleteClass($id_module, $class_order);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -384,8 +415,10 @@ class QuestionnairesDAO extends ClassesDAO
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
             
-            if (empty($questionnaire))
+        if (empty($questionnaire))
             throw new \InvalidArgumentException("Questionnaire cannot be empty");
+            
+        $response = false;
             
         // class_order = 0 temporary to avoid constraint error
         $this->db->prepare("
@@ -413,6 +446,14 @@ class QuestionnairesDAO extends ClassesDAO
             $newIdModule
         ));
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateClass($questionnaire->getModuleId(), $questionnaire->getClassOrder());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
 }

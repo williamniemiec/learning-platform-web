@@ -9,6 +9,7 @@ use models\Admin;
 use models\Module;
 use models\util\IllegalAccessException;
 use models\enum\ClassTypeEnum;
+use models\Action;
 
 
 /**
@@ -165,6 +166,8 @@ class ModulesDAO
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
         
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM modules
@@ -174,7 +177,15 @@ class ModulesDAO
         // Executes query
         $sql->execute(array($id_module));
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->deleteModule($id_module);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -215,8 +226,12 @@ class ModulesDAO
         $sql->execute(array($name));
         
         // Parses result
-        if ($sql->rowCount() > 0) {
+        if (!empty($sql) && $sql->rowCount() > 0) {
             $response = (int)$this->db->lastInsertId();
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->addModule($response);
+            $adminsDAO->newAction($action);
         }
         
         return $response;
@@ -327,20 +342,6 @@ class ModulesDAO
                         $class['order_new'],
                         $id_module
                     );
-                    
-//                     FALHOU AO FAZER DA FORMA ABAIXO - MUDAVA class_order = 0 E NÃO ALTERAVA O id_module
-//                     $query = "
-//                         UPDATE  ".$tableName."
-//                         SET     id_module = ? AND class_order = ?
-//                         WHERE   id_module = ? AND class_order = ?
-//                     ";
-                    
-//                     $bindParams = array(
-//                         $id_module,
-//                         $class['order_new'],
-//                         $class['id_module'],
-//                         $class['order_old']
-//                     );
                 }
 
                 $sql = $this->db->prepare($query);
@@ -383,6 +384,11 @@ class ModulesDAO
             throw $e;
         }
         
+        $action = new Action();
+        $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $action->updateModule($id_module);
+        $adminsDAO->newAction($action);
+
         return true;
     }
     
@@ -418,6 +424,8 @@ class ModulesDAO
         if (empty($name))
             throw new \InvalidArgumentException("Name cannot be empty");
         
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  modules 
@@ -428,7 +436,15 @@ class ModulesDAO
         // Executes query
         $sql->execute(array($name, $id_module));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateModule($id_module);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**

@@ -10,6 +10,7 @@ use models\Message;
 use models\SupportTopic;
 use models\util\IllegalAccessException;
 use models\SupportTopicCategory;
+use models\Action;
 
 
 /**
@@ -258,6 +259,8 @@ class SupportTopicDAO
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  support_topic
@@ -268,7 +271,15 @@ class SupportTopicDAO
         // Executes query
         $sql->execute(array($id_topic));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->closeTopic($id_topic);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -294,6 +305,8 @@ class SupportTopicDAO
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  support_topic
@@ -304,7 +317,15 @@ class SupportTopicDAO
         // Executes query
         $sql->execute(array($id_topic));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->openTopic($id_topic);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -337,6 +358,8 @@ class SupportTopicDAO
         if (!$this->isOpen($id_topic))
             throw new IllegalAccessException("Topic is closed");
             
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO support_topic_replies
@@ -347,7 +370,15 @@ class SupportTopicDAO
         // Executes query
         $sql->execute(array($id_topic, $this->admin->getId(), $text));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->answerTopic($id_topic);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**

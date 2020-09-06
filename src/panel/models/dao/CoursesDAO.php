@@ -10,6 +10,7 @@ use models\enum\CourseOrderByEnum;
 use models\enum\OrderDirectionEnum;
 use models\util\IllegalAccessException;
 use models\Admin;
+use models\Action;
 
 
 /**
@@ -197,6 +198,8 @@ class CoursesDAO
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
+        
+        $response = false;
             
         // Query construction
         $sql = $this->db->prepare("
@@ -207,7 +210,15 @@ class CoursesDAO
         // Executes query
         $sql->execute(array($id_course));
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->deleteCourse($id_course);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -279,6 +290,7 @@ class CoursesDAO
         if (empty($course))
             throw new \InvalidArgumentException("Course cannot be empty");
             
+        $response = false;
         $data_keys = array();
         $data_values = array();
         $data_sql = array();
@@ -310,11 +322,19 @@ class CoursesDAO
         $sql = $this->db->prepare($sql);
         $sql->execute($data_values);
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->addCourse($course->getId());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
-     * Edits a course.
+     * Updates a course.
      *
      * @param       Course $course Course to be updated
      * 
@@ -339,6 +359,7 @@ class CoursesDAO
         if (empty($course))
             throw new \InvalidArgumentException("Course cannot be empty");
         
+        $response = false;
         $data_values = array();
         $data_sql = array();
         
@@ -369,7 +390,15 @@ class CoursesDAO
         $sql = $this->db->prepare($sql);
         $sql->execute($data_values);
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateCourse($course->getId());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -410,6 +439,8 @@ class CoursesDAO
             throw new \InvalidArgumentException("Order cannot be empty or less ".
                 "than or equal to zero");
   
+        $response = false;
+        
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO course_modules
@@ -420,7 +451,15 @@ class CoursesDAO
         // Executes query
         $sql->execute(array($id_course, $id_module, $order));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateCourse($id_course);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -456,6 +495,8 @@ class CoursesDAO
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
             
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM course_modules
@@ -465,7 +506,15 @@ class CoursesDAO
         // Executes query
         $sql->execute(array($id_course, $id_module));
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateCourse($id_course);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -474,15 +523,32 @@ class CoursesDAO
      * @param       int $id_course Course id
      * 
      * @return      bool If modules have been successfully removed
+     * 
+     * @throws      \InvalidArgumentException If course id is empty, less than
+     * or equal to zero
      */
     public function deleteAllModules(int $id_course) : bool
     {
+        if (empty($id_course) || $id_course <= 0)
+            throw new \InvalidArgumentException("Course id cannot be empty ".
+                "or less than or equal to zero");
+            
+        $response = false;
+        
         $sql = $this->db->query("
             DELETE FROM course_modules
             WHERE id_course = ".$id_course
         );
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateCourse($id_course);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**

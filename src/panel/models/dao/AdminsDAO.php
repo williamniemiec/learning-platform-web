@@ -9,6 +9,7 @@ use models\Admin;
 use models\Authorization;
 use models\enum\GenreEnum;
 use models\util\IllegalAccessException;
+use models\Action;
 
 
 /**
@@ -150,8 +151,12 @@ class AdminsDAO
             md5($password)
         ));
         
-        if ($sql && $sql->rowCount() > 0)
+        if ($sql && $sql->rowCount() > 0) {
             $response = $this->db->lastInsertId();
+            $action = new Action();
+            $action->addAdmin($response);
+            $this->newAction($action);
+        }
         
         return $response;
     }
@@ -197,6 +202,7 @@ class AdminsDAO
         
         $admin = $this->get($id_admin);
         $bindParams = array($newId_authorization);
+        $response = false;
         
         // Query construction
         if ($admin->getEmail() == $newEmail) {
@@ -222,7 +228,14 @@ class AdminsDAO
         // Executes query
         $sql->execute($bindParams);
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $action = new Action();
+            $action->updateAdmin($id_admin);
+            $this->newAction($action);
+            $response = true;
+        }
+        
+        return $response;
     }
 
     /**
@@ -252,6 +265,8 @@ class AdminsDAO
         if (empty($birthdate))
             throw new \InvalidArgumentException("Birthdate cannot be empty");
         
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  admins
@@ -269,7 +284,7 @@ class AdminsDAO
             $this->admin->getId()
         ));
         
-        return $sql && $sql->rowCount() > 0;
+        return !empty($sql) && $sql->rowCount() > 0;
     }
     
     /**
@@ -303,6 +318,8 @@ class AdminsDAO
         if ($id_admin <= 0)
             $id_admin = $this->admin->getId();
             
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  admins
@@ -313,7 +330,39 @@ class AdminsDAO
         // Executes query
         $sql->execute(array(md5($newPassword), $id_admin));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            
+            if ($id_admin > 0) {
+                $action = new Action();
+                $action->updateAdmin($id_admin);
+                $this->newAction($action);
+            }
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Register an action.
+     * 
+     * @param       Action $action Action to be registered
+     * 
+     * @throws      \InvalidArgumentException If action is null or no action 
+     * has been selected
+     */
+    public function newAction(Action $action)
+    {
+        if (empty($action) || empty($action->get())) 
+            throw new \InvalidArgumentException("Action cannot be null");
+        
+        $sql = $this->db->prepare("
+            INSERT INTO actions
+            (id_admin, date, description)
+            VALUES (?, NOW(), ?)
+        ");
+        
+        $sql->execute(array($this->admin->getId(), $action->get()));
     }
     
     /**

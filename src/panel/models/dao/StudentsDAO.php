@@ -11,6 +11,7 @@ use models\Student;
 use models\Course;
 use models\util\IllegalAccessException;
 use models\enum\GenreEnum;
+use models\Action;
 
 
 /**
@@ -243,7 +244,7 @@ class StudentsDAO
             throw new \InvalidArgumentException("Admin logged in must be ".
                 "provided in the constructor");
             
-            if ($this->admin->getAuthorization()->getLevel() != 0)
+        if ($this->admin->getAuthorization()->getLevel() != 0)
             throw new IllegalAccessException("Current admin does not have ".
                 "authorization to perform this action");
             
@@ -251,6 +252,8 @@ class StudentsDAO
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
 
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM students 
@@ -260,7 +263,15 @@ class StudentsDAO
         // Executes query
         $sql->execute(array($id_student));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->deleteStudent($id_student);
+            $adminsDAO->newAction($action);
+            $response = true;
+        }
+        
+        return $response;
     }
     
     /**
@@ -296,6 +307,8 @@ class StudentsDAO
         if (!empty($newPassword))
             $this->updatePassword($id_student, $newPassword);
 
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             UPDATE  students 
@@ -306,7 +319,15 @@ class StudentsDAO
         // Executes query
         $sql->execute(array($newEmail, $id_student));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateStudent($id_student);
+            $adminsDAO->newAction($action);
+            $response = true;
+        }
+        
+        return $response;
     }
     
     /**
@@ -337,6 +358,8 @@ class StudentsDAO
         
         if (empty($newPassword))
             throw new \InvalidArgumentException("New password cannot be empty");
+          
+        $response = false;
             
         // Query construction
         $sql = $this->db->query("
@@ -348,7 +371,15 @@ class StudentsDAO
         // Executes query
         $sql->execute(array($id_student));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateStudent($id_student);
+            $adminsDAO->newAction($action);
+            $response = true;
+        }
+        
+        return $response;
     }
     
     /**
@@ -380,6 +411,8 @@ class StudentsDAO
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
         
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO purchases 
@@ -390,7 +423,15 @@ class StudentsDAO
         // Executes query
         $sql->execute(array($id_student, $id_bundle));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateStudent($id_student);
+            $adminsDAO->newAction($action);
+            $response = true;
+        }
+        
+        return $response;
     }
     
     /**
@@ -423,6 +464,8 @@ class StudentsDAO
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
             
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM purchases
@@ -432,6 +475,14 @@ class StudentsDAO
         // Executes query
         $sql->execute(array($id_student, $id_bundle));
         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateStudent($id_student);
+            $adminsDAO->newAction($action);
+            $response = true;
+        }
+        
+        return $response;
     }
 }

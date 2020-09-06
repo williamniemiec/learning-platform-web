@@ -10,6 +10,7 @@ use models\Admin;
 use models\Bundle;
 use models\enum\BundleOrderTypeEnum;
 use models\util\IllegalAccessException;
+use models\Action;
 
 
 /**
@@ -198,6 +199,7 @@ class BundlesDAO
         if (empty($bundle))
             throw new \InvalidArgumentException("Bundle cannot be empty");
         
+        $response = false;
         $bindParams = array(
             $bundle->getName(),
             $bundle->getPrice()
@@ -225,7 +227,15 @@ class BundlesDAO
         // Executes query
         $sql->execute($bindParams);
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->addBundle((int)$this->db->lastInsertId());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -254,6 +264,7 @@ class BundlesDAO
         if (empty($bundle))
             throw new \InvalidArgumentException("Bundle cannot be empty");
 
+        $response = false;
         $bindParams = array(
             $bundle->getName(),
             $bundle->getPrice()
@@ -283,7 +294,15 @@ class BundlesDAO
         // Executes query
         $sql->execute($bindParams);
 
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateBundle($bundle->getId());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -313,6 +332,8 @@ class BundlesDAO
                 throw new \InvalidArgumentException("Bundle id cannot be empty ".
                     "or less than or equal to zero");
         
+        $response = false;
+        
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM bundles
@@ -322,7 +343,15 @@ class BundlesDAO
         // Executes query
         $sql->execute(array($id_bundle));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->deleteBundle($id_bundle);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -351,7 +380,9 @@ class BundlesDAO
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
-                    
+        
+        $response = false;
+            
         // Query construction
         $sql = $this->db->query("
             UPDATE  bundles
@@ -359,7 +390,15 @@ class BundlesDAO
             WHERE   id_bundle = ".$id_bundle
         );
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateBundle($id_bundle);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -395,6 +434,8 @@ class BundlesDAO
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
                 
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             INSERT INTO bundle_courses
@@ -405,7 +446,15 @@ class BundlesDAO
         // Executes query
         $sql->execute(array($id_bundle, $id_course));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateBundle($id_bundle);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -440,6 +489,8 @@ class BundlesDAO
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
         
+        $response = false;
+            
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM bundle_courses
@@ -449,7 +500,15 @@ class BundlesDAO
         // Executes query
         $sql->execute(array($id_bundle, $id_course));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateBundle($id_bundle);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -480,12 +539,22 @@ class BundlesDAO
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
                 
+        $response = false;
+            
         $sql = $this->db->query("
             DELETE FROM bundle_courses
             WHERE id_bundle = ".$id_bundle
         );
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateBundle($id_bundle);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**

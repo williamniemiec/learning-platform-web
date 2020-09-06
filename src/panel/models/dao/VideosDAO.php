@@ -9,6 +9,7 @@ use models\Admin;
 use models\Video;
 use models\util\IllegalAccessException;
 use models\Module;
+use models\Action;
 
 
 /**
@@ -214,6 +215,8 @@ class VideosDAO extends ClassesDAO
         if (empty($video))
             throw new \InvalidArgumentException("Video cannot be empty");
         
+        $response = false;
+            
         if (empty($video->getDescription())) {
             $sql = $this->db->prepare("
                 INSERT INTO videos
@@ -248,8 +251,15 @@ class VideosDAO extends ClassesDAO
             ));
         }
         
-         
-        return $sql && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->addClass($video->getModuleId(), $video->getClassOrder());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     
@@ -279,6 +289,8 @@ class VideosDAO extends ClassesDAO
         if (empty($video))
             throw new \InvalidArgumentException("Video cannot be empty");
         
+        $response = false;
+            
         if (empty($video->getDescription())) {
             $sql = $this->db->prepare("
                 UPDATE  videos
@@ -311,7 +323,15 @@ class VideosDAO extends ClassesDAO
             ));
         }
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateClass($video->getModuleId(), $video->getClassOrder());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -346,7 +366,9 @@ class VideosDAO extends ClassesDAO
         if (empty($class_order) || $class_order <= 0)
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
-                    
+        
+        $response = false;
+        
         // Query construction
         $sql = $this->db->prepare("
             DELETE FROM videos
@@ -356,7 +378,15 @@ class VideosDAO extends ClassesDAO
         // Executes query
         $sql->execute(array($id_module, $class_order));
         
-        return $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->deleteClass($id_module, $class_order);
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
     
     /**
@@ -395,7 +425,9 @@ class VideosDAO extends ClassesDAO
         
         if (empty($video))
             throw new \InvalidArgumentException("Video cannot be empty");
-                
+           
+        $response = false;
+            
         // class_order = 0 temporary to avoid constraint error
         $this->db->prepare("
             UPDATE  videos
@@ -422,6 +454,14 @@ class VideosDAO extends ClassesDAO
             $newIdModule
         ));
         
-        return !empty($sql) && $sql->rowCount() > 0;
+        if (!empty($sql) && $sql->rowCount() > 0) {
+            $response = true;
+            $action = new Action();
+            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+            $action->updateClass($video->getModuleId(), $video->getClassOrder());
+            $adminsDAO->newAction($action);
+        }
+        
+        return $response;
     }
 }
