@@ -1,6 +1,6 @@
-# [Website Project] Learning platform
 ![logo](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/logo/logo.jpg?raw=true)
 
+<h1 align='center'>[Website Project] Learning platform</h1>
 <p align='center'>Projeto de website para uma plataforma de ensino. Esse projeto usa o <a href="https://github.com/williamniemiec/MVC-in-PHP">padrão de projeto MVC</a>, feito em PHP.</p>
 
 <hr />
@@ -41,8 +41,12 @@ Dentro da pasta src encontra-se todo o conteúdo referente à aplicação.
 | 	environment.php 				| `Arquivo`	| Define o ambiente do sistema
 | 	Web.config 				| `Arquivo`	| Redirecionamento para funcionamento do MVC em servidores IIS
 
-## Banco de dados
-![db](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/db/schema.png?raw=true)
+## Esquema do banco de dados
+### Modelo conceitual
+![db-schema-conceptual](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/db/schemas/conceptual/schema-conceptual.png?raw=true)
+
+#### Modelo lógico (diagrama ER)
+![db-schema-logical](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/db/schemas/logical/schema-logical.png?raw=true)
 
 ## Imagens da aplicação
 
