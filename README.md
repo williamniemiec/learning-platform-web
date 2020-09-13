@@ -45,8 +45,14 @@ Dentro da pasta src encontra-se todo o conteúdo referente à aplicação.
 ### Modelo conceitual
 ![db-schema-conceptual](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/db/schemas/conceptual/schema-conceptual.png?raw=true)
 
-#### Modelo lógico (diagrama ER)
+### Modelo lógico (diagrama ER)
 ![db-schema-logical](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/db/schemas/logical/schema-logical.png?raw=true)
+
+### Programas usados para a criação dos esquemas
+|Esquema|Nome|
+|-------|----|
+|Conceitual|[BRModelo 3.0](http://www.sis4.com/brModelo/)|
+|Lógico|[MySQL Workbench 8.0](https://www.mysql.com/products/workbench/)|
 
 ## Imagens da aplicação
 
