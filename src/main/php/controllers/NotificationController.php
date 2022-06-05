@@ -1,10 +1,10 @@
 <?php
 namespace controllers;
 
-use core\Controller;
+
+use config\Controller;
 use repositories\pdo\MySqlPDODatabase;
 use domain\Student;
-use dao\CoursesDAO;
 use dao\NotificationsDAO;
 
 

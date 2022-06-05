@@ -1,7 +1,8 @@
 <?php
 namespace controllers;
 
-use core\Controller;
+
+use config\Controller;
 use domain\Student;
 use domain\enum\BundleOrderTypeEnum;
 use domain\enum\OrderDirectionEnum;

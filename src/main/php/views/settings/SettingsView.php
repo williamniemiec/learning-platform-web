@@ -17,8 +17,8 @@
     		<div class="user_photo">
     			<img	class="img rounded-circle" 
     					src="<?php echo empty($user->getPhoto()) ? 
-    					    BASE_URL."src/main/web/images/default/user.png" : 
-    					    BASE_URL."src/main/web/images/profile_photos/".$user->getPhoto(); ?>"
+    					    BASE_URL."src/main/webapp/images/default/user.png" : 
+    					    BASE_URL."src/main/webapp/images/profile_photos/".$user->getPhoto(); ?>"
 			    />
     			<button id="btn_photo_update" class="btn_theme" data-toggle="modal" data-target="#changeProfilePhoto">&#8634;</button>
 			</div>

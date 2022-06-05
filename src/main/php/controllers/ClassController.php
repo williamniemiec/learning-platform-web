@@ -2,10 +2,9 @@
 namespace controllers;
 
 
-use core\Controller;
+use config\Controller;
 use repositories\pdo\MySqlPDODatabase;
 use domain\Student;
-use dao\NotificationsDAO;
 use dao\QuestionnairesDAO;
 use dao\VideosDAO;
 use dao\CommentsDAO;

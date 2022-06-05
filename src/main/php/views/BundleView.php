@@ -5,8 +5,8 @@
     	<div class="bundle-info">
     		<img	class="bundle-info-logo" 
 					src="<?php echo empty($bundle->getLogo()) ? 
-					    BASE_URL."src/main/web/images/default/noImage.png" : 
-					    BASE_URL."src/main/web/images/logos/bundles/".$bundle->getLogo(); ?>" 
+					    BASE_URL."src/main/webapp/images/default/noImage.png" : 
+					    BASE_URL."src/main/webapp/images/logos/bundles/".$bundle->getLogo(); ?>" 
 			/>
     		<div class="bundle-info-content">
     			<p><?php echo $bundle->getDescription(); ?></p>
@@ -40,8 +40,8 @@
             		<div class="mosaic-item">
                 		<img	class="mosaic-item-thumbnail" 
                 				src="<?php echo empty($course->getLogo()) ?
-                				    BASE_URL."src/main/web/images/default/noImage.png" :
-                				    BASE_URL."src/main/web/images/logos/courses/".$course->getLogo(); ?>" 
+                				    BASE_URL."src/main/webapp/images/default/noImage.png" :
+                				    BASE_URL."src/main/webapp/images/logos/courses/".$course->getLogo(); ?>" 
         				/>
                 		<div class="mosaic-item-content">
                     		<div class="mosaic-item-header"><?php echo $course->getName(); ?></div>
@@ -87,8 +87,8 @@
                     			>
                     				<img	class="gallery-item-thumbnail" 
                     						src="<?php echo empty($bundle->getLogo()) ? 
-                    						    BASE_URL."src/main/web/images/default/noImage.png" : 
-                    						    BASE_URL."src/main/web/images/logos/bundles/".$bundle->getLogo(); ?>" 
+                    						    BASE_URL."src/main/webapp/images/default/noImage.png" : 
+                    						    BASE_URL."src/main/webapp/images/logos/bundles/".$bundle->getLogo(); ?>" 
             						/>
                     				<div class="gallery-item-content">
                         				<div class="gallery-item-header"><?php echo $bundle->getName(); ?></div>
@@ -124,8 +124,8 @@
                     			>
                     				<img	class="gallery-item-thumbnail" 
                     						src="<?php echo empty($bundle->getLogo()) ? 
-                    						    BASE_URL."src/main/web/images/default/noImage.png" : 
-                    						    BASE_URL."src/main/web/images/logos/bundles/".$bundle->getLogo(); ?>" 
+                    						    BASE_URL."src/main/webapp/images/default/noImage.png" : 
+                    						    BASE_URL."src/main/webapp/images/logos/bundles/".$bundle->getLogo(); ?>" 
             						/>
                     				<div class="gallery-item-content">
                         				<div class="gallery-item-header"><?php echo $bundle->getName(); ?></div>

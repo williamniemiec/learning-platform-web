@@ -1,8 +1,8 @@
 {
 	"autoload" : {
 		"psr-4" : {
+			"config\\" : "src/main/php/config/",
 			"controllers\\" : "src/main/php/controllers/",
-			"core\\" : "src/main/php/core/",
 			"dao\\" : "src/main/php/dao/",
 			"domain\\" : "src/main/php/domain/",
 			"repositories\\" : "src/main/php/repositories/",

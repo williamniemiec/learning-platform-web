@@ -2,7 +2,7 @@
 namespace controllers;
 
 
-use core\Controller;
+use config\Controller;
 use repositories\pdo\MySqlPDODatabase;
 use domain\Student;
 use domain\Note;

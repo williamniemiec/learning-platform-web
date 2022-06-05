@@ -4,8 +4,8 @@
 	<div class="course_banner_area">
     	<img	class="img imr-responsive course_banner" 
     			src="<?php echo empty($logo) ? 
-    			    BASE_URL."src/main/web/images/default/noImage" : 
-		            BASE_URL."src/main/web/images/logos/courses/".$logo; ?>" 
+    			    BASE_URL."src/main/webapp/images/default/noImage" : 
+		            BASE_URL."src/main/webapp/images/logos/courses/".$logo; ?>" 
 		/>
     </div>
     
