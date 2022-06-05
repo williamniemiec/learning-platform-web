@@ -12,10 +12,6 @@ use dao\CommentsDAO;
 
 /**
  * Responsible for handling ajax requests for classes.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class ClassController extends Controller
 {
@@ -27,7 +23,7 @@ class ClassController extends Controller
      */
     public function index ()
     {
-        header("Location: ".BASE_URL);
+        $this->redirect_to_root();
     }
     
     
@@ -45,17 +41,16 @@ class ClassController extends Controller
      *
      * @apiNote     Must be called using POST request method
      */
-    public function getAnswer()
+    public function get_answer()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
 
-        $dbConnection = new MySqlPDODatabase();
-            
-        $questionnaireDAO = new QuestionnairesDAO($dbConnection);
+        $db_connection = new MySqlPDODatabase();
+        $questionnaire_dao = new QuestionnairesDAO($db_connection);
 
-        echo $questionnaireDAO->getAnswer($_POST['id_module'], $_POST['class_order']);
+        echo $questionnaire_dao->get_answer($_POST['id_module'], $_POST['class_order']);
     }
     
     /**
@@ -69,18 +64,18 @@ class ClassController extends Controller
      */
     public function mark_watched()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
 
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
         $class = $_POST['type'] == 0 ? 
-                new VideosDAO($dbConnection) : 
-                new QuestionnairesDAO($dbConnection);
+                new VideosDAO($db_connection) : 
+                new QuestionnairesDAO($db_connection);
         
-        $class->markAsWatched(
-            Student::getLoggedIn($dbConnection)->getId(), 
+        $class->mark_as_watched(
+            Student::get_logged_in($db_connection)->get_id(), 
             $_POST['id_module'], 
             $_POST['class_order']
         );
@@ -98,17 +93,18 @@ class ClassController extends Controller
     public function remove_watched()
     {
         // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
 
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
         $class = $_POST['type'] == 0 ?
-                new VideosDAO($dbConnection) :
-                new QuestionnairesDAO($dbConnection);
+                new VideosDAO($db_connection) :
+                new QuestionnairesDAO($db_connection);
         
-        $class->removeWatched(
-            Student::getLoggedIn($dbConnection)->getId(),
+        $class->remove_watched(
+            Student::get_logged_in($db_connection)->get_id(),
             $_POST['id_module'],
             $_POST['class_order']
         );
@@ -129,17 +125,18 @@ class ClassController extends Controller
     public function new_comment()
     {
         // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
             
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $commentsDAO = new CommentsDAO($dbConnection);
-        echo $commentsDAO->newComment(
-            Student::getLoggedIn($dbConnection)->getId(), 
-            (int)$_POST['id_course'],
-            (int)$_POST['id_module'],
-            (int)$_POST['class_order'],
+        $comments_dao = new CommentsDAO($db_connection);
+        echo $comments_dao->new_comment(
+            Student::get_logged_in($db_connection)->get_id(), 
+            (int) $_POST['id_course'],
+            (int) $_POST['id_module'],
+            (int) $_POST['class_order'],
             $_POST['content']
         );
     }
@@ -153,17 +150,16 @@ class ClassController extends Controller
      */
     public function delete_comment()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-                header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+           $this->redirect_to_root();
+        }
     
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
+        $comments_dao = new CommentsDAO($db_connection);
         
-        $commentsDAO = new CommentsDAO($dbConnection);
-        
-        $commentsDAO->deleteComment(
+        $comments_dao->delete_comment(
             $_POST['id_comment'], 
-            Student::getLoggedIn($dbConnection)->getId()
+            Student::get_logged_in($db_connection)->get_id()
         );
     }
                             
@@ -179,17 +175,16 @@ class ClassController extends Controller
      */
     public function add_reply()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
 
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
+        $comments_dao = new CommentsDAO($db_connection);
         
-        $commentsDAO = new CommentsDAO($dbConnection);
-        
-        echo $commentsDAO->newReply(
-            Student::getLoggedIn($dbConnection)->getId(),
-            (int)$_POST['id_comment'],
+        echo $comments_dao->new_reply(
+            Student::get_logged_in($db_connection)->get_id(),
+            (int) $_POST['id_comment'],
             $_POST['content']
         );
     }
@@ -203,17 +198,16 @@ class ClassController extends Controller
      */
     public function remove_reply()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
             
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
+        $comments_dao = new CommentsDAO($db_connection);
         
-        $commentsDAO = new CommentsDAO($dbConnection);
-        
-        $commentsDAO->deleteReply(
+        $comments_dao->deleteReply(
             $_POST['id_reply'],
-            Student::getLoggedIn($dbConnection)->getId()
+            Student::get_logged_in($db_connection)->get_id()
         );
     }
 }

@@ -100,7 +100,7 @@ abstract class ClassesDAO
      * 
      * @return      bool If student watched the class or not
      */
-    public abstract function wasWatched(int $id_student, int $id_module, int $class_order) : bool;
+    public abstract function was_watched(int $id_student, int $id_module, int $class_order) : bool;
     
     /**
      * Removes watched class markup from a class.
@@ -114,7 +114,7 @@ abstract class ClassesDAO
      * @throws      \InvalidArgumentException If student id, module id or 
      * class order is empty or less than or equal to zero
      */
-    public function removeWatched(int $id_student, int $id_module, int $class_order) : bool
+    public function remove_watched(int $id_student, int $id_module, int $class_order) : bool
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".

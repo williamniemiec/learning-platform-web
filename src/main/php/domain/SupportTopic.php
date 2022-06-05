@@ -155,7 +155,7 @@ class SupportTopic implements \JsonSerializable
         }
             
         if (empty($this->replies)) {
-            $topic = new SupportTopicDAO($db, Student::getLoggedIn($db)->getId());
+            $topic = new SupportTopicDAO($db, Student::get_logged_in($db)->get_id());
             $this->replies = $topic->getReplies($this->id_topic);
         }
         
@@ -171,7 +171,7 @@ class SupportTopic implements \JsonSerializable
      * 
      * @throws      \InvalidArgumentException If database is null
      */
-    public function setDatabase(Database $db) : SupportTopic
+    public function set_database(Database $db) : SupportTopic
     {
         if (empty($db))
             throw new \InvalidArgumentException("Database cannot be empty");

@@ -17,11 +17,11 @@
                 	<tbody>
                 		<?php foreach($modules as $module): ?>
                     		<tr>
-                    			<td><a href="<?php echo BASE_URL."modules/edit/".$module->getId(); ?>"><?php echo $module->getName(); ?></a></td>
-                    			<td><?php echo $module->getTotalClasses(); ?></td>
+                    			<td><a href="<?php echo BASE_URL."modules/edit/".$module->get_id(); ?>"><?php echo $module->get_name(); ?></a></td>
+                    			<td><?php echo $module->get_total_classes(); ?></td>
                     			<td class="actions">
-                    				<a class="btn_theme" href="<?php echo BASE_URL."modules/edit/".$module->getId(); ?>">Edit</a>
-                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."modules/delete/".$module->getId(); ?>">Delete</a>
+                    				<a class="btn_theme" href="<?php echo BASE_URL."modules/edit/".$module->get_id(); ?>">Edit</a>
+                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."modules/delete/".$module->get_id(); ?>">Delete</a>
                 				</td>
                     		</tr>
                 		<?php endforeach; ?>

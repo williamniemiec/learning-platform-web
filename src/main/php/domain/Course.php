@@ -68,7 +68,7 @@ class Course implements \JsonSerializable
      * 
      * @return      string Course name
      */
-    public function getName() : string
+    public function get_name() : string
     {
         return $this->name;
     }
@@ -79,7 +79,7 @@ class Course implements \JsonSerializable
      * @return      string Name of the course logo file or empty string if
      * course does not have a logo
      */
-    public function getLogo() : string
+    public function get_logo() : string
     {
         return $this->logo;
     }
@@ -106,7 +106,7 @@ class Course implements \JsonSerializable
      * 
      * @implNote    Lazy initialization
      */
-    public function getModules(Database $db, bool $provideDatabase = false) : array
+    public function get_modules(Database $db, bool $provideDatabase = false) : array
     {
         if (empty($this->modules)) {
             $modules = new ModulesDAO($db);
@@ -142,7 +142,7 @@ class Course implements \JsonSerializable
                 throw new \InvalidArgumentException("Database cannot be empty");
             
             $courses = new CoursesDAO($db);
-            $total = $courses->countClasses($this->id_course);
+            $total = $courses->count_classes($this->id_course);
             
             $this->total_classes = (int)$total['total_classes'];
         }
@@ -169,7 +169,7 @@ class Course implements \JsonSerializable
                 throw new \InvalidArgumentException("Database cannot be empty");
             
             $courses = new CoursesDAO($db);
-            $total = $courses->countClasses($this->id_course);
+            $total = $courses->count_classes($this->id_course);
             
             $this->total_length = (int)$total['total_length'];
         }

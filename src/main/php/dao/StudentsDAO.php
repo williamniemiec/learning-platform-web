@@ -150,7 +150,7 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor or course id is empty, less than or equal to zero
      */
-    public function getLastClassWatched(int $id_course) : ?_Class
+    public function get_last_class_watched(int $id_course) : ?_Class
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
@@ -237,9 +237,9 @@ class StudentsDAO
                 
         // Executes query
         $sql->execute(array(
-            $student->getName(),
+            $student->get_name(),
             $student->getGenre()->get() == 1,
-            $student->getBirthdate()->format("Y-m-d"),
+            $student->get_birthdate()->format("Y-m-d"),
             $student->getEmail(),
             md5($password)
         ));
@@ -278,10 +278,10 @@ class StudentsDAO
         
         // Executes query
         $sql->execute(array(
-            $student->getName(), 
+            $student->get_name(), 
             $student->getGenre()->get(), 
-            $student->getBirthdate()->format("Y-m-d"),
-            $student->getId()
+            $student->get_birthdate()->format("Y-m-d"),
+            $student->get_id()
         ));
         
         return $sql && $sql->rowCount() > 0;
@@ -416,7 +416,7 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor is empty, less than or equal to zero
      */
-    public function getTotalWatchedClasses() : array
+    public function get_total_watched_classes() : array
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
@@ -564,7 +564,7 @@ class StudentsDAO
      * provided in the constructor or bundle id is empty, less than or equal 
      * to zero
      */
-    public function hasBundle(int $id_bundle) : bool
+    public function has_bundle(int $id_bundle) : bool
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
@@ -594,7 +594,7 @@ class StudentsDAO
      * 
      * @throws      \InvalidArgumentException If email is empty
      */
-    public function isEmailInUse(string $email) : bool
+    public function is_email_in_use(string $email) : bool
     {
         if (empty($email))
             throw new \InvalidArgumentException("Email cannot be empty");
@@ -620,7 +620,7 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor is empty, less than or equal to zero
      */
-    public function clearHistory()
+    public function clear_history()
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
@@ -647,7 +647,7 @@ class StudentsDAO
         $sql = $this->db->query("
             SELECT  photo
             FROM    students
-            WHERE   id_student = ".Student::getLoggedIn($this->db)->getId()
+            WHERE   id_student = ".Student::get_logged_in($this->db)->get_id()
         );
         
         if (!empty($sql) && $sql->rowCount() > 0)

@@ -13,7 +13,7 @@
             		<label for="authorization">Authorization</label>
             		<select id="authorization" name="authorization" class="form-control">
             			<?php foreach ($authorizations as $authorization): ?>
-            				<option value="<?php echo $authorization->getId(); ?>"><?php echo ucfirst(strtolower($authorization->getName())); ?></option>
+            				<option value="<?php echo $authorization->get_id(); ?>"><?php echo ucfirst(strtolower($authorization->get_name())); ?></option>
             			<?php endforeach; ?>
             		</select>
             	</div>

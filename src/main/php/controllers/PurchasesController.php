@@ -10,11 +10,7 @@ use dao\StudentsDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link PurchasesView.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the PurchasesView.
  */
 class PurchasesController extends Controller
 {
@@ -27,10 +23,9 @@ class PurchasesController extends Controller
      */
     public function __construct()
     {
-            if (!Student::isLogged()) {
-                header("Location: ".BASE_URL);
-                exit;
-            }
+        if (!Student::is_logged()) {
+            $this->redirect_to_root();
+        }
     }
     
     
@@ -42,10 +37,10 @@ class PurchasesController extends Controller
      */
     public function index ()
     {
-        $dbConnection = new MySqlPDODatabase();
-        $student = Student::getLoggedIn($dbConnection);
-        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
-        $studentsDAO = new StudentsDAO($dbConnection, $student->getId());
+        $db_connection = new MySqlPDODatabase();
+        $student = Student::get_logged_in($db_connection);
+        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+        $students_dao = new StudentsDAO($db_connection, $student->get_id());
         $limit = 10;
         $index = 1;
         
@@ -60,17 +55,17 @@ class PurchasesController extends Controller
             'robots' => 'noindex'
         );
 
-        $viewArgs = array(
+        $view_args = array(
             'header' => $header,
-            'username' => $student->getName(),
-            'purchases' => $studentsDAO->getPurchases($limit, $limit * ($index - 1)),
+            'username' => $student->get_name(),
+            'purchases' => $students_dao->getPurchases($limit, $limit * ($index - 1)),
             'notifications' => array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification()),
-            'totalPages' => ceil($studentsDAO->countPurchases() / $limit),
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification()),
+            'totalPages' => ceil($students_dao->countPurchases() / $limit),
             'currentIndex' => $index
         );
         
-        $this->load_template("PurchasesView", $viewArgs, Student::isLogged());
+        $this->load_template("PurchasesView", $view_args, Student::is_logged());
     }
 }

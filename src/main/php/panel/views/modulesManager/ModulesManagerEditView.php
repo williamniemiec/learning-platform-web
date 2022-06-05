@@ -20,7 +20,7 @@
             <form method="POST" enctype="multipart/form-data">
             	<div class="form-group">
             		<label for="name">Module name</label>
-            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" required value="<?php echo $module->getName(); ?>" />
+            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" required value="<?php echo $module->get_name(); ?>" />
             	</div>
             	<div class="form-group">
             		<input class="btn_theme btn_full" type="submit" value="Save" class="form-control" />
@@ -46,15 +46,15 @@
                 		<tr>
                 			<td><?php echo $class instanceof Video ? $class->getTitle() : $class->getQuestion(); ?></td>
                 			<td><?php echo $class instanceof Video ? "Video" : "Questionnaire"; ?></td>
-                			<td><?php echo $class->getClassOrder(); ?></td>
+                			<td><?php echo $class->get_class_order(); ?></td>
                 		</tr>
             		<?php endforeach; ?>
             	</tbody>
             </table>
-            <button class="btn_theme" onclick="show_updateModules(<?php echo $module->getId(); ?>)">Include classes</button>
+            <button class="btn_theme" onclick="show_updateModules(<?php echo $module->get_id(); ?>)">Include classes</button>
 		</div>
 	</div>
 	
 	<!-- Modals -->
-	<?php $this->load_view("modulesManager/IncludeClassesModal", array('id_module' => $module->getId())); ?>
+	<?php $this->load_view("modulesManager/IncludeClassesModal", array('id_module' => $module->get_id())); ?>
 </div>

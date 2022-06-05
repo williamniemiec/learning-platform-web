@@ -34,7 +34,7 @@ abstract class User implements \JsonSerializable
      * 
      * @return      int User id
      */
-    public function getId() : int
+    public function get_id() : int
     {
         return $this->id;
     }
@@ -44,7 +44,7 @@ abstract class User implements \JsonSerializable
      * 
      * @return      string name
      */
-    public function getName() : string
+    public function get_name() : string
     {
         return $this->name;
     }
@@ -79,7 +79,7 @@ abstract class User implements \JsonSerializable
      *
      * @return      User Itself to allow chained calls
      */
-    public function setGenre(GenreEnum $genre) : User
+    public function set_genre(GenreEnum $genre) : User
     {
         $this->genre = $genre;
         return $this;
@@ -90,7 +90,7 @@ abstract class User implements \JsonSerializable
      * 
      * @return      DateTime User birthdate
      */
-    public function getBirthdate() : DateTime
+    public function get_birthdate() : DateTime
     {
         return $this->birthdate;
     }
@@ -102,7 +102,7 @@ abstract class User implements \JsonSerializable
      *
      * @return      User Itself to allow chained calls
      */
-    public function setBirthdate(\DateTime $birthdate) : User
+    public function set_birthdate(\DateTime $birthdate) : User
     {
         $this->birthdate = $birthdate;
         return $this;

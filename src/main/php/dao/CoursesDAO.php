@@ -62,7 +62,7 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If student id is empty or less 
      * than or equal to zero
      */
-    public function getMyCourses(int $id_student, string $name = '') : array
+    public function get_my_courses(int $id_student, string $name = '') : array
     {
         if (empty($id_student) || $id_student <= 0)
             throw new \InvalidArgumentException("Student id cannot be empty ".
@@ -126,7 +126,7 @@ class CoursesDAO
                     $course['description']
                 );
                 
-                $response[$i]['course']->getModules($this->db);
+                $response[$i]['course']->get_modules($this->db);
                 $response[$i]['course']->setTotalLength((int)$course['total_length']);
                 $response[$i]['course']->getTotalClasses($this->db);
                 $response[$i]['total_classes_watched'] = (int)$course['total_classes_watched'];
@@ -154,7 +154,7 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If course id is empty or less
      * than or equal to zero 
      */
-    public function countClasses(int $id_course) : array
+    public function count_classes(int $id_course) : array
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty ".
@@ -222,7 +222,7 @@ class CoursesDAO
                     $course['description']
                 );
                 
-                $total_classes = $this->countClasses($course['id_course']);
+                $total_classes = $this->count_classes($course['id_course']);
                 $response[$i]->setTotalClasses((int)$total_classes['total_classes']);
                 $response[$i]->setTotalLength((int)$total_classes['total_length']);
                 $i++;
@@ -287,7 +287,7 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If course id or student id is
      * empty or less than or equal to zero
      */
-    public function getFirstClassFromFirstModule(int $id_course) : ?_Class
+    public function get_first_class_from_first_module(int $id_course) : ?_Class
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty ".
@@ -342,7 +342,7 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If bundle id or student id is 
      * empty or less than or equal to zero
      */
-    public function hasCourse(int $id_course, int $id_student) : bool
+    public function has_course(int $id_course, int $id_student) : bool
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty ".

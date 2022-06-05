@@ -54,7 +54,7 @@ class CommentsDAO
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function newComment(int $id_student, int $id_course, int $id_module, 
+    public function new_comment(int $id_student, int $id_course, int $id_module, 
         int $class_order, string $text) : int
     {
         if (empty($id_student) || $id_student <= 0)
@@ -159,7 +159,7 @@ class CommentsDAO
      * @throws      \InvalidArgumentException If module id or class order is 
      * empty or less than or equal to zero
      */
-    public function getComments(int $id_module, int $class_order) : array
+    public function get_comments(int $id_module, int $class_order) : array
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be empty ".
@@ -218,7 +218,7 @@ class CommentsDAO
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function newReply(int $id_comment, int $id_student, string $text) : int 
+    public function new_reply(int $id_comment, int $id_student, string $text) : int 
     {
         if (empty($id_comment) || $id_comment <= 0)
             throw new \InvalidArgumentException("Comment id cannot be empty ".
@@ -263,7 +263,7 @@ class CommentsDAO
      * @throws      \InvalidArgumentException If comment id or student id is 
      * empty or less than or equal to zero
      */
-    public function deleteComment(int $id_comment, int $id_student) : bool
+    public function delete_comment(int $id_comment, int $id_student) : bool
     {
         if (empty($id_comment) || $id_comment <= 0)
             throw new \InvalidArgumentException("Comment id cannot be empty ".

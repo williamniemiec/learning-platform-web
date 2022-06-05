@@ -53,4 +53,43 @@ abstract class Controller
             require Controller::VIEWS_PATH."/"."template/html_no_logged.php";
         }
     }
+
+    /**
+     * Redirects the user to BASE_URL.
+     */
+    public function redirect_to_root()
+    {
+        $this->redirect_to("");
+    }
+
+    /**
+     * Redirects the user to some location from BASE_URL.
+     *
+     * @param       string $location Controller name
+     */
+    public function redirect_to($location)
+    {
+        header("Location: ".BASE_URL.$location);
+        exit;
+    }
+
+    /**
+     * Gets HTTP request method.
+     *
+     * @return       string request method
+     */
+    public function get_http_request_method()
+    {
+        return $_SERVER['REQUEST_METHOD'];
+    }
+
+    /**
+     * Reloads current page.
+     *
+     * @param       int $delay [optional] Delay time 
+     */
+    public function reload($delay = 0)
+    {
+        header("Refresh: ".$delay);
+    }
 }

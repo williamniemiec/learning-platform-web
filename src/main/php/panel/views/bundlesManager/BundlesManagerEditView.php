@@ -16,7 +16,7 @@
             <form method="POST" enctype="multipart/form-data">
             	<div class="form-group">
             		<label for="name">Bundle name*</label>
-            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $bundle->getName(); ?>" required />
+            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $bundle->get_name(); ?>" required />
             	</div>
             	
             	<div class="form-group">
@@ -26,17 +26,17 @@
             	
             	<div class="form-group">
             		<label for="description">Description</label>
-            		<textarea id="description" name="description" placeholder="Description" class="form-control"><?php echo $bundle->getDescription(); ?></textarea>
+            		<textarea id="description" name="description" placeholder="Description" class="form-control"><?php echo $bundle->get_description(); ?></textarea>
             	</div>
             	
             	<div class="form-group">
             		<label for="logo">Logo</label>
         			<img	class="manager-logo"
-        					src="<?php echo empty($bundle->getLogo()) ? 
+        					src="<?php echo empty($bundle->get_logo()) ? 
         			            BASE_URL."../assets/img/default/noImage.png" : 
-        			            BASE_URL."../assets/img/logos/bundles/".$bundle->getLogo(); ?>"
+        			            BASE_URL."../assets/img/logos/bundles/".$bundle->get_logo(); ?>"
 		            />
-		            <a href="<?php echo BASE_URL."bundles/deleteLogo/".$bundle->getId(); ?>" class="btn_theme btn_full btn_theme_danger">Remove logo</a>
+		            <a href="<?php echo BASE_URL."bundles/deleteLogo/".$bundle->get_id(); ?>" class="btn_theme btn_full btn_theme_danger">Remove logo</a>
             		<input id="logo" name="logo" type="file" accept=".jpeg,.png,.jpg" class="form-control" />
             	</div>
             	
@@ -63,22 +63,22 @@
             	<tbody>
             		<?php foreach($courses as $course): ?>
                 		<tr>
-                			<?php if (empty($course->getLogo())): ?>
+                			<?php if (empty($course->get_logo())): ?>
                 				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage.png"; ?>" /></td>
                 			<?php else: ?>
-                				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/courses/".$course->getLogo(); ?>" /></td>
+                				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/courses/".$course->get_logo(); ?>" /></td>
                 			<?php endif; ?>
-                			<td><?php echo $course->getName(); ?></td>
-                			<td><?php echo $course->getDescription(); ?></td>
+                			<td><?php echo $course->get_name(); ?></td>
+                			<td><?php echo $course->get_description(); ?></td>
                 			<td><?php echo $course->getTotalStudents(); ?></td>
                 		</tr>
             		<?php endforeach; ?>
             	</tbody>
             </table>
-            <button class="btn_theme" onclick="show_updateBundle(<?php echo $bundle->getId(); ?>)">Include courses</button>
+            <button class="btn_theme" onclick="show_updateBundle(<?php echo $bundle->get_id(); ?>)">Include courses</button>
 		</div>
 	</div>
 	
 	<!-- Modals -->
-	<?php $this->load_view("bundlesManager/IncludeCoursesModal", array('id_bundle' => $bundle->getId())); ?>
+	<?php $this->load_view("bundlesManager/IncludeCoursesModal", array('id_bundle' => $bundle->get_id())); ?>
 </div>

@@ -18,20 +18,20 @@
             <form method="POST" enctype="multipart/form-data">
             	<div class="form-group">
             		<label for="name">Course name</label>
-            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" required value="<?php echo $course->getName(); ?>" />
+            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" required value="<?php echo $course->get_name(); ?>" />
             	</div>
             	
             	<div class="form-group">
             		<label for="description">Description name</label>
-            		<textarea id="description" name="description" class="form-control"><?php echo $course->getDescription(); ?></textarea>
+            		<textarea id="description" name="description" class="form-control"><?php echo $course->get_description(); ?></textarea>
             	</div>
             	
             	<div class="form-group">
             		<label for="logo">Current logo</label><br />
             		<img	class="img img-responsive img-thumbnail manager-logo" 
-            				src="<?php echo empty($course->getLogo()) ? 
+            				src="<?php echo empty($course->get_logo()) ? 
             				    BASE_URL."../assets/img/default/noImage.png" : 
-            				    BASE_URL."../assets/img/logos/courses/".$course->getLogo(); ?>" 
+            				    BASE_URL."../assets/img/logos/courses/".$course->get_logo(); ?>" 
     				/><br /><br />
             		<input id="logo" name="logo" type="file" accept=".jpeg,.png,.jpg" class="form-control" />
             	</div>
@@ -57,16 +57,16 @@
             	<tbody>
             		<?php foreach($modules as $module): ?>
                 		<tr>
-                			<td><?php echo $module->getName(); ?></td>
-                			<td><?php echo $module->getTotalClasses(); ?></td>
+                			<td><?php echo $module->get_name(); ?></td>
+                			<td><?php echo $module->get_total_classes(); ?></td>
                 		</tr>
             		<?php endforeach; ?>
             	</tbody>
             </table>
-            <button class="btn_theme" onclick="show_updateCourses(<?php echo $course->getId(); ?>)">Include modules</button>
+            <button class="btn_theme" onclick="show_updateCourses(<?php echo $course->get_id(); ?>)">Include modules</button>
 		</div>
 	</div>
 	
 	<!-- Modals -->
-	<?php $this->load_view("coursesManager/IncludeModulesModal", array('id_course' => $course->getId())); ?>
+	<?php $this->load_view("coursesManager/IncludeModulesModal", array('id_course' => $course->get_id())); ?>
 </div>

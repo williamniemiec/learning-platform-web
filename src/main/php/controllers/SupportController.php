@@ -10,11 +10,7 @@ use dao\NotificationsDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link support/support.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the SupportView.
  */
 class SupportController extends Controller
 {
@@ -27,9 +23,8 @@ class SupportController extends Controller
      */
     public function __construct()
     {
-        if (!Student::isLogged()){
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Student::is_logged()) {
+            $this->redirect_to("login");
         }
     }
     
@@ -42,11 +37,11 @@ class SupportController extends Controller
      */
     public function index ()
     {   
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
-        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+        $student = Student::get_logged_in($db_connection);
+        $support_topic_dao = new SupportTopicDAO($db_connection, $student->get_id());
+        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
         $limit = 10;
         $index = 1;
         
@@ -64,20 +59,20 @@ class SupportController extends Controller
             'robots' => 'noindex'
         );
         
-        $viewArgs = array(
+        $view_args = array(
             'header' => $header,
-            'username' => $student->getName(),
+            'username' => $student->get_name(),
             'scripts' => array('SupportScript'),
-            'supportTopics' => $supportTopicDAO->getAll($limit, $offset),
+            'supportTopics' => $support_topic_dao->getAll($limit, $offset),
             'notifications' => array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification()),
-            'categories' => $supportTopicDAO->getCategories(),
-            'totalPages' => ceil($supportTopicDAO->count() / $limit),
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification()),
+            'categories' => $support_topic_dao->get_categories(),
+            'totalPages' => ceil($support_topic_dao->count() / $limit),
             'currentIndex' => $index
         );
         
-        $this->load_template("support/SupportView", $viewArgs);
+        $this->load_template("support/SupportView", $view_args);
     }
     
     /**
@@ -85,26 +80,25 @@ class SupportController extends Controller
      */
     public function open($id_topic)
     {
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
-        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
-        $topic = $supportTopicDAO->get($id_topic);
+        $student = Student::get_logged_in($db_connection);
+        $support_topic_dao = new SupportTopicDAO($db_connection, $student->get_id());
+        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+        $topic = $support_topic_dao->get($id_topic);
         
         // If topic does not exist or it exists but does not belongs to the 
         // student logged in, redirects him to courses page
         if (empty($topic)) {
-            header("Location: ".BASE_URL."courses");
-            exit;
+            $this->redirect_to("courses");
         }
         
         // Checks whether a reply has been sent
         if (!empty($_POST['topic_message'])) {
-            $supportTopicDAO->newReply($id_topic, $student->getId(), $_POST['topic_message']);
+            $support_topic_dao->new_reply($id_topic, $student->get_id(), $_POST['topic_message']);
             unset($_POST['topic_message']);
-            header("Refresh: 0");
-            exit;
+            
+            $this->reload();
         }
         
         $header = array(
@@ -114,16 +108,16 @@ class SupportController extends Controller
             'robots' => 'noindex'
         );
         
-        $viewArgs = array(
+        $view_args = array(
             'header' => $header,
-            'username' => $student->getName(),
-            'topic' => $topic->setDatabase($dbConnection),
+            'username' => $student->get_name(),
+            'topic' => $topic->set_database($db_connection),
             'notifications' => array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification())
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification())
         );
         
-        $this->load_template("support/SupportContentView", $viewArgs);
+        $this->load_template("support/SupportContentView", $view_args);
     }
     
     /**
@@ -131,23 +125,21 @@ class SupportController extends Controller
      */
     public function unlock($id_topic)
     {
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
-        $topic = $supportTopicDAO->get($id_topic);
+        $student = Student::get_logged_in($db_connection);
+        $support_topic_dao = new SupportTopicDAO($db_connection, $student->get_id());
+        $topic = $support_topic_dao->get($id_topic);
         
         // If topic does not exist or it exists but does not belongs to the
         // student logged in, redirects him to courses page
         if (empty($topic)) {
-            header("Location: ".BASE_URL."courses");
-            exit;
+            $this->redirect_to("courses");
         }
         
-        $supportTopicDAO->open($id_topic);
+        $support_topic_dao->open($id_topic);
         
-        header("Location: ".BASE_URL."support");
-        exit;
+        $this->redirect_to("support");
     }
     
     /**
@@ -155,23 +147,21 @@ class SupportController extends Controller
      */
     public function lock($id_topic)
     {
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
-        $topic = $supportTopicDAO->get($id_topic);
+        $student = Student::get_logged_in($db_connection);
+        $support_topic_dao = new SupportTopicDAO($db_connection, $student->get_id());
+        $topic = $support_topic_dao->get($id_topic);
         
         // If topic does not exist or it exists but does not belongs to the
         // student logged in, redirects him to courses page
         if (empty($topic)) {
-            header("Location: ".BASE_URL."courses");
-            exit;
+            $this->redirect_to("courses");
         }
         
-        $supportTopicDAO->close($id_topic);
+        $support_topic_dao->close($id_topic);
         
-        header("Location: ".BASE_URL."support");
-        exit;
+        $this->redirect_to("support");
     }
     
     /**
@@ -181,22 +171,21 @@ class SupportController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $supportTopicDAO = new SupportTopicDAO($dbConnection, $student->getId());
-        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+        $student = Student::get_logged_in($dbConnection);
+        $support_topic_dao = new SupportTopicDAO($dbConnection, $student->get_id());
+        $notifications_dao = new NotificationsDAO($dbConnection, $student->get_id());
         
         // Checks whether form has been sent
         if (!empty($_POST['topic_title']) && !empty($_POST['topic_category']) && 
                 !empty($_POST['topic_message'])) {
-            $supportTopicDAO->new(
+            $support_topic_dao->new(
                 (int)$_POST['topic_category'], 
-                $student->getId(), 
+                $student->get_id(), 
                 $_POST['topic_title'], 
                 $_POST['topic_message']
             );
             
-            header("Location: ".BASE_URL."support");
-            exit;
+            $this->redirect_to("support");
         }
         
         $header = array(
@@ -206,16 +195,16 @@ class SupportController extends Controller
             'robots' => 'noindex'
         );
         
-        $viewArgs = array(
+        $view_args = array(
             'header' => $header,
-            'username' => $student->getName(),
-            'categories' => $supportTopicDAO->getCategories(),
+            'username' => $student->get_name(),
+            'categories' => $support_topic_dao->get_categories(),
             'notifications' => array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification())
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification())
         );
         
-        $this->load_template("support/SupportNewView", $viewArgs);
+        $this->load_template("support/SupportNewView", $view_args);
     }
     
     
@@ -234,22 +223,23 @@ class SupportController extends Controller
      */
     public function search()
     {
-        if ($_SERVER['REQUEST_METHOD'] != "POST")
+        if ($this->get_http_request_method() != "POST") {
             return;
+        }
         
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $supportTopicDAO = new SupportTopicDAO(
-            $dbConnection, 
-            Student::getLoggedIn($dbConnection)->getId()
+        $support_topic_dao = new SupportTopicDAO(
+            $db_connection, 
+            Student::get_logged_in($db_connection)->get_id()
         );
         
         echo $_POST['filter']['type'] == 0 ?
-                json_encode($supportTopicDAO->search(
-                    $_POST['name'], 
-                    (int)$_POST['filter']['id_category'])) :
-                json_encode($supportTopicDAO->getAllAnsweredByCategory(
-                    $_POST['name'],
-                    (int)$_POST['filter']['id_category']));
+            json_encode($support_topic_dao->search(
+                $_POST['name'], 
+                (int)$_POST['filter']['id_category'])) :
+            json_encode($support_topic_dao->get_all_answered_by_category(
+                $_POST['name'],
+                (int)$_POST['filter']['id_category']));
     }
 }

@@ -294,7 +294,7 @@ class SupportTopicDAO
      * @throws      \InvalidArgumentException If any argument is invalid
      * @throws      IllegalAccessException If support topic is closed
      */
-    public function newReply(int $id_topic, int $id_student, string $message) : bool
+    public function new_reply(int $id_topic, int $id_student, string $message) : bool
     {
         if (empty($id_topic) || $id_topic <= 0)
             throw new \InvalidArgumentException("Topic id cannot be empty ".
@@ -388,7 +388,7 @@ class SupportTopicDAO
      * answered and that belongs to the category with the given id or empty
      * array if there are no matches
      */
-    public function getAllAnsweredByCategory(string $name = '', int $id_category = 0) : array
+    public function get_all_answered_by_category(string $name = '', int $id_category = 0) : array
     {
         $response = array();
         
@@ -485,7 +485,7 @@ class SupportTopicDAO
      * @return      SupportTopicCategory[] Support topic categories or empty 
      * array if there are no registered categories
      */
-    public function getCategories() : array
+    public function get_categories() : array
     {
         $response = array();
         

@@ -72,7 +72,7 @@ class Bundle implements \JsonSerializable
      *
      * @return      string Bundle name
      */
-    public function getName() : string
+    public function get_name() : string
     {
         return $this->name;
     }
@@ -104,7 +104,7 @@ class Bundle implements \JsonSerializable
      * @return      string Bundle description or empty string if
      * bundle does not have a description
      */
-    public function getDescription() : string
+    public function get_description() : string
     {
         return $this->description;
     }
@@ -119,7 +119,7 @@ class Bundle implements \JsonSerializable
      * 
      * @implNote    Lazy initialization
      */
-    public function getCourses(Database $db) : array
+    public function get_courses(Database $db) : array
     {
         if (empty($this->courses)) {
             $courses = new CoursesDAO($db);
@@ -139,7 +139,7 @@ class Bundle implements \JsonSerializable
      * 
      * @implNote    Lazy initialization
      */
-    public function getTotalLength(Database $db) : int
+    public function get_total_length(Database $db) : int
     {
         if (empty($this->totalLength)) {
             $bundles = new BundlesDAO($db);
@@ -161,7 +161,7 @@ class Bundle implements \JsonSerializable
      *
      * @implNote    Lazy initialization
      */
-    public function getTotalClasses(Database $db) : int
+    public function get_total_classes(Database $db) : int
     {
         if (empty($this->totalClasses)) {
             $bundles = new BundlesDAO($db);

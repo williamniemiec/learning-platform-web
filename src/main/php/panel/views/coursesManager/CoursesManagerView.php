@@ -49,19 +49,19 @@
                 	<tbody id="courses">
                 		<?php foreach($courses as $course): ?>
                     		<tr>
-                    			<?php if (empty($course->getLogo())): ?>
+                    			<?php if (empty($course->get_logo())): ?>
                     				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage.png"; ?>" /></td>
                     			<?php else: ?>
-                    				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/courses/".$course->getLogo(); ?>" /></td>
+                    				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/courses/".$course->get_logo(); ?>" /></td>
                     			<?php endif; ?>
-                    			<td><a href="<?php echo BASE_URL."courses/edit/".$course->getId(); ?>"><?php echo $course->getName(); ?></a></td>
-                    			<td><?php echo $course->getDescription(); ?></td>
+                    			<td><a href="<?php echo BASE_URL."courses/edit/".$course->get_id(); ?>"><?php echo $course->get_name(); ?></a></td>
+                    			<td><?php echo $course->get_description(); ?></td>
                     			<td><?php echo $course->getTotalStudents(); ?></td>
-                    			<td><?php echo $course->getTotalClasses(); ?></td>
-                    			<td><?php echo number_format($course->getTotalLength() / 60, 2); ?>h</td>
+                    			<td><?php echo $course->get_total_classes(); ?></td>
+                    			<td><?php echo number_format($course->get_total_length() / 60, 2); ?>h</td>
                     			<td class="actions">
-                    				<a class="btn_theme" href="<?php echo BASE_URL."courses/edit/".$course->getId(); ?>">Edit</a>
-                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."courses/delete/".$course->getId(); ?>">Delete</a>
+                    				<a class="btn_theme" href="<?php echo BASE_URL."courses/edit/".$course->get_id(); ?>">Edit</a>
+                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."courses/delete/".$course->get_id(); ?>">Delete</a>
                 				</td>
                     		</tr>
                 		<?php endforeach; ?>

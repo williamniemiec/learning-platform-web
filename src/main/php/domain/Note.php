@@ -56,7 +56,7 @@ class Note implements \JsonSerializable
      * 
      * @return      int Annotation id
      */
-    public function getId() : int
+    public function get_id() : int
     {
         return $this->id_note;
     }
@@ -86,7 +86,7 @@ class Note implements \JsonSerializable
      *
      * @return      DateTime Creation date
      */
-    public function getCreationDate() : DateTime
+    public function get_creation_date() : DateTime
     {
         return $this->date;
     }
@@ -96,7 +96,7 @@ class Note implements \JsonSerializable
      *
      * @return      Video Class associated with the annotation.
      */
-    public function getClass() : Video
+    public function get_class() : Video
     {
         return $this->class;
     }

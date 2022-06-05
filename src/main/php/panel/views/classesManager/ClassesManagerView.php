@@ -23,16 +23,16 @@ use models\Video;
                 		<?php foreach($classes as $class): ?>
                     		<tr>
                     			<td>
-                    				<a href="<?php echo BASE_URL."classes/edit/".$class->getModule()->getId()."/".$class->getClassOrder(); ?>">
+                    				<a href="<?php echo BASE_URL."classes/edit/".$class->getModule()->get_id()."/".$class->get_class_order(); ?>">
                     					<?php echo $class instanceof Video ? $class->getTitle() : $class->getQuestion(); ?>
                 					</a>
             					</td>
                     			<td><?php echo $class instanceof Video ? "Video" : "Questionnaire"; ?></td>
-                    			<td><?php echo $class->getModule()->getName(); ?></td>
-                    			<td><?php echo $class->getClassOrder(); ?></td>
+                    			<td><?php echo $class->getModule()->get_name(); ?></td>
+                    			<td><?php echo $class->get_class_order(); ?></td>
                     			<td class="actions">
-                    				<a class="btn_theme" href="<?php echo BASE_URL."classes/edit/".$class->getModule()->getId()."/".$class->getClassOrder(); ?>">Edit</a>
-                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."classes/delete/".$class->getModule()->getId()."/".$class->getClassOrder(); ?>">Delete</a>
+                    				<a class="btn_theme" href="<?php echo BASE_URL."classes/edit/".$class->getModule()->get_id()."/".$class->get_class_order(); ?>">Edit</a>
+                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."classes/delete/".$class->getModule()->get_id()."/".$class->get_class_order(); ?>">Delete</a>
                 				</td>
                     		</tr>
                 		<?php endforeach; ?>

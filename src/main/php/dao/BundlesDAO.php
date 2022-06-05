@@ -202,7 +202,7 @@ class BundlesDAO
      *  @throws      \InvalidArgumentException If bundle id is empty or less 
      *  than or equal to zero
      */
-    public function extensionBundles(int $id_bundle, int $id_student = -1) : array
+    public function extension_bundles(int $id_bundle, int $id_student = -1) : array
     {
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
@@ -276,7 +276,7 @@ class BundlesDAO
      * @throws      \InvalidArgumentException If bundle id is empty or less than
      * or equal to zero
      */
-    public function unrelatedBundles(int $id_bundle, int $id_student = -1) : array
+    public function unrelated_bundles(int $id_bundle, int $id_student = -1) : array
     {
         if (empty($id_bundle) || $id_bundle <= 0)
             throw new \InvalidArgumentException("Bundle id cannot be empty ".

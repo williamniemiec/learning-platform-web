@@ -11,7 +11,7 @@
             		<label for="topic_category">Category</label>
             		<select name="topic_category" class="form-control">
             			<?php foreach ($categories as $category): ?>
-                			<option value="<?php echo $category->getId(); ?>"><?php echo ucfirst(strtolower($category->getName())); ?></option>
+                			<option value="<?php echo $category->get_id(); ?>"><?php echo ucfirst(strtolower($category->get_name())); ?></option>
             			<?php endforeach; ?>
             		</select>
             	</div>

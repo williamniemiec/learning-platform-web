@@ -51,18 +51,18 @@
                 	<tbody>
                 		<?php foreach($bundles as $bundle): ?>
                     		<tr>
-                    			<?php if (empty($bundle->getLogo())): ?>
+                    			<?php if (empty($bundle->get_logo())): ?>
                     				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/default/noImage.png"; ?>" /></td>
                     			<?php else: ?>
-                    				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/bundles/".$bundle->getLogo(); ?>" /></td>
+                    				<td class="manager-table-logo"><img class="img img-responsive" src="<?php echo BASE_URL."../assets/img/logos/bundles/".$bundle->get_logo(); ?>" /></td>
                     			<?php endif; ?>
-                    			<td><a href="<?php echo BASE_URL."bundles/edit/".$bundle->getId(); ?>"><?php echo $bundle->getName(); ?></a></td>
-                    			<td><?php echo $bundle->getDescription(); ?></td>
+                    			<td><a href="<?php echo BASE_URL."bundles/edit/".$bundle->get_id(); ?>"><?php echo $bundle->get_name(); ?></a></td>
+                    			<td><?php echo $bundle->get_description(); ?></td>
                     			<td>US$ <?php echo $bundle->getPrice(); ?></td>
                     			<td><?php echo $bundle->getTotalStudents(); ?></td>
                     			<td class="actions">
-                    				<a class="btn_theme" href="<?php echo BASE_URL."bundles/edit/".$bundle->getId(); ?>">Edit</a>
-                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."bundles/delete/".$bundle->getId(); ?>">Delete</a>
+                    				<a class="btn_theme" href="<?php echo BASE_URL."bundles/edit/".$bundle->get_id(); ?>">Edit</a>
+                    				<a class="btn_theme btn_theme_danger" href="<?php echo BASE_URL."bundles/delete/".$bundle->get_id(); ?>">Delete</a>
                 				</td>
                     		</tr>
                 		<?php endforeach; ?>

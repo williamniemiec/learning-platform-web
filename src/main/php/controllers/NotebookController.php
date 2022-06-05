@@ -11,11 +11,7 @@ use dao\NotificationsDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link notebook_content.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the NotebookView.
  */
 class NotebookController extends Controller
 {
@@ -28,9 +24,8 @@ class NotebookController extends Controller
      */
     public function __construct()
     {
-        if (!Student::isLogged()){
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Student::is_logged()) {
+            $this->redirect_to("login");
         }
     }
     
@@ -43,24 +38,22 @@ class NotebookController extends Controller
      */
     public function index () 
     {
-        header("Location: ".BASE_URL."login");
-        exit;
+        $this->redirect_to("login");
     }
     
     public function open($id_note)
     {   
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
-        $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
-        $note = $notebookDAO->get($id_note);
+        $student = Student::get_logged_in($db_connection);
+        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+        $notebook_dao = new NotebookDAO($db_connection, $student->get_id());
+        $note = $notebook_dao->get($id_note);
         
         // If does not exist an note with the provided id or if it exists but
         // does not belongs to student logged in, redirects him to courses page
         if (empty($note)) {
-            header("Location: ".BASE_URL."courses");
-            exit;
+            $this->redirect_to("courses");
         }
         
         $header = array(
@@ -70,16 +63,16 @@ class NotebookController extends Controller
             'robots' => 'noindex'
         );
         
-        $viewArgs = array(
+        $view_args = array(
             'header' => $header,
-            'username' => $student->getName(),
+            'username' => $student->get_name(),
             'note' => $note,
             'notifications' => array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification()),
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification()),
         );
         
-        $this->load_template("notebook/NotebookContentView", $viewArgs);
+        $this->load_template("notebook/NotebookContentView", $view_args);
     }
     
     /**
@@ -89,33 +82,30 @@ class NotebookController extends Controller
      */
     public function edit($id_note)
     {
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
-        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
-        $note = $notebookDAO->get($id_note);
+        $student = Student::get_logged_in($db_connection);
+        $notebook_dao = new NotebookDAO($db_connection, $student->get_id());
+        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+        $note = $notebook_dao->get($id_note);
         
         // If does not exist an note with the provided id or if it exists but 
         // does not belongs to student logged in, redirects him to courses page
         if (empty($note)) {
-            header("Location: ".BASE_URL."courses");
-            exit;
+            $this->redirect_to("courses");
         }
         
         // Checks if form has been sent
         if (!empty($_POST['note_title']) && !empty($_POST['note_content'])) {
-            $notebookDAO->update(new Note(
-                $note->getId(), 
+            $notebook_dao->update(new Note(
+                $note->get_id(), 
                 $_POST['note_title'], 
                 $_POST['note_content'], 
-                $note->getCreationDate(), 
-                $note->getClass()
+                $note->get_creation_date(), 
+                $note->get_class()
             ));
             
-            // Redirects student to courses page
-            header("Location: ".BASE_URL."courses");
-            exit;
+            $this->redirect_to("courses");
         }
         
         $header = array(
@@ -127,11 +117,11 @@ class NotebookController extends Controller
         
         $viewArgs = array(
             'header' => $header,
-            'username' => $student->getName(),
+            'username' => $student->get_name(),
             'note' => $note,
             'notifications' => array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification()),
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification()),
         );
         
         $this->load_template("notebook/NotebookEditView", $viewArgs);
@@ -146,21 +136,19 @@ class NotebookController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
+        $student = Student::get_logged_in($dbConnection);
+        $notebookDAO = new NotebookDAO($dbConnection, $student->get_id());
         $note = $notebookDAO->get($id_note);
         
         // If does not exist an note with the provided id or if it exists but
         // does not belongs to student logged in, redirects him to courses page
         if (empty($note)) {
-            header("Location: ".BASE_URL."courses");
-            exit;
+            $this->redirect_to("courses");
         }
         
         $notebookDAO->delete($id_note);
         
-        header("Location: ".BASE_URL."courses");
-        exit;
+        $this->redirect_to("courses");
     }
     
     //-------------------------------------------------------------------------
@@ -181,8 +169,8 @@ class NotebookController extends Controller
     public function new()
     {
         // Checks if it is a POST request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST')
+            $this->redirect_to_root();
             
         if (empty($_POST['title']) || empty($_POST['content']) || 
                 empty($_POST['id_module']) || empty($_POST['class_order']) || 
@@ -190,10 +178,10 @@ class NotebookController extends Controller
             return;
         }
         
-        $dbConnection = new MySqlPDODatabase();
-        $notebookDAO = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $db_connection = new MySqlPDODatabase();
+        $notebook_dao = new NotebookDAO($db_connection, Student::get_logged_in($db_connection)->get_id());
         
-        echo $notebookDAO->new(
+        echo $notebook_dao->new(
             (int)$_POST['id_module'], 
             (int)$_POST['class_order'],
             $_POST['title'], 
@@ -212,19 +200,18 @@ class NotebookController extends Controller
      * 
      * @apiNote     Must be called using GET request method
      */
-    public function getAll()
+    public function get_all()
     {
-        // Checks if it is a GET request
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'GET') {
+            $this->redirect_to_root();
+        }
         
-        $dbConnection = new MySqlPDODatabase();
-        $notebookDAO = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $db_connection = new MySqlPDODatabase();
+        $notebook_dao = new NotebookDAO($db_connection, Student::get_logged_in($db_connection)->get_id());
         $offset = $_GET['limit'] * ($_GET['index'] - 1);
         
         echo json_encode(
-            $notebookDAO->getAll((int)$_GET['limit'], 
-                (int)$offset)
+            $notebook_dao->get_all((int) $_GET['limit'], (int) $offset)
         );
     }
     
@@ -241,22 +228,24 @@ class NotebookController extends Controller
      *
      * @apiNote     Must be called using GET request method
      */
-    public function getAllFromClass()
+    public function get_all_from_class()
     {
         // Checks if it is a GET request
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'GET') {
+            $this->redirect_to_root();
+        }
             
-            $dbConnection = new MySqlPDODatabase();
-            $notebookDAO = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
-            $offset = $_GET['limit'] * ($_GET['index'] - 1);
-            
-            echo json_encode(
-                $notebookDAO->getAllFromClass(
-                    $_GET['id_module'],
-                    $_GET['class_order'],
-                    (int)$_GET['limit'],
-                    (int)$offset)
-                );
+        $db_connection = new MySqlPDODatabase();
+        $notebook_dao = new NotebookDAO($db_connection, Student::get_logged_in($db_connection)->get_id());
+        $offset = $_GET['limit'] * ($_GET['index'] - 1);
+        
+        echo json_encode(
+            $notebook_dao->get_all_from_class(
+                $_GET['id_module'],
+                $_GET['class_order'],
+                (int) $_GET['limit'],
+                (int) $offset
+            )
+        );
     }
 }

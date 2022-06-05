@@ -63,7 +63,7 @@ class NotificationsDAO
      * @throws      \InvalidArgumentException If limit is empty or less than or
      * equal to zero
      */
-    public function getNotifications(int $limit = 10) : array
+    public function get_notifications(int $limit = 10) : array
     {
         if (empty($limit) || $limit <= 0)
             throw new \InvalidArgumentException("Limit cannot be empty or ".
@@ -94,7 +94,7 @@ class NotificationsDAO
                     $ref = $commentsDAO->get((int)$notification['id_reference']);
                 }
                 else {
-                    $supportTopicDAO = new SupportTopicDAO($this->db, Student::getLoggedIn($this->db)->getId());
+                    $supportTopicDAO = new SupportTopicDAO($this->db, Student::get_logged_in($this->db)->get_id());
                     $ref = $supportTopicDAO->get((int)$notification['id_reference']);
                 }
                 
@@ -118,7 +118,7 @@ class NotificationsDAO
      * 
      * @return      int Total unread notifications
      */
-    public function countUnreadNotification() : int
+    public function count_unread_notification() : int
     {
         // Query construction
         $sql = $this->db->prepare("
@@ -169,7 +169,7 @@ class NotificationsDAO
      * @throws      \InvalidArgumentException If notification id is empty or
      * less than or equal to zero
      */
-    public function markAsRead(int $id_notification) : void
+    public function mark_as_read(int $id_notification) : void
     {
         if (empty($id_notification) or $id_notification <= 0)
             throw new \InvalidArgumentException("Notification id cannot be empty ".

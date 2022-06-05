@@ -10,10 +10,6 @@ use dao\NotificationsDAO;
 
 /**
  * It will be responsible for site's page not found behavior.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class NotFoundController extends Controller 
 {
@@ -25,7 +21,7 @@ class NotFoundController extends Controller
 	 */
 	public function index()
 	{
-	    $dbConnection = new MySqlPDODatabase();
+	    $db_connection = new MySqlPDODatabase();
 	    
 	    $header = array(
 	        'title' => 'Page not found - Learning platform',
@@ -33,25 +29,25 @@ class NotFoundController extends Controller
 	        'robots' => 'noindex'
 	    );
 	    
-	    $viewArgs = array(
+	    $view_args = array(
 	        'header' => $header
 	    );
 	    
-	    $student = Student::getLoggedIn($dbConnection);
+	    $student = Student::get_logged_in($db_connection);
 	    
 	    if (empty($student)) {
-	        $this->load_template('error/404', $viewArgs, false);
+	        $this->load_template('error/404', $view_args, false);
 	    }
         else {
-            $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+            $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
     	        
-            $viewArgs['username'] = $student->getName();
-            $viewArgs['notifications'] = array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification()
+            $view_args['username'] = $student->get_name();
+            $view_args['notifications'] = array(
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification()
             );
             
-            $this->load_template('error/404', $viewArgs, true);
+            $this->load_template('error/404', $view_args, true);
         }
 	}
 }

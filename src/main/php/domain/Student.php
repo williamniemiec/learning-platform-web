@@ -58,7 +58,7 @@ class Student extends User
      *
      * @return      bool If student is logged
      */
-    public static function isLogged() : bool
+    public static function is_logged() : bool
     {
         return !empty($_SESSION['s_login']);
     }
@@ -78,7 +78,7 @@ class Student extends User
         $student = $studentsDAO->login($email, $password);
         
         if (!empty($student))
-            $_SESSION['s_login'] = $student->getId();
+            $_SESSION['s_login'] = $student->get_id();
         
         return $student;
     }
@@ -92,7 +92,7 @@ class Student extends User
      * @return      Student Student logged in or null if there is no student 
      * logged in
      */
-    public static function getLoggedIn(Database $db) : ?Student
+    public static function get_logged_in(Database $db) : ?Student
     {
         if (empty($_SESSION['s_login']))
             return null;

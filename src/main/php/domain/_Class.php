@@ -29,7 +29,7 @@ abstract class _Class implements \JsonSerializable
      * 
      * @return      int Module id
      */
-    public function getModuleId() : int
+    public function get_module_id() : int
     {
         return $this->id_module;
     }
@@ -39,7 +39,7 @@ abstract class _Class implements \JsonSerializable
      *
      * @return      int Module id
      */
-    public function getClassOrder() : int
+    public function get_class_order() : int
     {
         return $this->class_order;
     }

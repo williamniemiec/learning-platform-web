@@ -10,10 +10,6 @@ use dao\NotificationsDAO;
 
 /**
  * Responsible for handling ajax requests for notifications.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class NotificationController extends Controller
 {
@@ -25,7 +21,7 @@ class NotificationController extends Controller
      */
     public function index ()
     {
-        header("Location: ".BASE_URL);
+        $this->redirect_to_root();
     }
     
     
@@ -42,18 +38,19 @@ class NotificationController extends Controller
     public function read()
     {
         // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
             
         if (empty($_POST['id_notification'])) {
             return;
         }
         
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $notificationsDAO = new NotificationsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $notifications_dao = new NotificationsDAO($db_connection, Student::get_logged_in($db_connection)->get_id());
         
-        $notificationsDAO->markAsRead((int)$_POST['id_notification']);
+        $notifications_dao->mark_as_read((int) $_POST['id_notification']);
     }
     
     /**
@@ -66,18 +63,19 @@ class NotificationController extends Controller
     public function unread()
     {
         // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
             
-            if (empty($_POST['id_notification'])) {
-                return;
-            }
-            
-            $dbConnection = new MySqlPDODatabase();
-            
-            $notificationsDAO = new NotificationsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
-            
-            $notificationsDAO->markAsUnread((int)$_POST['id_notification']);
+        if (empty($_POST['id_notification'])) {
+            return;
+        }
+        
+        $db_connection = new MySqlPDODatabase();
+        
+        $notifications_dao = new NotificationsDAO($db_connection, Student::get_logged_in($db_connection)->get_id());
+        
+        $notifications_dao->markAsUnread((int)$_POST['id_notification']);
     }
     
     /**
@@ -90,17 +88,18 @@ class NotificationController extends Controller
     public function delete()
     {
         // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
             
         if (empty($_POST['id_notification'])) { 
             return; 
         }
         
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $notificationsDAO = new NotificationsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $notifications_dao = new NotificationsDAO($db_connection, Student::get_logged_in($db_connection)->get_id());
         
-        $notificationsDAO->delete((int)$_POST['id_notification']);
+        $notifications_dao->delete((int)$_POST['id_notification']);
     }
 }

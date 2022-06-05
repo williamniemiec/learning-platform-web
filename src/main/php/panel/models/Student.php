@@ -81,7 +81,7 @@ class Student extends User
         $student = $studentsDAO->login($email, $password);
         
         if (!empty($student))
-            $_SESSION['s_login'] = $student->getId();
+            $_SESSION['s_login'] = $student->get_id();
         
         return $student;
     }

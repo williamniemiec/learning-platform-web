@@ -90,7 +90,7 @@ function search(obj)
  */
 function navigate(action, goto = -1)
 {
-	let nav = new NotebookNavigator(4, "notebook/getAll")
+	let nav = new NotebookNavigator(4, "notebook/get_all")
 	nav.navigate(action, goto)
 }
 

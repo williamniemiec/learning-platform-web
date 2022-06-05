@@ -101,7 +101,7 @@ class QuestionnairesDAO extends ClassesDAO
      * @throws      \InvalidArgumentException If module id or class order is 
      * empty or less than or equal to zero
      */
-    public function getAnswer(int $id_module, int $class_order) : int
+    public function get_answer(int $id_module, int $class_order) : int
     {
         if (empty($id_module) || $id_module <= 0)
             throw new \InvalidArgumentException("Module id cannot be empty ".
@@ -199,7 +199,7 @@ class QuestionnairesDAO extends ClassesDAO
      * {@inheritdoc}
      * @Override
      */
-    public function wasWatched(int $id_student, int $id_module, int $class_order) : bool
+    public function was_watched(int $id_student, int $id_module, int $class_order) : bool
     {
         $sql = $this->db->prepare("
             SELECT  COUNT(*) AS was_watched

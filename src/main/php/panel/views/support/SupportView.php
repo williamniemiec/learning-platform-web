@@ -17,8 +17,8 @@
         					<select id="sel-category" name="sel-category" class="form-control">
         						<option value="0">All</option>
         						<?php foreach ($categories as $category): ?>
-        							<option value="<?php echo $category->getId(); ?>">
-        								<?php echo ucfirst(strtolower($category->getName())); ?>
+        							<option value="<?php echo $category->get_id(); ?>">
+        								<?php echo ucfirst(strtolower($category->get_name())); ?>
     								</option>
         						<?php endforeach; ?>
         					</select>
@@ -40,9 +40,9 @@
             	<tbody id="topics">
             		<?php foreach ($topics as $topic): ?>
             		<tr>
-            			<td><a href="<?php echo BASE_URL."support/open/".$topic->getId(); ?>"><?php echo $topic->getTitle(); ?></a></td>
-            			<td><?php echo ucfirst(strtolower($topic->getCategory()->getName())); ?></td>
-            			<td><?php echo $topic->getCreationDate()->format("m/d/Y H:m:s"); ?></td>
+            			<td><a href="<?php echo BASE_URL."support/open/".$topic->get_id(); ?>"><?php echo $topic->getTitle(); ?></a></td>
+            			<td><?php echo ucfirst(strtolower($topic->getCategory()->get_name())); ?></td>
+            			<td><?php echo $topic->get_creation_date()->format("m/d/Y H:m:s"); ?></td>
             			<td><?php echo $topic->isClosed() ? "Closed" : "Open" ?></td>
             		</tr>
             		<?php endforeach; ?>

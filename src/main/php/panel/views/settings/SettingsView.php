@@ -8,7 +8,7 @@ use models\enum\GenreEnum;
     	<div class="view_content">
     		<div class="form-group">
         		<label for="name">Name</label>
-        		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $user->getName(); ?>" readonly />
+        		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $user->get_name(); ?>" readonly />
         	</div>
         	
         	<div class="form-group">
@@ -23,7 +23,7 @@ use models\enum\GenreEnum;
         	
         	<div class="form-group">
         		<label for="birthdate">Birthdate</label>
-        		<input id="birthdate" type="date" name="birthdate" class="form-control" value="<?php echo $user->getBirthdate()->format("Y-m-d"); ?>" readonly />
+        		<input id="birthdate" type="date" name="birthdate" class="form-control" value="<?php echo $user->get_birthdate()->format("Y-m-d"); ?>" readonly />
         	</div>
         	
         	<div class="form-group">

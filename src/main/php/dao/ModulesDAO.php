@@ -119,11 +119,11 @@ class ModulesDAO
         
         // Creates response array
         foreach ($class_video as $class) {
-            $response[$class->getClassOrder()] = $class;
+            $response[$class->get_class_order()] = $class;
         }
         
         foreach ($class_questionnaire as $class) {
-            $response[$class->getClassOrder()] = $class;
+            $response[$class->get_class_order()] = $class;
         }
         
         return $response;

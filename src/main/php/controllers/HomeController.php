@@ -15,11 +15,7 @@ use dao\HistoricDAO;
 
 
 /**
- * Main controller. It will be responsible for site's main page behavior.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the HomeView.
  */
 class HomeController extends Controller 
 {
@@ -34,10 +30,10 @@ class HomeController extends Controller
      */
 	public function index ()
 	{   
-	    $dbConnection = new MySqlPDODatabase();
+	    $db_connection = new MySqlPDODatabase();
 	    
-	    $bundlesDAO = new BundlesDAO($dbConnection);
-	    $coursesDAO = new CoursesDAO($dbConnection);
+	    $bundles_dao = new BundlesDAO($db_connection);
+	    $courses_dao = new CoursesDAO($db_connection);
 	    
 	    $header = array(
 	        'title' => 'Home - Learning Platform',
@@ -48,37 +44,37 @@ class HomeController extends Controller
 	        'robots' => 'index'
 	    );
 	    
-	    $viewArgs = array(
+	    $view_args = array(
 	        'header' => $header,
 	        'scripts' => array('gallery', 'HomeScript'),
-	        'total_bundles' => $bundlesDAO->getTotal(),
-	        'total_courses' => $coursesDAO->getTotal(),
-	        'total_length' => number_format(ClassesDAO::getTotal($dbConnection)['total_length'] / 60, 2)
+	        'total_bundles' => $bundles_dao->getTotal(),
+	        'total_courses' => $courses_dao->getTotal(),
+	        'total_length' => number_format(ClassesDAO::getTotal($db_connection)['total_length'] / 60, 2)
 	    );
 
-	    if (Student::isLogged()) {
-	        $student = Student::getLoggedIn($dbConnection);
-	        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+	    if (Student::is_logged()) {
+	        $student = Student::get_logged_in($db_connection);
+	        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
 	        
-	        $viewArgs['username'] = $student->getName();
-	        $viewArgs['notifications'] = array(
-	            'notifications' => $notificationsDAO->getNotifications(10),
-	            'total_unread' => $notificationsDAO->countUnreadNotification());
-	        $viewArgs['bundles'] = $bundlesDAO->getAll(
-	            $student->getId(), -1, '',
+	        $view_args['username'] = $student->get_name();
+	        $view_args['notifications'] = array(
+	            'notifications' => $notifications_dao->get_notifications(10),
+	            'total_unread' => $notifications_dao->count_unread_notification());
+	        $view_args['bundles'] = $bundles_dao->getAll(
+	            $student->get_id(), -1, '',
 	            new BundleOrderTypeEnum(BundleOrderTypeEnum::SALES),
 	            new OrderDirectionEnum(OrderDirectionEnum::DESCENDING)
 	            );
 	    }
 	    else {
-	        $viewArgs['bundles'] = $bundlesDAO->getAll(
+	        $view_args['bundles'] = $bundles_dao->getAll(
 	            -1, -1, '',
 	            new BundleOrderTypeEnum(BundleOrderTypeEnum::SALES),
 	            new OrderDirectionEnum(OrderDirectionEnum::DESCENDING)
             );
 	    }
 	    
-		$this->load_template("HomeView", $viewArgs, Student::isLogged());
+		$this->load_template("HomeView", $view_args, Student::is_logged());
 	}
 	
 	/**
@@ -87,7 +83,7 @@ class HomeController extends Controller
 	public function logout()
 	{
 	    Student::logout();
-	    header("Location: ".BASE_URL);
+	    $this->redirect_to_root();
 	}
 	
 	
@@ -101,16 +97,17 @@ class HomeController extends Controller
 	 */
 	public function weekly_progress()
 	{
-	    if ($_SERVER['REQUEST_METHOD'] != 'POST')
-	        header("Location: ".BASE_URL);
+	    if ($this->get_http_request_method() != 'POST') {
+	        $this->redirect_to_root();
+		}
 	    
-	    $dbConnection = new MySqlPDODatabase();
-	    $historicDAO = new HistoricDAO(
-	        $dbConnection, 
-	        Student::getLoggedIn($dbConnection)->getId()
+	    $db_connection = new MySqlPDODatabase();
+	    $historic_dao = new HistoricDAO(
+	        $db_connection, 
+	        Student::get_logged_in($db_connection)->get_id()
         );
 	    
-	    echo json_encode($historicDAO->getWeeklyHistory());
+	    echo json_encode($historic_dao->get_weekly_history());
 	}
 	
 	/**
@@ -122,10 +119,10 @@ class HomeController extends Controller
 	 */
 	public function get_student_logged_in()
 	{
-	    // Checks if it is an ajax request
-	    if ($_SERVER['REQUEST_METHOD'] != 'POST')
-	        header("Location: ".BASE_URL);
+	    if ($this->get_http_request_method() != 'POST') {
+	        $this->redirect_to_root();
+		}
 	        
-	        echo json_encode(Student::getLoggedIn(new MySqlPDODatabase()));
+	    echo json_encode(Student::get_logged_in(new MySqlPDODatabase()));
 	}
 }

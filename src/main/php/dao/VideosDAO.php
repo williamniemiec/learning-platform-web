@@ -148,7 +148,7 @@ class VideosDAO extends ClassesDAO
      * {@inheritdoc}
      * @Override
      */
-    public function wasWatched(int $id_student, int $id_module, int $class_order) : bool
+    public function was_watched(int $id_student, int $id_module, int $class_order) : bool
     {
         $sql = $this->db->prepare("
             SELECT  COUNT(*) AS was_watched
@@ -177,7 +177,7 @@ class VideosDAO extends ClassesDAO
      * 
      * @Override
      */
-    public function markAsWatched(int $id_student, int $id_module, int $class_order) : bool
+    public function mark_as_watched(int $id_student, int $id_module, int $class_order) : bool
     {
         return $this->_markAsWatched($id_student, $id_module, $class_order,
             new ClassTypeEnum(ClassTypeEnum::VIDEO));

@@ -121,7 +121,7 @@ class NotebookDAO
      * @throws      \InvalidArgumentException If module id, class order is 
      * empty, less than or equal to zero
      */
-    public function getAllFromClass(int $id_module, int $class_order, 
+    public function get_all_from_class(int $id_module, int $class_order, 
         int $limit = -1, int $offset = -1) : array
     {
         if (empty($id_module) || $id_module <= 0)
@@ -267,7 +267,7 @@ class NotebookDAO
             $note->getTitle(),
             $note->getContent(),
             $this->id_student, 
-            $note->getId()
+            $note->get_id()
         ));
 
         return $sql && $sql->rowCount() > 0;
@@ -317,7 +317,7 @@ class NotebookDAO
      * @throws      \InvalidArgumentException If student id provided in the
      * constructor is empty, less than or equal to zero
      */
-    public function getAll(int $limit = -1, int $offset = -1) : array
+    public function get_all(int $limit = -1, int $offset = -1) : array
     {
         if (empty($this->id_student) || $this->id_student <= 0)
             throw new \InvalidArgumentException("Student id logged in must be ".
@@ -391,7 +391,7 @@ class NotebookDAO
      *
      * @return      int Total notes
      */
-    public function countAllFromClass(int $id_module, int $class_order) : int
+    public function count_all_from_class(int $id_module, int $class_order) : int
     {
         return (int)$this->db->query("
             SELECT  COUNT(*) AS total

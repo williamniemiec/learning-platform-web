@@ -58,7 +58,7 @@ class HistoricDAO
      * @throws      \InvalidArgumentException If course id is empty or less 
      * than or equal to zero
      */
-    public function countWatchedClasses(int $id_course) : int
+    public function count_watched_classes(int $id_course) : int
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty or ". 
@@ -107,7 +107,7 @@ class HistoricDAO
      * @throws      \InvalidArgumentException If course id is empty or less 
      * than or equal to zero
      */
-    public function getWatchedClassesFromCourse(int $id_course)
+    public function get_watched_classes_from_course(int $id_course)
     {
         if (empty($id_course) || $id_course <= 0)
             throw new \InvalidArgumentException("Course id cannot be empty or ".
@@ -149,7 +149,7 @@ class HistoricDAO
      *      student on this date</li>
      *  </ul>
      */
-    public function getWeeklyHistory() : array
+    public function get_weekly_history() : array
     {
         // Query construction
         $sql = $this->db->prepare("

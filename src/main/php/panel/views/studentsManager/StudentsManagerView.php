@@ -12,8 +12,8 @@
             					<select id="sel-course" name="filter-course" class="form-control">
             						<option value="0" <?php echo $selectedCourse == 0 ? "selected" : "" ?>>All</option>
             						<?php foreach ($courses as $course): ?>
-            							<option value="<?php echo $course->getId(); ?>" <?php echo $selectedCourse == $course->getId() ? "selected" : ""; ?>>
-            								<?php echo $course->getName(); ?>
+            							<option value="<?php echo $course->get_id(); ?>" <?php echo $selectedCourse == $course->get_id() ? "selected" : ""; ?>>
+            								<?php echo $course->get_name(); ?>
         								</option>
             						<?php endforeach; ?>
             					</select>
@@ -33,19 +33,19 @@
         		</thead>
         		<tbody>
         			<?php foreach ($students as $student): ?>
-            			<tr data-id_student="<?php echo $student->getId(); ?>">
-            				<td class="student_name"><?php echo $student->getName(); ?></td>
+            			<tr data-id_student="<?php echo $student->get_id(); ?>">
+            				<td class="student_name"><?php echo $student->get_name(); ?></td>
             				<td class="student_bundles">
             					<?php
                 					foreach($student->getBundles() as $bundle) {
-                					    echo $bundle->getName()." | ";
+                					    echo $bundle->get_name()." | ";
                 					}
             				    ?>	
             				</td>
             				<td class="student_totalBundles"><?php echo count($student->getBundles()); ?></td>
             				<td class="actions">
-            					<button class="btn_theme" onclick="show_editStudent(<?php echo $student->getId(); ?>)">Edit</button>
-            					<button class="btn_theme btn_theme_danger" onclick="deleteStudent(this,<?php echo $student->getId(); ?>)">Delete</button>
+            					<button class="btn_theme" onclick="show_editStudent(<?php echo $student->get_id(); ?>)">Edit</button>
+            					<button class="btn_theme btn_theme_danger" onclick="deleteStudent(this,<?php echo $student->get_id(); ?>)">Delete</button>
             				</td>
             			</tr>
         			<?php endforeach; ?>

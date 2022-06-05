@@ -102,11 +102,11 @@ class Module implements \JsonSerializable
             $classes_questionnaire = $questionnaires->getAllFromModule($this->id_module);
             
             foreach ($classes_video as $class) {
-                $this->classes[$class->getClassOrder()] = $class;
+                $this->classes[$class->get_class_order()] = $class;
             }
             
             foreach ($classes_questionnaire as $class) {
-                $this->classes[$class->getClassOrder()] = $class;
+                $this->classes[$class->get_class_order()] = $class;
             }
         }
         

@@ -139,7 +139,7 @@ class Module implements \JsonSerializable
         }
         
         uasort($this->classes, function($a, $b) {
-            return $a->getClassOrder() - $b->getClassOrder();
+            return $a->get_class_order() - $b->get_class_order();
         });
         
         return $this->classes;

@@ -29,11 +29,11 @@
 			<?php foreach($notebook as $note): ?>
 				<li class="notebook-item">
 					<div class="notebook-item-header">
-						<a href="<?php echo BASE_URL."notebook/open/".$note->getId(); ?>"><?php echo $note->getTitle(); ?></a>
+						<a href="<?php echo BASE_URL."notebook/open/".$note->get_id(); ?>"><?php echo $note->getTitle(); ?></a>
 					</div>
 					<div class="notebook-item-footer">
-						<div class="notebook-item-class"><?php echo $note->getClass()->getTitle(); ?></div>
-						<div class="notebook-item-date"><?php echo $note->getCreationDate()->format("m/d/Y H:i:s"); ?></div>
+						<div class="notebook-item-class"><?php echo $note->get_class()->getTitle(); ?></div>
+						<div class="notebook-item-date"><?php echo $note->get_creation_date()->format("m/d/Y H:i:s"); ?></div>
 					</div>
 				</li>
 			<?php endforeach; ?>
@@ -81,7 +81,7 @@
     				<div class="comment_content">
     					<div class="comment_info">
     						<!-- Comment info -->
-        					<h5><?php echo empty($comment['comment']->getCreator()) ? "Deleted user" : $comment['comment']->getCreator()->getName(); ?></h5>
+        					<h5><?php echo empty($comment['comment']->getCreator()) ? "Deleted user" : $comment['comment']->getCreator()->get_name(); ?></h5>
         					<p><?php echo $comment['comment']->getContent(); ?></p>
         					<button class="btn btn-small" onclick="open_reply(this)">&ldca; Reply</button>
         					<div class="comment_reply">
@@ -89,7 +89,7 @@
         						<div class="comment_reply_actions">
             						<button class="btn btn-primary" onclick="close_reply(this)">Cancel</button>
             						<button	class="btn btn-primary" 
-            								onclick="new_reply(this, <?php echo $comment['comment']->getId(); ?>)"
+            								onclick="new_reply(this, <?php echo $comment['comment']->get_id(); ?>)"
     								>
     									Send
 									</button>
@@ -107,13 +107,13 @@
         								/>
                 						<div class="comment_content">
                         					<div class="comment_info">
-                            					<h5><?php echo empty($reply->getCreator()) ? "Deleted user" : $reply->getCreator()->getName(); ?></h5>
+                            					<h5><?php echo empty($reply->getCreator()) ? "Deleted user" : $reply->getCreator()->get_name(); ?></h5>
                             					<p><?php echo $reply->getContent(); ?></p>
                         					</div>
-                        					<?php if (!empty($reply->getCreator()) && $reply->getCreator()->getId() == $_SESSION['s_login']): ?>
+                        					<?php if (!empty($reply->getCreator()) && $reply->getCreator()->get_id() == $_SESSION['s_login']): ?>
                             					<div class="comment_action">
                             						<button class="btn btn-danger" 
-                            								onclick="delete_reply(this,<?php echo $reply->getId(); ?>)"
+                            								onclick="delete_reply(this,<?php echo $reply->get_id(); ?>)"
                     								>
                     									&times;
                 									</button>
@@ -124,10 +124,10 @@
             					<?php endforeach; ?>
             				</div>
     					</div>
-    					<?php if (!empty($reply->getCreator()) && $comment['comment']->getCreator()->getId() == $_SESSION['s_login']): ?>
+    					<?php if (!empty($reply->getCreator()) && $comment['comment']->getCreator()->get_id() == $_SESSION['s_login']): ?>
         					<div class="comment_action">
         						<button	class="btn btn-danger" 
-    									onclick="deleteComment(this,<?php echo $comment['comment']->getId(); ?>)"
+    									onclick="deleteComment(this,<?php echo $comment['comment']->get_id(); ?>)"
 								>
 									&times;
 								</button>

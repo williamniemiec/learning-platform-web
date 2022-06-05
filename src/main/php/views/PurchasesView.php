@@ -13,7 +13,7 @@
 				<tbody>
 					<?php foreach ($purchases as $purchase): ?>
 					<tr>
-						<td><?php echo $purchase->getBundle()->getName(); ?></td>
+						<td><?php echo $purchase->getBundle()->get_name(); ?></td>
 						<td><?php echo $purchase->getDate()->format("m/d/Y H:m:s"); ?></td>
 						<td><?php echo number_format($purchase->getPrice(), 2); ?></td>
 					</tr>

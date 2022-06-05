@@ -11,11 +11,7 @@ use dao\NotificationsDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link settings/settings.php}.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the SettingsView.
  */
 class SettingsController extends Controller
 {
@@ -28,9 +24,8 @@ class SettingsController extends Controller
      */
     public function __construct()
     {
-        if (!Student::isLogged()){
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Student::is_logged()) {
+            $this->redirect_to("login");
         }
     }
     
@@ -43,10 +38,10 @@ class SettingsController extends Controller
      */
     public function index ()
     {
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+        $student = Student::get_logged_in($db_connection);
+        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
         
         $header = array(
             'title' => 'Settings - Learning platform',
@@ -55,22 +50,22 @@ class SettingsController extends Controller
             'robots' => 'noindex'
         );
         
-        $viewArgs = array(
+        $view_args = array(
             'header' => $header,
             'scripts' => array("SettingsScript"),
-            'username' => $student->getName(),
+            'username' => $student->get_name(),
             'user' => $student,
             'notifications' => array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification())
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification())
         );
         
         if (isset($_SESSION['cleared'])) {
-            $viewArgs['msg'] = "Session has been successfully cleared!";
+            $view_args['msg'] = "Session has been successfully cleared!";
             unset($_SESSION['cleared']);
         }
         
-        $this->load_template("settings/SettingsView", $viewArgs);
+        $this->load_template("settings/SettingsView", $view_args);
     }
     
     /**
@@ -78,10 +73,10 @@ class SettingsController extends Controller
      */
     public function edit()
     {
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $student = Student::getLoggedIn($dbConnection);
-        $notificationsDAO = new NotificationsDAO($dbConnection, $student->getId());
+        $student = Student::get_logged_in($db_connection);
+        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
 
         $header = array(
             'title' => 'Settings - Update - Learning platform',
@@ -92,60 +87,56 @@ class SettingsController extends Controller
         
         // Checks if edition form has been sent
         if (!empty($_POST['name'])) {
-            $studentsDAO = new StudentsDAO($dbConnection);
-            $student->setGenre(new GenreEnum($_POST['genre']));
-            $student->setBirthdate(new \DateTime($_POST['birthdate']));
+            $students_dao = new StudentsDAO($db_connection);
+            $student->set_genre(new GenreEnum($_POST['genre']));
+            $student->set_birthdate(new \DateTime($_POST['birthdate']));
             
-            $studentsDAO->update($student);
-            header("Location: ".BASE_URL."settings");
-            exit;
+            $students_dao->update($student);
+            $this->redirect_to("settings");
         }
         
-        $viewArgs = array(
+        $view_args = array(
             'header' => $header,
-            'username' => $student->getName(),
+            'username' => $student->get_name(),
             'user' => $student,
             'notifications' => array(
-                'notifications' => $notificationsDAO->getNotifications(10),
-                'total_unread' => $notificationsDAO->countUnreadNotification()),
+                'notifications' => $notifications_dao->get_notifications(10),
+                'total_unread' => $notifications_dao->count_unread_notification()),
             'msg' => ''
         );
         
-        $this->load_template("settings/SettingsEditView", $viewArgs);
+        $this->load_template("settings/SettingsEditView", $view_args);
     }
     
     public function clear()
     {
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $studentsDAO = new StudentsDAO(
-            $dbConnection, 
-            Student::getLoggedIn($dbConnection)->getId()
+        $students_dao = new StudentsDAO(
+            $db_connection, 
+            Student::get_logged_in($db_connection)->get_id()
         );
         
-        $_SESSION['cleared'] = $studentsDAO->clearHistory();
+        $_SESSION['cleared'] = $students_dao->clear_history();
         
-        header("Location: ".BASE_URL."settings");
-        exit;
+        $this->redirect_to("settings");
     }
     
     public function delete()
     {
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $studentsDAO = new StudentsDAO(
-            $dbConnection,
-            Student::getLoggedIn($dbConnection)->getId()
+        $students_dao = new StudentsDAO(
+            $db_connection,
+            Student::get_logged_in($db_connection)->get_id()
         );
         
-        if ($studentsDAO->delete()) {
-            header("Location: ".BASE_URL);            
+        if ($students_dao->delete()) {
+            $this->redirect_to_root();            
         }
         else {
-            header("Location: ".BASE_URL."settings");
+            $this->redirect_to("settings");
         }
-        
-        exit;
     }
     
     
@@ -163,17 +154,18 @@ class SettingsController extends Controller
      */
     public function update_profile_photo()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
         
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $studentsDAO = new StudentsDAO(
-            $dbConnection, 
-            Student::getLoggedIn($dbConnection)->getId()
+        $students_dao = new StudentsDAO(
+            $db_connection, 
+            Student::get_logged_in($db_connection)->get_id()
         );
         
-        echo $studentsDAO->updatePhoto($_FILES['photo']);
+        echo $students_dao->updatePhoto($_FILES['photo']);
     }
     
     /**
@@ -188,16 +180,17 @@ class SettingsController extends Controller
      */
     public function update_password()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($this->get_http_request_method() != 'POST') {
+            $this->redirect_to_root();
+        }
         
-        $dbConnection = new MySqlPDODatabase();
+        $db_connection = new MySqlPDODatabase();
         
-        $studentsDAO = new StudentsDAO(
-            $dbConnection, 
-            Student::getLoggedIn($dbConnection)->getId()
+        $students_dao = new StudentsDAO(
+            $db_connection, 
+            Student::get_logged_in($db_connection)->get_id()
         );
         
-        echo $studentsDAO->updatePassword($_POST['current_password'], $_POST['new_password']);
+        echo $students_dao->updatePassword($_POST['current_password'], $_POST['new_password']);
     }
 }

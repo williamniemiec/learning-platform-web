@@ -12,7 +12,7 @@ import NotebookNavigator from './NotebookNavigator.js'
  */
 function navigate(action, goto = -1, id_module, class_order)
 {
-	let nav = new NotebookNavigator(2, "notebook/getAllFromClass", {id_module, class_order})
+	let nav = new NotebookNavigator(2, "notebook/get_all_from_class", {id_module, class_order})
 	nav.navigate(action, goto)
 }
 
