@@ -75,8 +75,8 @@
     			<div class="comment">
     				<img	class="img img-thumbnail" 
     						src="<?php echo empty($comment['comment']->getCreator()) || empty($comment['comment']->getCreator()->getPhoto()) ? 
-    						     BASE_URL."assets/img/default/noImage.png" : 
-    						     BASE_URL."assets/img/profile_photos/".$comment['comment']->getCreator()->getPhoto(); ?>" 
+    						     BASE_URL."src/main/web/images/default/noImage.png" : 
+    						     BASE_URL."src/main/web/images/profile_photos/".$comment['comment']->getCreator()->getPhoto(); ?>" 
 					/>
     				<div class="comment_content">
     					<div class="comment_info">
@@ -102,8 +102,8 @@
                 					<div class="comment comment_reply_content">
                 						<img 	class="img img-thumbnail" 
                 								src="<?php echo empty($reply->getCreator()) || empty($reply->getCreator()->getPhoto()) ? 
-                        						     BASE_URL."assets/img/default/noImage.png" : 
-                        						     BASE_URL."assets/img/profile_photos/".$reply->getCreator()->getPhoto(); ?>"
+                        						     BASE_URL."src/main/web/images/default/noImage.png" : 
+                        						     BASE_URL."src/main/web/images/profile_photos/".$reply->getCreator()->getPhoto(); ?>"
         								/>
                 						<div class="comment_content">
                         					<div class="comment_info">

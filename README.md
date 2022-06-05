@@ -6,12 +6,13 @@
 	<a href="https://github.com/williamniemiec/learning-platform-web/actions/workflows/windows.yml"><img src="https://github.com/williamniemiec/learning-platform-web/actions/workflows/windows.yml/badge.svg" alt=""></a>
 	<a href="https://github.com/williamniemiec/learning-platform-web/actions/workflows/macos.yml"><img src="https://github.com/williamniemiec/learning-platform-web/actions/workflows/macos.yml/badge.svg" alt=""></a>
 	<a href="https://github.com/williamniemiec/learning-platform-web/actions/workflows/ubuntu.yml"><img src="https://github.com/williamniemiec/learning-platform-web/actions/workflows/ubuntu.yml/badge.svg" alt=""></a>
-	<a href="http://java.oracle.com"><img src="https://img.shields.io/badge/PHP-7+-D0008F.svg" alt="PHP compatibility"></a>
+	<a href="http://www.php.net"><img src="https://img.shields.io/badge/PHP-7+-D0008F.svg" alt="PHP compatibility"></a>
+	<a href="https://www.mysql.com"><img src="https://img.shields.io/badge/MySQL-5.7.26+-D0008F.svg" alt="MySQL compatibility"></a>
 	<a href="https://github.com/williamniemiec/learning-platform-web/releases"><img src="https://img.shields.io/github/v/release/williamniemiec/learning-platform-web" alt="Release"></a>
 	<a href="https://github.com/williamniemiec/learning-platform-web/blob/master/LICENSE"><img src="https://img.shields.io/github/license/williamniemiec/learning-platform-web" alt="License"></a>
 </p>
 <p align="center">
-	<a href='https://wniemiec-web-learning-platform.herokuapp.com/)'><img alt='Deploy' src='https://www.herokucdn.com/deploy/button.svg' width=200/></a>
+	<a href='https://wniemiec-web-learningplatform.herokuapp.com/)'><img alt='Deploy' src='https://www.herokucdn.com/deploy/button.svg' width=200/></a>
 </p>
 
 <hr />
@@ -31,6 +32,8 @@ The hosting service Heroku may have a certain delay (~ 1 min) for uploading the 
 
 ## ✔ Requirements
 - [PHP 7+](https://www.php.net);
+- [MySQL 5.7.26+](https://www.mysql.com);
+- [Composer](https://getcomposer.org);
 
 ## 🖼 Gallery
 

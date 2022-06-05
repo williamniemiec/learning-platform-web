@@ -2,11 +2,11 @@
 namespace controllers;
 
 use core\Controller;
-use models\Student;
-use database\pdo\MySqlPDODatabase;
-use models\dao\StudentsDAO;
-use models\enum\GenreEnum;
-use models\dao\NotificationsDAO;
+use repositories\pdo\MySqlPDODatabase;
+use domain\Student;
+use domain\enum\GenreEnum;
+use dao\StudentsDAO;
+use dao\NotificationsDAO;
 
 
 /**

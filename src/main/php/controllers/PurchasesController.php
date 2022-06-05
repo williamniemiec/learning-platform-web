@@ -3,10 +3,10 @@ namespace controllers;
 
 
 use core\Controller;
-use database\pdo\MySqlPDODatabase;
-use models\Student;
-use models\dao\NotificationsDAO;
-use models\dao\StudentsDAO;
+use repositories\pdo\MySqlPDODatabase;
+use domain\Student;
+use dao\NotificationsDAO;
+use dao\StudentsDAO;
 
 
 /**

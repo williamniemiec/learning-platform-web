@@ -3,8 +3,9 @@
 		"psr-4" : {
 			"controllers\\" : "src/main/php/controllers/",
 			"core\\" : "src/main/php/core/",
-			"models\\" : "src/main/php/models/",
-			"database\\" : "src/main/php/database/",
+			"dao\\" : "src/main/php/dao/",
+			"domain\\" : "src/main/php/domain/",
+			"repositories\\" : "src/main/php/repositories/",
 			"views\\" : "src/main/php/views/"
 		}
 	},

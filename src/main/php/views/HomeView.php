@@ -28,8 +28,8 @@
                 			>
                 				<img	class="gallery-item-thumbnail" 
                 						src="<?php echo empty($bundle['bundle']->getLogo()) ? 
-                						    BASE_URL."assets/img/default/noImage.png" : 
-                						    BASE_URL."assets/img/logos/bundles/".$bundle['bundle']->getLogo(); ?>" 
+                						    BASE_URL."src/main/web/images/default/noImage.png" : 
+                						    BASE_URL."src/main/web/images/logos/bundles/".$bundle['bundle']->getLogo(); ?>" 
         						/>
                 				<div class="gallery-item-content">
                     				<div class="gallery-item-header"><?php echo $bundle['bundle']->getName(); ?></div>

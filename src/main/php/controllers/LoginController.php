@@ -2,9 +2,9 @@
 namespace controllers;
 
 use core\Controller;
-use models\dao\StudentsDAO;
-use models\Student;
-use database\pdo\MySqlPDODatabase;
+use repositories\pdo\MySqlPDODatabase;
+use domain\Student;
+use dao\StudentsDAO;
 
 
 /**

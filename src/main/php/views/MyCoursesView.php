@@ -44,8 +44,8 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
                     			<!-- Course information -->
                 				<img	class="img img-responsive" 
                 						src="<?php echo empty($course['course']->getLogo()) ? 
-                						     BASE_URL."assets/img/default/noImage.png" : 
-                						     BASE_URL."assets/img/logos/courses/".$course['course']->getLogo(); ?>" 
+                						     BASE_URL."src/main/web/images/default/noImage.png" : 
+                						     BASE_URL."src/main/web/images/logos/courses/".$course['course']->getLogo(); ?>" 
                 				/>
                     			<h2><?php echo $course['course']->getName(); ?></h2>
                     			<p><?php echo $course['course']->getDescription(); ?></p>                			

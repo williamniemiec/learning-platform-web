@@ -3,14 +3,14 @@ namespace controllers;
 
 
 use core\Controller;
-use database\pdo\MySqlPDODatabase;
-use models\Student;
-use models\dao\CoursesDAO;
-use models\dao\NotificationsDAO;
-use models\dao\BundlesDAO;
-use models\enum\BundleOrderTypeEnum;
-use models\enum\OrderDirectionEnum;
-use models\dao\StudentsDAO;
+use repositories\pdo\MySqlPDODatabase;
+use dao\CoursesDAO;
+use dao\NotificationsDAO;
+use dao\BundlesDAO;
+use dao\StudentsDAO;
+use domain\Student;
+use domain\enum\BundleOrderTypeEnum;
+use domain\enum\OrderDirectionEnum;
 
 
 /**
