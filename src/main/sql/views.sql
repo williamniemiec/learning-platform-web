@@ -1,9 +1,10 @@
 -- ----------------------------------------------------------------------------
--- 		Visões
+-- 		Views
 -- ----------------------------------------------------------------------------
--- Total de minutos que os curso possuem.
+-- Total minutes that courses have.
 -- ----------------------------------------------------------------------------
-CREATE VIEW vw_courses_total_length (id_course, total_length) AS (
+CREATE VIEW vw_courses_total_length (id_course, total_length) 
+AS (
 	SELECT		id_course, SUM(length) as total_length
 	FROM 		(SELECT	id_module, length
 		 		 FROM		videos
@@ -15,9 +16,10 @@ CREATE VIEW vw_courses_total_length (id_course, total_length) AS (
 );
 
 -- ----------------------------------------------------------------------------
--- Total de minutos assistidos das aulas pelos estudantes.
+-- Total minutes of classes watched by students.
 -- ----------------------------------------------------------------------------
-CREATE VIEW vw_student_historic_watched_length (id_student, id_module, length) AS (
+CREATE VIEW vw_student_historic_watched_length (id_student, id_module, length) 
+AS (
 	SELECT	id_student, id_module, length
 	FROM	(SELECT	id_module, class_order, length
 	 		 FROM		videos

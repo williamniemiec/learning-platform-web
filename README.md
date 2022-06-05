@@ -1,87 +1,123 @@
-![logo](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/logo/logo.jpg?raw=true)
+![](https://raw.githubusercontent.com/williamniemiec/learning-platform-web/master/docs/images/logo/logo.jpg)
 
-<h1 align='center'>[Website Project] Learning platform</h1>
-<p align='center'>Projeto de website para uma plataforma de ensino. Esse projeto usa o <a href="https://github.com/williamniemiec/MVC-in-PHP">padrão de projeto MVC</a>, feito em PHP.</p>
+<h1 align='center'>Learning Platform - WEB</h1>
+<p align='center'>Learning platform built with PHP.</p>
+<p align="center">
+	<a href="https://github.com/williamniemiec/learning-platform-web/actions/workflows/windows.yml"><img src="https://github.com/williamniemiec/learning-platform-web/actions/workflows/windows.yml/badge.svg" alt=""></a>
+	<a href="https://github.com/williamniemiec/learning-platform-web/actions/workflows/macos.yml"><img src="https://github.com/williamniemiec/learning-platform-web/actions/workflows/macos.yml/badge.svg" alt=""></a>
+	<a href="https://github.com/williamniemiec/learning-platform-web/actions/workflows/ubuntu.yml"><img src="https://github.com/williamniemiec/learning-platform-web/actions/workflows/ubuntu.yml/badge.svg" alt=""></a>
+	<a href="http://java.oracle.com"><img src="https://img.shields.io/badge/PHP-7+-D0008F.svg" alt="PHP compatibility"></a>
+	<a href="https://github.com/williamniemiec/learning-platform-web/releases"><img src="https://img.shields.io/github/v/release/williamniemiec/learning-platform-web" alt="Release"></a>
+	<a href="https://github.com/williamniemiec/learning-platform-web/blob/master/LICENSE"><img src="https://img.shields.io/github/license/williamniemiec/learning-platform-web" alt="License"></a>
+</p>
+<p align="center">
+	<a href='https://wniemiec-web-learning-platform.herokuapp.com/)'><img alt='Deploy' src='https://www.herokucdn.com/deploy/button.svg' width=200/></a>
+</p>
 
 <hr />
 
-## Demonstração
-O site encontra-se hospedado, para fins de demonstração, [aqui](http://wp-learning-platform.azurewebsites.net/), e a área de administração [aqui](http://wp-learning-platform.azurewebsites.net/panel/).
+## ❇ Introduction
+Website project about a learning platform built with PHP along with [Selenium framework](https://www.selenium.dev/) for testing. It also uses <a href="https://github.com/williamniemiec/MVC-in-PHP">MVC design pattern</a>. This application was made for learning purposes only, not for profit. You can interact with the project through the Heroku platform ([click here to access](https://wniemiec-web-learning-platform-web.herokuapp.com/)) and access the administration area [here](https://wniemiec-web-learning-platform-web.herokuapp.com/admin).
 
-### Informações de login
-| Àrea |Email| Senha|
+
+### Login information
+| Area |Email| Password|
 |------- |------- | --- |
-| Acesso geral | student@lp.com |	teste12345@A |
-| Administração | admin@lp.com |	teste12345@A |
+| General | student@lp.com |	teste12345@A |
+| Administration | admin@lp.com |	teste12345@A |
 
-## Arquivos
-Dentro da pasta src encontra-se todo o conteúdo referente à aplicação.
+## ⚠ Warnings
+The hosting service Heroku may have a certain delay (~ 1 min) for uploading the application so the loading of the website may have a certain delay. 
 
-### /
-|Nome| Tipo| Descrição
-|------- | --- | ----
-| docs |	 `Diretório`	| Informações relativas a documentação / Diagrama UML |
-| sql 	|	 `Diretório`	| Contém as consultas sql para criação do banco de dados da aplicação |
-| src 	|	 `Diretório`	| Contém os arquivos fonte da aplicação |
+## ✔ Requirements
+- [PHP 7+](https://www.php.net);
 
-### /src
-|Name| Type| Function
-|------- | --- | ----
-| 	assets				| `Diretório`	| Contém todos os arquivos de conteúdo da aplicação
-| 	controllers 		| `Diretório`	| Contém todas as classes de controllers da aplicação
-| 	core 				| `Diretório`	| Contém as classes e interfaces essenciais para o funcionamento da estrutura MVC
-| database	|	 `Diretório`	| Contém as classes responsáveis pelã conexão com o banco de dados |
-| lib	|	 `Diretório`	| Contém as bibliotecas que a aplicação depende |
-| 	models 				| `Diretório`	| Contém todas as classes  da aplicação
-| panel	|	 `Diretório`	| Contém o sistema de gerenciamento da aplicação |
-| vendor	|	 `Diretório`	| Pasta contendo arquivos gerados pelo [Composer](https://getcomposer.org/) |
-| 	views 				| `Diretório`	| Contém todas as classes responsáveis pela parte visual do programa
-| 	.htaccess 				| `Arquivo`	| Redirecionamento para funcionamento do MVC em servidores Apache
-| 	config.php 				| `Arquivo`	| Variáveis do sistema
-| 	environment.php 				| `Arquivo`	| Define o ambiente do sistema
-| 	Web.config 				| `Arquivo`	| Redirecionamento para funcionamento do MVC em servidores IIS
-
-## Esquema do banco de dados
-### Modelo conceitual
-![db-schema-conceptual](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/db/schemas/conceptual/schema-conceptual.png?raw=true)
-
-### Modelo lógico (diagrama ER)
-![db-schema-logical](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/db/schemas/logical/schema-logical.png?raw=true)
-
-### Programas usados para a criação dos esquemas
-|Esquema|Nome|
-|-------|----|
-|Conceitual|[BRModelo 3.0](http://www.sis4.com/brModelo/)|
-|Lógico|[MySQL Workbench 8.0](https://www.mysql.com/products/workbench/)|
-
-## Imagens da aplicação
+## 🖼 Gallery
 
 #### Home
-![home](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/app/home.png?raw=true)
+![home](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/home.png?raw=true)
 
 #### Bundle information
-![bundle](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/gif/bundle.gif?raw=true)
+![bundle](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/gif/bundle.gif?raw=true)
 
 #### My courses
-![bundle-edit](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/gif/my-courses.gif?raw=true)
+![bundle-edit](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/gif/my-courses.gif?raw=true)
 
 #### Video class
-![video-class](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/gif/video-class.gif?raw=true)
+![video-class](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/gif/video-class.gif?raw=true)
 
 #### Settings
-![settings](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/app/settings.png?raw=true)
+![settings](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/settings.png?raw=true)
 
 #### Support
-![support](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/app/support.png?raw=true)
+![support](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/support.png?raw=true)
 
 #### Support - content
-![support-content](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/app/support-content.png?raw=true)
+![support-content](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/support-content.png?raw=true)
 
 #### Admin area - courses manager
-![courses-manager](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/app/courses-manager.png?raw=true)
+![courses-manager](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/courses-manager.png?raw=true)
 
 #### Admin area - bundles manager
-![bundles-manager](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/img/app/bundles-manager.png?raw=true)
+![bundles-manager](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/bundles-manager.png?raw=true)
 
 #### Admin area - bundles manager - edit
-![bundles-manager-edit](https://github.com/williamniemiec/wp_learningPlatform/blob/master/docs/gif/bundle-edit.gif?raw=true)
+![bundles-manager-edit](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/gif/bundle-edit.gif?raw=true)
+
+## 🚩 Changelog
+Details about each version are documented in the [releases section](https://github.com/williamniemiec/learning-platform-web/releases).
+
+## 🗺 Project structure
+![architecture](https://raw.githubusercontent.com/williamniemiec/learning-platform-web/master/docs/images/design/architecture.jpg)
+
+#### Database
+
+###### Conceptual diagram
+
+![database-conceptual-diagram](https://raw.githubusercontent.com/williamniemiec/learning-platform-web/master/docs/images/database/schema-conceptual.png?raw=true)
+
+###### Logical diagram
+![database-logical-diagram](https://raw.githubusercontent.com/williamniemiec/learning-platform-web/master/docs/images/database/schema-logical.png?raw=true)
+
+###### Programs used to create database schematics
+|Schema|Name|
+|-------|----|
+|Conceptual|[BRModelo 3.0](http://www.sis4.com/brModelo/)|
+|Logical|[MySQL Workbench 8.0](https://www.mysql.com/products/workbench/)|
+
+## 📁 Files
+
+### /
+|        Name        |Type|Description|
+|----------------|-------------------------------|-----------------------------|
+|docs |`Directory`|Documentation files|
+|src  |`Directory`|Application and test files|
+
+### /src
+|        Name        |Type|Description|
+|----------------|-------------------------------|-----------------------------|
+|main|`Directory`|Application files|
+|test|`Directory`|Test files|
+
+### /src/main
+|        Name        |Type|Description|
+|----------------|-------------------------------|-----------------------------|
+|php|`Directory`|Code files|
+|resources|`Directory`|Static files|
+| sql | `Directory`| SQL queries |
+
+### /src/main/php
+|        Name        |Type|Description|
+|----------------|-------------------------------|-----------------------------|
+| 	controllers 		| `Directory`	| Application controller classes
+| 	core 				| `Directory`	| Classes responsible for the MVC operations
+| database	|	 `Directory`	| Classes responsible for connecting to the database |
+| lib	|	 `Directory`	| Web dependencies |
+| 	models 				| `Directory`	| Model classes
+| panel	|	 `Directory`	| Admin system |
+| vendor	|	 `Directory`	| Files generated by [Composer](https://getcomposer.org/) |
+| 	views 				| `Directory`	| Visual application classes
+| 	.htaccess 				| `File`	| Redirection for correct MVC performance on Apache servers
+| 	config.php 				| `File`	| System variables
+| 	environment.php 				| `File`	| System environment
+| 	Web.config 				| `File`	| Redirection for correct MVC performance on IIS servers

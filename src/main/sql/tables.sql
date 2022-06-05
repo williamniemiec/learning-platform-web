@@ -1,11 +1,10 @@
 -- ----------------------------------------------------------------------------
--- O código foi escrito com base no MySQL 5.7.26 e foi utilizado o programa 
--- HeidiSQL versão 10.2.0 para testar a execução do código.
+-- Code developed on MySQL 5.7.26.
 -- ----------------------------------------------------------------------------
 
 
 -- ----------------------------------------------------------------------------
--- 		Criação do banco de dados
+-- 		Database creation
 -- ----------------------------------------------------------------------------
 CREATE DATABASE learning_platform
 CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -14,7 +13,7 @@ USE learning_platform;
 
 
 -- ----------------------------------------------------------------------------
--- 		Criação de tabelas
+-- 		Table creation
 -- ----------------------------------------------------------------------------
 CREATE TABLE students (
 	id_student	INT 			NOT NULL	AUTO_INCREMENT,
@@ -248,8 +247,8 @@ CREATE TABLE support_topic_replies (
 		ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- OBS: Apesar de o nome ser o mesmo que a da tabela comment_replies, id_reply
--- não é uma chave estrangeira para essa tabela
+-- Note: Even though the name is the same as that of the 'comment_replies' 
+-- table, 'id_reply' is not a foreign key to that table.
 
 
 CREATE TABLE authorization (

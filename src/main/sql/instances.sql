@@ -1,5 +1,5 @@
 -- ----------------------------------------------------------------------------
--- 		Instanciação
+-- 		Creation
 -- ----------------------------------------------------------------------------
 -- students
 -- ----------------------------------------------------------------------------
@@ -119,7 +119,7 @@ INSERT INTO bundle_courses VALUES (4, 2);
 -- ----------------------------------------------------------------------------
 -- purchases
 -- ----------------------------------------------------------------------------
--- OBS: O atributo price será, na aplicação, fornecido através de uma trigger
+-- Note: 'price' attribute will be provided by a trigger (in application).
 -- ----------------------------------------------------------------------------
 INSERT INTO purchases VALUES (1, 1, '2020-07-04 20:35:00', 19.00);
 INSERT INTO purchases VALUES (1, 2, '2020-07-04 20:35:00', 39.99);
@@ -293,7 +293,6 @@ VALUES (1, 14, 1, 'java – reserved keywords', '‘abstract,assert,boolean,brea
 	do,double,else,enum,extends,false,final,finally,float,for,goto,if,implements,import,instanceof,int,interface,long,
 	native,new,null,package,private,protected,public,return,short,static,strictfp,super,switch,synchronized,this,throw,
 	throws,transient,true,try,void,volatile,while,continue’', '2020-08-01 19:54:00');
-
 
 -- ----------------------------------------------------------------------------
 -- authorization

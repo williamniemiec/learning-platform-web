@@ -2,11 +2,11 @@
 -- 		Stored procedures
 -- ----------------------------------------------------------------------------
 DELIMITER $$
--- Obtem o preço de um pacote.
+-- Gets a bundle price.
 -- 
--- @param		id_bundle Id do pacote
+-- :param		id_bundle: Bundle id
 --
--- @return		Preço do pacote com o id fornecido
+-- :return		Bundle price
 CREATE PROCEDURE sp_bundle_price(IN id_bundle INT, OUT bundle_price DECIMAL(6,2))
 BEGIN
 	DECLARE current_bundle_price DECIMAL(6,2);
@@ -29,12 +29,12 @@ $$
 
 DELIMITER $$
 -- 
--- Verifica se um email está sendo usado no sistema por um administrador
--- ou por um estudante.
+-- Checks if an email is being used on the system by an administrator or a
+-- student.
 -- 
--- @param		user_email Email a ser verificado
+-- :param		user_email: Email to be verified
 --
--- @return		1 se o email já esta em uso ou 0 caso contrário
+-- :return		1 if the email is already in use or 0 otherwise
 --
 CREATE PROCEDURE sp_check_email_already_used(IN user_email VARCHAR(100), OUT alreadyInUse BIT(1))
 BEGIN
@@ -63,11 +63,11 @@ $$
 
 DELIMITER $$
 --
--- Obtem o estudante que criou um comentário.
+-- Gets the student who created a comment.
 --
--- @param		comment Id do comentário
+-- :param		comment: Comment id
 --
--- @return		Id do estudante que criou o comentário
+-- :return		Student id who created the comment
 --
 CREATE PROCEDURE sp_comments_get_creator(IN comment INT, OUT creator INT)
 BEGIN
@@ -87,11 +87,11 @@ $$
 
 DELIMITER $$
 --
--- Obtem o estudante que criou um tópico de suporte.
+-- Gets the student who created a support topic.
 --
--- @param		topic Id do tópico de suporte
+-- :param		topic: Support topic id
 --
--- @return		Id do estudante que criou o tópico de suporte
+-- :return		Student id who created the support topic
 --
 CREATE PROCEDURE sp_support_topic_get_creator(IN topic INT, OUT creator INT)
 BEGIN
@@ -111,11 +111,11 @@ $$
 
 DELIMITER $$
 --
--- Verifica se existe um comentário com um determinado id.
+-- Checks if there is a comment with an id.
 --
--- @param		comment Id do comentário
+-- :param		comment: Comment id
 --
--- @return		1 se existe; 0 caso contrário
+-- :return		1 if exists or 0 otherwise
 --
 CREATE PROCEDURE sp_comments_exists(IN `comment` INT, OUT result BIT(1))
 BEGIN
@@ -139,11 +139,11 @@ $$
 
 DELIMITER $$
 --
--- Verifica se existe um tópico de suporte com um determinado id.
+-- Checks if there is a support with an id.
 --
--- @param		topic Id do tópico de suporte
+-- :param		topic: Support topic id
 --
--- @return		1 se existe; 0 caso contrário
+-- :return		1 if exists or 0 otherwise
 --
 CREATE PROCEDURE sp_support_topic_exists(IN topic INT, OUT result BIT(1))
 BEGIN
@@ -167,11 +167,11 @@ $$
 
 DELIMITER $$
 --
--- Verifica se existe um estudante com um determinado id.
+-- Checks if there is a student with an id.
 --
--- @param		student Id do estudante
+-- :param		student: Student id
 --
--- @return		1 se existe; 0 caso contrário
+-- :return		1 if exists or 0 otherwise
 --
 CREATE PROCEDURE sp_students_exists(IN student INT, OUT result BIT(1))
 BEGIN
@@ -195,11 +195,11 @@ $$
 
 DELIMITER $$
 --
--- Verifica se existe um admin com um determinado id.
+-- Checks if there is an admin with an id.
 --
--- @param		admin Id do admin
+-- :param		admin: Admin id
 --
--- @return		1 se existe; 0 caso contrário
+-- :return		1 if exists or 0 otherwise
 --
 CREATE PROCEDURE sp_admins_exists(IN admin INT, OUT result BIT(1))
 BEGIN
@@ -223,13 +223,13 @@ $$
 
 DELIMITER $$
 --
--- Verifica se uma aula existe.
+-- Checks whether a class exists.
 --
--- @param		classType Tipo da aula (0 se for video e 1 se for questionário)
--- @param		module Modulo que a aula pertence
--- @param		classOrder Ordem da aula dentro do módulo
+-- :param		classType: Class type (0 for video and 1 for questionnaires)
+-- :param		module: Module that the class belongs to
+-- :param		classOrder: Class order within the module
 --
--- @return		1 se existe; 0 caso contrário
+-- :return		1 if the class exists or 0 otherwise
 --
 CREATE PROCEDURE sp_class_exists(IN classType BIT(1), IN module INT, IN classOrder INT, OUT result BIT(1))
 BEGIN
@@ -237,7 +237,7 @@ BEGIN
 	DECLARE c CURSOR FOR 
 		SELECT * FROM __tmp;
 
-	-- Cria uma tabela temporária, visto que cursores não podem ser declarados em blocos if-else
+	-- Creates a temporary table, as cursors cannot be declared in if-else blocks
 	DROP TEMPORARY TABLE IF EXISTS __tmp;
 	
 	IF classType = 0 THEN
@@ -270,11 +270,11 @@ $$
 
 DELIMITER $$
 --
--- Verifica se um tópico do suporte está aberto.
+-- Checks whether a topic is open.
 --
--- @param		topic Id do tópico
+-- :param		topic: Topic id
 --
--- @return		1 se está aberto; 0 caso contrário
+-- :return		1 if the topic is open and 0 otherwise
 --
 CREATE PROCEDURE sp_support_topic_is_open(IN topic INT, OUT result BiT(1))
 BEGIN
@@ -300,9 +300,9 @@ $$
 -- ----------------------------------------------------------------------------
 DELIMITER $$
 --
--- Ao inserir um registro na tabela purchases, obtem o valor do pacote e
--- adiciona ele na query de inserção, a fim de permitir inserções na tabela
--- purchases sem precisar informar o preço do pacote.
+-- When inserting a record in the purchases table, it obtains the value of the 
+-- package and adds it to the insertion query, in order to allow insertions in
+-- the purchases table without having to inform the package price.
 --
 CREATE TRIGGER tg_purchases_new
 BEFORE INSERT ON purchases
@@ -316,9 +316,9 @@ $$
 
 DELIMITER $$
 --
--- Verifica se o email do administrador já está sendo usado no sistema por
--- outro administrador ou por um estudante. Se sim, impede a inserção do
--- novo administrador
+-- Checks if the admin email is already being used on the system by another
+-- admin or a student. If yes, it prevents the insertion of the new
+-- administrator.
 --
 CREATE TRIGGER tg_admins_new
 BEFORE INSERT ON admins
@@ -334,8 +334,8 @@ $$
 
 DELIMITER $$
 --
--- Verifica se o email do estudante já está sendo usado no sistema por
--- outro estudante ou por um administrador
+-- Checks if the student's email is already being used in the system by another
+-- student or an administrator.
 --
 CREATE TRIGGER tg_students_new
 BEFORE INSERT ON students
@@ -351,7 +351,7 @@ $$
 
 DELIMITER $$
 --
--- Gera uma notificação para o estudante que criou o comentário.
+-- Generates a notification for the student who created the comment.
 --
 CREATE TRIGGER tg_comments_replies_notification
 AFTER INSERT ON comment_replies
@@ -369,7 +369,7 @@ $$
 
 DELIMITER $$
 --
--- Gera uma notificação para o estudante que criou o tópico.
+-- Generates a notification to the student who created the topic.
 --
 CREATE TRIGGER tg_support_topic_replies_notification
 AFTER INSERT ON support_topic_replies
@@ -387,14 +387,14 @@ $$
 
 
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
---			Política compensatória
+--			Compensatory policy
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 -- admins
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao atualizar um administrador, atualiza também, se houver, as respostas
--- que ele deu em topicos de suporte
+-- When updating an admin, it also updates, if any, the answers they gave in
+-- support topics.
 --
 CREATE TRIGGER tg_admins_update_support_topic
 AFTER UPDATE ON admins
@@ -410,8 +410,8 @@ $$
 -- students
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 --
--- Ao atualizar um estudante, atualiza também, se houver, as respostas
--- que ele deu em topicos de suporte
+-- When updating a student, it also updates, if any, the answers they gave in 
+-- support topics.
 --
 DELIMITER $$
 CREATE TRIGGER tg_students_update_support_topic
@@ -425,8 +425,8 @@ END
 $$
 
 --
--- Ao remover um estudante, remove também, se houver, as respostas
--- de todos os tópicos que ele criou
+-- Removing a student also removes, if any, replies from all topics that the 
+-- student has created.
 --
 DELIMITER $$
 CREATE TRIGGER tg_students_delete_support_topic
@@ -443,8 +443,8 @@ $$
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao atualizar um tópico do suporte, atualiza também as notificações que fazem
--- referência a ele
+-- When updating a support topic, it also updates notifications that reference
+-- it.
 --
 CREATE TRIGGER tg_support_topic_update_notifications
 AFTER UPDATE ON support_topic
@@ -458,8 +458,7 @@ $$
 
 DELIMITER $$
 --
--- Ao remover um tópico do suporte, remove também as notificações que fazem
--- referência a ele
+-- Removing a topic from support also removes notifications that reference it.
 --
 CREATE TRIGGER tg_support_topic_delete_notifications
 AFTER DELETE ON support_topic
@@ -475,8 +474,7 @@ $$
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao atualizar um comentário, atualiza também as notificações que fazem
--- referência a ele
+-- When updating a comment, it also updates notifications that reference it.
 --
 CREATE TRIGGER tg_comments_update_notifications
 AFTER UPDATE ON comments
@@ -490,8 +488,7 @@ $$
 
 DELIMITER $$
 --
--- Ao remover um comentário, remove também as notificações que fazem
--- referência a ele
+-- Removing a comment also removes notifications that reference it.
 --
 CREATE TRIGGER tg_comments_delete_notifications
 AFTER DELETE ON comments
@@ -507,8 +504,8 @@ $$
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao atualizar uma aula do tipo questionário, atualiza também o histórico dos
--- estudantes que assistiram a ela
+-- When updating a quiz class, it also updates the history of the students who 
+-- attended it.
 --
 CREATE TRIGGER tg_questionnaires_update_student_historic
 AFTER UPDATE ON questionnaires
@@ -521,8 +518,8 @@ END
 $$
 
 --
--- Ao remover uma aula do tipo questionário, remove ela também do histórico dos
--- estudantes que assistiram a ela
+-- Removing a quiz class also removes it from the history of students who 
+-- attended it.
 --
 DELIMITER $$
 CREATE TRIGGER tg_questionnaires_delete_student_historic
@@ -539,8 +536,8 @@ $$
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao atualizar uma aula do tipo video, atualiza também o histórico dos
--- estudantes que assistiram a ela
+-- When updating a video class, it also updates the history of the students who
+-- watched it.
 --
 CREATE TRIGGER tg_videos_update_student_historic
 AFTER UPDATE ON videos
@@ -554,8 +551,8 @@ $$
 
 DELIMITER $$
 --
--- Ao remover uma aula do tipo video, remove ela também do histórico dos
--- estudantes que assistiram a ela
+-- When removing a video class, it also removes it from the history of the 
+-- students who watched it.
 --
 CREATE TRIGGER tg_videos_delete_student_historic
 AFTER DELETE ON videos
@@ -568,17 +565,17 @@ $$
 
 
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
---			Restrição de integridade referencial
+--			Referential integrity constraint
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 -- notifications
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao criar uma notificação, verifica se a referência dela existe. Ou seja,
--- é verificado se existe um comentário ou topico de suporte com o id_reference.
--- Para saber se o id_reference referencia um comentário ou tópico de suporte
--- é verificado o atributo `type`. Se type for 0, referencia um comentário; caso
--- contrário, referencia um topico do suporte.
+-- When creating a notification, check if its reference exists. That is, it 
+-- checks if there is a comment or support topic with the id_reference. To see
+-- if the id_reference references a comment or support topic, check the `type`
+-- attribute. If type is 0, references a comment; otherwise, references a
+-- support topic.
 --
 CREATE TRIGGER tg_notifications_new
 BEFORE INSERT ON notifications
@@ -606,11 +603,11 @@ $$
 
 DELIMITER $$
 --
--- Ao modificar uma notificação, verifica se a referência dela existe. Ou seja,
--- é verificado se existe um comentário ou topico de suporte com o id_reference.
--- Para saber se o id_reference referencia um comentário ou tópico de suporte
--- é verificado o atributo `type`. Se type for 0, referencia um comentário; caso
--- contrário, referencia um topico do suporte.
+-- When modifying a notification, check if its reference exists. That is, it 
+-- checks if there is a comment or support topic with the id_reference. To see
+-- if the id_reference references a comment or support topic, check the `type`
+-- attribute. If type is 0, references a comment; otherwise, references a
+-- support topic.
 --
 CREATE TRIGGER tg_notifications_update
 BEFORE UPDATE ON notifications
@@ -641,12 +638,12 @@ $$
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao criar uma resposta para um tópico do suporte, verifica se ele está aberto
--- e se a referência do usuário que criou a resposta existe (ou seja, é 
--- verificado se existe um estudante ou administrador com o mesmo id_user). Para
--- saber se o id_user referencia um estudante ou administrador, é verificado o 
--- atributo `user_type`. Se type for 0, referencia um estudante; caso contrário,
--- referencia um administrador.
+-- When creating an answer for a support topic, it checks that it is open and
+-- that the reference of the user who created the answer exists (that is, it
+-- checks if there is a student or administrator with the same id_user). To
+-- see if id_user references a student or administrator, check the `user_type`
+-- attribute. If type is 0, references a student; otherwise, references an
+-- administrator.
 --
 CREATE TRIGGER tg_support_topic_replies_new
 BEFORE INSERT ON support_topic_replies
@@ -682,11 +679,11 @@ $$
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao adicionar um aula no histórico dos estudantes, verifica se ela existe.
--- Para isso, verifica o atributo `class_type`. Se for 0, verifica se existe
--- na tabela 'videos' um registro com chave primária correspondente aos atributos
--- `id_module` e `class_order` que foram adicionados; se for 1, faz o mesmo mas
--- a verificação será na tabela 'questionnaires'
+-- When adding a class to the student history, check if it exists. For that, it
+-- checks the `class_type` attribute. If it is 0, checks if there is a record
+-- in the 'videos' table with a primary key corresponding to the `id_module`
+-- and `class_order` attributes that were added; if it is 1, do the same but
+-- the check will be in the 'questionnaires' table.
 --
 CREATE TRIGGER tg_student_historic_new
 BEFORE INSERT ON student_historic
@@ -719,9 +716,9 @@ $$
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao adicionar uma aula do tipo vídeo, verifica se já existe uma aula que
--- pertença ao mesmo módulo e com a mesma ordem dentro dele. Se sim, gerará um
--- erro.
+-- When adding a video class, check if there is already a class that belongs
+-- to the same module and with the same order within it. If yes, it will
+-- generate an error.
 --
 CREATE TRIGGER tg_videos_new
 BEFORE INSERT ON videos
@@ -739,9 +736,9 @@ $$
 
 DELIMITER $$
 --
--- Ao editar uma aula do tipo vídeo, verifica se já existe uma aula que
--- pertença ao mesmo módulo com a mesma ordem dentro dele. Se sim, gerará um 
--- erro. 
+-- When editing a video class, check if there is already a class that belongs
+-- to the same module with the same order within it. If yes, it will generate
+-- an error.
 --
 CREATE TRIGGER tg_videos_update
 BEFORE UPDATE ON videos
@@ -762,9 +759,9 @@ $$
 -- -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DELIMITER $$
 --
--- Ao adicionar uma aula do tipo questionário, verifica se já existe uma aula 
--- que pertença ao mesmo módulo e com a mesma ordem dentro dele. Se sim, gerará
--- um erro.
+-- When adding a quiz type class, check if there is already a class that
+-- belongs to the same module and with the same order within it. If yes, it
+-- will generate an error.
 --
 CREATE TRIGGER tg_questionnaires_new
 BEFORE INSERT ON questionnaires
@@ -782,9 +779,9 @@ $$
 
 DELIMITER $$
 --
--- Ao editar uma aula do tipo questionário, verifica se já existe uma aula que
--- pertença ao mesmo módulo com a mesma ordem dentro dele. Se sim, gerará um 
--- erro. 
+-- When editing a quiz type class, check if there is already a class that
+-- belongs to the same module with the same order within it. If yes, it will
+-- generate an error.
 --
 CREATE TRIGGER tg_questionnaires_update
 BEFORE UPDATE ON questionnaires
