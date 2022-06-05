@@ -53,7 +53,7 @@ class Core
 			$currentAction = 'index';
 		}
 		
-		$controllerName = $currentController;
+		$controllerName = ucfirst($currentController);
 		$currentController = ucfirst($currentController);
 		$currentController = '\\controllers\\'.$currentController;
 
@@ -66,7 +66,7 @@ class Core
 			$c = new $currentController();
 		}
 
-		// Instanciates controller and action
+		// Instantiates controller and action
 		call_user_func_array(array($c, $currentAction), $params);	// $c->$currentAction($params);
 	}
 }

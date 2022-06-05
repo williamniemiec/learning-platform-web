@@ -53,7 +53,7 @@ class Core
 			$currentAction = 'index';
 		}
 		
-		$controllerName = $currentController;
+		$controllerName = ucfirst($currentController);
 		$currentController = ucfirst($currentController);
 		$currentController = '\\controllers\\'.$currentController;
 
