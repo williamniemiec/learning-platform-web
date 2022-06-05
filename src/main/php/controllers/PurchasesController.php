@@ -71,6 +71,6 @@ class PurchasesController extends Controller
             'currentIndex' => $index
         );
         
-        $this->loadTemplate("PurchasesView", $viewArgs, Student::isLogged());
+        $this->load_template("PurchasesView", $viewArgs, Student::isLogged());
     }
 }

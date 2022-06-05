@@ -1,7 +1,7 @@
 <!-- Students birthdate alert -->
 <?php
 if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
-    $this->loadView(
+    $this->load_view(
         'alerts/BirthdateAlert', 
         array('total_watched_videos' => $totalWatchedVideos, 
               'total_watched_length' => $totalWatchedLength)

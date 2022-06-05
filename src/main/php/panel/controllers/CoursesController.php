@@ -80,7 +80,7 @@ class CoursesController extends Controller
             'currentIndex' => $index
         );
         
-        $this->loadTemplate("coursesManager/CoursesManagerView", $viewArgs);
+        $this->load_template("coursesManager/CoursesManagerView", $viewArgs);
     }
     
     public function new()
@@ -151,7 +151,7 @@ class CoursesController extends Controller
             }
         }
         
-        $this->loadTemplate("coursesManager/CoursesManagerNewView", $viewArgs);
+        $this->load_template("coursesManager/CoursesManagerNewView", $viewArgs);
     }
     
     public function edit($id_course)
@@ -229,7 +229,7 @@ class CoursesController extends Controller
             }
         }
         
-        $this->loadTemplate("coursesManager/CoursesManagerEditView", $viewArgs);
+        $this->load_template("coursesManager/CoursesManagerEditView", $viewArgs);
     }
     
     /**

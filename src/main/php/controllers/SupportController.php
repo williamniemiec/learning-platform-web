@@ -77,7 +77,7 @@ class SupportController extends Controller
             'currentIndex' => $index
         );
         
-        $this->loadTemplate("support/SupportView", $viewArgs);
+        $this->load_template("support/SupportView", $viewArgs);
     }
     
     /**
@@ -123,7 +123,7 @@ class SupportController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
-        $this->loadTemplate("support/SupportContentView", $viewArgs);
+        $this->load_template("support/SupportContentView", $viewArgs);
     }
     
     /**
@@ -215,7 +215,7 @@ class SupportController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification())
         );
         
-        $this->loadTemplate("support/SupportNewView", $viewArgs);
+        $this->load_template("support/SupportNewView", $viewArgs);
     }
     
     

@@ -89,7 +89,7 @@ class CoursesController extends Controller
 		    $viewArgs['totalWatchedLength'] = $historicInfo['total_length_watched'];
 		}
         
-        $this->loadTemplate("MyCoursesView", $viewArgs, Student::isLogged());
+        $this->load_template("MyCoursesView", $viewArgs, Student::isLogged());
     }
     
     /**
@@ -236,7 +236,7 @@ class CoursesController extends Controller
             'total_unread' => $notificationsDAO->countUnreadNotification()
         );
         
-        $this->loadTemplate("class/course", $viewArgs);
+        $this->load_template("class/course", $viewArgs);
     }
     
     

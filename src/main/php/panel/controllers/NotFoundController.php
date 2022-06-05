@@ -39,12 +39,12 @@ class NotFoundController extends Controller
         $admin = Admin::getLoggedIn($dbConnection);
         
         if (empty($admin))
-            $this->loadTemplate('error/404', $viewArgs, false);
+            $this->load_template('error/404', $viewArgs, false);
             
         $viewArgs['username'] = $admin->getName();
         $viewArgs['authorization'] = $admin->getAuthorization();
         
-        $this->loadTemplate('error/404', $viewArgs, true);
+        $this->load_template('error/404', $viewArgs, true);
     }
 }
 

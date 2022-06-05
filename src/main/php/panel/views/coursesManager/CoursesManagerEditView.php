@@ -68,5 +68,5 @@
 	</div>
 	
 	<!-- Modals -->
-	<?php $this->loadView("coursesManager/IncludeModulesModal", array('id_course' => $course->getId())); ?>
+	<?php $this->load_view("coursesManager/IncludeModulesModal", array('id_course' => $course->getId())); ?>
 </div>

@@ -78,7 +78,7 @@ class HomeController extends Controller
             );
 	    }
 	    
-		$this->loadTemplate("HomeView", $viewArgs, Student::isLogged());
+		$this->load_template("HomeView", $viewArgs, Student::isLogged());
 	}
 	
 	/**

@@ -76,7 +76,7 @@ class LoginController extends Controller
             $viewArgs['msg'] = "Email and / or password incorrect";
         }
         
-        $this->loadTemplate("LoginView", $viewArgs, false);
+        $this->load_template("LoginView", $viewArgs, false);
     }
     
     /**
@@ -134,7 +134,7 @@ class LoginController extends Controller
             
         }
         
-        $this->loadTemplate("RegisterView", $viewArgs, false);
+        $this->load_template("RegisterView", $viewArgs, false);
     }
     
     /**

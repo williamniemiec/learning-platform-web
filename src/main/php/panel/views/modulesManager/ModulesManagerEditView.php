@@ -56,5 +56,5 @@
 	</div>
 	
 	<!-- Modals -->
-	<?php $this->loadView("modulesManager/IncludeClassesModal", array('id_module' => $module->getId())); ?>
+	<?php $this->load_view("modulesManager/IncludeClassesModal", array('id_module' => $module->getId())); ?>
 </div>

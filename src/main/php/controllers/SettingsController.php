@@ -70,7 +70,7 @@ class SettingsController extends Controller
             unset($_SESSION['cleared']);
         }
         
-        $this->loadTemplate("settings/SettingsView", $viewArgs);
+        $this->load_template("settings/SettingsView", $viewArgs);
     }
     
     /**
@@ -111,7 +111,7 @@ class SettingsController extends Controller
             'msg' => ''
         );
         
-        $this->loadTemplate("settings/SettingsEditView", $viewArgs);
+        $this->load_template("settings/SettingsEditView", $viewArgs);
     }
     
     public function clear()

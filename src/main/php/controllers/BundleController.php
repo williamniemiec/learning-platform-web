@@ -83,7 +83,7 @@ class BundleController extends Controller
 	        $viewArgs['unrelatedBundles'] = $bundlesDAO->unrelatedBundles($id_bundle);
 	    }
 	    
-	    $this->loadTemplate("BundleView", $viewArgs, Student::isLogged());
+	    $this->load_template("BundleView", $viewArgs, Student::isLogged());
 	}
 	
 	

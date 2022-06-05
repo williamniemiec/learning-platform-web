@@ -79,7 +79,7 @@ class NotebookController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification()),
         );
         
-        $this->loadTemplate("notebook/NotebookContentView", $viewArgs);
+        $this->load_template("notebook/NotebookContentView", $viewArgs);
     }
     
     /**
@@ -134,7 +134,7 @@ class NotebookController extends Controller
                 'total_unread' => $notificationsDAO->countUnreadNotification()),
         );
         
-        $this->loadTemplate("notebook/NotebookEditView", $viewArgs);
+        $this->load_template("notebook/NotebookEditView", $viewArgs);
     }
     
     /**

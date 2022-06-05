@@ -1,6 +1,7 @@
 <?php
 namespace config;
 
+
 use \controllers\NotFoundController;
 
 
@@ -9,64 +10,137 @@ use \controllers\NotFoundController;
  */
 class Core 
 {
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     //        Methods
-    //-----------------------------------------------------------------------
-	/**
-	 * Analyzes the URL to determine which controller to call and what action to pass to it
-	 */
-	public function run()
-	{
-		$params = array();
+    //-------------------------------------------------------------------------
+    /**
+     * Analyzes the URL to determine which controller to call and what action 
+     * to pass to it.
+     */
+    public function run()
+    {
+        $url = $this->get_current_url();
+        $controller = $this->extract_controller_from($url);
+        $action = $this->extract_action_from($url);
+        $params = $this->extract_params_from($url);
 
-		// Gets root url
-		$url = '/';						// Url default is '/' (if nothing has been sent)
-		if (isset($_GET['url'])) {
-			$url .= $_GET['url'];
-		}
-		
-		// Gets controller and action
-		if ($url != '/') {				// Checks if something has been sent
-			$url = explode("/", $url);
-			array_shift($url);			// Removes first item from array (it is null)
-			
-			// Gets controller
-			$currentController = $url[0]."Controller";
-			array_shift($url);
+        if(!$this->has_controller_with_name_and_action($controller, $action)) {
+            $controller_instance = new NotFoundController();    
+            $action = 'index';
+        } 
+        else {
+            $controller_instance = $this->build_controller_instance($controller);
+        }
 
-			// Gets action (if there is one) (also avoids '/'; ex: ../controller/)
-			if (isset($url[0]) && !empty($url[0]) && $url[0] != '/') {
-				$currentAction = $url[0];	// If there is an action, gets it
+        call_user_func_array(array($controller_instance, $action), $params);
+    }
 
-				array_shift($url);
-			} else {						// If there is no action, sets default
-				$currentAction = 'index'; 
-			}
+    private function get_current_url()
+    {
+        $url = '/';
+        
+        if (isset($_GET['url'])) {
+            $url .= $_GET['url'];
+        }
 
-			// Gets parameters (if there are any)
-			if (isset($url[0]) && !empty($url[0]) && $url[0] != '/') {
-				$params = $url;
-			}
+        return $url;
+    }
 
-		} else {	// If nothing was sent, sets controller and action default
-			$currentController = 'HomeController'; 
-			$currentAction = 'index';
-		}
-		
-		$controllerName = ucfirst($currentController);
-		$currentController = ucfirst($currentController);
-		$currentController = '\\controllers\\'.$currentController;
+    private function extract_controller_from($url)
+    {
+        if ($url == '/') {
+            return 'HomeController';
+        }
 
-		// If controller does not exist, set notFoundController as current controller
-		if( !file_exists('src/main/php/controllers/'.$controllerName.'.php') || 
-			!method_exists($currentController, $currentAction)) {
-			$c = new NotFoundController();	
-			$currentAction = 'index';
-		} else {
-			$c = new $currentController();
-		}
+        $url_terms = $this->extract_url_terms($url);
+        
+        return $url_terms[0]."Controller";
+    }
 
-		// Instantiates controller and action
-		call_user_func_array(array($c, $currentAction), $params);	// $c->$currentAction($params);
-	}
+    private function extract_url_terms($url) 
+    {
+        $url_terms = explode("/", $url);
+        array_shift($url_terms); // Removes first item from array (it is null)
+
+        return $url_terms;
+    }
+
+    private function extract_action_from($url)
+    {
+        if ($url == '/') {
+            return 'index';
+        }
+
+        $action = 'index';
+        $url_terms = $this->extract_url_terms($url);
+        array_shift($url_terms);
+
+        if (isset($url_terms[0]) && !$this->is_empty_url($url_terms[0])) {
+            $action = $url_terms[0];
+        }
+
+        return $action;
+    }
+
+    private function is_empty_url($url)
+    {
+        return  !isset($url) 
+                || empty($url) 
+                || ($url == '/');
+    }
+
+    private function extract_params_from($url)
+    {
+        if ($url == '/') {
+            return array();
+        }
+
+        $params = array();
+        $url_terms = $this->extract_url_terms($url);
+        array_shift($url_terms);
+
+        if (isset($url_terms[0]) && !$this->is_empty_url($url_terms[0])) {
+            array_shift($url_terms);
+        }
+
+        if (isset($url_terms[0]) && !$this->is_empty_url($url_terms[0])) {
+            $params = $url_terms;
+        }
+
+        return $params;
+    }
+
+    private function has_controller_with_name_and_action($name, $action)
+    {
+        return  $this->has_controller_with_name($name) 
+                && $this->has_controller_an_action_with_name($action, $name);
+    }
+
+    private function has_controller_with_name($name)
+    {
+        $normalized_name = ucfirst($name);
+        
+        return file_exists('src/main/php/controllers/'.$normalized_name.'.php');
+    }
+
+    private function has_controller_an_action_with_name($name, $controller)
+    {
+        $controller_name = $this->build_controller_class_path($controller);
+        
+        return method_exists($controller_name, $name);
+    }
+
+    private function build_controller_class_path($name)
+    {
+        $normalized_name = ucfirst($name);
+
+        return '\\controllers\\'.$normalized_name;
+    }
+
+    private function build_controller_instance($name)
+    {
+        $controller_class_path = $this->build_controller_class_path($name);
+        
+        return new $controller_class_path;
+    }
 }

@@ -1,36 +1,36 @@
 <!doctype html>
 <html>
     <head>
-        <?php $this->loadView("template/head", $header); ?>
+        <?php $this->load_view("template/head", $header); ?>
     </head>
 
     <body class="scrollbar_light">
     	<!-- Menu -->
-    	<?php $this->loadView("navbar/navbar_logged", array('username' => $username, 'notifications' => $notifications)); ?>
+    	<?php $this->load_view("navbar/navbar_logged", array('username' => $username, 'notifications' => $notifications)); ?>
     	
     	<!-- Content -->
 		<main>
-        	<?php $this->loadView($viewName, $viewData); ?>
+        	<?php $this->load_view($viewName, $viewData); ?>
         </main>
         
         <!-- Footer -->
         <footer>
-        	<?php $this->loadView("template/footer"); ?>
+        	<?php $this->load_view("template/footer"); ?>
     	</footer>
         
         <!-- Scripts -->
         <?php 
             if (!empty($scripts)) {
                 if (!empty($scriptsModule))
-                    $this->loadView("template/scripts", array('scripts' => $scripts, 'scriptsModule' => $scriptsModule));
+                    $this->load_view("template/scripts", array('scripts' => $scripts, 'scriptsModule' => $scriptsModule));
                 else
-                    $this->loadView("template/scripts", array('scripts' => $scripts));
+                    $this->load_view("template/scripts", array('scripts' => $scripts));
             }
             else {
                 if (!empty($scriptsModule))
-                    $this->loadView("template/scripts", array('scriptsModule' => $scriptsModule));
+                    $this->load_view("template/scripts", array('scriptsModule' => $scriptsModule));
                 else
-                    $this->loadView("template/scripts");
+                    $this->load_view("template/scripts");
             }
         ?>
     </body>

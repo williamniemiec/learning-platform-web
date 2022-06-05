@@ -40,5 +40,5 @@ use models\enum\GenreEnum;
 	</div>
 	
 	<!-- Modals -->
-	<?php $this->loadView('settings/ChangePasswordModal'); ?>
+	<?php $this->load_view('settings/ChangePasswordModal'); ?>
 </div>

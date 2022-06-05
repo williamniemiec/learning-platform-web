@@ -60,5 +60,5 @@
 </div>
 
 <!-- Modals -->
-<?php $this->loadView('settings/UpdateProfilePhotoModal'); ?>
-<?php $this->loadView('settings/ChangePasswordModal'); ?>
+<?php $this->load_view('settings/UpdateProfilePhotoModal'); ?>
+<?php $this->load_view('settings/ChangePasswordModal'); ?>

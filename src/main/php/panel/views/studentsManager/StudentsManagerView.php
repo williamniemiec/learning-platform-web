@@ -53,7 +53,7 @@
         	</table>
         	
         	<!-- Modals -->
-        	<?php $this->loadView("studentsManager/EditStudentModal"); ?>
+        	<?php $this->load_view("studentsManager/EditStudentModal"); ?>
     	</div>
 	</div>
 </div>

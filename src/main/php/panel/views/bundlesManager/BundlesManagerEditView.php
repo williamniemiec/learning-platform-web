@@ -80,5 +80,5 @@
 	</div>
 	
 	<!-- Modals -->
-	<?php $this->loadView("bundlesManager/IncludeCoursesModal", array('id_bundle' => $bundle->getId())); ?>
+	<?php $this->load_view("bundlesManager/IncludeCoursesModal", array('id_bundle' => $bundle->getId())); ?>
 </div>
