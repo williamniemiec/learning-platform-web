@@ -58,7 +58,7 @@ class Core
 		$currentController = '\\controllers\\'.$currentController;
 
 		// If controller does not exist, set notFoundController as current controller
-		if( !file_exists('controllers/'.$controllerName.'.php') || 
+		if( !file_exists('src/main/php/controllers/'.$controllerName.'.php') || 
 			!method_exists($currentController, $currentAction)) {
 			$c = new NotFoundController();	
 			$currentAction = 'index';

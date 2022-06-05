@@ -1,0 +1,14 @@
+{
+	"autoload" : {
+		"psr-4" : {
+			"controllers\\" : "src/main/php/controllers/",
+			"core\\" : "src/main/php/core/",
+			"models\\" : "src/main/php/models/",
+			"database\\" : "src/main/php/database/",
+			"views\\" : "src/main/php/views/"
+		}
+	},
+	"require-dev": {
+    	"heroku/heroku-buildpack-php": "*"
+  	}
+}

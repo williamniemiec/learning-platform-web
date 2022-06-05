@@ -24,7 +24,7 @@ abstract class Controller
 	public function loadView ($viewName, $viewData = array())
 	{
 		extract($viewData);				// Transforms array keys into variables
-		require 'views/'.$viewName.'.php';
+		require 'src/main/php/views/'.$viewName.'.php';
 	}
 
 	/**
@@ -38,8 +38,8 @@ abstract class Controller
 	    extract($viewData);				// Transforms array keys into variables
 	    
 	    if ($logged)
-	        require 'views/template/html_logged.php';
+	        require 'src/main/php/views/template/html_logged.php';
         else
-            require 'views/template/html_no_logged.php';
+            require 'src/main/php/views/template/html_no_logged.php';
 	}
 }
