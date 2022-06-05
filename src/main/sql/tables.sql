@@ -17,12 +17,12 @@ USE learning_platform;
 -- ----------------------------------------------------------------------------
 CREATE TABLE students (
 	id_student	INT 			NOT NULL	AUTO_INCREMENT,
-	name		VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(name) > 0),
+	name		VARCHAR(100)	NOT NULL 	,
 	genre		BIT(1)			NOT NULL,
 	birthdate	DATE			NOT NULL,
 	email		VARCHAR(100)	NOT NULL	UNIQUE,
-	password	VARCHAR(32)		NOT NULL 	CHECK (CHAR_LENGTH(password) = 32),
-	photo		VARCHAR(40) 	CHECK (CHAR_LENGTH(photo)),
+	password	VARCHAR(32)		NOT NULL 	,
+	photo		VARCHAR(40) 	,
 
 	PRIMARY KEY (id_student)
 ) ENGINE=InnoDB;
@@ -31,9 +31,9 @@ CREATE TABLE notifications (
 	id_notification	INT 			NOT NULL 	AUTO_INCREMENT,
 	id_student		INT				NOT NULL,
 	date 			DATETIME		NOT NULL,
-	id_reference	INT 			NOT NULL 	CHECK (id_reference > 0),
+	id_reference	INT 			NOT NULL 	,
 	type 			BIT(1)			NOT NULL,
-	message			TEXT			NOT NULL 	CHECK (CHAR_LENGTH(message) > 0),
+	message			TEXT			NOT NULL 	,
 	`read`			BIT(1)			DEFAULT		0,
 
 	PRIMARY KEY (id_notification),
@@ -52,8 +52,8 @@ CREATE TABLE modules (
 CREATE TABLE courses (
 	id_course 	INT 			NOT NULL 	AUTO_INCREMENT,
 	name		VARCHAR(50)		NOT NULL,
-	logo		VARCHAR(40) 	CHECK (CHAR_LENGTH(logo) > 0),
-	description	VARCHAR(200) 	CHECK (CHAR_LENGTH(description) > 0),
+	logo		VARCHAR(40) 	,
+	description	VARCHAR(200) 	,
 
 	PRIMARY KEY (id_course)
 ) ENGINE=InnoDB;
@@ -61,7 +61,7 @@ CREATE TABLE courses (
 CREATE TABLE course_modules (
 	id_course		INT 			NOT NULL,
 	id_module		INT 			NOT NULL,
-	module_order	INT 			NOT NULL 	CHECK (module_order > 0),
+	module_order	INT 			NOT NULL 	,
 
 	PRIMARY KEY (id_module, id_course),
 	UNIQUE (id_course, module_order),
@@ -75,10 +75,10 @@ CREATE TABLE course_modules (
 
 CREATE TABLE bundles (
 	id_bundle	INT 			NOT NULL 	AUTO_INCREMENT,
-	name		VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(name) > 0),
-	price		DECIMAL(6,2)	NOT NULL 	CHECK (price >= 0),
-	logo		VARCHAR(40) 	CHECK (CHAR_LENGTH(logo) > 0),	
-	description	VARCHAR(100) 	CHECK (CHAR_LENGTH(description) > 0),
+	name		VARCHAR(100)	NOT NULL 	,
+	price		DECIMAL(6,2)	NOT NULL 	,
+	logo		VARCHAR(40) 	,	
+	description	VARCHAR(100) 	,
 
 	PRIMARY KEY (id_bundle)
 ) ENGINE=InnoDB;
@@ -100,7 +100,7 @@ CREATE TABLE purchases (
 	id_student	INT 			NOT NULL,
 	id_bundle	INT 			NOT NULL,
 	date 		DATETIME		NOT NULL,
-	price		DECIMAL(6,2)	NOT NULL 	CHECK (price >= 0),
+	price		DECIMAL(6,2)	NOT NULL 	,
 
 	PRIMARY KEY (id_student, id_bundle),
 	FOREIGN KEY (id_student) REFERENCES students(id_student)
@@ -114,12 +114,12 @@ CREATE TABLE purchases (
 CREATE TABLE questionnaires (
 	id_module		INT 			NOT NULL,
 	class_order		INT 			NOT NULL,
-	question 		VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(question) > 0),
-	q1				VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(q1) > 0),
-	q2				VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(q2) > 0),
-	q3				VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(q3) > 0),
-	q4				VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(q4) > 0),
-	answer			BIT(3)			NOT NULL 	CHECK (answer >= 1 && answer <= 4),
+	question 		VARCHAR(100)	NOT NULL 	,
+	q1				VARCHAR(100)	NOT NULL 	,
+	q2				VARCHAR(100)	NOT NULL 	,
+	q3				VARCHAR(100)	NOT NULL 	,
+	q4				VARCHAR(100)	NOT NULL 	,
+	answer			BIT(3)			NOT NULL 	,
 
 	PRIMARY KEY (id_module, class_order),
 	FOREIGN KEY (id_module) REFERENCES modules(id_module)
@@ -130,10 +130,10 @@ CREATE TABLE questionnaires (
 CREATE TABLE videos (
 	id_module		INT 			NOT NULL,
 	class_order		INT 			NOT NULL,
-	title			VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(title) > 0),
-	description		VARCHAR(200) 	CHECK (CHAR_LENGTH(description) > 0),
-	videoID			VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(videoID) > 0),
-	length			INT 			NOT NULL 	CHECK (length > 0),
+	title			VARCHAR(100)	NOT NULL 	,
+	description		VARCHAR(200) 	,
+	videoID			VARCHAR(100)	NOT NULL 	,
+	length			INT 			NOT NULL 	,
 
 	PRIMARY KEY (id_module, class_order),
 	FOREIGN KEY (id_module) REFERENCES modules(id_module)
@@ -180,7 +180,7 @@ CREATE TABLE comment_replies (
 	id_student		INT,
 	id_comment		INT 			NOT NULL,
 	date			DATETIME 		NOT NULL,
-	text			TEXT 			NOT NULL 	CHECK (CHAR_LENGTH(text) > 0),
+	text			TEXT 			NOT NULL 	,
 
 	PRIMARY KEY (id_reply),
 	FOREIGN KEY (id_student) REFERENCES students(id_student)
@@ -196,8 +196,8 @@ CREATE TABLE notebook (
 	id_student		INT 			NOT NULL,
 	id_module		INT 			NOT NULL,
 	class_order		INT 			NOT NULL,
-	title			VARCHAR(100)	NOT NULL 	CHECK(CHAR_LENGTH(title) > 0),
-	content			TEXT 			NOT NULL	CHECK(CHAR_LENGTH(content) > 0),
+	title			VARCHAR(100)	NOT NULL 	,
+	content			TEXT 			NOT NULL	,
 	date			DATETIME		NOT NULL,
 
 	PRIMARY KEY (id_note),
@@ -211,7 +211,7 @@ CREATE TABLE notebook (
 
 CREATE TABLE support_topic_category (
 	id_category		INT 			NOT NULL 	AUTO_INCREMENT,
-	name			VARCHAR(50)		NOT NULL 	CHECK (CHAR_LENGTH(name) > 0),
+	name			VARCHAR(50)		NOT NULL 	,
 
 	PRIMARY KEY (id_category)
 ) ENGINE=InnoDB;
@@ -220,9 +220,9 @@ CREATE TABLE support_topic (
 	id_topic		INT 			NOT NULL 	AUTO_INCREMENT,
 	id_category 	INT 			NOT NULL,
 	id_student 		INT 			NOT NULL,
-	title			VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(title) > 0),
+	title			VARCHAR(100)	NOT NULL 	,
 	date 			DATETIME 		NOT NULL,
-	message 	 	TEXT 			NOT NULL 	CHECK (CHAR_LENGTH(message) > 0),
+	message 	 	TEXT 			NOT NULL 	,
 	closed 			BIT(1) 			DEFAULT 	0,
 
 	PRIMARY KEY (id_topic),
@@ -239,7 +239,7 @@ CREATE TABLE support_topic_replies (
 	id_user 		INT 			NOT NULL,
 	date 			DATETIME 		NOT NULL,
 	user_type 		BIT(1)			NOT NULL,
-	text 			TEXT 			NOT NULL 	CHECK (CHAR_LENGTH(text) > 0),
+	text 			TEXT 			NOT NULL 	,
 
 	PRIMARY KEY (id_reply),
 	FOREIGN KEY (id_topic) REFERENCES support_topic(id_topic)
@@ -253,8 +253,8 @@ CREATE TABLE support_topic_replies (
 
 CREATE TABLE authorization (
 	id_authorization	INT 			NOT NULL	AUTO_INCREMENT,
-	name				VARCHAR(50)		NOT NULL 	CHECK (CHAR_LENGTH(name) > 0),
-	level 				INT 			NOT NULL 	CHECK (level >= 0),
+	name				VARCHAR(50)		NOT NULL 	,
+	level 				INT 			NOT NULL 	,
 
 	PRIMARY KEY (id_authorization)
 ) ENGINE=InnoDB;
@@ -262,11 +262,11 @@ CREATE TABLE authorization (
 CREATE TABLE admins (
 	id_admin 			INT 			NOT NULL	AUTO_INCREMENT,
 	id_authorization	INT 			NOT NULL,
-	name				VARCHAR(100)	NOT NULL 	CHECK (CHAR_LENGTH(name) > 0),
+	name				VARCHAR(100)	NOT NULL 	,
 	genre				BIT(1)			NOT NULL,
 	birthdate			DATE			NOT NULL,
 	email				VARCHAR(100)	NOT NULL	UNIQUE,
-	password			VARCHAR(32)		NOT NULL 	CHECK (CHAR_LENGTH(text) = 32),
+	password			VARCHAR(32)		NOT NULL 	,
 
 	PRIMARY KEY (id_admin),
 	FOREIGN KEY (id_authorization) REFERENCES authorization(id_authorization)
@@ -277,7 +277,7 @@ CREATE TABLE actions (
 	id_action 			INT 			NOT NULL 	AUTO_INCREMENT,
 	date				DATETIME		NOT NULL,
 	id_admin			INT				NOT NULL,
-	description 		VARCHAR(200)	NOT NULL 	CHECK (CHAR_LENGTH(description) > 0),
+	description 		VARCHAR(200)	NOT NULL 	,
 
 	PRIMARY KEY (id_action),
 	FOREIGN KEY (id_admin) REFERENCES admins(id_admin)

@@ -13,12 +13,12 @@ if (ENVIRONMENT == 'development') {
     ));
 }
 else {
-    define("BASE_URL", "http://wp-learning-platform.azurewebsites.net/");
+    define("BASE_URL", "https://wniemiec-web-learningplatform.herokuapp.com/");
     define("DB", array(
-        'host' => "learning-platform.mysql.database.azure.com",
+        'host' => "eyw6324oty5fsovx.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
         'charset' => "utf8",
-        'username' => "adm@learning-platform",
-        'password' => "test12345@A",
-        'database' => "learning_platform"
+        'username' => "dcudisias8jnnqed",
+        'password' => "lalcf6ef9d9z73dr",
+        'database' => "wxfxzloo0agsgsxj"
     ));
 }
