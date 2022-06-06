@@ -98,7 +98,6 @@ abstract class Database
         $this->username = DB['username'];
         $this->password = DB['password'];
         $this->database = DB['database'];
-        
         $this->conn = $this->getInstance();
     }
     

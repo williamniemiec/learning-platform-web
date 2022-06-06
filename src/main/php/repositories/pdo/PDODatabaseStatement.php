@@ -13,6 +13,9 @@ use repositories\DatabaseStatement;
  */
 class PDODatabaseStatement extends DatabaseStatement
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
     private $db;
     
     
@@ -50,16 +53,11 @@ class PDODatabaseStatement extends DatabaseStatement
      */
     public function fetchAll(bool $withTableName = false): array
     {
-        if ($withTableName) {
-           $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
-        }
-        else {
-            $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, false);
-        }
+        $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, $withTableName);
         
-        $result = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
+        $data = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
         
-        return $result == false ? array() : $result;
+        return $data ? $data : array();
     }
 
     /**
@@ -68,16 +66,11 @@ class PDODatabaseStatement extends DatabaseStatement
      */
     public function fetch(bool $withTableName = false) : array
     {
-        if ($withTableName) {
-            $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
-        }
-        else {
-            $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, false);
-        }
+        $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, $withTableName);
+
+        $data = $this->statement->fetch(\PDO::FETCH_ASSOC);
         
-        $result = $this->statement->fetch(\PDO::FETCH_ASSOC);
-        
-        return $result == false ? array() : $result;
+        return $data ? $data : array();
     }
 
     /**
