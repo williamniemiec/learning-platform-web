@@ -16,12 +16,11 @@ use domain\Purchase;
 /**
  * Responsible for managing 'students' table.
  */
-class StudentsDAO
+class StudentsDAO extends DAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $db;
     private $idStudent;
     
     
@@ -36,7 +35,7 @@ class StudentsDAO
      */
     public function __construct(Database $db, int $id_student = -1)
     {
-        $this->db = $db->getConnection();
+        parent::__construct($db);
         $this->idStudent = $id_student;
     }
 
@@ -57,40 +56,48 @@ class StudentsDAO
      */
     public function login(string $email, string $pass) : ?Student
     {
-        if (empty($email)) {
-            throw new \InvalidArgumentException("Email cannot be empty");
-        }
-        
-        if (empty($pass)) {
-            throw new \InvalidArgumentException("Password cannot be empty");
-        }
-        
-        $response = null;
-            
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateEmail($email);
+        $this->validatePassword($pass);
+        $this->withQuery("
             SELECT  * 
             FROM    students 
             WHERE   email = ? AND password = ?
         ");
+        $this->runQueryWithArguments($email, md5($pass));
         
-        // Executes query
-        $sql->execute(array($email, md5($pass)));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $student = $sql->fetch();
-            $response = new Student(
-                (int) $student['id_student'],
-                $student['name'],
-                new GenreEnum($student['genre']),
-                new \DateTime($student['birthdate']),
-                $student['email'],
-                $student['photo']
-            );
+        return $this->parseStudentResponseQuery();
+    }
+
+    private function validateEmail($email)
+    {
+        if (empty($email)) {
+            throw new \InvalidArgumentException("Email cannot be empty");
         }
+    }
+
+    private function validatePassword($password)
+    {
+        if (empty($password)) {
+            throw new \InvalidArgumentException("Password cannot be empty");
+        }
+    }
+
+    private function parseStudentResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
+        }
+
+        $studentRaw = $this->getResponseQuery();
         
-        return $response;
+        return new Student(
+            (int) $studentRaw['id_student'],
+            $studentRaw['name'],
+            new GenreEnum($studentRaw['genre']),
+            new \DateTime($studentRaw['birthdate']),
+            $studentRaw['email'],
+            $studentRaw['photo']
+        );
     }
     
     /**
@@ -104,38 +111,23 @@ class StudentsDAO
      */
     public function get() : ?Student
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-        
-        $response = null;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateStudentId($this->idStudent);
+        $this->withQuery("
             SELECT  * 
             FROM    students
             WHERE   id_student = ?
         ");
+        $this->runQueryWithArguments($this->idStudent);
         
-        // Executes query
-        $sql->execute(array($this->idStudent));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $student = $sql->fetch();
-            
-            $response = new Student(
-                (int) $student['id_student'],
-                $student['name'], 
-                new GenreEnum($student['genre']), 
-                new \DateTime($student['birthdate']), 
-                $student['email'],
-                $student['photo'] 
-            );
+        return $this->parseStudentResponseQuery();
+    }
+
+    private function validateStudentId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                                                "provided in the constructor");
         }
-        
-        return $response;
     }
     
     /**
@@ -151,20 +143,9 @@ class StudentsDAO
      */
     public function getLastClassWatched(int $idCourse) : ?ClassType
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-        
-        if (empty($idCourse) || $idCourse <= 0) {
-            throw new \InvalidArgumentException("Course id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        $response = null;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateStudentId($this->idStudent);
+        $this->validateCourseId($idCourse);
+        $this->withQuery("
             SELECT      id_module, class_order,
                         CASE
                             WHEN class_type = 0 THEN 'video'
@@ -178,39 +159,50 @@ class StudentsDAO
             ORDER BY    date DESC
             LIMIT 1
         ");
+        $this->runQueryWithArguments($this->idStudent, $idCourse);
         
-        // Executes query
-        $sql->execute(array($this->idStudent, $idCourse));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $class = $sql->fetch();
-            
-            if ($class['class_type'] == 'video') {
-                $videos = new VideosDAO($this->db);
-                
-                $response = $videos->get(
-                    (int) $class['id_module'], 
-                    (int) $class['class_order']
-                ); 
-            }
-            else {
-                $questionnaires = new QuestionnairesDAO($this->db);
-                
-                $response = $questionnaires->get(
-                    (int) $class['id_module'],
-                    (int) $class['class_order']
-                ); 
-            }
+        return $this->parseClassResponseQuery();
+    }
+
+    private function validateCourseId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Course id cannot be empty or ".
+                                                "less than or equal to zero");
         }
-        
-        return $response;
+    }
+
+    private function parseClassResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
+        }
+
+        $class = null;
+        $rawClass = $this->getResponseQuery();
+            
+        if ($rawClass['class_type'] == 'video') {
+            $videosDao = new VideosDAO($this->db);
+            $class = $videosDao->get(
+                (int) $rawClass['id_module'], 
+                (int) $rawClass['class_order']
+            ); 
+        }
+        else {
+            $questionnairesDao = new QuestionnairesDAO($this->db);
+            $class = $questionnairesDao->get(
+                (int) $rawClass['id_module'],
+                (int) $rawClass['class_order']
+            ); 
+        }
+
+        return $class;
     }
     
     /**
      * Adds a new student.
      *
-     * @param       Student $student Informations about the student
+     * @param       Student $student Information about the student
      * @param       string $password Student password
      * @param       bool $autoLogin [Optional] If true, after registration is
      * completed the student will automatically login to the system
@@ -221,42 +213,42 @@ class StudentsDAO
      */
     public function register(Student $student, string $password, bool $autoLogin = true) : int
     {
-        if (empty($student)) {
-            throw new \InvalidArgumentException("Student cannot be empty");
-        }
-            
-        if (empty($password)) {
-            throw new \InvalidArgumentException("Password cannot be empty");
-        }
-                
-        $response = -1;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateStudent($student);
+        $this->validatePassword($password);
+        $this->withQuery("
             INSERT INTO students
             (name,genre,birthdate,email,password)
             VALUES (?,?,?,?,?)
         ");
-                
-        // Executes query
-        $sql->execute(array(
+        $this->runQueryWithArguments(
             $student->getName(),
             $student->getGenre()->get() == 1,
             $student->getBirthdate()->format("Y-m-d"),
             $student->getEmail(),
             md5($password)
-        ));
+        );
         
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            if ($autoLogin) {
-                $_SESSION['s_login'] = $this->db->lastInsertId();
-            }
-                
-            $response = $this->db->lastInsertId();
+        return $this->parseNewStudentResponseQuery($autoLogin);
+    }
+
+    private function parseNewStudentResponseQuery($autoLogin)
+    {
+        if (!$this->hasResponseQuery()) {
+            return -1;
         }
-        
-        return $response;
+
+        if ($autoLogin) {
+            $_SESSION['s_login'] = $this->db->lastInsertId();
+        }
+            
+        return $this->db->lastInsertId();
+    }
+
+    private function validateStudent($student)
+    {
+        if (empty($student)) {
+            throw new \InvalidArgumentException("Student cannot be empty");
+        }
     }
     
     /**
@@ -270,26 +262,20 @@ class StudentsDAO
      */
     public function update(Student $student) : bool
     {
-        if (empty($student)) {
-            throw new \InvalidArgumentException("Student cannot be empty");
-        }
-
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateStudent($student);
+        $this->withQuery("
             UPDATE  students 
             SET     name = ?, genre = ?, birthdate = ? 
             WHERE   id_student = ?
         ");
-        
-        // Executes query
-        $sql->execute(array(
+        $this->runQueryWithArguments(
             $student->getName(), 
             $student->getGenre()->get(), 
             $student->getBirthdate()->format("Y-m-d"),
             $student->getId()
-        ));
+        );
         
-        return $sql && $sql->rowCount() > 0;
+        return $this->hasResponseQuery();
     }
     
     /**
@@ -302,21 +288,14 @@ class StudentsDAO
      */
     public function delete() : bool
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-        
-        // Query construction
-        $sql = $this->db->query("
+        $this->validateStudentId($this->idStudent);
+        $this->withQuery("
             DELETE FROM students 
             WHERE id_student = ?
         ");
+        $this->runQueryWithArguments($this->idStudent);
         
-        // Executes query
-        $sql->execute(array($this->idStudent));
-        
-        return $sql && $sql->rowCount() > 0;
+        return $this->hasResponseQuery();
     }
     
     /**
@@ -332,31 +311,63 @@ class StudentsDAO
      */
     public function updatePhoto(array $photo) : bool
     {
-        // Deletes old image (if there is one)
-        $imageName = $this->getPhoto();
+        $this->removeOldPhoto();
+        $filename = $this->storeNewPhoto($photo);
+        $this->withQuery("
+            UPDATE students 
+            SET photo = ".$filename."
+            WHERE id_student = ?
+        ");
+        $this->runQueryWithArguments($this->idStudent);
         
-        // Deletes photo
+        return $this->hasResponseQuery();
+    }
+
+    private function removeOldPhoto()
+    {
+        $imageName = $this->getPhoto();
+
         if (!empty($imageName)) {
             unlink("assets/img/profile_photos/".$imageName);
         }
+    }
+
+    /**
+     * Gets photo of the logged in student.
+     * 
+     * @return      string Photo filename or empty string if student does not
+     * have a photo
+     */
+    private function getPhoto()
+    {
+        $this->withQuery("
+            SELECT  photo
+            FROM    students
+            WHERE   id_student = ".Student::getLoggedIn($this->db)->getId()
+        );
+        $this->runQueryWithoutArguments();
+    
+        return $this->parsePhotoResponseQuery();
+    }
+
+    private function parsePhotoResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return "";
+        }
+        
+        return $this->getResponseQuery()['photo'];
+    }
+
+    private function storeNewPhoto($photo)
+    {
+        $filename = null;
 
         if (!empty($photo)) {
             $filename = FileUtil::storePhoto($photo, "../assets/img/profile_photos/");
         }
         
-        $filename = empty($filename) ? null : "'".$filename."'";
-        
-        // Query construction
-        $sql = $this->db->prepare("
-            UPDATE students 
-            SET photo = ".$filename."
-            WHERE id_student = ?
-        ");
-        
-        // Executes query
-        $sql->execute(array($this->idStudent));
-        
-        return $sql && $sql->rowCount() > 0;
+        return empty($filename) ? null : "'".$filename."'";
     }
     
     /**
@@ -371,42 +382,46 @@ class StudentsDAO
      */
     public function updatePassword(string $currentPassword, string $newPassword) : bool
     {
-        if (empty($currentPassword)) {
-            throw new \InvalidArgumentException("Current password cannot be empty");
-        }
-        
-        if (empty($newPassword)) {
-            throw new \InvalidArgumentException("New password cannot be empty");
-        }
-        
-        $response = false;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateCurrentPassword($currentPassword);
+        $this->validateNewPassword($newPassword);
+        $this->withQuery("
             SELECT  COUNT(*) AS correctPassword 
             FROM    students 
             WHERE   id_student = ? AND password = '".md5($currentPassword)."'
         ");
-        
-        // Executes query
-        $sql->execute(array($this->idStudent));
-        
-        // Checks if current password is correct
-        if ($sql->fetch()['correctPassword'] > 0) {            
-            // Query construction
-            $sql = $this->db->prepare("
-                UPDATE  students 
-                SET     password = '".md5($newPassword)."' 
-                WHERE   id_student = ?
-            ");
-            
-            // Executes query
-            $sql->execute(array($this->idStudent));
-            
-            $response = $sql && $sql->rowCount() > 0;
+        $this->runQueryWithArguments($this->idStudent);
+
+        return $this->parseUpdatePasswordResponseQuery($newPassword);
+    }
+
+    private function validateCurrentPassword($password)
+    {
+        if (empty($password)) {
+            throw new \InvalidArgumentException("Current password cannot be empty");
         }
+    }
+
+    private function validateNewPassword($password)
+    {
+        if (empty($password)) {
+            throw new \InvalidArgumentException("New password cannot be empty");
+        }
+    }
+
+    private function parseUpdatePasswordResponseQuery($newPassword)
+    {
+        if ($this->getResponseQuery()['correctPassword'] <= 0) {            
+            return false;
+        }
+
+        $this->withQuery("
+            UPDATE  students 
+            SET     password = '".md5($newPassword)."' 
+            WHERE   id_student = ?
+        ");
+        $this->runQueryWithArguments($this->idStudent);
         
-        return $response;
+        return $this->hasResponseQuery();
     }
     
     /**
@@ -427,13 +442,8 @@ class StudentsDAO
      */
     public function getTotalWatchedClasses() : array
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateStudentId($this->idStudent);
+        $this->withQuery("
             SELECT      SUM(total_length_watched) AS total_length_watched,
                         COUNT(total_classes_watched) AS total_classes_watched
             FROM (
@@ -449,11 +459,9 @@ class StudentsDAO
                 					      WHERE     id_student = ?)
             ) AS tmp
         ");
+        $this->runQueryWithArguments($this->idStudent, $this->idStudent);
         
-        // Executes query
-        $sql->execute(array($this->idStudent, $this->idStudent));
-        
-        return $sql->fetch();
+        return $this->getResponseQuery();
     }
 
     /**
@@ -470,14 +478,15 @@ class StudentsDAO
      */
     public function getPurchases(int $limit = -1, int $offset = -1) : array
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
+        $this->validateStudentId($this->idStudent);
+        $this->withQuery($this->buildGetPurchasesQuery($limit, $offset));
+        $this->runQueryWithArguments($this->idStudent);
         
-        $response = null;
-            
-        // Query construction
+        return $this->parsePurchasesResponseQuery();
+    }
+
+    private function buildGetPurchasesQuery($limit, $offset)
+    {
         $query = "
             SELECT  *, 
                     bundles.price AS price_bundle, 
@@ -494,29 +503,33 @@ class StudentsDAO
                 $query .= " LIMIT ".$limit;
             }
         }
-            
-        $sql = $this->db->prepare($query);
-            
-        // Executes query
-        $sql->execute(array($this->idStudent));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $purchase) {
-                $response[] = new Purchase(
-                    new Bundle(
-                        (int) $purchase['id_bundle'], 
-                        $purchase['name'], 
-                        (float) $purchase['price_bundle'],
-                        $purchase['logo'],
-                        $purchase['description']
-                    ),
-                    new \DateTime($purchase['date']),
-                    (float) $purchase['price_purchase']
-                );
-            }
+
+        return $query;
+    }
+
+    private function parsePurchasesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {            
+            return array();
         }
-        
-        return $response;
+
+        $purchases = array();
+
+        foreach ($this->getAllResponseQuery() as $purchase) {
+            $purchases[] = new Purchase(
+                new Bundle(
+                    (int) $purchase['id_bundle'], 
+                    $purchase['name'], 
+                    (float) $purchase['price_bundle'],
+                    $purchase['logo'],
+                    $purchase['description']
+                ),
+                new \DateTime($purchase['date']),
+                (float) $purchase['price_purchase']
+            );
+        }
+
+        return $purchases;
     }
     
     /**
@@ -526,11 +539,14 @@ class StudentsDAO
      */
     public function countPurchases() : int
     {
-        return (int) $this->db->query("
+        $this->withQuery("
             SELECT  COUNT(*) AS total
             FROM    purchases
             WHERE   id_student = ".$this->idStudent
-        )->fetch()['total'];
+        );
+        $this->runQueryWithoutArguments();
+
+        return ((int) $this->getResponseQuery()['total']);
     }
     
     /**
@@ -545,27 +561,24 @@ class StudentsDAO
      */
     public function addBundle(int $idBundle) : bool
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-        
-        if (empty($idBundle) || $idBundle <= 0) {
-            throw new \InvalidArgumentException("Bundle id cannot be less ".
-                "than or equal to zero");
-        }
-            
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateStudentId($this->idStudent);
+        $this->validateBundleId($idBundle);
+        $this->withQuery("
             INSERT INTO purchases
             (id_student, id_bundle, date)
             VALUES (?, ?, NOW())
         ");
+        $this->runQueryWithArguments($this->idStudent, $idBundle);
         
-        // Executes query
-        $sql->execute(array($this->idStudent, $idBundle));
-        
-        return !empty($sql) && $sql->rowCount() > 0;
+        return $this->hasResponseQuery();
+    }
+
+    private function validateBundleId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Bundle id cannot be less ".
+                                                "than or equal to zero");
+        }
     }
     
     /**
@@ -581,25 +594,16 @@ class StudentsDAO
      */
     public function hasBundle(int $idBundle) : bool
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-            
-        if (empty($idBundle) || $idBundle <= 0) {
-            throw new \InvalidArgumentException("Bundle id cannot be less ".
-                "than or equal to zero");
-        }
-        
-        $sql = $this->db->prepare("
+        $this->validateStudentId($this->idStudent);
+        $this->validateBundleId($idBundle);
+        $this->withQuery("
             SELECT  COUNT(*) AS has_bundle
             FROM    purchases
             WHERE   id_student = ? AND id_bundle = ?
         ");
+        $this->runQueryWithArguments($this->idStudent, $idBundle);
         
-        $sql->execute(array($this->idStudent, $idBundle));
-        
-        return $sql->fetch()['has_bundle'] > 0;
+        return ($this->getResponseQuery()['has_bundle'] > 0);
     }
     
     /**
@@ -613,21 +617,15 @@ class StudentsDAO
      */
     public function isEmailInUse(string $email) : bool
     {
-        if (empty($email)) {
-            throw new \InvalidArgumentException("Email cannot be empty");
-        }
-
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateEmail($email);
+        $this->withQuery("
             SELECT  COUNT(*) AS count 
             FROM    students, admins 
             WHERE   email = ?
         ");
-        
-        // Executes query
-        $sql->execute(array($email));
+        $this->runQueryWithArguments($email);
 
-        return $sql->fetch()['count'] > 0;
+        return ($this->getResponseQuery()['count'] > 0);
     }
     
     /**
@@ -640,39 +638,13 @@ class StudentsDAO
      */
     public function clearHistory()
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-            
-        $sql = $this->db->query("
+        $this->validateStudentId($this->idStudent);
+        $this->withQuery("
             DELETE FROM student_historic
             WHERE id_student = ".$this->idStudent
         );
+        $this->runQueryWithoutArguments();
         
-        return !empty($sql) && $sql->rowCount() > 0;
-    }
-    
-    /**
-     * Gets photo of the logged in student.
-     * 
-     * @return      string Photo filename or empty string if student does not
-     * have a photo
-     */
-    private function getPhoto()
-    {
-        $response = "";
-        
-        $sql = $this->db->query("
-            SELECT  photo
-            FROM    students
-            WHERE   id_student = ".Student::getLoggedIn($this->db)->getId()
-        );
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = $sql->fetch()['photo'];
-        }
-        
-        return $response;
+        return $this->hasResponseQuery();
     }
 }

@@ -7,12 +7,17 @@ namespace dao;
 use repositories\Database;
 
 
+/**
+ * Represents a Data Access Object.
+ */
 abstract class DAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
     protected $db;
+    protected $sql;
+    private $query;
 
 
     //-------------------------------------------------------------------------
@@ -27,18 +32,34 @@ abstract class DAO
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
-    protected function runQueryWithArguments($sql, ...$bindArguments)
+    protected function withQuery($query)
     {
-        $sql->execute($bindArguments);
+        $this->query = $query;
     }
 
-    protected function runQueryWithoutArguments($query)
+    protected function runQueryWithArguments(...$bindArguments)
     {
-        return $this->db->query($query);
+        $this->sql = $this->db->prepare($this->query);
+        $this->sql->execute($bindArguments);
     }
 
-    protected function hasDatabaseChanged($sql)
+    protected function runQueryWithoutArguments()
     {
-        return $sql && ($sql->rowCount() > 0);
+        $this->sql = $this->db->query($this->query);
+    }
+
+    protected function hasResponseQuery()
+    {
+        return $this->sql && ($this->sql->rowCount() > 0);
+    }
+
+    protected function getResponseQuery()
+    {
+        return $this->sql->fetch();
+    }
+
+    protected function getAllResponseQuery()
+    {
+        return $this->sql->fetchAll();
     }
 }

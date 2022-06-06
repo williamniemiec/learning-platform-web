@@ -47,29 +47,23 @@ class VideosDAO extends ClassesDAO
     {
         $this->validateModuleId($idModule);
         $this->validateClassOrder($classOrder);
-            
-        $sql = $this->buildGetQuery();
-        $this->runQueryWithArguments($sql, $idModule, $classOrder);
-        
-        return $this->parseGetQueryResponse($sql);
-    }
-
-    private function buildGetQuery()
-    {
-        return $this->db->prepare("
+        $this->withQuery("
             SELECT  * 
             FROM    videos 
             WHERE   id_module = ? AND class_order = ?
         ");
+        $this->runQueryWithArguments($idModule, $classOrder);
+
+        return $this->parseGetResponseQuery();
     }
 
-    private function parseGetQueryResponse($sql)
+    private function parseGetResponseQuery()
     {
-        if (!$sql || $sql->rowCount() <= 0) {
+        if (!$this->hasResponseQuery()) {
             return array();
         }
         
-        $rawClass = $sql->fetch();
+        $rawClass = $this->getResponseQuery();
         
         return new Video(
             (int) $rawClass['id_module'],
@@ -112,32 +106,25 @@ class VideosDAO extends ClassesDAO
     public function getAllFromModule(int $idModule) : array
     {
         $this->validateModuleId($idModule);
-
-        $sql = $this->buildGetAllQuery();
-        $this->runQueryWithArguments($sql, $idModule);
-        
-        return $this->parseGetAllQueryResponse($sql);
-    }
-
-    private function buildGetAllQuery()
-    {
-        return $this->db->prepare("
+        $this->withQuery("
             SELECT  *
             FROM    videos
             WHERE   id_module = ?
         ");
+        $this->runQueryWithArguments($idModule);
+        
+        return $this->parseGetAllResponseQuery();
     }
 
-    private function parseGetAllQueryResponse($sql)
+    private function parseGetAllResponseQuery()
     {
-        if (!$sql || $sql->rowCount() <= 0) {
+        if (!$this->hasResponseQuery()) {
             return array();
         }
         
         $classes = array();
-        $rawClasses = $sql->fetchAll();
             
-        foreach ($rawClasses as $class) {
+        foreach ($this->getAllResponseQuery() as $class) {
             $classes[] = new Video(
                 (int) $class['id_module'], 
                 (int) $class['class_order'], 
@@ -157,10 +144,13 @@ class VideosDAO extends ClassesDAO
      */
     public function totalLength() : int
     {
-        return $this->db->query("
+        $this->withQuery("
             SELECT  SUM(length) AS total_length
             FROM    videos
-        ")->fetch()['total_length'];
+        ");
+        $this->runQueryWithoutArguments();
+        
+        return $this->getResponseQuery()['total_length'];
     }
     
     /**
@@ -169,15 +159,7 @@ class VideosDAO extends ClassesDAO
      */
     public function wasWatched(int $idStudent, int $idModule, int $classOrder) : bool
     {
-        $sql = $this->buildWasWatchedQuery();
-        $this->runQueryWithArguments($sql, $idStudent, $idModule, $classOrder);
-        
-        return $this->parseWasWatchedQueryResponse($sql);
-    }
-
-    private function buildWasWatchedQuery()
-    {
-        return $this->db->prepare("
+        $this->withQuery("
             SELECT  COUNT(*) AS was_watched
             FROM    student_historic
             WHERE   class_type = 0 AND 
@@ -185,11 +167,9 @@ class VideosDAO extends ClassesDAO
                     id_module = ? AND 
                     class_order = ?
         ");
-    }
-
-    private function parseWasWatchedQueryResponse($sql)
-    {
-        return ($sql->fetch()['was_watched'] > 0);
+        $this->runQueryWithArguments($idStudent, $idModule, $classOrder);
+        
+        return ($this->getResponseQuery()['was_watched'] > 0);
     }
     
     /**
@@ -207,7 +187,11 @@ class VideosDAO extends ClassesDAO
      */
     public function markAsWatched(int $idStudent, int $idModule, int $classOrder) : bool
     {
-        return $this->_MarkAsWatched($idStudent, $idModule, $classOrder,
-            new ClassTypeEnum(ClassTypeEnum::VIDEO));
+        return $this->_MarkAsWatched(
+            $idStudent, 
+            $idModule, 
+            $classOrder,
+            new ClassTypeEnum(ClassTypeEnum::VIDEO)
+        );
     }
 }
