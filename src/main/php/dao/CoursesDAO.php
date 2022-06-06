@@ -12,15 +12,8 @@ use domain\ClassType;
 /**
  * Responsible for managing 'courses' table.
  */
-class CoursesDAO
+class CoursesDAO extends DAO
 {
-    //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $idUser;
-    private $db;
-    
-    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
@@ -31,7 +24,7 @@ class CoursesDAO
      */
     public function __construct(Database $db)
     {
-        $this->db = $db->getConnection();
+        parent::__construct($db);
     }
     
     
@@ -60,14 +53,58 @@ class CoursesDAO
      */
     public function getMyCourses(int $idStudent, string $name = '') : array
     {
-        if (empty($idStudent) || $idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id cannot be empty ".
-                "or less than or equal to zero");
+        $this->validateStudentId($idStudent);
+        $this->withQuery($this->buildGetMyCoursesQuery($name));
+        
+        if (empty($name)) {
+            $this->runQueryWithArguments($idStudent, $idStudent);
         }
-        
-        $response = array();
-        
-        // Query construction
+        else {
+            $this->runQueryWithArguments($idStudent, $idStudent, $name."%");
+        }
+
+        return $this->parseGetMyCoursesResponseQuery();
+    }
+
+    private function validateStudentId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Student id cannot be empty or".
+                                                "less than or equal to zero");
+        }
+    }
+
+    private function parseGetMyCoursesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $courses = array();
+        $i = 0;
+            
+        foreach ($this->getAllResponseQuery() as $course) {
+            $courses[$i]['course'] = new Course(
+                (int) $course['id_course'], 
+                $course['name'],
+                $course['logo'],
+                $course['description']
+            );
+            
+            $courses[$i]['course']->getModules($this->db);
+            $courses[$i]['course']->setTotalLength((int) $course['total_length']);
+            $courses[$i]['course']->getTotalClasses($this->db);
+            $courses[$i]['total_classes_watched'] = (int) $course['total_classes_watched'];
+            $courses[$i]['total_length_watched'] = (int) $course['total_length_watched'];
+
+            $i++;
+        }
+
+        return $courses;
+    }
+
+    private function buildGetMyCoursesQuery($name)
+    {
         $query = "
             SELECT      id_course, name, logo, description, 
                         CASE 
@@ -100,40 +137,11 @@ class CoursesDAO
             GROUP BY    id_course, name, logo, description
         ";
         
-        // Filters courses with the given name (if provided)
         if (!empty($name)) {
             $query .= " HAVING      name LIKE ?";
-            $sql = $this->db->prepare($query);
-            $sql->execute(array($idStudent, $idStudent, $name."%"));
         }
-        else {
-            $sql = $this->db->prepare($query);
-            $sql->execute(array($idStudent, $idStudent));
-        }
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $i = 0;
-            
-            foreach ($sql->fetchAll() as $course) {
-                $response[$i]['course'] = new Course(
-                    (int)$course['id_course'], 
-                    $course['name'],
-                    $course['logo'],
-                    $course['description']
-                );
-                
-                $response[$i]['course']->getModules($this->db);
-                $response[$i]['course']->setTotalLength((int) $course['total_length']);
-                $response[$i]['course']->getTotalClasses($this->db);
-                $response[$i]['total_classes_watched'] = (int) $course['total_classes_watched'];
-                $response[$i]['total_length_watched'] = (int) $course['total_length_watched'];
 
-                $i++;
-            }
-        }
-        
-        return $response;
+        return $query;
     }
     
     /**
@@ -153,13 +161,8 @@ class CoursesDAO
      */
     public function countClasses(int $idCourse) : array
     {
-        if (empty($idCourse) || $idCourse <= 0) {
-            throw new \InvalidArgumentException("Course id cannot be empty ".
-                "or less than or equal to zero");
-        }
-       
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateCourseId($idCourse);
+        $this->withQuery("
             SELECT  SUM(total) AS total_classes, 
                     SUM(length) as total_length
             FROM    (SELECT      COUNT(*) AS total, SUM(5) AS length
@@ -170,65 +173,75 @@ class CoursesDAO
                      FROM        videos NATURAL JOIN course_modules
                      WHERE       id_course = ?) AS tmp
         ");
+        $this->runQueryWithArguments($idCourse, $idCourse);
         
-        // Executes query
-        $sql->execute(array($idCourse, $idCourse));
-        
-        return $sql->fetch();
+        return $this->getResponseQuery();
+    }
+
+    private function validateCourseId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Course id cannot be empty or".
+                                                "less than or equal to zero");
+        }
     }
     
     /**
      * Gets courses that belongs to a bundle.
      * 
-     * @param       int $id_bundle Bundle id
+     * @param       int idBundle Bundle id
      * 
      * @return      Course[] Courses belonging to this bundle
      * 
      * @throws      \InvalidArgumentException If bundle id is empty or less 
      * than or equal to zero
      */
-    public function getFromBundle(int $id_bundle) : array
+    public function getFromBundle(int $idBundle) : array
     {
-        if (empty($id_bundle) || $id_bundle <= 0) {
-            throw new \InvalidArgumentException("Bundle id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        $response = array();
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateBundleId($idBundle);
+        $this->withQuery("
             SELECT  *
             FROM    courses
             WHERE   id_course IN (SELECT    id_course
                                   FROM      bundle_courses
                                   WHERE     id_bundle = ?)        
         ");
+        $this->runQueryWithArguments($idBundle);
         
-        // Executes query
-        $sql->execute(array($id_bundle));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $courses = $sql->fetchAll();
-            $i = 0;
-            
-            foreach ($courses as $course) {
-                $response[$i] = new Course(
-                    (int) $course['id_course'],
-                    $course['name'],
-                    $course['logo'],
-                    $course['description']
-                );
-                
-                $totalClasses = $this->countClasses($course['id_course']);
-                $response[$i]->setTotalClasses((int)$totalClasses['total_classes']);
-                $response[$i]->setTotalLength((int)$totalClasses['total_length']);
-                $i++;
-            }
+        return $this->parseGetFromBundleResponseQuery();
+    }
+
+    private function validateBundleId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Bundle id cannot be empty or".
+                                                "less than or equal to zero");
         }
-        
-        return $response;
+    }
+
+    private function parseGetFromBundleResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $courses = array();
+        $i = 0;
+            
+        foreach ($this->getAllResponseQuery() as $course) {
+            $totalClasses = $this->countClasses($course['id_course']);
+            $courses[$i] = new Course(
+                (int) $course['id_course'], 
+                $course['name'],
+                $course['logo'],
+                $course['description']
+            );
+            $courses[$i]->setTotalClasses((int) $totalClasses['total_classes']);
+            $courses[$i]->setTotalLength((int) $totalClasses['total_length']);
+            $i++;
+        }
+
+        return $courses;
     }
 
     /**
@@ -243,36 +256,31 @@ class CoursesDAO
      */
     public function get(int $idCourse) : Course
     {
-        if (empty($idCourse) || $idCourse <= 0) {
-            throw new \InvalidArgumentException("Course id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        $response = null;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateCourseId($idCourse);
+        $this->withQuery("
             SELECT  *
             FROM    courses
             WHERE   id_course = ?
         ");
+        $this->runQueryWithArguments($idCourse);
         
-        // Executes query
-        $sql->execute(array($idCourse));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $course = $sql->fetch();
-            
-            $response = new Course(
-                (int) $course['id_course'],
-                $course['name'],
-                $course['logo'],
-                $course['description']
-            );
+        return $this->parseGetResponseQuery();
+    }
+
+    private function parseGetResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
         }
-        
-        return $response;
+
+        $courseRaw = $this->getResponseQuery();
+            
+        return new Course(
+            (int) $courseRaw['id_course'],
+            $courseRaw['name'],
+            $courseRaw['logo'],
+            $courseRaw['description']
+        );
     }
     
     /**
@@ -289,15 +297,8 @@ class CoursesDAO
      */
     public function getFirstClassFromFirstModule(int $idCourse) : ?ClassType
     {
-        if (empty($idCourse) || $idCourse <= 0) {
-            throw new \InvalidArgumentException("Course id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        $response = null;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateCourseId($idCourse);
+        $this->withQuery("
             SELECT      id_module, class_order, class_type FROM (
                 SELECT    id_module, class_order, 'questionnaire' AS class_type
                 FROM        questionnaires NATURAL JOIN course_modules
@@ -310,26 +311,30 @@ class CoursesDAO
             WHERE       id_course = ?
             ORDER BY    module_order
         ");
-            
-        // Executes query
-        $sql->execute(array($idCourse, $idCourse, $idCourse));
+        $this->runQueryWithArguments($idCourse, $idCourse, $idCourse);
         
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $response = $sql->fetch();
-            
-            if ($response['class_type'] == 'video') {
-                $videosDao = new VideosDAO($this->db);
-                
-                $response = $videosDao->get($response['id_module'], 1);
-            } else {
-                $questionnairesDao = new QuestionnairesDAO($this->db);
-                
-                $response = $questionnairesDao->get((int) $response['id_module'], 1);
-            }
+        return $this->parseGetClassResponseQuery();
+    }
+
+    private function parseGetClassResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
         }
+
+        $class = null;
+        $classRaw = $this->getResponseQuery();
             
-        return $response;
+        if ($classRaw['class_type'] == 'video') {
+            $videosDao = new VideosDAO($this->db);
+            $class = $videosDao->get($classRaw['id_module'], 1);
+        } 
+        else {
+            $questionnairesDao = new QuestionnairesDAO($this->db);
+            $class = $questionnairesDao->get((int) $classRaw['id_module'], 1);
+        }
+
+        return $class;
     }
     
     /**
@@ -345,18 +350,9 @@ class CoursesDAO
      */
     public function hasCourse(int $idCourse, int $idStudent) : bool
     {
-        if (empty($idCourse) || $idCourse <= 0) {
-            throw new \InvalidArgumentException("Course id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        if (empty($idStudent) || $idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateCourseId($idCourse);
+        $this->validateStudentId($idStudent);
+        $this->withQuery("
             SELECT  COUNT(*) AS count
             FROM    courses
             WHERE   id_course = ? AND
@@ -364,11 +360,9 @@ class CoursesDAO
                                   FROM      bundle_courses NATURAL JOIN purchases
                                   WHERE     id_student = ?)
         ");
+        $this->runQueryWithArguments($idCourse, $idStudent);
         
-        // Executes query
-        $sql->execute(array($idCourse, $idStudent));
-        
-        return $sql->fetch()['count'] > 0; 
+        return ($this->getResponseQuery()['count'] > 0); 
     }
     
     /**
@@ -378,9 +372,12 @@ class CoursesDAO
      */
     public function getTotal() : int
     {
-        return (int) $this->db->query("
+        $this->withQuery("
             SELECT  COUNT(*) AS total
             FROM    courses
-        ")->fetch()['total'];
+        ");
+        $this->runQueryWithoutArguments();
+        
+        return ((int) $this->getResponseQuery()['total']);
     }
 }

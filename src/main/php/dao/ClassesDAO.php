@@ -14,12 +14,6 @@ use domain\enum\ClassTypeEnum;
 abstract class ClassesDAO extends DAO
 {
     //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    protected $db;
-
-
-    //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     protected function __construct(Database $db)
@@ -58,38 +52,56 @@ abstract class ClassesDAO extends DAO
     public function _MarkAsWatched(int $idStudent, int $idModule, int $classOrder, 
         ClassTypeEnum $classType) : bool
     {
-        if (empty($idStudent) || $idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-        }
-                
-        if (empty($classOrder) || $classOrder <= 0) {
-            throw new \InvalidArgumentException("Class order cannot be empty ".
-                "or less than or equal to zero");
-        }
+        $this->validateStudentId($idStudent);
+        $this->validateModuleId($idModule);
+        $this->validateClassOrder($classOrder);
+        $this->validateClassType($classType);
+        $this->withQuery($this->buildMarkAsWatchedQuery($classType));
+        $this->runQueryWithArguments($idStudent, $idModule, $classOrder);
         
-        if (empty($classType) || (empty($classType->get()) && $classType->get() != 0)) {
-            throw new \InvalidArgumentException("Class type cannot be empty ");
+        return $this->hasResponseQuery();
+    }
+
+    private function validateStudentId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Student id cannot be empty or".
+                                                "less than or equal to zero");
         }
-                    
+    }
+
+    protected function validateModuleId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Module id cannot be empty or ".
+                                                "less than or equal to zero");
+        }
+    }
+
+    protected function validateClassOrder($order)
+    {
+        if (empty($order) || $order <= 0) {
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                                                "or less than or equal to zero");
+        }
+    }
+
+    private function validateClassType($type)
+    {
+        if (empty($type) || (empty($type->get()) && $type->get() != 0)) {
+            throw new \InvalidArgumentException("Class type cannot be empty");
+        }
+    }
+
+    private function buildMarkAsWatchedQuery($classType)
+    {
         $classType = $classType->get() == 1 ? "b'1'" : "b'0'";
         
-        // Query construction
-        $sql = $this->db->prepare("
+        return "
             INSERT INTO student_historic
             (id_student, id_module, class_order, class_type, date)
             VALUES (?, ?, ?, ".$classType.", CURDATE())
-        ");
-
-        // Executes query
-        $sql->execute(array($idStudent, $idModule, $classOrder));
-        
-        return !empty($sql) && $sql->rowCount() > 0;
+        ";
     }
     
     /**
@@ -124,31 +136,16 @@ abstract class ClassesDAO extends DAO
      */
     public function removeWatched(int $idStudent, int $idModule, int $classOrder) : bool
     {
-        if (empty($idStudent) || $idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        if (empty($classOrder) || $classOrder <= 0) {
-            throw new \InvalidArgumentException("Class order cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateStudentId($idStudent);
+        $this->validateModuleId($idModule);
+        $this->validateClassOrder($classOrder);
+        $this->withQuery("
             DELETE FROM student_historic 
             WHERE id_student = ? AND id_module = ? AND class_order = ?
         ");
+        $this->runQueryWithArguments($idStudent, $idModule, $classOrder);
         
-        // Executes query
-        $sql->execute(array($idStudent, $idModule, $classOrder));
-        
-        return !empty($sql) && $sql->rowCount() > 0;
+        return $this->hasResponseQuery();
     }
     
     /**

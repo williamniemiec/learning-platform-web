@@ -24,7 +24,7 @@ class QuestionnairesDAO extends ClassesDAO
      */
     public function __construct(Database $db)
     {
-        $this->db = $db->getConnection();
+        parent::__construct($db);
     }
     
     
@@ -46,47 +46,38 @@ class QuestionnairesDAO extends ClassesDAO
      */
     public function get(int $idModule, int $classOrder) : Questionnaire
     {
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        if (empty($classOrder) || $classOrder <= 0) {
-            throw new \InvalidArgumentException("Class order cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        $response = null;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateModuleId($idModule);
+        $this->validateClassOrder($classOrder);
+        $this->withQuery("
             SELECT  * 
             FROM    questionnaires 
             WHERE   id_module = ? AND class_order = ?
         ");
+        $this->runQueryWithArguments($idModule, $classOrder);
         
-        // Executes query
-        $sql->execute(array($idModule, $classOrder));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $class = $sql->fetch();
-            
-            $response = new Questionnaire(
-                (int) $class['id_module'],
-                (int) $class['class_order'],
-                $class['question'],
-                $class['q1'],
-                $class['q2'],
-                $class['q3'],
-                $class['q4'],
-                (int) $class['answer']
-            ); 
+        return $this->parseQuestionnaireResponseQuery();
+    }
+
+    private function parseQuestionnaireResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
         }
         
-        return $response;
+        $rawClass = $this->getResponseQuery();
+            
+        return new Questionnaire(
+            (int) $rawClass['id_module'],
+            (int) $rawClass['class_order'],
+            $rawClass['question'],
+            $rawClass['q1'],
+            $rawClass['q2'],
+            $rawClass['q3'],
+            $rawClass['q4'],
+            (int) $rawClass['answer']
+        ); 
     }
-    
+
     /**
      * Gets the answer from a quest.
      *
@@ -101,34 +92,25 @@ class QuestionnairesDAO extends ClassesDAO
      */
     public function getAnswer(int $idModule, int $classOrder) : int
     {
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        if (empty($classOrder) || $classOrder <= 0) {
-            throw new \InvalidArgumentException("Class order cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        $response = -1;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateModuleId($idModule);
+        $this->validateClassOrder($idModule);
+        $this->withQuery("
             SELECT  answer 
             FROM    questionnaires 
             WHERE   id_module = ? AND class_order = ?
         ");
+        $this->runQueryWithArguments($idModule, $classOrder);
         
-        // Executes query
-        $sql->execute(array($idModule, $classOrder));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $response = (int)$sql->fetch()['answer'];
+        return $this->parseAnswerResponseQuery();
+    }
+
+    private function parseAnswerResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return -1;
         }
         
-        return $response;
+        return ((int) $this->getResponseQuery()['answer']);
     }
     
     /**
@@ -145,42 +127,39 @@ class QuestionnairesDAO extends ClassesDAO
      */
     public function getAllFromModule(int $idModule) : array
     {
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        $response = array();
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateModuleId($idModule);
+        $this->withQuery("
             SELECT  *
             FROM    questionnaires
             WHERE   id_module = ?   
         ");
-        
-        // Executes query
-        $sql->execute(array($idModule));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $classes = $sql->fetchAll();
-            
-            foreach ($classes as $class) {
-                $response[] = new Questionnaire(
-                    (int)$class['id_module'], 
-                    (int)$class['class_order'], 
-                    $class['question'], 
-                    $class['q1'], 
-                    $class['q2'], 
-                    $class['q3'], 
-                    $class['q4'], 
-                    (int)$class['answer']
-                ); 
-            }
+        $this->runQueryWithArguments($idModule);
+
+        return $this->parseQuestionnairesResponseQuery();
+    }
+
+    private function parseQuestionnairesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
-        
-        return $response;
+
+        $classes = array();
+            
+        foreach ($this->getAllResponseQuery() as $class) {
+            $classes[] = new Questionnaire(
+                (int) $class['id_module'], 
+                (int) $class['class_order'], 
+                $class['question'], 
+                $class['q1'], 
+                $class['q2'], 
+                $class['q3'], 
+                $class['q4'], 
+                (int) $class['answer']
+            ); 
+        }
+
+        return $classes;
     }
     
     /**
@@ -189,11 +168,14 @@ class QuestionnairesDAO extends ClassesDAO
      */
     public function totalLength() : int
     {
-        return $this->db->query("
+        $this->withQuery("
             SELECT  SUM(length) AS total_length
             FROM    (SELECT 5 AS length
-                     FROM   questionnaires) AS tmp
-        ")->fetch()['total_length'];
+                    FROM   questionnaires) AS tmp
+        ");
+        $this->runQueryWithoutArguments();
+
+        return $this->getResponseQuery()['total_length'];
     }
     
     /**
@@ -202,7 +184,7 @@ class QuestionnairesDAO extends ClassesDAO
      */
     public function wasWatched(int $id_student, int $id_module, int $class_order) : bool
     {
-        $sql = $this->db->prepare("
+        $this->withQuery("
             SELECT  COUNT(*) AS was_watched
             FROM    student_historic
             WHERE   class_type = 1 AND
@@ -210,10 +192,9 @@ class QuestionnairesDAO extends ClassesDAO
                     id_module = ? AND
                     class_order = ?
         ");
+        $this->runQueryWithArguments($id_student, $id_module, $class_order);
         
-        $sql->execute(array($id_student, $id_module, $class_order));
-        
-        return $sql->fetch()['was_watched'] > 0;
+        return ($this->getResponseQuery()['was_watched'] > 0);
     }
     
     /**

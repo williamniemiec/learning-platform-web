@@ -12,15 +12,12 @@ use domain\Video;
 /**
  * Responsible for managing 'notebook' table.
  */
-class NotebookDAO
+class NotebookDAO extends DAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $db;
     private $idStudent;
-    private $idModule;
-    private $classOrder;
     
     
     //-------------------------------------------------------------------------
@@ -37,12 +34,8 @@ class NotebookDAO
      */
     public function __construct(Database $db, int $idStudent)
     {
-        if (empty($idStudent) || $idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-            
-        $this->db = $db->getConnection();
+        parent::__construct($db);
+        $this->validateStudentId($idStudent);
         $this->idStudent = $idStudent;
     }
     
@@ -50,6 +43,14 @@ class NotebookDAO
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
+    private function validateStudentId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                                                "or less than or equal to zero");
+        }
+    }
+
     /**
      * Gets information about a note.
      *
@@ -62,47 +63,50 @@ class NotebookDAO
      * equal to zero
      */
     public function get(int $idNote) : ?Note
-    {       
-        if (empty($idNote) || $idNote <= 0) {
-            throw new \InvalidArgumentException("Note id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        $response = null;
-            
-        // Query construction
-        $sql = $this->db->prepare("
+    { 
+        $this->validateNoteId($idNote);
+        $this->withQuery("
             SELECT  *,
                     notebook.title AS notebook_title, 
                     videos.title AS videos_title
             FROM    notebook JOIN videos USING (id_module, class_order)
             WHERE   id_student = ? AND id_note = ?
         ");
-            
-        // Executes query
-        $sql->execute(array($this->idStudent, $idNote));
+        $this->runQueryWithArguments($this->idStudent, $idNote);
         
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $note = $sql->fetch();
-            
-            $response = new Note(
-                (int) $note['id_note'],
-                $note['notebook_title'],
-                $note['content'],
-                new \DateTime($note['date']),
-                new Video(
-                    (int) $note['id_module'],
-                    (int) $note['class_order'],
-                    $note['videos_title'],
-                    $note['videoID'],
-                    (int) $note['length'],
-                    $note['description']
-                )
-            );
+        return $this->parseNotebookResponseQuery();
+    }
+
+    private function validateNoteId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Note id cannot be empty or ".
+                                                "less than or equal to zero");
         }
-        
-        return $response;
+    }
+
+    private function parseNotebookResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
+        }
+
+        $noteRaw = $this->getResponseQuery();
+            
+        return new Note(
+            (int) $noteRaw['id_note'],
+            $noteRaw['notebook_title'],
+            $noteRaw['content'],
+            new \DateTime($noteRaw['date']),
+            new Video(
+                (int) $noteRaw['id_module'],
+                (int) $noteRaw['class_order'],
+                $noteRaw['videos_title'],
+                $noteRaw['videoID'],
+                (int) $noteRaw['length'],
+                $noteRaw['description']
+            )
+        );
     }
     
     /**
@@ -119,22 +123,48 @@ class NotebookDAO
      * @throws      \InvalidArgumentException If module id, class order is 
      * empty, less than or equal to zero
      */
-    public function getAllFromClass(int $idModule, int $classOrder, 
-        int $limit = -1, int $offset = -1) : array
+    public function getAllFromClass(
+        int $idModule, 
+        int $classOrder, 
+        int $limit = -1, 
+        int $offset = -1
+    ) : array
     {
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
+        $this->validateLoggedStudent();
+        $this->validateModuleId($idModule);
+        $this->validateClassOrder($classOrder);
+        $this->withQuery($this->buildGetAllFromModuleQuery($limit, $offset));
+        $this->runQueryWithArguments($this->idStudent, $idModule, $classOrder);
+        
+        return $this->parseNotebooksResponseQuery();
+    }
+
+    private function validateLoggedStudent()
+    {
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
+            throw new \InvalidArgumentException("Student id logged in must be ".
+                                                "provided in the constructor");
         }
-            
-        if (empty($classOrder) || $classOrder <= 0) {
+    }
+
+    private function validateModuleId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Module id cannot be empty or ".
+                                                "less than or equal to zero");
+        }
+    }
+
+    private function validateClassOrder($order)
+    {
+        if (empty($order) || $order <= 0) {
             throw new \InvalidArgumentException("Class order cannot be empty ".
-                "or less than or equal to zero");
+                                                "or less than or equal to zero");
         }
-            
-        $response = array();
-            
-        // Query construction
+    }
+
+    private function buildGetAllFromModuleQuery($limit, $offset)
+    {
         $query = "
             SELECT      *,
                         notebook.title AS notebook_title,
@@ -152,33 +182,36 @@ class NotebookDAO
                 $query .= " LIMIT ".$limit;
             }
         }
-        
-        $sql = $this->db->prepare($query);
-        
-        // Executes query
-        $sql->execute(array($this->idStudent, $idModule, $classOrder));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $note) {
-                $response[] = new Note(
-                    (int) $note['id_note'],
-                    $note['notebook_title'],
-                    $note['content'],
-                    new \DateTime($note['date']),
-                    new Video(
-                        (int) $note['id_module'],
-                        (int) $note['class_order'],
-                        $note['videos_title'],
-                        $note['videoID'],
-                        (int) $note['length'],
-                        $note['description']
-                    )
-                );
-            }
+
+        return $query;
+    }
+
+    private function parseNotebooksResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
-            
-        return $response;
+
+        $notebooks = $this->getResponseQuery();
+        
+        foreach ($this->getAllResponseQuery() as $note) {
+            $notebooks[] = new Note(
+                (int) $note['id_note'],
+                $note['notebook_title'],
+                $note['content'],
+                new \DateTime($note['date']),
+                new Video(
+                    (int) $note['id_module'],
+                    (int) $note['class_order'],
+                    $note['videos_title'],
+                    $note['videoID'],
+                    (int) $note['length'],
+                    $note['description']
+                )
+            );
+        }
+
+        return $notebooks;
     }
     
     /**
@@ -197,50 +230,48 @@ class NotebookDAO
      */
     public function new(int $idModule, int $classOrder, string $title, string $content) : int
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-            
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        if (empty($classOrder) || $classOrder <= 0) {
-            throw new \InvalidArgumentException("Class order cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        if (empty($title)) {
-            throw new \InvalidArgumentException("Title cannot be empty");
-        }
-            
-        if (empty($content)) {
-            throw new \InvalidArgumentException("Content cannot be empty");
-        }
-        
-        $response = -1;
-        
-        $sql = $this->db->prepare("
+        $this->validateLoggedStudent();
+        $this->validateModuleId($idModule);
+        $this->validateClassOrder($classOrder);
+        $this->validateTitle($title);
+        $this->validateContent($content);
+        $this->withQuery("
             INSERT INTO notebook
             (id_student, id_module, class_order, title, content, date)
             VALUES (?, ?, ?, ?, ?, NOW())
         ");
-        
-        $sql->execute(array(
+        $this->runQueryWithArguments(
             $this->idStudent, 
             $idModule, 
             $classOrder, 
             $title, 
             $content
-        ));
+        );
         
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = (int)$this->db->lastInsertId();
+        return $this->parseNewResponseQuery();
+    }
+
+    private function validateTitle($title)
+    {
+        if (empty($title)) {
+            throw new \InvalidArgumentException("Title cannot be empty");
         }
-        
-        return $response;
+    }
+
+    private function validateContent($content)
+    {
+        if (empty($content)) {
+            throw new \InvalidArgumentException("Content cannot be empty");
+        }
+    }
+
+    private function parseNewResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return -1;
+        }
+
+        return ((int) $this->db->lastInsertId());
     }
     
     /**
@@ -255,31 +286,28 @@ class NotebookDAO
      */
     public function update(Note $note) : bool
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-            
-        if (empty($note)) {
-            throw new \InvalidArgumentException("Note cannot be empty");
-        }
-   
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateLoggedStudent();
+        $this->validateNote($note);
+        $this->withQuery("
             UPDATE  notebook
             SET     title = ?, content = ?
             WHERE   id_student = ? AND id_note = ? 
         ");
-                        
-        // Executes query
-        $sql->execute(array(
+        $this->runQueryWithArguments(
             $note->getTitle(),
             $note->getContent(),
             $this->idStudent, 
             $note->getId()
-        ));
+        );
 
-        return $sql && $sql->rowCount() > 0;
+        return $this->hasResponseQuery();
+    }
+
+    private function validateNote($note)
+    {
+        if (empty($note)) {
+            throw new \InvalidArgumentException("Note cannot be empty");
+        }
     }
     
     /**
@@ -294,26 +322,15 @@ class NotebookDAO
      */
     public function delete(int $idNote) : bool
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-            
-        if (empty($idNote) || $idNote <= 0) {
-            throw new \InvalidArgumentException("Note id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateLoggedStudent();
+        $this->validateNoteId($idNote);
+        $this->withQuery("
             DELETE FROM notebook
             WHERE id_student = ? AND id_note = ?
         ");
-        
-        // Executes query
-        $sql->execute(array($this->idStudent, $idNote));
+        $this->runQueryWithArguments($this->idStudent, $idNote);
             
-        return $sql && $sql->rowCount() > 0;
+        return $this->hasResponseQuery();
     }
     
     /**
@@ -330,13 +347,15 @@ class NotebookDAO
      */
     public function getAll(int $limit = -1, int $offset = -1) : array
     {
-        if (empty($this->idStudent) || $this->idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id logged in must be ".
-                "provided in the constructor");
-        }
-                
-        $response = array();
+        $this->validateLoggedStudent();
+        $this->withQuery($this->buildGetAllQuery($limit, $offset));
+        $this->runQueryWithArguments($this->idStudent);
         
+        return $this->parseNotebooksResponseQuery();
+    }
+
+    private function buildGetAllQuery($limit, $offset)
+    {
         $query = "
             SELECT  *, 
                     notebook.title AS notebook_title, 
@@ -353,34 +372,8 @@ class NotebookDAO
                 $query .= " LIMIT ".$limit;
             }
         }
-        
-        // Query construction
-        $sql = $this->db->prepare($query);
-            
-        // Executes query
-        $sql->execute(array($this->idStudent));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $note) {
-                $response[] = new Note(
-                    (int) $note['id_note'],
-                    $note['notebook_title'],
-                    $note['content'],
-                    new \DateTime($note['date']),
-                    new Video(
-                        (int) $note['id_module'],
-                        (int) $note['class_order'],
-                        $note['videos_title'],
-                        $note['videoID'],
-                        (int) $note['length'],
-                        $note['description']
-                    )
-                );
-            }
-        }
-        
-        return $response;
+
+        return $query;
     }
     
     /**
@@ -390,11 +383,14 @@ class NotebookDAO
      */
     public function count() : int
     {
-        return (int) $this->db->query("
+        $this->withQuery("
             SELECT  COUNT(*) AS total
             FROM    notebook
             WHERE   id_student = ".$this->idStudent
-        )->fetch()['total'];
+        );
+        $this->runQueryWithoutArguments();
+
+        return ((int) $this->getResponseQuery()['total']);
     }
     
     /**
@@ -407,12 +403,15 @@ class NotebookDAO
      */
     public function countAllFromClass(int $idModule, int $classOrder) : int
     {
-        return (int) $this->db->query("
+        $this->withQuery("
             SELECT  COUNT(*) AS total
             FROM    notebook JOIN videos USING (id_module, class_order)
             WHERE   id_student = ".$this->idStudent." AND 
                     id_module = ".$idModule." AND 
                     class_order = ".$classOrder
-            )->fetch()['total'];
+        );
+        $this->runQueryWithoutArguments();
+        
+        return ((int) $this->getResponseQuery()['total']);
     }
 }

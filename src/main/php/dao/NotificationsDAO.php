@@ -13,13 +13,12 @@ use domain\Student;
 /**
  * Responsible for managing 'notifications' table.
  */
-class NotificationsDAO
+class NotificationsDAO extends DAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
     private $idStudent;
-    private $db;
     
     
     //-------------------------------------------------------------------------
@@ -36,19 +35,23 @@ class NotificationsDAO
      */
     public function __construct(Database $db, int $idStudent)
     {
-        if (empty($idStudent) || $idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id cannot be empty or ".
-                "less than or equal to zero");
-        }
-            
+        parent::__construct($db);   
+        $this->validateStudentId($idStudent);
         $this->idStudent = $idStudent;
-        $this->db = $db->getConnection();        
     }
     
     
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
+    private function validateStudentId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                                                "or less than or equal to zero");
+        }
+    }
+
     /**
      * Gets notifications from current student.
      * 
@@ -62,53 +65,61 @@ class NotificationsDAO
      */
     public function getNotifications(int $limit = 10) : array
     {
-        if (empty($limit) || $limit <= 0) {
-            throw new \InvalidArgumentException("Limit cannot be empty or ".
-                "less than or equal to zero");
-        }
-        
-        $response = array();
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateLimit($limit);
+        $this->withQuery("
             SELECT      *
             FROM        notifications
             WHERE       id_student = ?
             ORDER BY    date DESC, `read` ASC
             LIMIT       ".$limit."
         ");
-        
-        // Executes query
-        $sql->execute(array($this->idStudent));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $notifications = $sql->fetchAll();
-            
-            foreach ($notifications as $notification) {
-                if ($notification['type'] == 0) {
-                    $commentsDao = new CommentsDAO($this->db);
-                    
-                    $ref = $commentsDao->get((int) $notification['id_reference']);
-                }
-                else {
-                    $supportTopicDao = new SupportTopicDAO($this->db, Student::getLoggedIn($this->db)->getId());
-                    $ref = $supportTopicDao->get((int) $notification['id_reference']);
-                }
-                
-                $response[] = new Notification(
-                    (int) $notification['id_notification'],
-                    (int) $notification['id_student'], 
-                    new \DateTime($notification['date']),
-                    $ref,
-                    new NotificationTypeEnum($notification['type']),
-                    $notification['message'],
-                    (int) $notification['read']
-                );
-            }
+        $this->runQueryWithArguments($this->idStudent);
+
+        return $this->parseNotificationsResponseQuery();
+    }
+
+    private function validateLimit($value)
+    {
+        if (empty($value) || $value <= 0) {
+            throw new \InvalidArgumentException("Limit cannot be empty or ".
+                                                "less than or equal to zero");
         }
+    }
+
+    private function parseNotificationsResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $notifications = array();
         
-        return $response;
+        foreach ($this->getAllResponseQuery() as $notification) {
+            if ($notification['type'] == 0) {
+                $commentsDao = new CommentsDAO($this->db);
+                
+                $ref = $commentsDao->get((int) $notification['id_reference']);
+            }
+            else {
+                $supportTopicDao = new SupportTopicDAO(
+                    $this->db, 
+                    Student::getLoggedIn($this->db)->getId()
+                );
+                $ref = $supportTopicDao->get((int) $notification['id_reference']);
+            }
+            
+            $notifications[] = new Notification(
+                (int) $notification['id_notification'],
+                (int) $notification['id_student'], 
+                new \DateTime($notification['date']),
+                $ref,
+                new NotificationTypeEnum($notification['type']),
+                $notification['message'],
+                (int) $notification['read']
+            );
+        }
+
+        return $notifications;
     }
 
     /**
@@ -118,17 +129,14 @@ class NotificationsDAO
      */
     public function countUnreadNotification() : int
     {
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->withQuery("
             SELECT  COUNT(*) AS total_unread
             FROM    notifications
             WHERE   id_student = ? AND `read` = 0
         ");
-
-        // Executes query
-        $sql->execute(array($this->idStudent));
+        $this->runQueryWithArguments($this->idStudent);
         
-        return (int) $sql->fetch()['total_unread'];
+        return ((int) $this->getResponseQuery()['total_unread']);
     }
     
     /**
@@ -143,21 +151,23 @@ class NotificationsDAO
      */
     public function delete(int $idNotification) : bool
     {
-        if (empty($idNotification) || $idNotification <= 0) {
-            throw new \InvalidArgumentException("Notification id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateNotificationId($idNotification);
+        $this->withQuery("
             DELETE FROM notifications
             WHERE id_student = ? AND id_notification = ?
         ");
+        $this->runQueryWithArguments($this->idStudent, $idNotification);
         
-        // Executes query
-        $sql->execute(array($this->idStudent, $idNotification));
-        
-        return $sql && $sql->rowCount() > 0;
+        return $this->hasResponseQuery();
+    }
+
+    private function validateNotificationId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Notification id cannot be ".
+                                                "empty or less than or equal ".
+                                                "to zero");
+        }
     }
     
     /**
@@ -170,20 +180,13 @@ class NotificationsDAO
      */
     public function markAsRead(int $idNotification) : void
     {
-        if (empty($idNotification) || $idNotification <= 0) {
-            throw new \InvalidArgumentException("Notification id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateNotificationId($idNotification);
+        $this->withQuery("
             UPDATE  notifications
             SET     `read` = 1
             WHERE   id_student = ? AND id_notification = ?
         ");
-        
-        // Executes query
-        $sql->execute(array($this->idStudent, $idNotification));
+        $this->runQueryWithArguments($this->idStudent, $idNotification);
     }
     
     /**
@@ -196,19 +199,12 @@ class NotificationsDAO
      */
     public function markAsUnread(int $idNotification) : void
     {
-        if (empty($idNotification) || $idNotification <= 0) {
-            throw new \InvalidArgumentException("Notification id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateNotificationId($idNotification);
+        $this->withQuery("
             UPDATE  notifications
             SET     `read` = 0
             WHERE   id_student = ? AND id_notification = ?
         ");
-            
-        // Executes query
-        $sql->execute(array($this->idStudent, $idNotification));
+        $this->runQueryWithArguments($this->idStudent, $idNotification);
     }
 }

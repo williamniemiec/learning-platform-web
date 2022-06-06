@@ -10,12 +10,11 @@ use repositories\Database;
 /**
  * Responsible for managing 'student_historic' table.
  */
-class HistoricDAO
+class HistoricDAO extends DAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $db;
     private $idStudent;
     
     
@@ -32,19 +31,23 @@ class HistoricDAO
      */
     public function __construct(Database $db, int $idStudent)
     {
-        if (empty($idStudent) || $idStudent <= 0) {
-            throw new \InvalidArgumentException("Student id cannot be empty or ". 
-                "less than or equal to zero");
-        }
-        
+        parent::__construct($db);
+        $this->validateStudentId($idStudent);
         $this->idStudent = $idStudent;
-        $this->db = $db->getConnection();
     }
     
     
     //-------------------------------------------------------------------------
     //        Methods
     //-------------------------------------------------------------------------
+    private function validateStudentId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Student id cannot be empty ".
+                                                "or less than or equal to zero");
+        }
+    }
+
     /**
      * Gets total watched classes by a student in a course.
      * 
@@ -57,22 +60,23 @@ class HistoricDAO
      */
     public function countWatchedClasses(int $idCourse) : int
     {
-        if (empty($idCourse) || $idCourse <= 0) {
-            throw new \InvalidArgumentException("Course id cannot be empty or ". 
-                "less than or equal to zero");
-        }
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateCourseId($idCourse);
+        $this->withQuery("
             SELECT  COUNT(*) AS watchedClasses
             FROM    student_historic NATURAL JOIN course_modules
             WHERE   id_student = ? AND id_course = ?
         ");
+        $this->runQueryWithArguments($this->idStudent, $idCourse);
         
-        // Executes query
-        $sql->execute(array($this->idStudent, $idCourse));
-        
-        return (int) $sql->fetch()['watchedClasses'];
+        return ((int) $this->getResponseQuery()['watchedClasses']);
+    }
+
+    private function validateCourseId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Course id cannot be empty or".
+                                                "less than or equal to zero");
+        }
     }
 
     /**
@@ -82,14 +86,13 @@ class HistoricDAO
      */
     public function clear() : bool
     {
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->withQuery("
             DELETE FROM student_historic
             WHERE id_student = ?
         ");
-
-        // Executes query
-        $sql->execute(array($this->idStudent))->rowCount() > 0;
+        $this->runQueryWithArguments($this->idStudent);
+        
+        return $this->hasResponseQuery();
     }
     
     /**
@@ -107,15 +110,8 @@ class HistoricDAO
      */
     public function getWatchedClassesFromCourse(int $idCourse)
     {
-        if (empty($idCourse) || $idCourse <= 0) {
-            throw new \InvalidArgumentException("Course id cannot be empty or ".
-                "less than or equal to zero");
-        }
-        
-        $response = array();
-            
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateCourseId($idCourse);
+        $this->withQuery("
             SELECT  id_module, class_order
             FROM    student_historic
             WHERE   id_student = ? AND
@@ -123,18 +119,24 @@ class HistoricDAO
                                   FROM      course_modules
                                   WHERE     id_course = ?)
         ");
+        $this->runQueryWithArguments($this->idStudent, $idCourse);
         
-        // Executes query
-        $sql->execute(array($this->idStudent, $idCourse));
-        
-        
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $class) {
-                $response[$class['id_module']][$class['class_order']] = true;                
-            }
+        return $this->parseWatchedClassesResponseQuery();
+    }
+
+    private function parseWatchedClassesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
+
+        $watchedClasses = array();
             
-        return $response;
+        foreach ($this->getAllResponseQuery() as $class) {
+            $watchedClasses[$class['id_module']][$class['class_order']] = true;
+        }
+
+        return $watchedClasses;
     }
     
     /**
@@ -150,8 +152,7 @@ class HistoricDAO
      */
     public function getWeeklyHistory() : array
     {
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->withQuery("
             SELECT      date, COUNT(*) AS total_classes_watched
             FROM        student_historic
             WHERE       id_student = ? AND 
@@ -160,23 +161,26 @@ class HistoricDAO
             ORDER BY    date DESC
             LIMIT 7
         ");
+        $this->runQueryWithArguments($this->idStudent);
         
-        $response = array();
-        
-        // Executes query
-        $sql->execute(array($this->idStudent));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $i = 0;
-            
-            foreach ($sql->fetchAll() as $date) {
-                //$date = str_replace("-", "", $date['date']);
-                $response[$i]['date'] = str_replace("-", "/", $date['date']);
-                $response[$i]['total_classes_watched'] = $date['total_classes_watched'];
-                $i++;
-            }
+        return $this->parsHistoryResponseQuery();
+    }
+
+    private function parsHistoryResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
-        
-        return $response;
+
+        $history = array();
+        $i = 0;
+            
+        foreach ($this->getAllResponseQuery() as $date) {
+            $history[$i]['date'] = str_replace("-", "/", $date['date']);
+            $history[$i]['total_classes_watched'] = $date['total_classes_watched'];
+            $i++;
+        }
+
+        return $history;
     }
 }

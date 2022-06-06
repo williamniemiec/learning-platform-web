@@ -13,14 +13,8 @@ use domain\enum\BundleOrderTypeEnum;
 /**
  * Responsible for managing 'bundles' table.
  */
-class BundlesDAO
+class BundlesDAO extends DAO
 {
-    //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $db;
-    
-    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
@@ -31,7 +25,7 @@ class BundlesDAO
      */
     public function __construct(Database $db)
     {
-        $this->db = $db->getConnection();
+        parent::__construct($db);
     }
     
     
@@ -51,36 +45,40 @@ class BundlesDAO
      */
     public function get(int $idBundle) : Bundle
     {
-        if (empty($idBundle) || $idBundle <= 0) {
-            throw new \InvalidArgumentException("Bundle id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        $response = null;
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateBundleId($idBundle);
+        $this->withQuery("
             SELECT  *
             FROM    bundles
             WHERE   id_bundle = ?
         ");
+        $this->runQueryWithArguments($idBundle);
         
-        // Executes query
-        $sql->execute(array($idBundle));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $bundle = $sql->fetch();
-            $response = new Bundle(
-                (int) $bundle['id_bundle'], 
-                $bundle['name'], 
-                (float) $bundle['price'],
-                $bundle['logo'],
-                $bundle['description']
-            );
+        return $this->parseGetResponseQuery();
+    }
+
+    private function validateBundleId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Bundle id cannot be empty or".
+                                                "less than or equal to zero");
         }
+    }
+
+    private function parseGetResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
+        }
+
+        $bundleRaw = $this->getResponseQuery();
         
-        return $response;
+        return new Bundle(
+            (int) $bundleRaw['id_bundle'], 
+            $bundleRaw['name'], 
+            (float) $bundleRaw['price'],
+            $bundleRaw['logo'],
+            $bundleRaw['description']
+        );
     }
 
     /**
@@ -104,24 +102,27 @@ class BundlesDAO
      *  bundle</li>
      * </ul>
      */
-    public function getAll(int $idStudent = -1, int $limit = -1, string $name = '',
-        BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
+    public function getAll(
+        int $idStudent = -1, 
+        int $limit = -1, 
+        string $name = '',
+        BundleOrderTypeEnum $orderBy = null, 
+        OrderDirectionEnum $orderType = null
+    ) : array
     {
-        $response = array();
-        $bindParams = array();
+        $this->withQuery($this->buildGetAllQuery($idStudent, $limit, $name, $orderBy, $orderType));
+        $this->runQueryWithArguments($this->buildGetAllQueryArguments($idStudent, $name));
 
-        if (empty($orderType)) {
-            $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
-        }
-        
-        // Query construction
+        return $this->parseGetAllResponseQuery($idStudent);
+    }
+
+    private function buildGetAllQuery($idStudent, $limit, $name, $orderBy, $orderType)
+    {
         $query = "
             SELECT      id_bundle, name, bundles.price, logo, description,
                         COUNT(id_course) AS courses,
         ";
         
-        // If a student was provided, for each bundle add the information if he
-        // has the bundle or not
         if ($idStudent > 0) {
             $query .= "
                         CASE
@@ -129,8 +130,6 @@ class BundlesDAO
                             ELSE 0
                         END AS has_bundle,
             ";
-            
-            $bindParams[] = $idStudent;
         }
         
         $query .= "
@@ -141,51 +140,63 @@ class BundlesDAO
             GROUP BY    id_bundle, name, bundles.price, description
         ";
         
-        // Limits the search to a specified name (if a name was specified)
         if (!empty($name)) {
-            $query .= empty($orderBy) ? " HAVING name LIKE ?" : " HAVING name LIKE ?";
-            $bindParams[] = $name.'%';
+            $query .= " HAVING name LIKE ?";
         }
         
-        // Sets order by criteria (if any)
-        if (!empty($orderBy)) {
-            $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
+        if (empty($orderType)) {
+            $type = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
+            $query .= " ORDER BY ".$orderBy->get()." ".$type->get();
         }
 
-        // Limits the results (if a limit was given)
         if ($limit > 0) {
             $query .= " LIMIT ".$limit;
         }
-        
-        // Prepares query
-        $sql = $this->db->prepare($query);
 
-        // Executes query
-        $sql->execute($bindParams);
+        return $query;
+    }
+
+    private function buildGetAllQueryArguments($idStudent, $name)
+    {
+        $bindParams = array();
+
+        if ($idStudent > 0) {
+            $bindParams[] = $idStudent;
+        }
         
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $bundles = $sql->fetchAll();
-            $i = 0;
-    
-            foreach ($bundles as $bundle) {
-                $response[$i]['bundle'] = new Bundle(
-                    (int) $bundle['id_bundle'],
-                    $bundle['name'],
-                    (float) $bundle['price'],
-                    $bundle['logo'],
-                    $bundle['description']
-                );
-                
-                if ($idStudent > 0) {
-                    $response[$i]['has_bundle'] = $bundle['has_bundle'] > 0;
-                }
-                
-                $i++;
-            }
+        if (!empty($name)) {
+            $bindParams[] = $name.'%';
         }
 
-        return $response;
+        return $bindParams;
+    }
+
+    private function parseGetAllResponseQuery($idStudent)
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $bundles = array();
+        $i = 0;
+            
+        foreach ($this->getAllResponseQuery() as $bundle) {
+            $bundles[$i]['bundle'] = new Bundle(
+                (int) $bundle['id_bundle'],
+                $bundle['name'],
+                (float) $bundle['price'],
+                $bundle['logo'],
+                $bundle['description']
+            );
+            
+            if ($idStudent > 0) {
+                $bundles[$i]['has_bundle'] = ($bundle['has_bundle'] > 0);
+            }
+
+            $i++;
+        }
+
+        return $bundles;
     }
     
     /**
@@ -204,15 +215,15 @@ class BundlesDAO
      */
     public function extensionBundles(int $idBundle, int $idStudent = -1) : array
     {
-        if (empty($idBundle) || $idBundle <= 0) {
-            throw new \InvalidArgumentException("Bundle id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        $response = array();
-        $bind_params = array($idBundle);
+        $this->validateBundleId($idBundle);
+        $this->withQuery($this->buildExtensionBundlesQuery($idStudent));
+        $this->runQueryWithArguments($this->buildBundlesQueryArguments($idStudent, $idBundle));
         
-        // Query construction
+        return $this->parseBundlesResponseQuery();
+    }
+
+    private function buildExtensionBundlesQuery($idStudent)
+    {
         $query = "
             SELECT  b.id_bundle, b.name, b.price, b.logo, b.description
             FROM    bundles b
@@ -224,11 +235,7 @@ class BundlesDAO
             $query .= " 
                     (id_student IS NULL OR id_student != ?) AND 
             ";
-            
-            $bind_params[] = $idStudent;
         }
-        
-        $bind_params[] = $idBundle;
         
         $query .= "
                     NOT EXISTS (
@@ -241,25 +248,41 @@ class BundlesDAO
                     )
          ";
 
-        $sql = $this->db->prepare($query);
-        
-        // Executes query
-        $sql->execute($bind_params);
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $bundle) {
-                $response[] = new Bundle(
-                    (int) $bundle['id_bundle'],
-                    $bundle['name'],
-                    (float) $bundle['price'],
-                    $bundle['logo'],
-                    $bundle['description']
-                );
-            }
+         return $query;
+    }
+
+    private function buildBundlesQueryArguments($idStudent, $idBundle)
+    {
+        $bindParams = array($idBundle);
+
+        if ($idStudent > 0) {
+            $bindParams[] = $idStudent;
         }
 
-        return $response;
+        $bindParams[] = $idBundle;
+
+        return $bindParams;
+    }
+
+    private function parseBundlesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $bundles = array();
+            
+        foreach ($this->getAllResponseQuery() as $bundle) {
+            $bundles[] = new Bundle(
+                (int) $bundle['id_bundle'],
+                $bundle['name'],
+                (float) $bundle['price'],
+                $bundle['logo'],
+                $bundle['description']
+            );
+        }
+
+        return $bundles;
     }
     
     /**
@@ -278,23 +301,23 @@ class BundlesDAO
      */
     public function unrelatedBundles(int $idBundle, int $idStudent = -1) : array
     {
-        if (empty($idBundle) || $idBundle <= 0) {
-            throw new \InvalidArgumentException("Bundle id cannot be empty ".
-                "or less than or equal to zero");
-        }
+        $this->validateBundleId($idBundle);
+        $this->withQuery($this->buildUnrelatedBundlesQuery($idStudent));
+        $this->runQueryWithArguments($this->buildBundlesQueryArguments($idStudent, $idBundle));
         
-        $response = array();
-        $bindParams = array($idBundle);
-        
-        // Query construction
+        return $this->parseBundlesResponseQuery();
+    }
+
+    private function buildUnrelatedBundlesQuery($idStudent)
+    {
+        $query = "";
+
         if ($idStudent > 0) {
             $query = "
                 SELECT  *
                 FROM    bundles b
                 WHERE   id_bundle != ? AND
             ";
-            
-            $bindParams[] = $idStudent;
         }
         else {
             $query = "
@@ -312,30 +335,9 @@ class BundlesDAO
                             id_course IN (SELECT id_course
                                           FROM   bundle_courses
                                           WHERE  id_bundle = b.id_bundle)
-                )
-        ";
-        
-        $bindParams[] = $idBundle;
-        
-        $sql = $this->db->prepare($query);
-        
-        $sql->execute($bindParams);
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $bundle) {
-                $response[] = new Bundle(
-                    (int) $bundle['id_bundle'], 
-                    $bundle['name'], 
-                    (float) $bundle['price'],
-                    $bundle['logo'],
-                    $bundle['description']
-                );
-                
-            }
-        }
-            
-        return $response;
+               ";
+
+        return $query;
     }
     
     /**
@@ -360,18 +362,8 @@ class BundlesDAO
      */
     public function countTotalClasses(int $idBundle) : array
     {
-        if (empty($idBundle) || $idBundle <= 0) {
-            throw new \InvalidArgumentException("Bundle id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        $response = array(
-            "total_classes" => 0,
-            "total_length" => 0
-        );
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateBundleId($idBundle);
+        $this->withQuery("
             SELECT      COUNT(id_module) AS total_classes, 
                         SUM(length) AS total_length
             FROM        (SELECT      id_module, 5 AS length
@@ -384,19 +376,31 @@ class BundlesDAO
                                       FROM      course_modules NATURAL JOIN bundle_courses
                                       WHERE     id_bundle = ?)
         ");
-        
-        // Executes query
-        $sql->execute(array($idBundle));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $result) {
-                $response["total_classes"] += $result["total_classes"];
-                $response["total_length"] += $result["total_length"];
-            }
+        $this->runQueryWithArguments($idBundle);
+
+        return $this->parseTotalClassesResponseQuery();
+    }
+
+    private function parseTotalClassesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array(
+                "total_classes" => 0,
+                "total_length" => 0
+            );
         }
-        
-        return $response;
+
+        $total = array(
+            "total_classes" => 0,
+            "total_length" => 0
+        );
+            
+        foreach ($this->getAllResponseQuery() as $result) {
+            $total["total_classes"] += $result["total_classes"];
+            $total["total_length"] += $result["total_length"];
+        }
+
+        return $total;
     }
     
     /**
@@ -406,9 +410,12 @@ class BundlesDAO
      */
     public function getTotal() : int
     {
-        return (int) $this->db->query("
+        $this->withQuery("
             SELECT  COUNT(*) AS total
             FROM    bundles
-        ")->fetch()['total'];
+        ");
+        $this->runQueryWithoutArguments();
+        
+        return ((int) $this->getResponseQuery()['total']);
     }
 }

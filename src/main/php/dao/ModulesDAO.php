@@ -11,14 +11,8 @@ use domain\Module;
 /**
  * Responsible for managing 'modules' table.
  */
-class ModulesDAO
+class ModulesDAO extends DAO
 {
-    //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $db;
-    
-    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
@@ -29,7 +23,7 @@ class ModulesDAO
      */
     public function __construct(Database $db)
     {
-        $this->db = $db->getConnection();
+        parent::__construct($db);
     }
     
     
@@ -39,53 +33,58 @@ class ModulesDAO
     /**
      * Gets all modules from a course.
      *
-     * @param       int $id_course Course id
+     * @param       int idCourse Course id
      *
      * @return      Module[] Modules from this course
      * 
      * @throws      \InvalidArgumentException If course id is empty or less than
      * or equal to zero 
      */
-    public function getFromCourse(int $id_course) : array
+    public function getFromCourse(int $idCourse) : array
     {
-        if (empty($id_course) || $id_course <= 0) {
-            throw new \InvalidArgumentException("Course id cannot be empty ".
-                "or less than or equal to zero");
-        }
-        
-        $response = array();
-        
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateCourseId($idCourse);
+        $this->withQuery("
             SELECT  *
             FROM    modules
             WHERE   id_module IN (SELECT    id_module
                                   FROM      course_modules
                                   WHERE     id_course = ?)
         ");
-        
-        // Executes query
-        $sql->execute(array($id_course));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $modules = $sql->fetchAll();
-            
-            foreach ($modules as $module) {
-                $response[] = new Module(
-                    (int)$module['id_module'], 
-                    $module['name']
-                );
-            }
+        $this->runQueryWithArguments($idCourse);
+
+        return $this->parseNotebookResponseQuery();
+    }
+
+    private function validateCourseId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Course id cannot be empty or".
+                                                "less than or equal to zero");
         }
-        
-        return $response;
+    }
+
+    private function parseNotebookResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $modules = array();
+            
+        foreach ($this->getAllResponseQuery() as $module) {
+            $modules[] = new Module(
+                (int) $module['id_module'], 
+                $module['name']
+            );
+        }
+
+        return $modules;
     }
     
     /**
      * Gets information about all classes from a module.
      *
-     * @param       int $id_module Module id
+     * @param       int idModule Module id
      *
      * @return      array Information about all classes from the module. The
      * returned array has the following format:
@@ -97,32 +96,42 @@ class ModulesDAO
      * @throws      \InvalidArgumentException If module id is empty or less 
      * than or equal to zero
      */
-    public function getClassesFromModule(int $id_module) : array
+    public function getClassesFromModule(int $idModule) : array
     {
-        if (empty($id_module) || $id_module <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
+        $this->validateModuleId($idModule);
+        
+        $classes = array();
+
+        foreach ($this->getAllVideoClassesFromModule($idModule) as $class) {
+            $classes[$class->getClassOrder()] = $class;
         }
         
-        $response = array();
-        $videos = new VideosDAO($this->db);
-        $questionnaires = new QuestionnairesDAO($this->db);
-        
-        // Gets video classes inside the module 
-        $class_video = $videos->getFromModule($id_module);
-        
-        // Gets questionnaire classes inside the module
-        $class_questionnaire = $questionnaires->getFromModule($id_module);
-        
-        // Creates response array
-        foreach ($class_video as $class) {
-            $response[$class->getClassOrder()] = $class;
+        foreach ($this->getAllQuestionnairesClassesFromModule($idModule) as $class) {
+            $classes[$class->getClassOrder()] = $class;
         }
         
-        foreach ($class_questionnaire as $class) {
-            $response[$class->getClassOrder()] = $class;
+        return $classes;
+    }
+
+    private function validateModuleId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Module id cannot be empty or".
+                                                "less than or equal to zero");
         }
+    }
+
+    private function getAllVideoClassesFromModule($id)
+    {
+        $videosDao = new VideosDAO($this->db);
         
-        return $response;
+        return $videosDao->getAllFromModule($id);
+    }
+
+    private function getAllQuestionnairesClassesFromModule($id)
+    {
+        $questionnairesDao = new QuestionnairesDAO($this->db);
+        
+        return $questionnairesDao->getAllFromModule($id);
     }
 }

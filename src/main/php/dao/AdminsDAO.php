@@ -13,14 +13,8 @@ use domain\enum\GenreEnum;
 /**
  * Responsible for managing 'admins' table.
  */
-class AdminsDAO
+class AdminsDAO extends DAO
 {
-    //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $db;
-    
-    
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
@@ -33,7 +27,7 @@ class AdminsDAO
      */
     public function __construct(Database $db)
     {
-        $this->db = $db->getConnection();
+        parent::__construct($db);
     }
     
     
@@ -53,39 +47,42 @@ class AdminsDAO
      */
     public function get($idAdmin) : Admin
     {
-        if (empty($idAdmin) || $idAdmin <= 0) {
-            throw new \InvalidArgumentException("Admin id cannot be less than ".
-                "or equal to zero");
-        }
-        
-        $response = null;
-
-        // Query construction
-        $sql = $this->db->prepare("
+        $this->validateAdminId($idAdmin);
+        $this->withQuery("
             SELECT  *, 
                     admins.name AS admin_name, 
                     authorization.name AS authorization_name
             FROM    admins JOIN authorization USING (id_authorization)
             WHERE   id_admin = ?
         ");
+        $this->runQueryWithArguments($idAdmin);
         
-        // Executes query
-        $sql->execute(array($idAdmin));
-        
-        // Parses result
-        if ($sql->rowCount() > 0) {
-            $admin = $sql->fetch();
-            
-            $response = new Admin(
-                (int) $admin['id_admin'], 
-                new Authorization($admin['authorization_name'], (int) $admin['level']), 
-                $admin['admin_name'], 
-                new GenreEnum($admin['genre']), 
-                new \DateTime($admin['birthdate']), 
-                $admin['email']
-            );
+        return $this->parseGetResponseQuery();
+    }
+
+    private function validateAdminId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Admin id cannot be empty or".
+                                                "less than or equal to zero");
         }
+    }
+
+    private function parseGetResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
+        }
+
+        $adminRaw = $this->getResponseQuery();
         
-        return $response;
+        return new Admin(
+            (int) $adminRaw['id_admin'], 
+            new Authorization($adminRaw['authorization_name'], (int) $adminRaw['level']), 
+            $adminRaw['admin_name'], 
+            new GenreEnum($adminRaw['genre']), 
+            new \DateTime($adminRaw['birthdate']), 
+            $adminRaw['email']
+        );
     }
 }

@@ -74,22 +74,6 @@ class VideosDAO extends ClassesDAO
             $rawClass['description']
         ); 
     }
-
-    private function validateModuleId($id)
-    {
-        if (empty($id) || $id <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty or ".
-                                                "less than or equal to zero");
-        }
-    }
-
-    private function validateClassOrder($order)
-    {
-        if (empty($order) || $order <= 0) {
-            throw new \InvalidArgumentException("Class order cannot be empty ".
-                                                "or less than or equal to zero");
-        }
-    }
     
     /**
      * Gets all video classes from a module.
