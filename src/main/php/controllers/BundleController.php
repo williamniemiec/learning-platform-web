@@ -25,60 +25,60 @@ class BundleController extends Controller
      */
 	public function index ()
 	{   
-	    $this->redirect_to_root();
+	    $this->redirectToRoot();
 	}
 	
-	public function open($id_bundle)
+	public function open($idBundle)
 	{
-	    $db_connection = new MySqlPDODatabase();
+	    $dbConnection = new MySqlPDODatabase();
 	    
-	    $bundles_dao = new BundlesDAO($db_connection);
-	    $bundle = $bundles_dao->get($id_bundle);
+	    $bundlesDao = new BundlesDAO($dbConnection);
+	    $bundle = $bundlesDao->get($idBundle);
 	    
 	    $header = array(
-	        'title' => $bundle->get_name().' - Learning Platform',
+	        'title' => $bundle->getName().' - Learning Platform',
 	        'styles' => array('BundleStyle', 'gallery'),
-	        'description' => $bundle->get_description(),
-	        'keywords' => array('learning platform', 'bundle', $bundle->get_name()),
+	        'description' => $bundle->getDescription(),
+	        'keywords' => array('learning platform', 'bundle', $bundle->getName()),
 	        'robots' => 'index'
 	    );
 	    
-	    $view_args = array(
+	    $viewArgs = array(
 	        'header' => $header,
 	        'bundle' => $bundle,
 	        'has_bundle' => false,
-	        'courses' => $bundle->get_courses($db_connection),
-	        'total_classes' => $bundle->get_total_classes($db_connection),
-	        'total_length' => $bundle->get_total_length($db_connection),
+	        'courses' => $bundle->getCourses($dbConnection),
+	        'total_classes' => $bundle->getTotalClasses($dbConnection),
+	        'total_length' => $bundle->getTotalLength($dbConnection),
 	        'scripts' => array('BundleScript')
 	    );
 	    
-	    if (Student::is_logged()) {
-	        $student = Student::get_logged_in($db_connection);
-	        $students_dao = new StudentsDAO($db_connection, $student->get_id());
-	        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+	    if (Student::isLogged()) {
+	        $student = Student::getLoggedIn($dbConnection);
+	        $studentsDao = new StudentsDAO($dbConnection, $student->getId());
+	        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
 	        
-	        $view_args['notifications'] = array(
-                'notifications' => $notifications_dao->get_notifications(10),
-                'total_unread' => $notifications_dao->count_unread_notification()
+	        $viewArgs['notifications'] = array(
+                'notifications' => $notificationsDao->getNotifications(10),
+                'total_unread' => $notificationsDao->countUnreadNotification()
             );
 	        
-	        $view_args['username'] = $student->get_name();
-	        $view_args['extensionBundles'] = $bundles_dao->extension_bundles(
-	            $id_bundle, $student->get_id()
+	        $viewArgs['username'] = $student->getName();
+	        $viewArgs['extensionBundles'] = $bundlesDao->extensionBundles(
+	            $idBundle, $student->getId()
             );
-	        $view_args['unrelatedBundles'] = $bundles_dao->unrelated_bundles(
-	            $id_bundle, 
-	            $student->get_id()
+	        $viewArgs['unrelatedBundles'] = $bundlesDao->unrelatedBundles(
+	            $idBundle, 
+	            $student->getId()
             );
-	        $view_args['has_bundle'] = $students_dao->has_bundle($id_bundle);
+	        $viewArgs['has_bundle'] = $studentsDao->hasBundle($idBundle);
 	    }
 	    else {
-	        $view_args['extensionBundles'] = $bundles_dao->extension_bundles($id_bundle);
-	        $view_args['unrelatedBundles'] = $bundles_dao->unrelated_bundles($id_bundle);
+	        $viewArgs['extensionBundles'] = $bundlesDao->extensionBundles($idBundle);
+	        $viewArgs['unrelatedBundles'] = $bundlesDao->unrelatedBundles($idBundle);
 	    }
 	    
-	    $this->load_template("BundleView", $view_args, Student::is_logged());
+	    $this->loadTemplate("BundleView", $viewArgs, Student::isLogged());
 	}
 	
 	
@@ -108,17 +108,17 @@ class BundleController extends Controller
 	 */
 	public function search()
 	{
-	    if ($this->get_http_request_method() != 'POST') {
+	    if ($this->getHttpRequestMethod() != 'POST') {
 	        return;
 		}
 	        
-        $db_connection = new MySqlPDODatabase();
-        $bundles_dao = new BundlesDAO($db_connection);
-        $student = Student::get_logged_in($db_connection);
-        $id_student = empty($student) ? -1 : $student->get_id();
+        $dbConnection = new MySqlPDODatabase();
+        $bundlesDao = new BundlesDAO($dbConnection);
+        $student = Student::getLoggedIn($dbConnection);
+        $idStudent = empty($student) ? -1 : $student->getId();
         
-        echo json_encode($bundles_dao->getAll(
-            $id_student, 
+        echo json_encode($bundlesDao->getAll(
+            $idStudent, 
             100, 
             $_POST['name'], 
             new BundleOrderTypeEnum($_POST['filter']['type']), 
@@ -138,20 +138,20 @@ class BundleController extends Controller
 	 */
 	public function buy()
 	{
-	    if ($this->get_http_request_method() != 'POST' || empty($_POST['id_bundle'])) {
+	    if ($this->getHttpRequestMethod() != 'POST' || empty($_POST['id_bundle'])) {
 	        return;
 		}
 	    
         $link = '';
 	        
-        if (!Student::is_logged()) {
+        if (!Student::isLogged()) {
             $_SESSION['redirect'] = BASE_URL."bundle/open/".$_POST['id_bundle'];
             $link = BASE_URL."login";
         }
         else {
-            $db_connection = new MySqlPDODatabase();
-            $students_dao = new StudentsDAO($db_connection, Student::get_logged_in($db_connection)->get_id());
-            $students_dao->addBundle((int)$_POST['id_bundle']);
+            $dbConnection = new MySqlPDODatabase();
+            $studentsDao = new StudentsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+            $studentsDao->addBundle((int)$_POST['id_bundle']);
             $link = BASE_URL."bundle/open/".$_POST['id_bundle'];
         }
         

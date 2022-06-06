@@ -74,7 +74,7 @@ class SupportController extends Controller
             'currentIndex' => $index
         );
         
-        $this->load_template("support/SupportView", $viewArgs);
+        $this->loadTemplate("support/SupportView", $viewArgs);
     }
     
     /**
@@ -120,7 +120,7 @@ class SupportController extends Controller
             'topic' => $topic->setDatabase($dbConnection),
         );
         
-        $this->load_template("support/SupportContentView", $viewArgs);
+        $this->loadTemplate("support/SupportContentView", $viewArgs);
     }
     
     /**

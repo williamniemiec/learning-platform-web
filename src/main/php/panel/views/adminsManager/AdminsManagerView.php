@@ -14,10 +14,10 @@
         		<tbody>
         			<?php foreach ($admins as $admin): ?>
             			<tr>
-            				<td class="admin_name"><?php echo $admin->get_name(); ?></td>
-            				<td class="admin_privileges"><?php echo ucfirst(strtolower($admin->getAuthorization()->get_name())); ?></td>
+            				<td class="admin_name"><?php echo $admin->getName(); ?></td>
+            				<td class="admin_privileges"><?php echo ucfirst(strtolower($admin->getAuthorization()->getName())); ?></td>
             				<td class="actions">
-            					<a href="<?php echo BASE_URL."admins/edit/".$admin->get_id(); ?>" class="btn_theme">Edit</a>
+            					<a href="<?php echo BASE_URL."admins/edit/".$admin->getId(); ?>" class="btn_theme">Edit</a>
             				</td>
             			</tr>
         			<?php endforeach; ?>

@@ -8,10 +8,6 @@ use DateTime;
 
 /**
  * Responsible for representing messages of a support topic or a class.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Message implements \JsonSerializable
 {
@@ -101,7 +97,7 @@ class Message implements \JsonSerializable
     {
         return array(
             'id' => $this->id,
-            'message' => message,
+            'message' => $this->message,
             'date' => $this->date->format("Y/m/d H:i:s"),
             'user' => $this->user
         );

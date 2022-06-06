@@ -11,10 +11,6 @@ use domain\dao\SupportTopicDAO;
 
 /**
  * Responsible for representing a support topic.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class SupportTopic implements \JsonSerializable
 {
@@ -147,15 +143,16 @@ class SupportTopic implements \JsonSerializable
      */
     public function getReplies(?Database $db = null) : array
     {
-        if (empty($this->db) && empty($db))
+        if (empty($this->db) && empty($db)) {
             throw new \InvalidArgumentException("Database cannot be empty");
+        }
         
         if (empty($db)) {
             $db = $this->db;       
         }
             
         if (empty($this->replies)) {
-            $topic = new SupportTopicDAO($db, Student::get_logged_in($db)->get_id());
+            $topic = new SupportTopicDAO($db, Student::getLoggedIn($db)->getId());
             $this->replies = $topic->getReplies($this->id_topic);
         }
         
@@ -171,10 +168,11 @@ class SupportTopic implements \JsonSerializable
      * 
      * @throws      \InvalidArgumentException If database is null
      */
-    public function set_database(Database $db) : SupportTopic
+    public function setDatabase(Database $db) : SupportTopic
     {
-        if (empty($db))
+        if (empty($db)) {
             throw new \InvalidArgumentException("Database cannot be empty");
+        }
         
         $this->db = $db;
         

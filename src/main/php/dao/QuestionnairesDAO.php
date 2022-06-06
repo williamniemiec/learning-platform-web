@@ -11,10 +11,6 @@ use domain\enum\ClassTypeEnum;
 
 /**
  * Responsible for managing 'questionnaires' table.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class QuestionnairesDAO extends ClassesDAO
 {
@@ -38,8 +34,8 @@ class QuestionnairesDAO extends ClassesDAO
     /**
      * Gets questionnaire class
      *
-     * @param       int $id_module Module id that the class belongs to
-     * @param       int $class_order Class order inside the module that it 
+     * @param       int idModule Module id that the class belongs to
+     * @param       int classOrder Class order inside the module that it 
      * belongs to
      *
      * @return      Questionnaire Questionnaire class or null if class does not
@@ -48,15 +44,17 @@ class QuestionnairesDAO extends ClassesDAO
      * @throws      \InvalidArgumentException If module id or class order is 
      * empty or less than or equal to zero
      */
-    public function get(int $id_module, int $class_order) : Questionnaire
+    public function get(int $idModule, int $classOrder) : Questionnaire
     {
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
-        if (empty($class_order) || $class_order <= 0)
+        if (empty($classOrder) || $classOrder <= 0) {
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = null;
         
@@ -68,21 +66,21 @@ class QuestionnairesDAO extends ClassesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_module, $class_order));
+        $sql->execute(array($idModule, $classOrder));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $class = $sql->fetch();
             
             $response = new Questionnaire(
-                (int)$class['id_module'],
-                (int)$class['class_order'],
+                (int) $class['id_module'],
+                (int) $class['class_order'],
                 $class['question'],
                 $class['q1'],
                 $class['q2'],
                 $class['q3'],
                 $class['q4'],
-                (int)$class['answer']
+                (int) $class['answer']
             ); 
         }
         
@@ -92,8 +90,8 @@ class QuestionnairesDAO extends ClassesDAO
     /**
      * Gets the answer from a quest.
      *
-     * @param       int $id_module Module id that the class belongs to
-     * @param       int $class_order Class order inside the module that it 
+     * @param       int idModule Module id that the class belongs to
+     * @param       int classOrder Class order inside the module that it 
      * belongs to
      *
      * @return      int Correct answer
@@ -101,15 +99,17 @@ class QuestionnairesDAO extends ClassesDAO
      * @throws      \InvalidArgumentException If module id or class order is 
      * empty or less than or equal to zero
      */
-    public function get_answer(int $id_module, int $class_order) : int
+    public function getAnswer(int $idModule, int $classOrder) : int
     {
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($class_order) || $class_order <= 0)
+        if (empty($classOrder) || $classOrder <= 0) {
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = -1;
         
@@ -121,7 +121,7 @@ class QuestionnairesDAO extends ClassesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_module, $class_order));
+        $sql->execute(array($idModule, $classOrder));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
@@ -134,7 +134,7 @@ class QuestionnairesDAO extends ClassesDAO
     /**
      * Gets all questionnaire classes from a module.
      * 
-     * @param       int $id_module Module id
+     * @param       int $idModule Module id
      * 
      * @return      Questionnaire[] Classes that belongs to the module
      * 
@@ -143,11 +143,12 @@ class QuestionnairesDAO extends ClassesDAO
      * 
      * @Override
      */
-    public function getAllFromModule(int $id_module) : array
+    public function getAllFromModule(int $idModule) : array
     {
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = array();
         
@@ -159,7 +160,7 @@ class QuestionnairesDAO extends ClassesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_module));
+        $sql->execute(array($idModule));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
@@ -199,7 +200,7 @@ class QuestionnairesDAO extends ClassesDAO
      * {@inheritdoc}
      * @Override
      */
-    public function was_watched(int $id_student, int $id_module, int $class_order) : bool
+    public function wasWatched(int $id_student, int $id_module, int $class_order) : bool
     {
         $sql = $this->db->prepare("
             SELECT  COUNT(*) AS was_watched
@@ -230,7 +231,7 @@ class QuestionnairesDAO extends ClassesDAO
      */
     public function markAsWatched(int $id_student, int $id_module, int $class_order) : bool
     {
-        return $this->_markAsWatched($id_student, $id_module, $class_order, 
+        return $this->_MarkAsWatched($id_student, $id_module, $class_order, 
             new ClassTypeEnum(ClassTypeEnum::QUESTIONNAIRE));
     }
 }

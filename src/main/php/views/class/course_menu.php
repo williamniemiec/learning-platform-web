@@ -11,11 +11,11 @@
     
     <?php foreach ($modules as $module): ?>
     	<div class="module">
-    		<h4><?php echo $module->get_name(); ?></h4>
+    		<h4><?php echo $module->getName(); ?></h4>
     		<div class="module_classes">
     			<?php $id = 0; ?>
-    			<?php foreach ($module->getClasses() as $class): ?>
-    				<div class="module_class" data-class="<?php echo $class->get_module_id()."/".$class->get_class_order(); ?>">
+    			<?php foreach ($module->get_classes() as $class): ?>
+    				<div class="module_class" data-class="<?php echo $class->getModuleId()."/".$class->getClassOrder(); ?>">
     					<?php if ($class instanceof Video): ?>
     						<div class="module_title">
         						<a href="<?php echo BASE_URL."courses/open/".$id_course."/".$class->getModuleId()."/".$class->getClassOrder(); ?>">
@@ -26,10 +26,10 @@
     							<small class="class_watched">Watched</small>
     						<?php endif; ?>
     					<?php else: ?>
-    						<a href="<?php echo BASE_URL."courses/open/".$id_course."/".$class->get_module_id()."/".$class->get_class_order(); ?>">
+    						<a href="<?php echo BASE_URL."courses/open/".$id_course."/".$class->getModuleId()."/".$class->getClassOrder(); ?>">
     							<?php echo ++$id.". Questionnaire"; ?>
     						</a>
-    						<?php if (!empty($watched_classes[$class->get_module_id()][$class->get_class_order()])): ?>
+    						<?php if (!empty($watched_classes[$class->getModuleId()][$class->getClassOrder()])): ?>
     							<small class="class_watched">Watched</small>
     						<?php endif; ?>
     					<?php endif; ?>

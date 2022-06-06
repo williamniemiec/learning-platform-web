@@ -8,7 +8,7 @@
         		<!-- User name -->
         		<div class="form-group">
             		<label for="name">Name*</label>
-            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $user->get_name(); ?>" required />
+            		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $user->getName(); ?>" required />
             	</div>
             	
             	<!-- Genre -->
@@ -25,7 +25,7 @@
             	<!-- Birthdate -->
             	<div class="form-group">
             		<label for="birthdate">Birthdate*</label>
-            		<input id="birthdate" type="date" name="birthdate" class="form-control" value="<?php echo $user->get_birthdate()->format("Y-m-d"); ?>" required />
+            		<input id="birthdate" type="date" name="birthdate" class="form-control" value="<?php echo $user->getBirthdate()->format("Y-m-d"); ?>" required />
             	</div>
             	
             	<!-- Email -->

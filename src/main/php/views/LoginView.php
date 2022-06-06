@@ -1,7 +1,7 @@
 <div class="container">
 	<!-- Shows error message if an error occurs -->
 	<?php if ($error): ?>
-		<?php $this->load_view("alerts/alert_error", array('msg' => $msg)); ?>
+		<?php $this->loadView("alerts/alert_error", array('msg' => $msg)); ?>
 	<?php endif; ?>
 
 	<div class="view_panel login">

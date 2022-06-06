@@ -24,13 +24,13 @@
 					
 					<!-- Read / unread button -->
     				<?php if ($notification->wasRead()): ?>
-    					<button	onClick="unread(this, <?php echo $notification->get_id(); ?>)" 
+    					<button	onClick="unread(this, <?php echo $notification->getId(); ?>)" 
     							class="notification_btn"
 						>
     						Mark as unread
 						</button>
     				<?php else: ?>
-    					<button	onClick="read(this, <?php echo $notification->get_id(); ?>)" 
+    					<button	onClick="read(this, <?php echo $notification->getId(); ?>)" 
     							class="notification_btn"
 						>
 							Mark as read
@@ -38,7 +38,7 @@
     				<?php endif; ?>
     				
     				<!-- Remove button -->
-    				<button	onClick="remove(this, <?php echo $notification->get_id(); ?>)" 
+    				<button	onClick="remove(this, <?php echo $notification->getId(); ?>)" 
     						class="close caret"
 					>
     					&times;
@@ -49,10 +49,10 @@
     			<a	class="notification_msg"
 					href="<?php if ($notification->getReferenceType()->get() == NotificationTypeEnum::COMMENT): ?>
     			          <?php echo BASE_URL."courses/open/".$notification->getReference()->getCourseId()
-                                     ."/".$notification->getReference()->get_module_id()
-                                     ."/".$notification->getReference()->get_class_order(); ?>"
+                                     ."/".$notification->getReference()->getModuleId()
+                                     ."/".$notification->getReference()->getClassOrder(); ?>"
     			          <?php else: ?> 
-    			          <?php echo BASE_URL."support/open/".$notification->getReference()->get_id(); ?>"
+    			          <?php echo BASE_URL."support/open/".$notification->getReference()->getId(); ?>"
 			              <?php endif; ?>
 				>
 					<?php echo $notification->getMessage(); ?>

@@ -6,15 +6,10 @@ namespace dao;
 
 use repositories\Database;
 use domain\enum\ClassTypeEnum;
-use domain\_Class;
 
 
 /**
  * Responsible for representing classes.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 abstract class ClassesDAO
 {
@@ -42,34 +37,38 @@ abstract class ClassesDAO
     /**
      * Marks a class as watched by a student.
      * 
-     * @param       int $id_student Student id
-     * @param       int $id_module Module id
-     * @param       int $class_order Class order
-     * @param       ClassTypeEnum $class_type Class type
+     * @param       int idStudent Student id
+     * @param       int idModule Module id
+     * @param       int classOrder Class order
+     * @param       ClassTypeEnum classType Class type
      * 
      * @return      bool If class has been successfully added to student history
      * 
      * @throws      \InvalidArgumentException If any argument is invalid 
      */
-    public function _markAsWatched(int $id_student, int $id_module, int $class_order, 
-        ClassTypeEnum $class_type) : bool
+    public function _MarkAsWatched(int $idStudent, int $idModule, int $classOrder, 
+        ClassTypeEnum $classType) : bool
     {
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($idStudent) || $idStudent <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
                 
-        if (empty($class_order) || $class_order <= 0)
+        if (empty($classOrder) || $classOrder <= 0) {
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
+        }
         
-        if (empty($class_type) || (empty($class_type->get()) && $class_type->get() != 0))
+        if (empty($classType) || (empty($classType->get()) && $classType->get() != 0)) {
             throw new \InvalidArgumentException("Class type cannot be empty ");
+        }
                     
-        $classType = $class_type->get() == 1 ? "b'1'" : "b'0'";
+        $classType = $classType->get() == 1 ? "b'1'" : "b'0'";
         
         // Query construction
         $sql = $this->db->prepare("
@@ -79,7 +78,7 @@ abstract class ClassesDAO
         ");
 
         // Executes query
-        $sql->execute(array($id_student, $id_module, $class_order));
+        $sql->execute(array($idStudent, $idModule, $classOrder));
         
         return !empty($sql) && $sql->rowCount() > 0;
     }
@@ -94,39 +93,42 @@ abstract class ClassesDAO
     /**
      * Checks whether a student watched a specific class.
      * 
-     * @param       int $id_student Student id
-     * @param       int $id_module Module id to which the class belongs
-     * @param       int $class_order Class order in module
+     * @param       int idStudent Student id
+     * @param       int idModule Module id to which the class belongs
+     * @param       int classOrder Class order in module
      * 
      * @return      bool If student watched the class or not
      */
-    public abstract function was_watched(int $id_student, int $id_module, int $class_order) : bool;
+    public abstract function wasWatched(int $idStudent, int $idModule, int $classOrder) : bool;
     
     /**
      * Removes watched class markup from a class.
      * 
-     * @param       int $id_student Student id
-     * @param       int $id_module Module id
-     * @param       int $class_order Class order
+     * @param       int idStudent Student id
+     * @param       int idModule Module id
+     * @param       int classOrder Class order
      * 
      * @return      bool If class has been successfully removed from student history
      * 
      * @throws      \InvalidArgumentException If student id, module id or 
      * class order is empty or less than or equal to zero
      */
-    public function remove_watched(int $id_student, int $id_module, int $class_order) : bool
+    public function removeWatched(int $idStudent, int $idModule, int $classOrder) : bool
     {
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($idStudent) || $idStudent <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($class_order) || $class_order <= 0)
+        if (empty($classOrder) || $classOrder <= 0) {
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         // Query construction
         $sql = $this->db->prepare("
@@ -135,7 +137,7 @@ abstract class ClassesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_student, $id_module, $class_order));
+        $sql->execute(array($idStudent, $idModule, $classOrder));
         
         return !empty($sql) && $sql->rowCount() > 0;
     }

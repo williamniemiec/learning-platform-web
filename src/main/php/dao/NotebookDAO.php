@@ -11,10 +11,6 @@ use domain\Video;
 
 /**
  * Responsible for managing 'notebook' table.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class NotebookDAO
 {
@@ -22,9 +18,9 @@ class NotebookDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_student;
-    private $id_module;
-    private $class_order;
+    private $idStudent;
+    private $idModule;
+    private $classOrder;
     
     
     //-------------------------------------------------------------------------
@@ -34,19 +30,20 @@ class NotebookDAO
      * Creates 'notebook' table manager.
      *
      * @param       Database $db Database
-     * @param       int $id_student Student id
+     * @param       int idStudent Student id
      * 
      * @throws      \InvalidArgumentException If student id is empty, less than
      * or equal to zero
      */
-    public function __construct(Database $db, int $id_student)
+    public function __construct(Database $db, int $idStudent)
     {
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($idStudent) || $idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
             
         $this->db = $db->getConnection();
-        $this->id_student = $id_student;
+        $this->idStudent = $idStudent;
     }
     
     
@@ -56,7 +53,7 @@ class NotebookDAO
     /**
      * Gets information about a note.
      *
-     * @param       int $id_note Note id
+     * @param       int idNote Note id
      *
      * @return      Note Information about the note or null if note does
      * not exist or it exists but does not belongs to the student
@@ -64,11 +61,12 @@ class NotebookDAO
      * @throws      \InvalidArgumentException If note id is empty, less than or
      * equal to zero
      */
-    public function get(int $id_note) : ?Note
+    public function get(int $idNote) : ?Note
     {       
-        if (empty($id_note) || $id_note <= 0)
+        if (empty($idNote) || $idNote <= 0) {
             throw new \InvalidArgumentException("Note id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         $response = null;
             
@@ -82,23 +80,23 @@ class NotebookDAO
         ");
             
         // Executes query
-        $sql->execute(array($this->id_student, $id_note));
+        $sql->execute(array($this->idStudent, $idNote));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $note = $sql->fetch();
             
             $response = new Note(
-                (int)$note['id_note'],
+                (int) $note['id_note'],
                 $note['notebook_title'],
                 $note['content'],
                 new \DateTime($note['date']),
                 new Video(
-                    (int)$note['id_module'],
-                    (int)$note['class_order'],
+                    (int) $note['id_module'],
+                    (int) $note['class_order'],
                     $note['videos_title'],
                     $note['videoID'],
-                    (int)$note['length'],
+                    (int) $note['length'],
                     $note['description']
                 )
             );
@@ -110,8 +108,8 @@ class NotebookDAO
     /**
      * Gets all student notes for a class.
      *
-     * @param       int $id_module Module id to which the annotation belongs
-     * @param       int $class_order Class order in the module
+     * @param       int idModule Module id to which the annotation belongs
+     * @param       int classOrder Class order in the module
      * @param       int $limit [Optional] Maximum bundles returned
      * @param       int $offset [Optional] Ignores first results from the return
      *
@@ -121,16 +119,18 @@ class NotebookDAO
      * @throws      \InvalidArgumentException If module id, class order is 
      * empty, less than or equal to zero
      */
-    public function get_all_from_class(int $id_module, int $class_order, 
+    public function getAllFromClass(int $idModule, int $classOrder, 
         int $limit = -1, int $offset = -1) : array
     {
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($class_order) || $class_order <= 0)
+        if (empty($classOrder) || $classOrder <= 0) {
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         $response = array();
             
@@ -145,31 +145,33 @@ class NotebookDAO
         ";
             
         if ($limit > 0) {
-            if ($offset > 0)
+            if ($offset > 0) {
                 $query .= " LIMIT ".$offset.",".$limit;
-            else
+            }
+            else {
                 $query .= " LIMIT ".$limit;
+            }
         }
         
         $sql = $this->db->prepare($query);
         
         // Executes query
-        $sql->execute(array($this->id_student, $id_module, $class_order));
+        $sql->execute(array($this->idStudent, $idModule, $classOrder));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $note) {
                 $response[] = new Note(
-                    (int)$note['id_note'],
+                    (int) $note['id_note'],
                     $note['notebook_title'],
                     $note['content'],
                     new \DateTime($note['date']),
                     new Video(
-                        (int)$note['id_module'],
-                        (int)$note['class_order'],
+                        (int) $note['id_module'],
+                        (int) $note['class_order'],
                         $note['videos_title'],
                         $note['videoID'],
-                        (int)$note['length'],
+                        (int) $note['length'],
                         $note['description']
                     )
                 );
@@ -182,8 +184,8 @@ class NotebookDAO
     /**
      * Creates a new note.
      * 
-     * @param       int $id_module Module id to which the annotation was created
-     * @param       int $class_order Class order in the module
+     * @param       int idModule Module id to which the annotation was created
+     * @param       int classOrder Class order in the module
      * @param       string $title Note's title
      * @param       string $content Note's content
      * 
@@ -193,25 +195,30 @@ class NotebookDAO
      * if module id or class order or student id provided in the constructor is
      * empty, less than or equal to zero
      */
-    public function new(int $id_module, int $class_order, string $title, string $content) : int
+    public function new(int $idModule, int $classOrder, string $title, string $content) : int
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
             
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($class_order) || $class_order <= 0)
+        if (empty($classOrder) || $classOrder <= 0) {
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($title))
+        if (empty($title)) {
             throw new \InvalidArgumentException("Title cannot be empty");
+        }
             
-        if (empty($content))
+        if (empty($content)) {
             throw new \InvalidArgumentException("Content cannot be empty");
+        }
         
         $response = -1;
         
@@ -222,9 +229,9 @@ class NotebookDAO
         ");
         
         $sql->execute(array(
-            $this->id_student, 
-            $id_module, 
-            $class_order, 
+            $this->idStudent, 
+            $idModule, 
+            $classOrder, 
             $title, 
             $content
         ));
@@ -248,12 +255,14 @@ class NotebookDAO
      */
     public function update(Note $note) : bool
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
             
-        if (empty($note))
+        if (empty($note)) {
             throw new \InvalidArgumentException("Note cannot be empty");
+        }
    
         // Query construction
         $sql = $this->db->prepare("
@@ -266,8 +275,8 @@ class NotebookDAO
         $sql->execute(array(
             $note->getTitle(),
             $note->getContent(),
-            $this->id_student, 
-            $note->get_id()
+            $this->idStudent, 
+            $note->getId()
         ));
 
         return $sql && $sql->rowCount() > 0;
@@ -276,22 +285,24 @@ class NotebookDAO
     /**
      * Removes a note.
      *
-     * @param       int $id_note Note id to be removed
+     * @param       int idNote Note id to be removed
      *
      * @return      bool If note has been successfully removed.
      *
      * @throws      \InvalidArgumentException If note id or student id provided in the
      * constructor is empty, less than or equal to zero
      */
-    public function delete(int $id_note) : bool
+    public function delete(int $idNote) : bool
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
             
-        if (empty($id_note) || $id_note <= 0)
+        if (empty($idNote) || $idNote <= 0) {
             throw new \InvalidArgumentException("Note id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         // Query construction
         $sql = $this->db->prepare("
@@ -300,7 +311,7 @@ class NotebookDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student, $id_note));
+        $sql->execute(array($this->idStudent, $idNote));
             
         return $sql && $sql->rowCount() > 0;
     }
@@ -317,11 +328,12 @@ class NotebookDAO
      * @throws      \InvalidArgumentException If student id provided in the
      * constructor is empty, less than or equal to zero
      */
-    public function get_all(int $limit = -1, int $offset = -1) : array
+    public function getAll(int $limit = -1, int $offset = -1) : array
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
                 
         $response = array();
         
@@ -334,32 +346,34 @@ class NotebookDAO
         ";
         
         if ($limit > 0) {
-            if ($offset > 0)
+            if ($offset > 0) {
                 $query .= " LIMIT ".$offset.",".$limit;
-            else
+            }
+            else {
                 $query .= " LIMIT ".$limit;
+            }
         }
         
         // Query construction
         $sql = $this->db->prepare($query);
             
         // Executes query
-        $sql->execute(array($this->id_student));
+        $sql->execute(array($this->idStudent));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $note) {
                 $response[] = new Note(
-                    (int)$note['id_note'],
+                    (int) $note['id_note'],
                     $note['notebook_title'],
                     $note['content'],
                     new \DateTime($note['date']),
                     new Video(
-                        (int)$note['id_module'],
-                        (int)$note['class_order'],
+                        (int) $note['id_module'],
+                        (int) $note['class_order'],
                         $note['videos_title'],
                         $note['videoID'],
-                        (int)$note['length'],
+                        (int) $note['length'],
                         $note['description']
                     )
                 );
@@ -376,29 +390,29 @@ class NotebookDAO
      */
     public function count() : int
     {
-        return (int)$this->db->query("
+        return (int) $this->db->query("
             SELECT  COUNT(*) AS total
             FROM    notebook
-            WHERE   id_student = ".$this->id_student
+            WHERE   id_student = ".$this->idStudent
         )->fetch()['total'];
     }
     
     /**
      * Gets total number of notes that a student created in a class.
      *
-     * @param       int $id_module Module id to which the annotation belongs
-     * @param       int $class_order Class order in the module
+     * @param       int idModule Module id to which the annotation belongs
+     * @param       int classOrder Class order in the module
      *
      * @return      int Total notes
      */
-    public function count_all_from_class(int $id_module, int $class_order) : int
+    public function countAllFromClass(int $idModule, int $classOrder) : int
     {
-        return (int)$this->db->query("
+        return (int) $this->db->query("
             SELECT  COUNT(*) AS total
             FROM    notebook JOIN videos USING (id_module, class_order)
-            WHERE   id_student = ".$this->id_student." AND 
-                    id_module = ".$id_module." AND 
-                    class_order = ".$class_order
+            WHERE   id_student = ".$this->idStudent." AND 
+                    id_module = ".$idModule." AND 
+                    class_order = ".$classOrder
             )->fetch()['total'];
     }
 }

@@ -8,15 +8,10 @@ use repositories\Database;
 use domain\Admin;
 use domain\Authorization;
 use domain\enum\GenreEnum;
-use domain\util\IllegalAccessException;
 
 
 /**
  * Responsible for managing 'admins' table.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class AdminsDAO
 {
@@ -48,7 +43,7 @@ class AdminsDAO
     /**
      * Gets information about an admin.
      * 
-     * @param       int $id_admin Admin id
+     * @param       int idAdmin Admin id
      * 
      * @return      Admin Admin with the given id or null if there us no admin
      * with the given id
@@ -56,11 +51,12 @@ class AdminsDAO
      * @throws      \InvalidArgumentException If admin id is empty, less than
      * or equal to zero
      */
-    public function get($id_admin) : Admin
+    public function get($idAdmin) : Admin
     {
-        if (empty($id_admin) || $id_admin <= 0)
+        if (empty($idAdmin) || $idAdmin <= 0) {
             throw new \InvalidArgumentException("Admin id cannot be less than ".
                 "or equal to zero");
+        }
         
         $response = null;
 
@@ -74,15 +70,15 @@ class AdminsDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_admin));
+        $sql->execute(array($idAdmin));
         
         // Parses result
         if ($sql->rowCount() > 0) {
             $admin = $sql->fetch();
             
             $response = new Admin(
-                (int)$admin['id_admin'], 
-                new Authorization($admin['authorization_name'], (int)$admin['level']), 
+                (int) $admin['id_admin'], 
+                new Authorization($admin['authorization_name'], (int) $admin['level']), 
                 $admin['admin_name'], 
                 new GenreEnum($admin['genre']), 
                 new \DateTime($admin['birthdate']), 

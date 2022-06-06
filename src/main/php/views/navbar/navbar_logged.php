@@ -12,7 +12,7 @@
 				</ul>
 			</div>
 			<div class="navbar-nav nav-right">
-				<?php $this->load_view("notification/NotificationView", array("notifications" => $notifications)); ?>
+				<?php $this->loadView("notification/NotificationView", array("notifications" => $notifications)); ?>
 				
 				<div class="dropdown">
 					<a class="btn btn-link dropdown-toggle" data-toggle="dropdown">

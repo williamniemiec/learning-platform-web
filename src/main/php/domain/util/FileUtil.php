@@ -4,10 +4,6 @@ namespace domain\util;
 
 /**
  * Contains methods that perform file manipulation.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class FileUtil
 {
@@ -25,8 +21,9 @@ class FileUtil
      */
     public static function isPhoto(array $photo) : bool
     {
-        if (empty($photo))
+        if (empty($photo)) {
             throw new \InvalidArgumentException("Photo cannot be empty");
+        }
             
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime = finfo_file($finfo, $photo['tmp_name']);
@@ -48,22 +45,25 @@ class FileUtil
      */
     public static function storePhoto(array $photo, string $target) : string
     {
-        if (empty($photo['tmp_name']) || !FileUtil::isPhoto($photo))
+        if (empty($photo['tmp_name']) || !FileUtil::isPhoto($photo)) {
             throw new \InvalidArgumentException("Invalid photo");
+        }
             
         $extension = explode("/", $photo['type'])[1];
         
         // Checks if photo extension has an accepted extension or not
-        if ($extension != "jpg" && $extension != "jpeg" && $extension != "png")
+        if ($extension != "jpg" && $extension != "jpeg" && $extension != "png") {
             throw new \InvalidArgumentException("Invalid photo extension - must be .jpg, .jpeg or .png");
+        }
             
         // Generates photo name
         $filename = md5(rand(1,9999).time().rand(1,9999));
         $filename = $filename."."."jpg";
         
         // Saves photo
-        if (!$target[count($target)-1] == '/')
+        if (!$target[count($target)-1] == '/') {
             $target .= "/";
+        }
             
         move_uploaded_file($photo['tmp_name'], $target.$filename);
         

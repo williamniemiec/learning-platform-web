@@ -27,11 +27,11 @@ abstract class Controller
      * @param       string view_name View name
      * @param       array view_data [optional] View's parameters
      */
-    public function load_view($view_name, $view_data = array())
+    public function loadView($viewName, $viewData = array())
     {
-        extract($view_data);
+        extract($viewData);
         
-        require Controller::VIEWS_PATH."/".$view_name.".php";
+        require Controller::VIEWS_PATH."/".$viewName.".php";
     }
 
     /**
@@ -42,9 +42,9 @@ abstract class Controller
      * @param       bool $logged [optional] True if user is logged; false 
      * otherwise
      */
-    public function load_template($view_name, $view_data = array(), $logged = true)
+    public function loadTemplate($viewName, $viewData = array(), $logged = true)
     {
-        extract($view_data);
+        extract($viewData);
         
         if ($logged) {
             require Controller::VIEWS_PATH."/"."template/html_logged.php";
@@ -57,9 +57,9 @@ abstract class Controller
     /**
      * Redirects the user to BASE_URL.
      */
-    public function redirect_to_root()
+    public function redirectToRoot()
     {
-        $this->redirect_to("");
+        $this->redirectTo("");
     }
 
     /**
@@ -67,7 +67,7 @@ abstract class Controller
      *
      * @param       string $location Controller name
      */
-    public function redirect_to($location)
+    public function redirectTo($location)
     {
         header("Location: ".BASE_URL.$location);
         exit;
@@ -78,7 +78,7 @@ abstract class Controller
      *
      * @return       string request method
      */
-    public function get_http_request_method()
+    public function getHttpRequestMethod()
     {
         return $_SERVER['REQUEST_METHOD'];
     }

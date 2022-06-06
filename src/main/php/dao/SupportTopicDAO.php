@@ -13,10 +13,6 @@ use domain\util\IllegalAccessException;
 
 /**
  * Responsible for managing 'support_topic' table.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class SupportTopicDAO
 {
@@ -24,7 +20,7 @@ class SupportTopicDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_student;
+    private $idStudent;
     
     
     //-------------------------------------------------------------------------
@@ -41,12 +37,13 @@ class SupportTopicDAO
      */
     public function __construct(Database $db, int $id_student)
     {
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($id_student) || $id_student <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty or ".
                 "less than or equal to zero");
+        }
         
         $this->db = $db->getConnection();
-        $this->id_student = $id_student;
+        $this->idStudent = $id_student;
     }
     
     
@@ -56,7 +53,7 @@ class SupportTopicDAO
     /**
      * Gets information about a support topic.
      *
-     * @param      int $id_topic Topic id
+     * @param      int $idTopic Topic id
      *
      * @return      SupportTopic Support topic with the given id or null if there
      * is no topic with the provided id
@@ -64,11 +61,12 @@ class SupportTopicDAO
      * @throws      \InvalidArgumentException If topic id is empty or less than
      * or equal to zero
      */
-    public function get(int $id_topic) : ?SupportTopic
+    public function get(int $idTopic) : ?SupportTopic
     {
-        if (empty($id_topic) || $id_topic <= 0)
+        if (empty($idTopic) || $idTopic <= 0) {
             throw new \InvalidArgumentException("Topic id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = null;
         
@@ -80,21 +78,21 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_topic));
+        $sql->execute(array($idTopic));
 
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $topic = $sql->fetch();
-            $students = new StudentsDAO($this->db, (int)$topic['id_student']);
+            $students = new StudentsDAO($this->db, (int) $topic['id_student']);
             
             $response = new SupportTopic(
-                (int)$topic['id_topic'],
+                (int) $topic['id_topic'],
                 $students->get(),
                 $topic['title'],
-                new SupportTopicCategory((int)$topic['id_category'], $topic['name']),
+                new SupportTopicCategory((int) $topic['id_category'], $topic['name']),
                 new \DateTime($topic['date']), 
                 $topic['message'], 
-                (int)$topic['closed']
+                (int) $topic['closed']
             );
         }
         
@@ -107,7 +105,7 @@ class SupportTopicDAO
      * @param       int $limit [Optional] Maximum topics returned
      * @param       int $offset [Optional] Ignores first results from the return
      * 
-     * @return      SupportTopic[] Support topics creadted by the student or 
+     * @return      SupportTopic[] Support topics created by the student or 
      * empty array if he has not created a topic yet
      */
     public function getAll(int $limit = -1, int $offset = -1) : array
@@ -117,30 +115,32 @@ class SupportTopicDAO
         $query = "
             SELECT  *
             FROM    support_topic NATURAL JOIN support_topic_category
-            WHERE   id_student = ".$this->id_student;
+            WHERE   id_student = ".$this->idStudent;
 
         // Limits the results (if a limit was given)
         if ($limit > 0) {
-            if ($offset > 0)
+            if ($offset > 0) {
                 $query .= " LIMIT ".$offset.",".$limit;
-            else
+            }
+            else {
                 $query .= " LIMIT ".$limit;
+            }
         }
         
         $sql = $this->db->query($query);
         
         if (!empty($sql) && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $topic) {
-                $studentsDAO = new StudentsDAO($this->db, (int)$topic['id_student']);
+                $students_dao = new StudentsDAO($this->db, (int) $topic['id_student']);
                 
                 $response[] = new SupportTopic(
-                    (int)$topic['id_topic'],
-                    $studentsDAO->get(),
+                    (int) $topic['id_topic'],
+                    $students_dao->get(),
                     $topic['title'],
-                    new SupportTopicCategory((int)$topic['id_category'], $topic['name']),
+                    new SupportTopicCategory((int) $topic['id_category'], $topic['name']),
                     new \DateTime($topic['date']),
                     $topic['message'],
-                    (int)$topic['closed']
+                    (int) $topic['closed']
                 );
             }
         }
@@ -151,8 +151,8 @@ class SupportTopicDAO
     /**
      * Creates a new support topic.
      * 
-     * @param       int $id_category Category id that the support topic belongs
-     * @param       int $id_student Student id that created the support topic
+     * @param       int $idCategory Category id that the support topic belongs
+     * @param       int $idStudent Student id that created the support topic
      * @param       string $title Support topic's title
      * @param       string $message Support topic's content
      * 
@@ -160,22 +160,26 @@ class SupportTopicDAO
      * 
      * @throws      \InvalidArgumentException If any argument is invalid
      */
-    public function new(int $id_category, int $id_student, string $title, 
+    public function new(int $idCategory, int $idStudent, string $title, 
         string $message) : bool
     {
-        if (empty($id_category) || $id_category <= 0)
+        if (empty($idCategory) || $idCategory <= 0) {
             throw new \InvalidArgumentException("Category id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($idStudent) || $idStudent <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
-        if (empty($title))
+        if (empty($title)) {
             throw new \InvalidArgumentException("Title cannot be empty");
+        }
         
-        if (empty($message))
+        if (empty($message)) {
             throw new \InvalidArgumentException("Message cannot be empty");
+        }
         
         // Query construction
         $sql = $this->db->prepare("
@@ -185,7 +189,7 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_category, $id_student, $title, $message));
+        $sql->execute(array($idCategory, $idStudent, $title, $message));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -193,8 +197,8 @@ class SupportTopicDAO
     /**
      * Removes a support topic
      * 
-     * @param       int $id_topic Support topic id to be deleted
-     * @param       int $id_student Student id logged in. It is necessary to 
+     * @param       int $idTopic Support topic id to be deleted
+     * @param       int $idStudent Student id logged in. It is necessary to 
      * prevent a student from deleting a topic that is not his 
      * 
      * @return      bool If support topic has been successfully removed
@@ -202,15 +206,17 @@ class SupportTopicDAO
      * @throws      \InvalidArgumentException If topic id or student id is empty
      * or less than or equal to zero
      */
-    public function delete(int $id_topic, int $id_student) : bool
+    public function delete(int $idTopic, int $idStudent) : bool
     {
-        if (empty($id_topic) || $id_topic <= 0)
+        if (empty($idTopic) || $idTopic <= 0) {
             throw new \InvalidArgumentException("Topic id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($idStudent) || $idStudent <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         // Query construction
         $sql = $this->db->prepare("
@@ -219,7 +225,7 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_topic, $id_student));
+        $sql->execute(array($idTopic, $idStudent));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -227,18 +233,19 @@ class SupportTopicDAO
     /**
      * Closes a support topic.
      * 
-     * @param       int $id_topic Support topic id to be closed
+     * @param       int $idTopic Support topic id to be closed
      * 
      * @return      bool If support topic has been successfully closed
      * 
      * @throws      \InvalidArgumentException If topic id is empty or less than
      * or equal to zero
      */
-    public function close(int $id_topic) : bool
+    public function close(int $idTopic) : bool
     {
-        if (empty($id_topic) || $id_topic <= 0)
+        if (empty($idTopic) || $idTopic <= 0) {
             throw new \InvalidArgumentException("Topic id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         // Query construction
         $sql = $this->db->prepare("
@@ -248,7 +255,7 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_topic, $this->id_student));
+        $sql->execute(array($idTopic, $this->idStudent));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -256,18 +263,19 @@ class SupportTopicDAO
     /**
      * Opens a support topic.
      *
-     * @param       int $id_topic Support topic id to be opened
+     * @param       int $idTopic Support topic id to be opened
      *
      * @return      bool If support topic has been successfully closed
      * 
      * @throws      \InvalidArgumentException If topic id is empty or less than
      * or equal to zero
      */
-    public function open(int $id_topic) : bool
+    public function open(int $idTopic) : bool
     {
-        if (empty($id_topic) || $id_topic <= 0)
+        if (empty($idTopic) || $idTopic <= 0) {
             throw new \InvalidArgumentException("Topic id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         // Query construction
         $sql = $this->db->prepare("
@@ -277,7 +285,7 @@ class SupportTopicDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_topic, $this->id_student));
+        $sql->execute(array($idTopic, $this->idStudent));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -294,21 +302,25 @@ class SupportTopicDAO
      * @throws      \InvalidArgumentException If any argument is invalid
      * @throws      IllegalAccessException If support topic is closed
      */
-    public function new_reply(int $id_topic, int $id_student, string $message) : bool
+    public function newReply(int $id_topic, int $id_student, string $message) : bool
     {
-        if (empty($id_topic) || $id_topic <= 0)
+        if (empty($id_topic) || $id_topic <= 0) {
             throw new \InvalidArgumentException("Topic id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($id_student) || $id_student <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
-        if (empty($message))
+        if (empty($message)) {
             throw new \InvalidArgumentException("Message cannot be empty");
+        }
         
-        if (!$this->isOpen($id_topic))
+        if (!$this->isOpen($id_topic)) {
             throw new IllegalAccessException("Topic is closed");
+        }
             
         // Query construction
         $sql = $this->db->prepare("
@@ -336,9 +348,10 @@ class SupportTopicDAO
      */
     public function getReplies(int $id_topic) : array
     {
-        if (empty($id_topic) || $id_topic <= 0)
+        if (empty($id_topic) || $id_topic <= 0) {
             throw new \InvalidArgumentException("Topic id cannot be empty ".
                 "or less than or equal to zero");
+        }
 
         $response = array();
         
@@ -358,7 +371,7 @@ class SupportTopicDAO
             
             foreach ($replies as $reply) {
                 if ($reply['user_type'] == 0) {
-                    $students = new StudentsDAO($this->db, (int)$reply['id_user']);
+                    $students = new StudentsDAO($this->db, (int) $reply['id_user']);
                     $user = $students->get();
                 }
                 else {
@@ -370,7 +383,7 @@ class SupportTopicDAO
                     $user, 
                     new \DateTime($reply['date']), 
                     $reply['text'],
-                    (int)$reply['id_reply']
+                    (int) $reply['id_reply']
                 );
             }
         }
@@ -388,7 +401,7 @@ class SupportTopicDAO
      * answered and that belongs to the category with the given id or empty
      * array if there are no matches
      */
-    public function get_all_answered_by_category(string $name = '', int $id_category = 0) : array
+    public function getAllAnsweredByCategory(string $name = '', int $id_category = 0) : array
     {
         $response = array();
         
@@ -408,21 +421,21 @@ class SupportTopicDAO
         $sql = $this->db->prepare($query);
         
         // Executes query
-        $sql->execute(array($this->id_student, $name."%"));
+        $sql->execute(array($this->idStudent, $name."%"));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $supportTopic) {            
-                $students = new StudentsDAO($this->db, (int)$supportTopic['id_student']);
+                $students = new StudentsDAO($this->db, (int) $supportTopic['id_student']);
                 
                 $response[] = new SupportTopic(
-                    (int)$supportTopic['id_topic'],
+                    (int) $supportTopic['id_topic'],
                     $students->get(),
                     $supportTopic['title'],
-                    new SupportTopicCategory((int)$supportTopic['id_category'], $supportTopic['name']),
+                    new SupportTopicCategory((int) $supportTopic['id_category'], $supportTopic['name']),
                     new \DateTime($supportTopic['date']),
                     $supportTopic['message'],
-                    (int)$supportTopic['closed']
+                    (int) $supportTopic['closed']
                 );
             }
         }
@@ -434,13 +447,13 @@ class SupportTopicDAO
      * Searches for a topic with a given name.
      * 
      * @param       string $name [Optional] Support topic title to be searched
-     * @param       int $id_category [Optional] Searches for topics that belongs to a
+     * @param       int $idCategory [Optional] Searches for topics that belongs to a
      * category
      * 
      * @return      SupportTopic[] Support topics that match with the provided
      * name or empty array if there are no matches
      */
-    public function search(string $name = '', int $id_category = 0) : array
+    public function search(string $name = '', int $idCategory = 0) : array
     {
         $response = array();
         
@@ -451,27 +464,27 @@ class SupportTopicDAO
             WHERE   id_student = ? AND title LIKE ?
         ";
         
-        if ($id_category > 0)
-            $query .= " AND id_category = ".$id_category;
+        if ($idCategory > 0)
+            $query .= " AND id_category = ".$idCategory;
         
         $sql = $this->db->prepare($query);
         
         // Executes query
-        $sql->execute(array($this->id_student, $name.'%'));
+        $sql->execute(array($this->idStudent, $name.'%'));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $supportTopic) {
-                $students = new StudentsDAO($this->db, (int)$supportTopic['id_student']);
+                $students = new StudentsDAO($this->db, (int) $supportTopic['id_student']);
                 
                 $response[] = new SupportTopic(
-                    (int)$supportTopic['id_topic'],
+                    (int) $supportTopic['id_topic'],
                     $students->get(),
                     $supportTopic['title'],
-                    new SupportTopicCategory((int)$supportTopic['id_category'], $supportTopic['name']),
+                    new SupportTopicCategory((int) $supportTopic['id_category'], $supportTopic['name']),
                     new \DateTime($supportTopic['date']),
                     $supportTopic['message'],
-                    (int)$supportTopic['closed']
+                    (int) $supportTopic['closed']
                 );
             }
         }
@@ -485,7 +498,7 @@ class SupportTopicDAO
      * @return      SupportTopicCategory[] Support topic categories or empty 
      * array if there are no registered categories
      */
-    public function get_categories() : array
+    public function getCategories() : array
     {
         $response = array();
         
@@ -499,7 +512,7 @@ class SupportTopicDAO
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $category) {
                 $response[] = new SupportTopicCategory(
-                    (int)$category['id_category'],
+                    (int) $category['id_category'],
                     $category['name']
                 );
             }
@@ -515,7 +528,7 @@ class SupportTopicDAO
      */
     public function count() : int
     {
-        return (int)$this->db->query("
+        return (int) $this->db->query("
             SELECT  COUNT(*) AS total
             FROM    support_topic
         ")->fetch()['total'];
@@ -524,14 +537,14 @@ class SupportTopicDAO
     /**
      * Checks whether a support topic is open.
      * 
-     * @param       int $id_topic Support topic id
+     * @param       int idTopic Support topic id
      * 
      * @return      bool If support topic is open
      */
-    private function isOpen(int $id_topic) : bool
+    private function isOpen(int $idTopic) : bool
     {
         $sql = $this->db->prepare("CALL sp_support_topic_is_open(?, @isOpen)");
-        $sql->execute(array($id_topic));
+        $sql->execute(array($idTopic));
         
         $sql = $this->db->query("SELECT @isOpen AS is_open");
         

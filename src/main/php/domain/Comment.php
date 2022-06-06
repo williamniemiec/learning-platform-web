@@ -11,20 +11,16 @@ use dao\CommentsDAO;
 
 /**
  * Responsible for representing comments.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Comment
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_comment;
-    private $id_course;
-    private $id_module;
-    private $class_order;
+    private $idComment;
+    private $idCourse;
+    private $idModule;
+    private $classOrder;
     private $student;
     private $date;
     private $text;
@@ -51,10 +47,10 @@ class Comment
         int $class_order, ?Student $student, DateTime $date, string $text, 
         ?array $replies = array())
     {
-        $this->id_comment = $id_comment;
-        $this->id_course = $id_course;
-        $this->id_module = $id_module;
-        $this->class_order = $class_order;
+        $this->idComment = $id_comment;
+        $this->idCourse = $id_course;
+        $this->idModule = $id_module;
+        $this->classOrder = $class_order;
         $this->student = $student;
         $this->date = $date;
         $this->text = $text;
@@ -72,7 +68,7 @@ class Comment
      */
     public function getId() : int
     {
-        return $this->id_comment;
+        return $this->idComment;
     }
     
     /**
@@ -82,7 +78,7 @@ class Comment
      */
     public function getCourseId() : int
     {
-        return $this->id_course;
+        return $this->idCourse;
     }
     
     /**
@@ -92,7 +88,7 @@ class Comment
      */
     public function getModuleId() : int
     {
-        return $this->id_module;
+        return $this->idModule;
     }
     
     /**
@@ -102,7 +98,7 @@ class Comment
      */
     public function getClassOrder() : int
     {
-        return $this->class_order;
+        return $this->classOrder;
     }
     
     /**
@@ -148,7 +144,7 @@ class Comment
         if (empty($this->replies)) {
             $comments = new CommentsDAO($db);
             
-            $this->replies = $comments->getReplies($this->id_comment);
+            $this->replies = $comments->getReplies($this->idComment);
         }
         
         return $this->replies;

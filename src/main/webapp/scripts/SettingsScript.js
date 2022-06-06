@@ -7,7 +7,7 @@ function update_profilePhoto(obj)
 	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"settings/update_profile_photo",
+		url:BASE_URL+"settings/updateProfilePhoto",
 		data: data,
 		contentType: false,
 		processData: false,
@@ -30,7 +30,7 @@ function update_password(obj)
 	
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"settings/update_password",
+		url:BASE_URL+"settings/updatePassword",
 		data: {
 			new_password: newPassword,
 			current_password: currentPassword

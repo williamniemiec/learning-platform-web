@@ -1,7 +1,7 @@
 <!-- Students birthdate alert -->
 <?php
 if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
-    $this->load_view(
+    $this->loadView(
         'alerts/BirthdateAlert', 
         array('total_watched_videos' => $totalWatchedVideos, 
               'total_watched_length' => $totalWatchedLength)
@@ -39,45 +39,45 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
                 	<div id="courses">
                 		<?php foreach($courses as $course): ?>
                 			<button	class="course" 
-                					onClick="window.location.href='<?php echo BASE_URL."courses/open/".$course['course']->get_id(); ?>'"
+                					onClick="window.location.href='<?php echo BASE_URL."courses/open/".$course['course']->getId(); ?>'"
                 			>
                     			<!-- Course information -->
                 				<img	class="img img-responsive" 
-                						src="<?php echo empty($course['course']->get_logo()) ? 
+                						src="<?php echo empty($course['course']->getLogo()) ? 
                 						     BASE_URL."src/main/webapp/images/default/noImage.png" : 
-                						     BASE_URL."src/main/webapp/images/logos/courses/".$course['course']->get_logo(); ?>" 
+                						     BASE_URL."src/main/webapp/images/logos/courses/".$course['course']->getLogo(); ?>" 
                 				/>
-                    			<h2><?php echo $course['course']->get_name(); ?></h2>
-                    			<p><?php echo $course['course']->get_description(); ?></p>                			
+                    			<h2><?php echo $course['course']->getName(); ?></h2>
+                    			<p><?php echo $course['course']->getDescription(); ?></p>                			
                     			
                     			<div class="course_info">
                     				<span class="course_watchedClasses">
                     					&#128249;
                     					<?php echo $course['total_classes_watched']; ?> / 
-                    					<?php echo $course['course']->get_total_classes(); ?>
+                    					<?php echo $course['course']->getTotalClasses(); ?>
                     				</span>
                     				<span class="course_length">
                     					&#128337;
-                    					<?php echo $course['course']->get_total_length() == 0 ? "0/0" : 
+                    					<?php echo $course['course']->getTotalLength() == 0 ? "0/0" : 
                     					               number_format($course['total_length_watched']/60, 2) 
                     					                   ."h / "
-                                                           .number_format($course['course']->get_total_length()/60, 2) 
+                                                           .number_format($course['course']->getTotalLength()/60, 2) 
                     					                   ."h"; ?>
             					    </span>
                     			</div>
                     			
                     			<!-- Course progress -->
                     			<div class="progress position-relative">
-                    				<?php if ($course['course']->get_total_classes() == 0): ?>
+                    				<?php if ($course['course']->getTotalClasses() == 0): ?>
                     					<div class="progress-bar bg-success" style="width:0%"></div>
                     					<small class="justify-content-center d-flex position-absolute w-100">0%</small>
                     				<?php else: ?>
                         				<div	class="progress-bar bg-success" 
-                        						style="width:<?php echo floor($course['total_classes_watched']/$course['course']->get_total_classes() * 100); ?>%"
+                        						style="width:<?php echo floor($course['total_classes_watched']/$course['course']->getTotalClasses() * 100); ?>%"
                 						>
                         				</div>
                         				<small class="justify-content-center d-flex position-absolute w-100">
-                        					<?php echo floor($course['total_classes_watched']/$course['course']->get_total_classes() *100); ?>%
+                        					<?php echo floor($course['total_classes_watched']/$course['course']->getTotalClasses() *100); ?>%
                     					</small>
                         			<?php endif; ?>
                         		</div>
@@ -95,11 +95,11 @@ if (!empty($totalWatchedVideos) && !empty($totalWatchedLength))
             			<?php foreach($notebook as $note): ?>
             				<li class="notebook-item">
         						<div class="notebook-item-header">
-        							<a href="<?php echo BASE_URL."notebook/open/".$note->get_id(); ?>"><?php echo $note->getTitle(); ?></a>
+        							<a href="<?php echo BASE_URL."notebook/open/".$note->getId(); ?>"><?php echo $note->getTitle(); ?></a>
         						</div>
         						<div class="notebook-item-footer">
-        							<div class="notebook-item-class"><?php echo $note->get_class()->getTitle(); ?></div>
-        							<div class="notebook-item-date"><?php echo $note->get_creation_date()->format("m-d-Y H:m:s"); ?></div>
+        							<div class="notebook-item-class"><?php echo $note->getClass()->getTitle(); ?></div>
+        							<div class="notebook-item-date"><?php echo $note->getCreationDate()->format("m-d-Y H:m:s"); ?></div>
         						</div>
             				</li>
         				<?php endforeach; ?>

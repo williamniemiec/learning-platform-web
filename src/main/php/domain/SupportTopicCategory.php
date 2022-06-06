@@ -6,17 +6,13 @@ namespace domain;
 
 /**
  * Responsible for representing a support topic category.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class SupportTopicCategory implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_category;
+    private $idCategory;
     private $name;
     
     
@@ -31,7 +27,7 @@ class SupportTopicCategory implements \JsonSerializable
      */
     public function __construct(int $id_category, string $name)
     {
-        $this->id_category = $id_category;
+        $this->idCategory = $id_category;
         $this->name = $name;
     }
     
@@ -46,7 +42,7 @@ class SupportTopicCategory implements \JsonSerializable
      */
     public function getId() : int
     {
-        return $this->id_category;
+        return $this->idCategory;
     }
     
     /**
@@ -72,7 +68,7 @@ class SupportTopicCategory implements \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'id' => $this->id_category,
+            'id' => $this->idCategory,
             'name' => $this->name
         );
     }

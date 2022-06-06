@@ -11,23 +11,19 @@ use dao\CoursesDAO;
 
 /**
  * Responsible for representing courses.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Course implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_course;
+    private $idCourse;
     private $name;
     private $logo;
     private $description;
     private $modules;
-    private $total_classes;
-    private $total_length;
+    private $totalClasses;
+    private $totalLength;
     
     
     //-------------------------------------------------------------------------
@@ -43,7 +39,7 @@ class Course implements \JsonSerializable
      */
     public function __construct(int $id_course, string $name, ?string $logo = '', ?string $description = '')
     {
-        $this->id_course = $id_course;
+        $this->idCourse = $id_course;
         $this->name = $name;
         $this->logo = empty($logo) ? "" : $logo;
         $this->description = empty($description) ? "" : $description;
@@ -60,7 +56,7 @@ class Course implements \JsonSerializable
      */
     public function getId() : int
     {
-        return $this->id_course;
+        return $this->idCourse;
     }
     
     /**
@@ -68,7 +64,7 @@ class Course implements \JsonSerializable
      * 
      * @return      string Course name
      */
-    public function get_name() : string
+    public function getName() : string
     {
         return $this->name;
     }
@@ -79,7 +75,7 @@ class Course implements \JsonSerializable
      * @return      string Name of the course logo file or empty string if
      * course does not have a logo
      */
-    public function get_logo() : string
+    public function getLogo() : string
     {
         return $this->logo;
     }
@@ -99,21 +95,21 @@ class Course implements \JsonSerializable
      * Gets all modules from a course.
      * 
      * @param       Database $db Database
-     * @param       bool $provideDatabase [Optional] If true, provide database
+     * @param       bool provide_database [Optional] If true, provide database
      * to all modules. Default is false
      * 
      * @return      Module[] Modules from this course
      * 
      * @implNote    Lazy initialization
      */
-    public function get_modules(Database $db, bool $provideDatabase = false) : array
+    public function getModules(Database $db, bool $provide_database = false) : array
     {
         if (empty($this->modules)) {
             $modules = new ModulesDAO($db);
             
-            $this->modules = $modules->getFromCourse($this->id_course);
+            $this->modules = $modules->getFromCourse($this->idCourse);
             
-            if ($provideDatabase) {
+            if ($provide_database) {
                 foreach ($this->modules as $module) {
                     $module->setDatabase($db);
                 }
@@ -137,17 +133,18 @@ class Course implements \JsonSerializable
      */
     public function getTotalClasses(?Database $db = null) : int
     {
-        if (empty($this->total_classes)) {
-            if (empty($db))
+        if (empty($this->totalClasses)) {
+            if (empty($db)) {
                 throw new \InvalidArgumentException("Database cannot be empty");
+            }
             
             $courses = new CoursesDAO($db);
-            $total = $courses->count_classes($this->id_course);
+            $total = $courses->countClasses($this->idCourse);
             
-            $this->total_classes = (int)$total['total_classes'];
+            $this->totalClasses = (int) $total['total_classes'];
         }
         
-        return $this->total_classes;
+        return $this->totalClasses;
     }
     
     /**
@@ -162,53 +159,57 @@ class Course implements \JsonSerializable
      *
      * @implNote    Lazy initialization
      */
+    
     public function getTotalLength(?Database $db = null) : int
     {
-        if (empty($this->total_length) && $this->total_length != 0) {
-            if (empty($db))
+        if (empty($this->totalLength) && $this->totalLength != 0) {
+            if (empty($db)) {
                 throw new \InvalidArgumentException("Database cannot be empty");
+            }
             
             $courses = new CoursesDAO($db);
-            $total = $courses->count_classes($this->id_course);
+            $total = $courses->countClasses($this->idCourse);
             
-            $this->total_length = (int)$total['total_length'];
+            $this->totalLength = (int) $total['total_length'];
         }
         
-        return $this->total_length;
+        return $this->totalLength;
     }
     
     /**
      * Sets total classes of the course.
      * 
-     * @param       int $totalClasses Total classes of the course
+     * @param       int $total_classes Total classes of the course
      * 
      * @throws      \InvalidArgumentException If total classes is empty or less 
      * than zero
      */
-    public function setTotalClasses(int $totalClasses) : void
+    public function setTotalClasses(int $total_classes) : void
     {
-        if ((empty($totalClasses) && $totalClasses != 0) || $totalClasses < 0)
+        if ((empty($total_classes) && $total_classes != 0) || $total_classes < 0) {
             throw new \InvalidArgumentException("Total classes cannot be less ".
                 "than zero");
+        }
         
-        $this->total_classes = $totalClasses;
+        $this->totalClasses = $total_classes;
     }
     
     /**
      * Sets total length of the course (in minutes).
      *
-     * @param       int $totalClasses Total length of the course
+     * @param       int $total_classes Total length of the course
      *
      * @throws      \InvalidArgumentException If total length is empty or less 
      * than zero
      */
     public function setTotalLength(int $totalLength) : void
     {
-        if ((empty($totalLength) && $totalLength != 0) || $totalLength < 0)
+        if ((empty($totalLength) && $totalLength != 0) || $totalLength < 0) {
             throw new \InvalidArgumentException("Total length cannot be less ".
                 "than zero");
+        }
             
-        $this->total_length = $totalLength;
+        $this->totalLength = $totalLength;
     }
     
     
@@ -224,13 +225,13 @@ class Course implements \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'id' => $this->id_course,
+            'id' => $this->idCourse,
             'name' => $this->name,
             'logo' => $this->logo,
             'description' => $this->description,
             'modules' => $this->modules,
-            'total_classes' => $this->total_classes,
-            'total_length' => $this->total_length
+            'total_classes' => $this->totalClasses,
+            'total_length' => $this->totalLength
         );
     }
 }

@@ -5,10 +5,6 @@ namespace domain\util;
 /**
  * Should be thrown when a method has been invoked at an illegal or 
  * inappropriate time, or has an attribute that contains an invalid value.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
  class IllegalStateException extends \Exception
  {
@@ -20,7 +16,7 @@ namespace domain\util;
       * thrown when a method has been invoked at an illegal or inappropriate 
       * time, or has an attribute that contains an invalid value.
       *
-      * @param       string $messsage [Optional] Message
+      * @param       string $message [Optional] Message
       */
      public function __construct($message = '')
      {

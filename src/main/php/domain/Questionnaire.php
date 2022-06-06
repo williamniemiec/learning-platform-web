@@ -6,10 +6,6 @@ namespace domain;
 
 /**
  * Responsible for representing questionnaire-type classes.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Questionnaire extends _Class
 {
@@ -43,8 +39,8 @@ class Questionnaire extends _Class
     public function __construct(int $id_module, int $class_order, string $question, 
         string $q1, string $q2, string $q3, string $q4, int $answer)
     {
-        $this->id_module = $id_module;
-        $this->class_order = $class_order;
+        $this->idModule = $id_module;
+        $this->classOrder = $class_order;
         $this->question = $question;
         $this->q1 = $q1;
         $this->q2 = $q2;
@@ -60,7 +56,7 @@ class Questionnaire extends _Class
     /**
      * Gets questionnaire question.
      * 
-     * @return      string Questionnarie question
+     * @return      string Questionnaire question
      */
     public function getQuestion() : string
     {

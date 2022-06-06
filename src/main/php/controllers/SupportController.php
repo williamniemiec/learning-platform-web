@@ -23,8 +23,8 @@ class SupportController extends Controller
      */
     public function __construct()
     {
-        if (!Student::is_logged()) {
-            $this->redirect_to("login");
+        if (!Student::isLogged()) {
+            $this->redirectTo("login");
         }
     }
     
@@ -37,11 +37,11 @@ class SupportController extends Controller
      */
     public function index ()
     {   
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::get_logged_in($db_connection);
-        $support_topic_dao = new SupportTopicDAO($db_connection, $student->get_id());
-        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+        $student = Student::getLoggedIn($dbConnection);
+        $supportTopicDao = new SupportTopicDAO($dbConnection, $student->getId());
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
         $limit = 10;
         $index = 1;
         
@@ -59,43 +59,43 @@ class SupportController extends Controller
             'robots' => 'noindex'
         );
         
-        $view_args = array(
+        $viewArgs = array(
             'header' => $header,
-            'username' => $student->get_name(),
+            'username' => $student->getName(),
             'scripts' => array('SupportScript'),
-            'supportTopics' => $support_topic_dao->getAll($limit, $offset),
+            'supportTopics' => $supportTopicDao->getAll($limit, $offset),
             'notifications' => array(
-                'notifications' => $notifications_dao->get_notifications(10),
-                'total_unread' => $notifications_dao->count_unread_notification()),
-            'categories' => $support_topic_dao->get_categories(),
-            'totalPages' => ceil($support_topic_dao->count() / $limit),
+                'notifications' => $notificationsDao->getNotifications(10),
+                'total_unread' => $notificationsDao->countUnreadNotification()),
+            'categories' => $supportTopicDao->getCategories(),
+            'totalPages' => ceil($supportTopicDao->count() / $limit),
             'currentIndex' => $index
         );
         
-        $this->load_template("support/SupportView", $view_args);
+        $this->loadTemplate("support/SupportView", $viewArgs);
     }
     
     /**
      * Opens a support topic to read.
      */
-    public function open($id_topic)
+    public function open($idTopic)
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::get_logged_in($db_connection);
-        $support_topic_dao = new SupportTopicDAO($db_connection, $student->get_id());
-        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
-        $topic = $support_topic_dao->get($id_topic);
+        $student = Student::getLoggedIn($dbConnection);
+        $supportTopicDao = new SupportTopicDAO($dbConnection, $student->getId());
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
+        $topic = $supportTopicDao->get($idTopic);
         
         // If topic does not exist or it exists but does not belongs to the 
         // student logged in, redirects him to courses page
         if (empty($topic)) {
-            $this->redirect_to("courses");
+            $this->redirectTo("courses");
         }
         
         // Checks whether a reply has been sent
         if (!empty($_POST['topic_message'])) {
-            $support_topic_dao->new_reply($id_topic, $student->get_id(), $_POST['topic_message']);
+            $supportTopicDao->newReply($idTopic, $student->getId(), $_POST['topic_message']);
             unset($_POST['topic_message']);
             
             $this->reload();
@@ -108,60 +108,60 @@ class SupportController extends Controller
             'robots' => 'noindex'
         );
         
-        $view_args = array(
+        $viewArgs = array(
             'header' => $header,
-            'username' => $student->get_name(),
-            'topic' => $topic->set_database($db_connection),
+            'username' => $student->getName(),
+            'topic' => $topic->setDatabase($dbConnection),
             'notifications' => array(
-                'notifications' => $notifications_dao->get_notifications(10),
-                'total_unread' => $notifications_dao->count_unread_notification())
+                'notifications' => $notificationsDao->getNotifications(10),
+                'total_unread' => $notificationsDao->countUnreadNotification())
         );
         
-        $this->load_template("support/SupportContentView", $view_args);
+        $this->loadTemplate("support/SupportContentView", $viewArgs);
     }
     
     /**
      * Opens a support topic.
      */
-    public function unlock($id_topic)
+    public function unlock($idTopic)
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::get_logged_in($db_connection);
-        $support_topic_dao = new SupportTopicDAO($db_connection, $student->get_id());
-        $topic = $support_topic_dao->get($id_topic);
+        $student = Student::getLoggedIn($dbConnection);
+        $supportTopicDao = new SupportTopicDAO($dbConnection, $student->getId());
+        $topic = $supportTopicDao->get($idTopic);
         
         // If topic does not exist or it exists but does not belongs to the
         // student logged in, redirects him to courses page
         if (empty($topic)) {
-            $this->redirect_to("courses");
+            $this->redirectTo("courses");
         }
         
-        $support_topic_dao->open($id_topic);
+        $supportTopicDao->open($idTopic);
         
-        $this->redirect_to("support");
+        $this->redirectTo("support");
     }
     
     /**
      * Closes a support topic.
      */
-    public function lock($id_topic)
+    public function lock($idTopic)
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::get_logged_in($db_connection);
-        $support_topic_dao = new SupportTopicDAO($db_connection, $student->get_id());
-        $topic = $support_topic_dao->get($id_topic);
+        $student = Student::getLoggedIn($dbConnection);
+        $supportTopicDao = new SupportTopicDAO($dbConnection, $student->getId());
+        $topic = $supportTopicDao->get($idTopic);
         
         // If topic does not exist or it exists but does not belongs to the
         // student logged in, redirects him to courses page
         if (empty($topic)) {
-            $this->redirect_to("courses");
+            $this->redirectTo("courses");
         }
         
-        $support_topic_dao->close($id_topic);
+        $supportTopicDao->close($idTopic);
         
-        $this->redirect_to("support");
+        $this->redirectTo("support");
     }
     
     /**
@@ -171,21 +171,21 @@ class SupportController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::get_logged_in($dbConnection);
-        $support_topic_dao = new SupportTopicDAO($dbConnection, $student->get_id());
-        $notifications_dao = new NotificationsDAO($dbConnection, $student->get_id());
+        $student = Student::getLoggedIn($dbConnection);
+        $supportTopicDao = new SupportTopicDAO($dbConnection, $student->getId());
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
         
         // Checks whether form has been sent
         if (!empty($_POST['topic_title']) && !empty($_POST['topic_category']) && 
                 !empty($_POST['topic_message'])) {
-            $support_topic_dao->new(
+            $supportTopicDao->new(
                 (int)$_POST['topic_category'], 
-                $student->get_id(), 
+                $student->getId(), 
                 $_POST['topic_title'], 
                 $_POST['topic_message']
             );
             
-            $this->redirect_to("support");
+            $this->redirectTo("support");
         }
         
         $header = array(
@@ -195,16 +195,16 @@ class SupportController extends Controller
             'robots' => 'noindex'
         );
         
-        $view_args = array(
+        $viewArgs = array(
             'header' => $header,
-            'username' => $student->get_name(),
-            'categories' => $support_topic_dao->get_categories(),
+            'username' => $student->getName(),
+            'categories' => $supportTopicDao->getCategories(),
             'notifications' => array(
-                'notifications' => $notifications_dao->get_notifications(10),
-                'total_unread' => $notifications_dao->count_unread_notification())
+                'notifications' => $notificationsDao->getNotifications(10),
+                'total_unread' => $notificationsDao->countUnreadNotification())
         );
         
-        $this->load_template("support/SupportNewView", $view_args);
+        $this->loadTemplate("support/SupportNewView", $viewArgs);
     }
     
     
@@ -223,22 +223,22 @@ class SupportController extends Controller
      */
     public function search()
     {
-        if ($this->get_http_request_method() != "POST") {
+        if ($this->getHttpRequestMethod() != "POST") {
             return;
         }
         
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $support_topic_dao = new SupportTopicDAO(
-            $db_connection, 
-            Student::get_logged_in($db_connection)->get_id()
+        $supportTopicDao = new SupportTopicDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
         );
         
         echo $_POST['filter']['type'] == 0 ?
-            json_encode($support_topic_dao->search(
+            json_encode($supportTopicDao->search(
                 $_POST['name'], 
                 (int)$_POST['filter']['id_category'])) :
-            json_encode($support_topic_dao->get_all_answered_by_category(
+            json_encode($supportTopicDao->getAllAnsweredByCategory(
                 $_POST['name'],
                 (int)$_POST['filter']['id_category']));
     }

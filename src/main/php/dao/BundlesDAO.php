@@ -12,10 +12,6 @@ use domain\enum\BundleOrderTypeEnum;
 
 /**
  * Responsible for managing 'bundles' table.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class BundlesDAO
 {
@@ -45,7 +41,7 @@ class BundlesDAO
     /**
      * Gets a bundle
      * 
-     * @param       int $id_bundle Bundle id or null if there is no bundle with
+     * @param       int idBundle Bundle id or null if there is no bundle with
      * the given id
      * 
      * @return      Bundle Bundle with the given id
@@ -53,11 +49,12 @@ class BundlesDAO
      * @throws      \InvalidArgumentException If bundle id is empty or less 
      * than or equal to zero
      */
-    public function get(int $id_bundle) : Bundle
+    public function get(int $idBundle) : Bundle
     {
-        if (empty($id_bundle) || $id_bundle <= 0)
+        if (empty($idBundle) || $idBundle <= 0) {
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = null;
         
@@ -69,15 +66,15 @@ class BundlesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_bundle));
+        $sql->execute(array($idBundle));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $bundle = $sql->fetch();
             $response = new Bundle(
-                (int)$bundle['id_bundle'], 
+                (int) $bundle['id_bundle'], 
                 $bundle['name'], 
-                (float)$bundle['price'],
+                (float) $bundle['price'],
                 $bundle['logo'],
                 $bundle['description']
             );
@@ -90,10 +87,10 @@ class BundlesDAO
      * Gets all registered bundles. If a filter option is provided, it gets 
      * only those bundles that satisfy these filters.
      * 
-     * @param       int $id_student [Optional] Student id 
+     * @param       int idStudent [Optional] Student id 
      * @param       int $limit [Optional] Maximum bundles returned
      * @param       string $name [Optional] Bundle name
-     * @param       BundleOrderTypeEnum $orderBy [Optional] Ordering criteria 
+     * @param       BundleOrderTypeEnum order_by [Optional] Ordering criteria 
      * @param       OrderDirectionEnum $orderType [Optional] Order that the 
      * elements will be returned. Default is ascending.
      * 
@@ -107,14 +104,15 @@ class BundlesDAO
      *  bundle</li>
      * </ul>
      */
-    public function getAll(int $id_student = -1, int $limit = -1, string $name = '',
+    public function getAll(int $idStudent = -1, int $limit = -1, string $name = '',
         BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
     {
         $response = array();
         $bindParams = array();
 
-        if (empty($orderType))
+        if (empty($orderType)) {
             $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
+        }
         
         // Query construction
         $query = "
@@ -124,7 +122,7 @@ class BundlesDAO
         
         // If a student was provided, for each bundle add the information if he
         // has the bundle or not
-        if ($id_student > 0) {
+        if ($idStudent > 0) {
             $query .= "
                         CASE
                             WHEN id_student = ? THEN 1
@@ -132,7 +130,7 @@ class BundlesDAO
                         END AS has_bundle,
             ";
             
-            $bindParams[] = $id_student;
+            $bindParams[] = $idStudent;
         }
         
         $query .= "
@@ -155,8 +153,9 @@ class BundlesDAO
         }
 
         // Limits the results (if a limit was given)
-        if ($limit > 0) 
+        if ($limit > 0) {
             $query .= " LIMIT ".$limit;
+        }
         
         // Prepares query
         $sql = $this->db->prepare($query);
@@ -171,15 +170,16 @@ class BundlesDAO
     
             foreach ($bundles as $bundle) {
                 $response[$i]['bundle'] = new Bundle(
-                    (int)$bundle['id_bundle'],
+                    (int) $bundle['id_bundle'],
                     $bundle['name'],
-                    (float)$bundle['price'],
+                    (float) $bundle['price'],
                     $bundle['logo'],
                     $bundle['description']
                 );
                 
-                if ($id_student > 0)
+                if ($idStudent > 0) {
                     $response[$i]['has_bundle'] = $bundle['has_bundle'] > 0;
+                }
                 
                 $i++;
             }
@@ -193,8 +193,8 @@ class BundlesDAO
      * given id has, not including bundles that a student already has (if 
      * provided).
      * 
-     *  @param      int $id_bundle Bundle id
-     *  @param      int $id_student [Optional] Student id 
+     *  @param      int idBundle Bundle id
+     *  @param      int idStudent [Optional] Student id 
      *  
      *  @return     Bundle[] Bundles that are contained in the given bundle 
      *  disregarding those that the student already has
@@ -202,14 +202,15 @@ class BundlesDAO
      *  @throws      \InvalidArgumentException If bundle id is empty or less 
      *  than or equal to zero
      */
-    public function extension_bundles(int $id_bundle, int $id_student = -1) : array
+    public function extensionBundles(int $idBundle, int $idStudent = -1) : array
     {
-        if (empty($id_bundle) || $id_bundle <= 0)
+        if (empty($idBundle) || $idBundle <= 0) {
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         $response = array();
-        $bindParams = array($id_bundle);
+        $bind_params = array($idBundle);
         
         // Query construction
         $query = "
@@ -219,15 +220,15 @@ class BundlesDAO
             WHERE   id_bundle != ? AND
         ";
         
-        if ($id_student > 0) {
+        if ($idStudent > 0) {
             $query .= " 
                     (id_student IS NULL OR id_student != ?) AND 
             ";
             
-            $bindParams[] = $id_student;
+            $bind_params[] = $idStudent;
         }
         
-        $bindParams[] = $id_bundle;
+        $bind_params[] = $idBundle;
         
         $query .= "
                     NOT EXISTS (
@@ -243,15 +244,15 @@ class BundlesDAO
         $sql = $this->db->prepare($query);
         
         // Executes query
-        $sql->execute($bindParams);
+        $sql->execute($bind_params);
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $bundle) {
                 $response[] = new Bundle(
-                    (int)$bundle['id_bundle'],
+                    (int) $bundle['id_bundle'],
                     $bundle['name'],
-                    (float)$bundle['price'],
+                    (float) $bundle['price'],
                     $bundle['logo'],
                     $bundle['description']
                 );
@@ -261,14 +262,13 @@ class BundlesDAO
         return $response;
     }
     
-    
     /**
      * Gets bundles that do not contain any courses in common with a
      * supplied bundle, disregarding those that a student already has (if 
      * provided).
      * 
-     * @param       int $id_bundle Bundle id
-     * @param       int $id_student [Optional] Student id
+     * @param       int idBundle Bundle id
+     * @param       int idStudent [Optional] Student id
      * 
      * @return      Bundle[] Bundles that does not have courses contained in 
      * the given bundle disregarding those that the student already has
@@ -276,24 +276,25 @@ class BundlesDAO
      * @throws      \InvalidArgumentException If bundle id is empty or less than
      * or equal to zero
      */
-    public function unrelated_bundles(int $id_bundle, int $id_student = -1) : array
+    public function unrelatedBundles(int $idBundle, int $idStudent = -1) : array
     {
-        if (empty($id_bundle) || $id_bundle <= 0)
+        if (empty($idBundle) || $idBundle <= 0) {
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = array();
-        $bindParams = array($id_bundle);
+        $bindParams = array($idBundle);
         
         // Query construction
-        if ($id_student > 0) {
+        if ($idStudent > 0) {
             $query = "
                 SELECT  *
                 FROM    bundles b
                 WHERE   id_bundle != ? AND
             ";
             
-            $bindParams[] = $id_student;
+            $bindParams[] = $idStudent;
         }
         else {
             $query = "
@@ -314,20 +315,19 @@ class BundlesDAO
                 )
         ";
         
-        $bindParams[] = $id_bundle;
+        $bindParams[] = $idBundle;
         
         $sql = $this->db->prepare($query);
         
-        // Executes query
         $sql->execute($bindParams);
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $bundle) {
                 $response[] = new Bundle(
-                    (int)$bundle['id_bundle'], 
+                    (int) $bundle['id_bundle'], 
                     $bundle['name'], 
-                    (float)$bundle['price'],
+                    (float) $bundle['price'],
                     $bundle['logo'],
                     $bundle['description']
                 );
@@ -342,7 +342,7 @@ class BundlesDAO
      * Gets the total number of classes that a bundle has along with its 
      * duration (in minutes).
      * 
-     * @param       int $id_bundle Bundle id
+     * @param       int idBundle Bundle id
      * 
      * @return      array Total of classes that the bundle has along with its 
      * duration (in minutes). The returned array has the following keys:
@@ -358,11 +358,12 @@ class BundlesDAO
      * @implSpec    It will always return an array with the two keys informed
      * above, even if both have zero value
      */
-    public function countTotalClasses(int $id_bundle) : array
+    public function countTotalClasses(int $idBundle) : array
     {
-        if (empty($id_bundle) || $id_bundle <= 0)
+        if (empty($idBundle) || $idBundle <= 0) {
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         $response = array(
             "total_classes" => 0,
@@ -385,7 +386,7 @@ class BundlesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_bundle));
+        $sql->execute(array($idBundle));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
@@ -405,7 +406,7 @@ class BundlesDAO
      */
     public function getTotal() : int
     {
-        return (int)$this->db->query("
+        return (int) $this->db->query("
             SELECT  COUNT(*) AS total
             FROM    bundles
         ")->fetch()['total'];

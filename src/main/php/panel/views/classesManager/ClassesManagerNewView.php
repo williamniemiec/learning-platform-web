@@ -34,8 +34,8 @@
             		<label for="id_module">Module (class order will be the highets class order in use + 1)</label>
             		<select name="id_module" class="form-control">
             			<?php foreach ($modules as $k => $module): ?>
-            				<option value='<?php echo $module->get_id(); ?>' <?php $k == 1 ? "selected" : "" ?>>
-            					<?php echo $module->get_name(); ?>
+            				<option value='<?php echo $module->getId(); ?>' <?php $k == 1 ? "selected" : "" ?>>
+            					<?php echo $module->getName(); ?>
         					</option>
         				<?php endforeach; ?>
             		</select>

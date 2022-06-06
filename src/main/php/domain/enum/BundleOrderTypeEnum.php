@@ -9,10 +9,6 @@ use domain\util\Enumeration;
 
 /**
  * Contains bundle 'order by' options.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class BundleOrderTypeEnum extends Enumeration
 {

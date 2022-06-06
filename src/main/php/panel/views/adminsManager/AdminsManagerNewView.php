@@ -1,7 +1,7 @@
 <div class="container">
    <!-- Shows error message if an error occurs -->
 	<?php if ($error): ?>
-		<?php $this->load_view("alerts/alert_error", array('msg' => $msg)); ?>
+		<?php $this->loadView("alerts/alert_error", array('msg' => $msg)); ?>
 	<?php endif; ?>
 	
 	<div class="view_panel">
@@ -13,7 +13,7 @@
             		<label for="authorization">Authorization</label>
             		<select id="authorization" name="authorization" class="form-control">
             			<?php foreach ($authorizations as $authorization): ?>
-            				<option value="<?php echo $authorization->get_id(); ?>"><?php echo ucfirst(strtolower($authorization->get_name())); ?></option>
+            				<option value="<?php echo $authorization->getId(); ?>"><?php echo ucfirst(strtolower($authorization->getName())); ?></option>
             			<?php endforeach; ?>
             		</select>
             	</div>

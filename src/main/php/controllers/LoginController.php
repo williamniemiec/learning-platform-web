@@ -21,8 +21,8 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        if (Student::is_logged()) {
-            $this->redirect_to_root();
+        if (Student::isLogged()) {
+            $this->redirectToRoot();
         }
     }
     
@@ -35,7 +35,7 @@ class LoginController extends Controller
      */
     public function index ()
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
         $header = array(
             'title' => 'Login - Learning platform',
@@ -45,7 +45,7 @@ class LoginController extends Controller
             'robots' => 'index'
         );
         
-        $view_args = array(
+        $viewArgs = array(
             'header' => $header,
             'error' => false,
             'msg' => ''
@@ -53,7 +53,7 @@ class LoginController extends Controller
         
         // Checks if login form has been sent
         if (!empty($_POST['email'])) {
-            if (!empty(Student::login($db_connection, $_POST['email'], $_POST['password']))) {
+            if (!empty(Student::login($dbConnection, $_POST['email'], $_POST['password']))) {
                 // If login was successful, redirects him
                 if (empty($_SESSION['redirect'])) {
                     header("Location: ".BASE_URL."courses");
@@ -67,11 +67,11 @@ class LoginController extends Controller
                 exit;
             }
             
-            $view_args['error'] = true;
-            $view_args['msg'] = "Email and / or password incorrect";
+            $viewArgs['error'] = true;
+            $viewArgs['msg'] = "Email and / or password incorrect";
         }
         
-        $this->load_template("LoginView", $view_args, false);
+        $this->loadTemplate("LoginView", $viewArgs, false);
     }
     
     /**
@@ -87,7 +87,7 @@ class LoginController extends Controller
             'robots' => 'index'
         );
         
-        $view_args = array(
+        $viewArgs = array(
             'header' => $header,
             'scripts' => array(),
             'error' => false,
@@ -95,14 +95,14 @@ class LoginController extends Controller
         );
         
         // Checks if registration form has been sent
-        if ($this->was_registration_form_sent()) {
+        if ($this->wasRegistrationFormSent()) {
             // Checks if all fields are filled
-            if ($this->is_all_fields_filled()) {
-                $students_dao = new StudentsDAO(new MySqlPDODatabase());
+            if ($this->isAllFieldsFilled()) {
+                $studentsDao = new StudentsDAO(new MySqlPDODatabase());
                 
-                if ($students_dao->is_email_in_use($_POST['email'])) {
-                    $view_args['error'] = true;
-                    $view_args['msg'] = "Email is already being used";
+                if ($studentsDao->isEmailInUse($_POST['email'])) {
+                    $viewArgs['error'] = true;
+                    $viewArgs['msg'] = "Email is already being used";
                 }
                 else {
                     $student = new Student(
@@ -113,23 +113,23 @@ class LoginController extends Controller
                         $_POST['password']
                     );
                     
-                    if ($students_dao->register($student)) {
-                        $this->redirect_to_root();
+                    if ($studentsDao->register($student)) {
+                        $this->redirectToRoot();
                         exit;
                     }
                     
-                    $view_args['error'] = true;
-                    $view_args['msg'] = "Error when registering";
+                    $viewArgs['error'] = true;
+                    $viewArgs['msg'] = "Error when registering";
                 }
             } 
             else {
-                $view_args['error'] = true;
-                $view_args['msg'] = "Fill in all fields!";
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = "Fill in all fields!";
             }
             
         }
         
-        $this->load_template("RegisterView", $view_args, false);
+        $this->loadTemplate("RegisterView", $viewArgs, false);
     }
     
     /**
@@ -144,7 +144,7 @@ class LoginController extends Controller
      * 
      * @return      boolean If all required fields are filled
      */
-    private function is_all_fields_filled()
+    private function isAllFieldsFilled()
     {
         return (
             isset($_POST['name']) &&
@@ -160,7 +160,7 @@ class LoginController extends Controller
      * 
      * @return      boolean If registration form was sent
      */
-    private function was_registration_form_sent()
+    private function wasRegistrationFormSent()
     {
         return (
             !empty($_POST['name']) ||

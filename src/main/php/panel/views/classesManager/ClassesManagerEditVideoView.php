@@ -20,8 +20,8 @@
             		<label for="id_module">Module (class order will be the highets class order in use + 1)</label>
             		<select name="id_module" class="form-control" data-toggle="tooltip" data-placement="top" title="To change class order go to modules manager">
             			<?php foreach ($modules as $k => $module): ?>
-            				<option value='<?php echo $module->get_id(); ?>' <?php echo $module->get_id() == $class->getModule()->getId() ? "selected" : "" ?>>
-            					<?php echo $module->get_name(); ?>
+            				<option value='<?php echo $module->getId(); ?>' <?php echo $module->getId() == $class->getModule()->getId() ? "selected" : "" ?>>
+            					<?php echo $module->getName(); ?>
         					</option>
         				<?php endforeach; ?>
             		</select>

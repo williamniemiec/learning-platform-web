@@ -9,18 +9,14 @@ use domain\enum\NotificationTypeEnum;
 
 /**
  * Responsible for representing notifications.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Notification
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_notification;
-    private $id_student;
+    private $idNotification;
+    private $idStudent;
     private $date;
     private $reference;
     private $type;
@@ -34,8 +30,8 @@ class Notification
     /**
      * Creates a representation of a notification.
      *
-     * @param       int $id_notification Notification id
-     * @param       int $id_student Student id to which the notification
+     * @param       int idNotification Notification id
+     * @param       int idStudent Student id to which the notification
      * belongs
      * @param       DateTime $date Date to which the notification was generated
      * @param       mixed $reference Comment or Support topic to which the 
@@ -45,11 +41,11 @@ class Notification
      * @param       int $read [Optional] If the notification has not yet been
      * read
      */
-    public function __construct(int $id_notification, int $id_student, DateTime $date, $reference,
+    public function __construct(int $idNotification, int $idStudent, DateTime $date, $reference,
         NotificationTypeEnum $type, string $message, int $read = 0)
     {
-        $this->id_notification = $id_notification;
-        $this->id_student = $id_student;
+        $this->idNotification = $idNotification;
+        $this->idStudent = $idStudent;
         $this->date = $date;
         $this->reference = $reference;
         $this->type = $type;
@@ -68,7 +64,7 @@ class Notification
      */
     public function getId() : int
     {
-        return $this->id_notification;
+        return $this->idNotification;
     }
     
     /**
@@ -78,7 +74,7 @@ class Notification
      */
     public function getStudentId() : int
     {
-        return $this->id_student;
+        return $this->idStudent;
     }
     
     /**

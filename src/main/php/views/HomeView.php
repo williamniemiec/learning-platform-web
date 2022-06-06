@@ -24,16 +24,16 @@
         			<div class="gallery-items-area">
         				<?php foreach ($bundles as $bundle): ?>
                 			<button	class="gallery-item" 
-                					onClick="window.location.href='<?php echo BASE_URL."bundle/open/".$bundle['bundle']->get_id() ?>'"
+                					onClick="window.location.href='<?php echo BASE_URL."bundle/open/".$bundle['bundle']->getId() ?>'"
                 			>
                 				<img	class="gallery-item-thumbnail" 
-                						src="<?php echo empty($bundle['bundle']->get_logo()) ? 
+                						src="<?php echo empty($bundle['bundle']->getLogo()) ? 
                 						    BASE_URL."src/main/webapp/images/default/noImage.png" : 
-                						    BASE_URL."src/main/webapp/images/logos/bundles/".$bundle['bundle']->get_logo(); ?>" 
+                						    BASE_URL."src/main/webapp/images/logos/bundles/".$bundle['bundle']->getLogo(); ?>" 
         						/>
                 				<div class="gallery-item-content">
-                    				<div class="gallery-item-header"><?php echo $bundle['bundle']->get_name(); ?></div>
-                    				<div class="gallery-item-body"><p><?php echo $bundle['bundle']->get_description(); ?></p></div>
+                    				<div class="gallery-item-header"><?php echo $bundle['bundle']->getName(); ?></div>
+                    				<div class="gallery-item-body"><p><?php echo $bundle['bundle']->getDescription(); ?></p></div>
                     				<div class="gallery-item-footer">
                     					<?php echo !empty($bundle['has_bundle']) ? "Purchased" : $bundle['bundle']->getPrice(); ?>
                 					</div>

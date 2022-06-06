@@ -24,8 +24,8 @@ class SettingsController extends Controller
      */
     public function __construct()
     {
-        if (!Student::is_logged()) {
-            $this->redirect_to("login");
+        if (!Student::isLogged()) {
+            $this->redirectTo("login");
         }
     }
     
@@ -38,10 +38,10 @@ class SettingsController extends Controller
      */
     public function index ()
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::get_logged_in($db_connection);
-        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+        $student = Student::getLoggedIn($dbConnection);
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
         
         $header = array(
             'title' => 'Settings - Learning platform',
@@ -50,22 +50,22 @@ class SettingsController extends Controller
             'robots' => 'noindex'
         );
         
-        $view_args = array(
+        $viewArgs = array(
             'header' => $header,
             'scripts' => array("SettingsScript"),
-            'username' => $student->get_name(),
+            'username' => $student->getName(),
             'user' => $student,
             'notifications' => array(
-                'notifications' => $notifications_dao->get_notifications(10),
-                'total_unread' => $notifications_dao->count_unread_notification())
+                'notifications' => $notificationsDao->getNotifications(10),
+                'total_unread' => $notificationsDao->countUnreadNotification())
         );
         
         if (isset($_SESSION['cleared'])) {
-            $view_args['msg'] = "Session has been successfully cleared!";
+            $viewArgs['msg'] = "Session has been successfully cleared!";
             unset($_SESSION['cleared']);
         }
         
-        $this->load_template("settings/SettingsView", $view_args);
+        $this->loadTemplate("settings/SettingsView", $viewArgs);
     }
     
     /**
@@ -73,10 +73,10 @@ class SettingsController extends Controller
      */
     public function edit()
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::get_logged_in($db_connection);
-        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+        $student = Student::getLoggedIn($dbConnection);
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
 
         $header = array(
             'title' => 'Settings - Update - Learning platform',
@@ -87,55 +87,55 @@ class SettingsController extends Controller
         
         // Checks if edition form has been sent
         if (!empty($_POST['name'])) {
-            $students_dao = new StudentsDAO($db_connection);
-            $student->set_genre(new GenreEnum($_POST['genre']));
-            $student->set_birthdate(new \DateTime($_POST['birthdate']));
+            $students_dao = new StudentsDAO($dbConnection);
+            $student->setGenre(new GenreEnum($_POST['genre']));
+            $student->setBirthdate(new \DateTime($_POST['birthdate']));
             
             $students_dao->update($student);
-            $this->redirect_to("settings");
+            $this->redirectTo("settings");
         }
         
-        $view_args = array(
+        $viewArgs = array(
             'header' => $header,
-            'username' => $student->get_name(),
+            'username' => $student->getName(),
             'user' => $student,
             'notifications' => array(
-                'notifications' => $notifications_dao->get_notifications(10),
-                'total_unread' => $notifications_dao->count_unread_notification()),
+                'notifications' => $notificationsDao->getNotifications(10),
+                'total_unread' => $notificationsDao->countUnreadNotification()),
             'msg' => ''
         );
         
-        $this->load_template("settings/SettingsEditView", $view_args);
+        $this->loadTemplate("settings/SettingsEditView", $viewArgs);
     }
     
     public function clear()
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $students_dao = new StudentsDAO(
-            $db_connection, 
-            Student::get_logged_in($db_connection)->get_id()
+        $studentsDao = new StudentsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
         );
         
-        $_SESSION['cleared'] = $students_dao->clear_history();
+        $_SESSION['cleared'] = $studentsDao->clearHistory();
         
-        $this->redirect_to("settings");
+        $this->redirectTo("settings");
     }
     
     public function delete()
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $students_dao = new StudentsDAO(
-            $db_connection,
-            Student::get_logged_in($db_connection)->get_id()
+        $studentsDao = new StudentsDAO(
+            $dbConnection,
+            Student::getLoggedIn($dbConnection)->getId()
         );
         
-        if ($students_dao->delete()) {
-            $this->redirect_to_root();            
+        if ($studentsDao->delete()) {
+            $this->redirectToRoot();            
         }
         else {
-            $this->redirect_to("settings");
+            $this->redirectTo("settings");
         }
     }
     
@@ -152,20 +152,20 @@ class SettingsController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function update_profile_photo()
+    public function updateProfilePhoto()
     {
-        if ($this->get_http_request_method() != 'POST') {
-            $this->redirect_to_root();
+        if ($this->getHttpRequestMethod() != 'POST') {
+            $this->redirectToRoot();
         }
         
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $students_dao = new StudentsDAO(
-            $db_connection, 
-            Student::get_logged_in($db_connection)->get_id()
+        $studentsDao = new StudentsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
         );
         
-        echo $students_dao->updatePhoto($_FILES['photo']);
+        echo $studentsDao->updatePhoto($_FILES['photo']);
     }
     
     /**
@@ -178,19 +178,19 @@ class SettingsController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function update_password()
+    public function updatePassword()
     {
-        if ($this->get_http_request_method() != 'POST') {
-            $this->redirect_to_root();
+        if ($this->getHttpRequestMethod() != 'POST') {
+            $this->redirectToRoot();
         }
         
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $students_dao = new StudentsDAO(
-            $db_connection, 
-            Student::get_logged_in($db_connection)->get_id()
+        $studentsDao = new StudentsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
         );
         
-        echo $students_dao->updatePassword($_POST['current_password'], $_POST['new_password']);
+        echo $studentsDao->updatePassword($_POST['current_password'], $_POST['new_password']);
     }
 }

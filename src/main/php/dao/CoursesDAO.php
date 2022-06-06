@@ -11,17 +11,13 @@ use domain\_Class;
 
 /**
  * Responsible for managing 'courses' table.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class CoursesDAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_user;
+    private $idUser;
     private $db;
     
     
@@ -45,7 +41,7 @@ class CoursesDAO
     /**
      * Gets courses that a student has.
      * 
-     * @param       int $id_student Student id
+     * @param       int idStudent Student id
      * @param       string $name [Optional] Course name (searches for this name)
      * 
      * @return      array Courses that a student has along with the progress of
@@ -62,11 +58,12 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If student id is empty or less 
      * than or equal to zero
      */
-    public function get_my_courses(int $id_student, string $name = '') : array
+    public function getMyCourses(int $idStudent, string $name = '') : array
     {
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($idStudent) || $idStudent <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = array();
         
@@ -107,11 +104,11 @@ class CoursesDAO
         if (!empty($name)) {
             $query .= " HAVING      name LIKE ?";
             $sql = $this->db->prepare($query);
-            $sql->execute(array($id_student, $id_student, $name."%"));
+            $sql->execute(array($idStudent, $idStudent, $name."%"));
         }
         else {
             $sql = $this->db->prepare($query);
-            $sql->execute(array($id_student, $id_student));
+            $sql->execute(array($idStudent, $idStudent));
         }
         
         // Parses results
@@ -126,11 +123,11 @@ class CoursesDAO
                     $course['description']
                 );
                 
-                $response[$i]['course']->get_modules($this->db);
-                $response[$i]['course']->setTotalLength((int)$course['total_length']);
+                $response[$i]['course']->getModules($this->db);
+                $response[$i]['course']->setTotalLength((int) $course['total_length']);
                 $response[$i]['course']->getTotalClasses($this->db);
-                $response[$i]['total_classes_watched'] = (int)$course['total_classes_watched'];
-                $response[$i]['total_length_watched'] = (int)$course['total_length_watched'];
+                $response[$i]['total_classes_watched'] = (int) $course['total_classes_watched'];
+                $response[$i]['total_length_watched'] = (int) $course['total_length_watched'];
 
                 $i++;
             }
@@ -142,7 +139,7 @@ class CoursesDAO
     /**
      * Gets total classes from a course along with its duration (in minutes).
      *
-     * @param        int $id_course Course id
+     * @param        int idCourse Course id
      *
      * @return       array Total course classes and total duration. The 
      * returned array has the following keys:
@@ -154,11 +151,12 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If course id is empty or less
      * than or equal to zero 
      */
-    public function count_classes(int $id_course) : array
+    public function countClasses(int $idCourse) : array
     {
-        if (empty($id_course) || $id_course <= 0)
+        if (empty($idCourse) || $idCourse <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
+        }
        
         // Query construction
         $sql = $this->db->prepare("
@@ -174,7 +172,7 @@ class CoursesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_course, $id_course));
+        $sql->execute(array($idCourse, $idCourse));
         
         return $sql->fetch();
     }
@@ -191,9 +189,10 @@ class CoursesDAO
      */
     public function getFromBundle(int $id_bundle) : array
     {
-        if (empty($id_bundle) || $id_bundle <= 0)
+        if (empty($id_bundle) || $id_bundle <= 0) {
             throw new \InvalidArgumentException("Bundle id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = array();
         
@@ -216,15 +215,15 @@ class CoursesDAO
             
             foreach ($courses as $course) {
                 $response[$i] = new Course(
-                    (int)$course['id_course'],
+                    (int) $course['id_course'],
                     $course['name'],
                     $course['logo'],
                     $course['description']
                 );
                 
-                $total_classes = $this->count_classes($course['id_course']);
-                $response[$i]->setTotalClasses((int)$total_classes['total_classes']);
-                $response[$i]->setTotalLength((int)$total_classes['total_length']);
+                $totalClasses = $this->countClasses($course['id_course']);
+                $response[$i]->setTotalClasses((int)$totalClasses['total_classes']);
+                $response[$i]->setTotalLength((int)$totalClasses['total_length']);
                 $i++;
             }
         }
@@ -233,20 +232,21 @@ class CoursesDAO
     }
 
     /**
-     * Gets informations about a course.
+     * Gets information about a course.
      *
-     * @param       int $id_course Course id
+     * @param       int id_Course Course id
      *
-     * @return      Course Informations about a course
+     * @return      Course Information about a course
      * 
      * @throws      \InvalidArgumentException If bundle id is empty or less 
      * than or equal to zero
      */
-    public function get(int $id_course) : Course
+    public function get(int $idCourse) : Course
     {
-        if (empty($id_course) || $id_course <= 0)
+        if (empty($idCourse) || $idCourse <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = null;
         
@@ -258,14 +258,14 @@ class CoursesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_course));
+        $sql->execute(array($idCourse));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $course = $sql->fetch();
             
             $response = new Course(
-                (int)$course['id_course'],
+                (int) $course['id_course'],
                 $course['name'],
                 $course['logo'],
                 $course['description']
@@ -278,7 +278,7 @@ class CoursesDAO
     /**
      * Gets the first class from the first module from a course.
      *
-     * @param       int $id_course Course id
+     * @param       int idCourse Course id
      *
      * @return      _Class First class from the first module from a course or
      * null if there are no registered modules - classes in the course with
@@ -287,11 +287,12 @@ class CoursesDAO
      * @throws      \InvalidArgumentException If course id or student id is
      * empty or less than or equal to zero
      */
-    public function get_first_class_from_first_module(int $id_course) : ?_Class
+    public function getFirstClassFromFirstModule(int $idCourse) : ?_Class
     {
-        if (empty($id_course) || $id_course <= 0)
+        if (empty($idCourse) || $idCourse <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         $response = null;
         
@@ -311,20 +312,20 @@ class CoursesDAO
         ");
             
         // Executes query
-        $sql->execute(array($id_course, $id_course, $id_course));
+        $sql->execute(array($idCourse, $idCourse, $idCourse));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $response = $sql->fetch();
             
             if ($response['class_type'] == 'video') {
-                $videosDAO = new VideosDAO($this->db);
+                $videosDao = new VideosDAO($this->db);
                 
-                $response = $videosDAO->get($response['id_module'], 1);
+                $response = $videosDao->get($response['id_module'], 1);
             } else {
-                $questionnairesDAO = new QuestionnairesDAO($this->db);
+                $questionnairesDao = new QuestionnairesDAO($this->db);
                 
-                $response = $questionnairesDAO->get((int)$response['id_module'], 1);
+                $response = $questionnairesDao->get((int) $response['id_module'], 1);
             }
         }
             
@@ -334,23 +335,25 @@ class CoursesDAO
     /**
      * Checks whether a student has a course.
      * 
-     * @param       int $id_course Course id
-     * @param       int $id_student Student id
+     * @param       int idCourse Course id
+     * @param       int idStudent Student id
      * 
      * @return      bool If current student has the course
      * 
      * @throws      \InvalidArgumentException If bundle id or student id is 
      * empty or less than or equal to zero
      */
-    public function has_course(int $id_course, int $id_student) : bool
+    public function hasCourse(int $idCourse, int $idStudent) : bool
     {
-        if (empty($id_course) || $id_course <= 0)
+        if (empty($idCourse) || $idCourse <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($idStudent) || $idStudent <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         // Query construction
         $sql = $this->db->prepare("
@@ -363,7 +366,7 @@ class CoursesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_course, $id_student));
+        $sql->execute(array($idCourse, $idStudent));
         
         return $sql->fetch()['count'] > 0; 
     }
@@ -375,7 +378,7 @@ class CoursesDAO
      */
     public function getTotal() : int
     {
-        return (int)$this->db->query("
+        return (int) $this->db->query("
             SELECT  COUNT(*) AS total
             FROM    courses
         ")->fetch()['total'];

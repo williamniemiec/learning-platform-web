@@ -25,7 +25,7 @@
     		
     		<div class="form-group">
         		<label for="name">Name</label>
-        		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $user->get_name(); ?>" readonly />
+        		<input id="name" type="text" name="name" placeholder="Name" class="form-control" value="<?php echo $user->getName(); ?>" readonly />
         	</div>
         	
         	<div class="form-group">
@@ -40,7 +40,7 @@
         	
         	<div class="form-group">
         		<label for="birthdate">Birthdate</label>
-        		<input id="birthdate" type="date" name="birthdate" class="form-control" value="<?php echo $user->get_birthdate()->format("Y-m-d"); ?>" readonly />
+        		<input id="birthdate" type="date" name="birthdate" class="form-control" value="<?php echo $user->getBirthdate()->format("Y-m-d"); ?>" readonly />
         	</div>
         	
         	<div class="form-group">
@@ -60,5 +60,5 @@
 </div>
 
 <!-- Modals -->
-<?php $this->load_view('settings/UpdateProfilePhotoModal'); ?>
-<?php $this->load_view('settings/ChangePasswordModal'); ?>
+<?php $this->loadView('settings/UpdateProfilePhotoModal'); ?>
+<?php $this->loadView('settings/ChangePasswordModal'); ?>

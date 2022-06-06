@@ -12,17 +12,13 @@ use repositories\Database;
 
 /**
  * Responsible for representing modules.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Module implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_module;
+    private $idModule;
     private $name;
     private $db;
     
@@ -38,7 +34,7 @@ class Module implements \JsonSerializable
      */
     public function __construct(int $id_module, string $name)
     {
-        $this->id_module = $id_module;
+        $this->idModule = $id_module;
         $this->name = $name;
     }
     
@@ -53,7 +49,7 @@ class Module implements \JsonSerializable
      */
     public function getCourseId() : int
     {
-        return $this->id_module;
+        return $this->idModule;
     }
     
     /**
@@ -84,29 +80,31 @@ class Module implements \JsonSerializable
      * 
      * @implNote    Lazy initialization
      */
-    public function getClasses(?Database $db = null) : array
+    public function get_classes(?Database $db = null) : array
     {
-        if (empty($db) && empty($this->db))
+        if (empty($db) && empty($this->db)) {
             throw new IllegalStateException("No database has been set");
+        }
         
-        // Sets database
-        if (empty($db))
+        // Sets database 
+        if (empty($db)) {
             $db = $this->db;
+        }
             
         if (empty($this->classes)) {
             $this->classes = array();
             $videos = new VideosDAO($db);
             $questionnaires = new QuestionnairesDAO($db);
             
-            $classes_video = $videos->getAllFromModule($this->id_module);
-            $classes_questionnaire = $questionnaires->getAllFromModule($this->id_module);
+            $classes_video = $videos->getAllFromModule($this->idModule);
+            $classes_questionnaire = $questionnaires->getAllFromModule($this->idModule);
             
             foreach ($classes_video as $class) {
-                $this->classes[$class->get_class_order()] = $class;
+                $this->classes[$class->getClassOrder()] = $class;
             }
             
             foreach ($classes_questionnaire as $class) {
-                $this->classes[$class->get_class_order()] = $class;
+                $this->classes[$class->getClassOrder()] = $class;
             }
         }
         
@@ -131,7 +129,7 @@ class Module implements \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'id_module' => $this->id_module,
+            'id_module' => $this->idModule,
             'name' => $this->name
         );
     }

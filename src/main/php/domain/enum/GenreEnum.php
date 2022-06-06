@@ -9,10 +9,6 @@ use domain\util\Enumeration;
 
 /**
  * Contains genre types.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class GenreEnum extends Enumeration
 {

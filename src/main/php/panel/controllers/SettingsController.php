@@ -60,7 +60,7 @@ class SettingsController extends Controller
             'user' => $admin
         );
         
-        $this->load_template("settings/SettingsView", $viewArgs);
+        $this->loadTemplate("settings/SettingsView", $viewArgs);
     }
     
     /**
@@ -95,7 +95,7 @@ class SettingsController extends Controller
             'user' => $admin
         );
         
-        $this->load_template("settings/SettingsEditView", $viewArgs);
+        $this->loadTemplate("settings/SettingsEditView", $viewArgs);
     }
     
     
@@ -111,7 +111,7 @@ class SettingsController extends Controller
      *
      * @apiNote     Must be called using POST request method
      */
-    public function update_password()
+    public function updatePassword()
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST')
             header("Location: ".BASE_URL);

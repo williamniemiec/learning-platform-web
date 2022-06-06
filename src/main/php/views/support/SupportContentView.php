@@ -6,21 +6,21 @@
 		<div class="view_content">
             <!-- Topic actions -->
             <?php if ($topic->isClosed()): ?>
-    			<a href="<?php echo BASE_URL."support/unlock/".$topic->get_id(); ?>" class="btn_theme" >Open</a>
+    			<a href="<?php echo BASE_URL."support/unlock/".$topic->getId(); ?>" class="btn_theme" >Open</a>
 			<?php else: ?>
-				<a href="<?php echo BASE_URL."support/lock/".$topic->get_id(); ?>" class="btn_theme" >Close</a>
+				<a href="<?php echo BASE_URL."support/lock/".$topic->getId(); ?>" class="btn_theme" >Close</a>
 			<?php endif; ?>
     		
     		<!-- Topic first message -->
         	<div class="message view_widget">
         		<div class="message_info">
             		<div class="message_author">
-            			<?php echo $topic->getCreator()->get_name(); ?>
+            			<?php echo $topic->getCreator()->getName(); ?>
             			<?php if ($topic->getCreator() instanceof Admin): ?>
             				<span class="privilege_admin">Admin</span>
         				<?php endif; ?>
         			</div>
-            		<div class="view_widget_info"><?php echo $topic->get_creation_date()->format("m-d-Y H:i:s"); ?></div>
+            		<div class="view_widget_info"><?php echo $topic->getCreationDate()->format("m-d-Y H:i:s"); ?></div>
         		</div>
         		<div class="message_content"><?php echo $topic->getContent(); ?></div>
         	</div>
@@ -30,7 +30,7 @@
         		<div class="message view_widget">
             		<div class="message_info">
                 		<div class="message_author">
-                			<?php echo $reply->getCreator()->get_name(); ?>
+                			<?php echo $reply->getCreator()->getName(); ?>
                 			<?php if ($reply->getCreator() instanceof Admin): ?>
                 				<span class="privilege_admin">Admin</span>
             				<?php endif; ?>

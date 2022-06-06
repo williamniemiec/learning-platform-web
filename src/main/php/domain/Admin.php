@@ -7,12 +7,9 @@ namespace domain;
 use DateTime;
 use domain\enum\GenreEnum;
 
+
 /**
  * Responsible for representing admin-type users.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Admin extends User
 {

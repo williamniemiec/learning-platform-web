@@ -6,10 +6,6 @@ namespace domain;
 
 /**
  * Responsible for representing video-type classes.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Video extends _Class
 {
@@ -18,7 +14,7 @@ class Video extends _Class
     //-------------------------------------------------------------------------
     private $title;
     private $description;
-    private $videoID;
+    private $videoId;
     private $length;
     
     
@@ -32,7 +28,7 @@ class Video extends _Class
      * @param       int $class_order Class order inside the module to which the
      * class belongs
      * @param       string $title Class title
-     * @param       string $videoID Class video URL (must be from YouTube). 
+     * @param       string video_id Class video URL (must be from YouTube). 
      * Must be in the following format:
      * <ul>
      *  <li><b>Youtube URL:</b> https://www.youtube.com/watch?v=abcdefghijk</li>
@@ -42,12 +38,12 @@ class Video extends _Class
      * @param       string $description [Optional] Class description
      */
     public function __construct(int $id_module, int $class_order, string $title,
-        string $videoID, int $length, ?string $description = '')
+        string $video_id, int $length, ?string $description = '')
     {
-        $this->id_module = $id_module;
-        $this->class_order = $class_order;
+        $this->idModule = $id_module;
+        $this->classOrder = $class_order;
         $this->title = $title;
-        $this->videoID = $videoID;
+        $this->videoId = $video_id;
         $this->length = $length;
         $this->description = empty($description) ? '' : $description;
     }
@@ -73,7 +69,7 @@ class Video extends _Class
      */
     public function getVideoId() : string
     {
-        return $this->videoID;
+        return $this->videoId;
     }
     
     /**
@@ -113,7 +109,7 @@ class Video extends _Class
         $json['type'] = 'video';
         $json['title'] = $this->title;
         $json['description'] = $this->description;
-        $json['videoID'] = $this->videoID;
+        $json['videoID'] = $this->videoId;
         $json['length'] = $this->length;
         
         return $json;

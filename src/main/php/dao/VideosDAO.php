@@ -11,10 +11,6 @@ use domain\Video;
 
 /**
  * Responsible for managing 'videos' table.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class VideosDAO extends ClassesDAO
 {
@@ -38,8 +34,8 @@ class VideosDAO extends ClassesDAO
     /**
      * Gets video from a class.
      *
-     * @param       int $id_module Module id that the class belongs to
-     * @param       int $class_order Class order inside the module that it 
+     * @param       int idModule Module id that the class belongs to
+     * @param       int classOrder Class order inside the module that it 
      * belongs to
      *
      * @return      Video Video class or null if class does not exist
@@ -47,15 +43,17 @@ class VideosDAO extends ClassesDAO
      * @throws      \InvalidArgumentException If module id or class order is 
      * empty or less than or equal to zero
      */
-    public function get(int $id_module, int $class_order) : ?Video
+    public function get(int $idModule, int $classOrder) : ?Video
     {
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
-        if (empty($class_order) || $class_order <= 0)
+        if (empty($classOrder) || $classOrder <= 0) {
             throw new \InvalidArgumentException("Class order cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         $response = null;
         
@@ -67,18 +65,18 @@ class VideosDAO extends ClassesDAO
         ");
         
         // Executes query
-        $sql->execute(array($id_module, $class_order));
+        $sql->execute(array($idModule, $classOrder));
         
         // Parses results
         if ($sql->rowCount() > 0) {
             $class = $sql->fetch();
             
             $response = new Video(
-                (int)$class['id_module'],
-                (int)$class['class_order'],
+                (int) $class['id_module'],
+                (int) $class['class_order'],
                 $class['title'],
                 $class['videoID'],
-                (int)$class['length'],
+                (int) $class['length'],
                 $class['description']
             ); 
         }
@@ -89,7 +87,7 @@ class VideosDAO extends ClassesDAO
     /**
      * Gets all video classes from a module.
      * 
-     * @param       int $id_module Module id
+     * @param       int idModule Module id
      * 
      * @return      Video[] Classes that belongs to the module
      * 
@@ -98,11 +96,12 @@ class VideosDAO extends ClassesDAO
      * 
      * @Override
      */
-    public function getAllFromModule(int $id_module) : array
+    public function getAllFromModule(int $idModule) : array
     {
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($idModule) || $idModule <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
             
         $response = array();
         
@@ -112,18 +111,18 @@ class VideosDAO extends ClassesDAO
             WHERE   id_module = ?
         ");
         
-        $sql->execute(array($id_module));
+        $sql->execute(array($idModule));
         
         if ($sql->rowCount() > 0) {
             $classes =  $sql->fetchAll();
             
             foreach ($classes as $class) {
                 $response[] = new Video(
-                    (int)$class['id_module'], 
-                    (int)$class['class_order'], 
+                    (int) $class['id_module'], 
+                    (int) $class['class_order'], 
                     $class['title'], 
                     $class['videoID'], 
-                    (int)$class['length'],
+                    (int) $class['length'],
                     $class['description']
                 );
             }
@@ -148,7 +147,7 @@ class VideosDAO extends ClassesDAO
      * {@inheritdoc}
      * @Override
      */
-    public function was_watched(int $id_student, int $id_module, int $class_order) : bool
+    public function wasWatched(int $idStudent, int $idModule, int $classOrder) : bool
     {
         $sql = $this->db->prepare("
             SELECT  COUNT(*) AS was_watched
@@ -159,7 +158,7 @@ class VideosDAO extends ClassesDAO
                     class_order = ?
         ");
         
-        $sql->execute(array($id_student, $id_module, $class_order));
+        $sql->execute(array($idStudent, $idModule, $classOrder));
         
         return $sql->fetch()['was_watched'] > 0;
     }
@@ -167,9 +166,9 @@ class VideosDAO extends ClassesDAO
     /**
      * Marks a class as watched by a student.
      * 
-     * @param       int $id_student Student id
-     * @param       int $id_module Module id
-     * @param       int $class_order Class order
+     * @param       int $idStudent Student id
+     * @param       int $idModule Module id
+     * @param       int $classOrder Class order
      * 
      * @return      bool If class has been successfully added to student history
      * 
@@ -177,9 +176,9 @@ class VideosDAO extends ClassesDAO
      * 
      * @Override
      */
-    public function mark_as_watched(int $id_student, int $id_module, int $class_order) : bool
+    public function markAsWatched(int $idStudent, int $idModule, int $classOrder) : bool
     {
-        return $this->_markAsWatched($id_student, $id_module, $class_order,
+        return $this->_MarkAsWatched($idStudent, $idModule, $classOrder,
             new ClassTypeEnum(ClassTypeEnum::VIDEO));
     }
 }

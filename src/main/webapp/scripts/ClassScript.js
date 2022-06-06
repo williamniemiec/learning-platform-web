@@ -44,7 +44,7 @@ $(function(){
 		// Marks class as watched
 		$.ajax({
 			type:"POST",
-			url:BASE_URL+"class/mark_watched",
+			url:BASE_URL+"class/markWatched",
 			data:{id_module, class_order, type:1}
 		})
 	})
@@ -119,7 +119,7 @@ function markAsWatched(id_module, class_order)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL + "class/mark_watched",
+		url:BASE_URL + "class/markWatched",
 		data:{id_module, class_order, type:0}
 	})
 	
@@ -142,7 +142,7 @@ function removeWatched(id_module, class_order)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL + "class/remove_watched",
+		url:BASE_URL + "class/removeWatched",
 		data:{id_module, class_order, type:0}
 	})
 	
@@ -275,7 +275,7 @@ function getStudentLoggedIn()
 	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL + "home/get_student_logged_in",
+		url:BASE_URL + "home/getStudentLoggedIn",
 		async:false,
 		datatype:'json',
 		success:(s) => {
@@ -298,7 +298,7 @@ function deleteComment(obj, id_comment)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL + "class/delete_comment",
+		url:BASE_URL + "class/deleteComment",
 		data:{id_comment},
 		success:function() {
 			$(obj).closest(".comment").hide("slow")
@@ -320,7 +320,7 @@ function new_reply(obj, id_comment)
 	
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"class/add_reply",
+		url:BASE_URL+"class/addReply",
 		data:{id_comment, content},
 		success: (id) => {
 			const creator = getStudentLoggedIn()
@@ -368,7 +368,7 @@ function delete_reply(obj, id_reply)
 {
 	$.ajax({
 		type:"POST",
-		url:BASE_URL+"class/remove_reply",
+		url:BASE_URL+"class/removeReply",
 		data:{id_reply:id_reply},
 		success:function() {
 			$(obj).closest(".comment_reply_content").hide("slow")

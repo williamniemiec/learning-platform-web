@@ -30,8 +30,8 @@ class CoursesController extends Controller
      */
     public function __construct()
     {
-        if (!Student::is_logged()) {
-            $this->redirect_to("login");
+        if (!Student::isLogged()) {
+            $this->redirectTo("login");
         }
     }
     
@@ -44,7 +44,7 @@ class CoursesController extends Controller
      */
     public function index ()
     { 
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
         $header = array(
             'title' => 'My courses - Learning Platform',
@@ -54,22 +54,22 @@ class CoursesController extends Controller
             'robots' => 'noindex'
         );
         
-        $student = Student::get_logged_in($db_connection);
-        $courses_dao = new CoursesDAO($db_connection);
-        $notebook_dao = new NotebookDAO($db_connection, $student->get_id());
-        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
-        $courses = $courses_dao->get_my_courses($student->get_id());
-        $notes = $notebook_dao->get_all(4);
-        $total_notes = $notebook_dao->count();
+        $student = Student::getLoggedIn($dbConnection);
+        $coursesDao = new CoursesDAO($dbConnection);
+        $notebookDao = new NotebookDAO($dbConnection, $student->getId());
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
+        $courses = $coursesDao->getMyCourses($student->getId());
+        $notes = $notebookDao->getAll(4);
+        $total_notes = $notebookDao->count();
         
-		$view_args = array(
-		    'username' => $student->get_name(),
+		$viewArgs = array(
+		    'username' => $student->getName(),
 		    'courses' => $courses,
 		    'totalCourses' => count($courses),
 		    'header' => $header,
 		    'notifications' => array(
-		        'notifications' => $notifications_dao->get_notifications(10),
-		        'total_unread' => $notifications_dao->count_unread_notification()),
+		        'notifications' => $notificationsDao->getNotifications(10),
+		        'total_unread' => $notificationsDao->countUnreadNotification()),
 		    'scripts' => array('ProgressChart'),
 		    'scriptsModule' => array('MyCoursesScript'),
 		    'notebook' => $notes,
@@ -77,14 +77,14 @@ class CoursesController extends Controller
 		);
 
 		// Checks if it is student's birthdate
-		if ($student->get_birthdate()->format("m-d") == (new \DateTime())->format("m-d")) {
-		    $students_dao = new StudentsDAO($db_connection);
-		    $historic_info = $students_dao->get_total_watched_classes();
-		    $view_args['totalWatchedVideos'] = $historic_info['total_classes_watched'];
-		    $view_args['totalWatchedLength'] = $historic_info['total_length_watched'];
+		if ($student->getBirthdate()->format("m-d") == (new \DateTime())->format("m-d")) {
+		    $studentsDao = new StudentsDAO($dbConnection);
+		    $historicInfo = $studentsDao->getTotalWatchedClasses();
+		    $viewArgs['totalWatchedVideos'] = $historicInfo['total_classes_watched'];
+		    $viewArgs['totalWatchedLength'] = $historicInfo['total_length_watched'];
 		}
         
-        $this->load_template("MyCoursesView", $view_args, Student::is_logged());
+        $this->loadTemplate("MyCoursesView", $viewArgs, Student::isLogged());
     }
     
     /**
@@ -92,100 +92,100 @@ class CoursesController extends Controller
      * watched by the student. If he never watched one, the first class from
      * the first module will open.
      * 
-     * @param       int $id_course Course id
-     * @param       int $id_module [Optional] Module id to which the class 
+     * @param       int idCourse Course id
+     * @param       int idModule [Optional] Module id to which the class 
      * belongs
-     * @param       int $class_order [Optional] Class order in module
+     * @param       int classOrder [Optional] Class order in module
      */
-    public function open(int $id_course, int $id_module = -1, int $class_order = -1) : void
+    public function open(int $idCourse, int $idModule = -1, int $classOrder = -1) : void
     {
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
         
-        $student = Student::get_logged_in($db_connection);
-        $students = new StudentsDAO($db_connection, $student->get_id());
-        $courses = new CoursesDAO($db_connection);
-        $historic = new HistoricDAO($db_connection, $student->get_id());
-        $notifications_dao = new NotificationsDAO($db_connection, $student->get_id());
+        $student = Student::getLoggedIn($dbConnection);
+        $students = new StudentsDAO($dbConnection, $student->getId());
+        $courses = new CoursesDAO($dbConnection);
+        $historic = new HistoricDAO($dbConnection, $student->getId());
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
         
         
         // If student is not enrolled in the course, redirects it to home page
-        if (!$courses->has_course($id_course, $student->get_id())) {
-            $this->redirect_to_root();
+        if (!$courses->hasCourse($idCourse, $student->getId())) {
+            $this->redirectToRoot();
         }
         
-        if ($id_module > 0 && $class_order > 0) {
-            $videos_dao = new VideosDAO($db_connection);
-            $class = $videos_dao->get($id_module, $class_order);
+        if ($idModule > 0 && $classOrder > 0) {
+            $videosDao = new VideosDAO($dbConnection);
+            $class = $videosDao->get($idModule, $classOrder);
             
             if (empty($class)) {
-                $questionnaires_dao = new QuestionnairesDAO($db_connection);
-                $class = $questionnaires_dao->get($id_module, $class_order);
+                $questionnairesDao = new QuestionnairesDAO($dbConnection);
+                $class = $questionnairesDao->get($idModule, $classOrder);
             }
         }
         else {
-            $class = $students->get_last_class_watched($id_course);
+            $class = $students->getLastClassWatched($idCourse);
         }
             
         // Gets class to be opened
         if (empty($class)) {
-            $class = $courses->get_first_class_from_first_module($id_course);
+            $class = $courses->getFirstClassFromFirstModule($idCourse);
         }
         
         // Gets information about current course
-        $course = $courses->get($id_course);
+        $course = $courses->get($idCourse);
 
         // Gets class information
         if (empty($class)) {
             $name = 'No classes';
             //$class['type'] = "noClasses";
-            $class_content = array(
+            $classContent = array(
                 'message' => 'There are no registered classes'
             );
             $view = "noClasses";
         } 
         else {
             if ($class instanceof Video) {
-                $comments_dao = new CommentsDAO($db_connection);
-                $videos_dao = new VideosDAO($db_connection);
-                $notebook_dao = new NotebookDAO($db_connection, $student->get_id());
+                $commentsDao = new CommentsDAO($dbConnection);
+                $videosDao = new VideosDAO($dbConnection);
+                $notebookDao = new NotebookDAO($dbConnection, $student->getId());
   
                 $name = $class->getTitle();
                 $limit = 2;
                 
-                $class_content = array(
-                    'id_course' => $id_course,
+                $classContent = array(
+                    'id_course' => $idCourse,
                     'class' => $class,
-                    'comments' => $comments_dao->get_comments(
-                        $class->get_module_id(), 
-                        $class->get_class_order()
+                    'comments' => $commentsDao->getComments(
+                        $class->getModuleId(), 
+                        $class->getClassOrder()
                     ),
-                    'watched' => $videos_dao->was_watched(
-                        $student->get_id(), $class->get_module_id(),
-                        $class->get_class_order()
+                    'watched' => $videosDao->wasWatched(
+                        $student->getId(), $class->getModuleId(),
+                        $class->getClassOrder()
                     ),
-                    'notebook' => $notebook_dao->get_all_from_class(
-                        $class->get_module_id(),
-                        $class->get_class_order(),
+                    'notebook' => $notebookDao->getAllFromClass(
+                        $class->getModuleId(),
+                        $class->getClassOrder(),
                         $limit
                     ),
-                    'totalPages' => floor($notebook_dao->count_all_from_class(
-                        $class->get_module_id(),
-                        $class->get_class_order()
+                    'totalPages' => floor($notebookDao->countAllFromClass(
+                        $class->getModuleId(),
+                        $class->getClassOrder()
                     ) / $limit)
                 );
                 
                 $view = "class_video";
             }
             else {
-                $questionnaires_dao = new QuestionnairesDAO($db_connection);
+                $questionnairesDao = new QuestionnairesDAO($dbConnection);
                 
                 $name = "Questionnaire";
                 
-                $class_content = array(
+                $classContent = array(
                     'class' => $class,
-                    'watched' => $questionnaires_dao->was_watched(
-                        $student->get_id(), $class->get_module_id(), 
-                        $class->get_class_order()
+                    'watched' => $questionnairesDao->wasWatched(
+                        $student->getId(), $class->getModuleId(), 
+                        $class->getClassOrder()
                     )
                 );
                 
@@ -194,47 +194,47 @@ class CoursesController extends Controller
         }
         
         $header = array(
-            'title' => $course->get_name().' - Learning platform',
+            'title' => $course->getName().' - Learning platform',
             'styles' => array('courses', 'mobile_menu_button', 'NotebookStyle'),
             'description' => $name,
             'robots' => 'noindex'
         );
         
-        $view_args = array(
+        $viewArgs = array(
             'header' => $header,
             'scripts' => array('ClassScript'),
             'scriptsModule' => array('ClassNotebookScript'),
-            'username' => $student->get_name(),
+            'username' => $student->getName(),
             'view' => 'class/'.$view,
             'info_menu' => array(
-                'id_course' => $id_course,
-                'modules' => $course->get_modules($db_connection, true),
-                'watched_classes' => $historic->get_watched_classes_from_course($id_course),
-                'logo' => $course->get_logo()
+                'id_course' => $idCourse,
+                'modules' => $course->getModules($dbConnection, true),
+                'watched_classes' => $historic->getWatchedClassesFromCourse($idCourse),
+                'logo' => $course->getLogo()
             )
         );
         
         if (!empty($class)) {
-            $view_args['info_course'] = array(
+            $viewArgs['info_course'] = array(
                 'title' => $name,
-                'wasWatched' => $class_content['watched']
+                'wasWatched' => $classContent['watched']
             );
             
-            $view_args['info_class'] = array(
+            $viewArgs['info_class'] = array(
                 'class' => $class,
-                'total' => $courses->count_classes($id_course),
-                'totalWatchedClasses' => $historic->count_watched_classes($id_course),
-                'wasWatched' => $class_content['watched']
+                'total' => $courses->countClasses($idCourse),
+                'totalWatchedClasses' => $historic->countWatchedClasses($idCourse),
+                'wasWatched' => $classContent['watched']
             );
         }
         
-        $view_args['classContent'] = $class_content;
-        $view_args['notifications'] = array(
-            'notifications' => $notifications_dao->get_notifications(10),
-            'total_unread' => $notifications_dao->count_unread_notification()
+        $viewArgs['classContent'] = $classContent;
+        $viewArgs['notifications'] = array(
+            'notifications' => $notificationsDao->getNotifications(10),
+            'total_unread' => $notificationsDao->countUnreadNotification()
         );
         
-        $this->load_template("class/course", $view_args);
+        $this->loadTemplate("class/course", $viewArgs);
     }
     
     
@@ -253,16 +253,16 @@ class CoursesController extends Controller
     public function search()
     {
         // Checks if it is an ajax request
-        if ($this->get_http_request_method() != 'POST') {
-            $this->redirect_to_root();
+        if ($this->getHttpRequestMethod() != 'POST') {
+            $this->redirectToRoot();
         }
         
-        $db_connection = new MySqlPDODatabase();
+        $dbConnection = new MySqlPDODatabase();
             
-        $courses_dao = new CoursesDAO($db_connection);
+        $coursesDao = new CoursesDAO($dbConnection);
         
-        echo json_encode($courses_dao->get_my_courses(
-            Student::get_logged_in($db_connection)->get_id(), 
+        echo json_encode($coursesDao->getMyCourses(
+            Student::getLoggedIn($dbConnection)->getId(), 
             $_POST['text']
         ));
     }

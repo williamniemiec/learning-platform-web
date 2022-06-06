@@ -9,10 +9,6 @@ use domain\enum\GenreEnum;
 
 /**
  * Responsible for representing users. An user can be a student or an admin.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 abstract class User implements \JsonSerializable
 {
@@ -34,7 +30,7 @@ abstract class User implements \JsonSerializable
      * 
      * @return      int User id
      */
-    public function get_id() : int
+    public function getId() : int
     {
         return $this->id;
     }
@@ -44,7 +40,7 @@ abstract class User implements \JsonSerializable
      * 
      * @return      string name
      */
-    public function get_name() : string
+    public function getName() : string
     {
         return $this->name;
     }
@@ -79,7 +75,7 @@ abstract class User implements \JsonSerializable
      *
      * @return      User Itself to allow chained calls
      */
-    public function set_genre(GenreEnum $genre) : User
+    public function setGenre(GenreEnum $genre) : User
     {
         $this->genre = $genre;
         return $this;
@@ -90,7 +86,7 @@ abstract class User implements \JsonSerializable
      * 
      * @return      DateTime User birthdate
      */
-    public function get_birthdate() : DateTime
+    public function getBirthdate() : DateTime
     {
         return $this->birthdate;
     }
@@ -102,7 +98,7 @@ abstract class User implements \JsonSerializable
      *
      * @return      User Itself to allow chained calls
      */
-    public function set_birthdate(\DateTime $birthdate) : User
+    public function setBirthdate(\DateTime $birthdate) : User
     {
         $this->birthdate = $birthdate;
         return $this;

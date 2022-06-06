@@ -11,17 +11,13 @@ use dao\BundlesDAO;
 
 /**
  * Responsible for representing bundles.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Bundle implements \JsonSerializable
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
-    private $id_bundle;
+    private $idBundle;
     private $name;
     private $price;
     private $logo;
@@ -46,7 +42,7 @@ class Bundle implements \JsonSerializable
     public function __construct(int $id_bundle, string $name, float $price, 
         ?string $logo = '', ?string $description = '')
     {
-        $this->id_bundle = $id_bundle;
+        $this->idBundle = $id_bundle;
         $this->name = $name;
         $this->price = $price;
         $this->logo = empty($logo) ? '' : $logo;
@@ -64,7 +60,7 @@ class Bundle implements \JsonSerializable
      */
     public function getId() : int
     {
-        return $this->id_bundle;
+        return $this->idBundle;
     }
     
     /**
@@ -72,7 +68,7 @@ class Bundle implements \JsonSerializable
      *
      * @return      string Bundle name
      */
-    public function get_name() : string
+    public function getName() : string
     {
         return $this->name;
     }
@@ -104,7 +100,7 @@ class Bundle implements \JsonSerializable
      * @return      string Bundle description or empty string if
      * bundle does not have a description
      */
-    public function get_description() : string
+    public function getDescription() : string
     {
         return $this->description;
     }
@@ -119,12 +115,12 @@ class Bundle implements \JsonSerializable
      * 
      * @implNote    Lazy initialization
      */
-    public function get_courses(Database $db) : array
+    public function getCourses(Database $db) : array
     {
         if (empty($this->courses)) {
             $courses = new CoursesDAO($db);
             
-            $this->courses = $courses->getFromBundle($this->id_bundle);
+            $this->courses = $courses->getFromBundle($this->idBundle);
         }
         
         return $this->courses;
@@ -139,11 +135,11 @@ class Bundle implements \JsonSerializable
      * 
      * @implNote    Lazy initialization
      */
-    public function get_total_length(Database $db) : int
+    public function getTotalLength(Database $db) : int
     {
         if (empty($this->totalLength)) {
             $bundles = new BundlesDAO($db);
-            $total = $bundles->countTotalClasses($this->id_bundle);
+            $total = $bundles->countTotalClasses($this->idBundle);
             
             $this->totalLength = $total['total_length'];
             $this->totalClasses = $total['total_classes'];
@@ -161,11 +157,11 @@ class Bundle implements \JsonSerializable
      *
      * @implNote    Lazy initialization
      */
-    public function get_total_classes(Database $db) : int
+    public function getTotalClasses(Database $db) : int
     {
         if (empty($this->totalClasses)) {
             $bundles = new BundlesDAO($db);
-            $total = $bundles->countTotalClasses($this->id_bundle);
+            $total = $bundles->countTotalClasses($this->idBundle);
             
             $this->totalLength = $total['total_length'];
             $this->totalClasses = $total['total_classes'];
@@ -187,7 +183,7 @@ class Bundle implements \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'id' => $this->id_bundle,
+            'id' => $this->idBundle,
             'name' => $this->name,
             'price' => $this->price,
             'logo' => $this->logo,

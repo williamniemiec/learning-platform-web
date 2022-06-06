@@ -7,10 +7,6 @@ namespace domain\util;
 /**
  * Responsible for representing enumerations. The operation consists of setting
  * an enumeration (selecting it) and obtaining it when desired.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Enumeration
 {
@@ -26,8 +22,9 @@ class Enumeration
      */
     public final function __construct($enum = null)
     {
-        if (!empty($enum) || (empty($enum) && $enum == '0'))
+        if (!empty($enum) || (empty($enum) && $enum == '0')) {
             $this->selected = $enum;
+        }
     }
     
     //-------------------------------------------------------------------------

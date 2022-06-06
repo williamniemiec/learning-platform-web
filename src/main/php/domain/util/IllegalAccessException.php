@@ -5,10 +5,6 @@ namespace domain\util;
 /**
  * An IllegalAccessException is thrown when an application tries to do 
  * something and it does not have permission to do it.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class IllegalAccessException extends \Exception
 {
@@ -20,7 +16,7 @@ class IllegalAccessException extends \Exception
      * thrown when an application tries to do something and it does not have
      * permission to do it.
      *
-     * @param       string $messsage [Optional] Message
+     * @param       string $message [Optional] Message
      */
     public function __construct($message = '')
     {

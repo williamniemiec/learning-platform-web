@@ -72,7 +72,7 @@ class ClassesController extends Controller
         }
         
         usort($classes, function($c1, $c2) {
-            return $c1->getModule()->get_name() > $c2->getModule()->get_name();
+            return $c1->getModule()->getName() > $c2->getModule()->getName();
         });
         
         $header = array(

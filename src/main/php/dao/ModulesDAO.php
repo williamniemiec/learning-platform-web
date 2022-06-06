@@ -6,15 +6,10 @@ namespace dao;
 
 use repositories\Database;
 use domain\Module;
-use domain\_Class;
 
 
 /**
  * Responsible for managing 'modules' table.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class ModulesDAO
 {
@@ -53,9 +48,10 @@ class ModulesDAO
      */
     public function getFromCourse(int $id_course) : array
     {
-        if (empty($id_course) || $id_course <= 0)
+        if (empty($id_course) || $id_course <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = array();
         
@@ -87,11 +83,11 @@ class ModulesDAO
     }
     
     /**
-     * Gets informations about all classes from a module.
+     * Gets information about all classes from a module.
      *
      * @param       int $id_module Module id
      *
-     * @return      array Informations about all classes from the module. The
+     * @return      array Information about all classes from the module. The
      * returned array has the following format:
      * <ul>
      *  <li><b>Key</b>: Class order inside this module</li>
@@ -103,9 +99,10 @@ class ModulesDAO
      */
     public function getClassesFromModule(int $id_module) : array
     {
-        if (empty($id_module) || $id_module <= 0)
+        if (empty($id_module) || $id_module <= 0) {
             throw new \InvalidArgumentException("Module id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = array();
         $videos = new VideosDAO($this->db);
@@ -119,11 +116,11 @@ class ModulesDAO
         
         // Creates response array
         foreach ($class_video as $class) {
-            $response[$class->get_class_order()] = $class;
+            $response[$class->getClassOrder()] = $class;
         }
         
         foreach ($class_questionnaire as $class) {
-            $response[$class->get_class_order()] = $class;
+            $response[$class->getClassOrder()] = $class;
         }
         
         return $response;

@@ -8,10 +8,6 @@ use DateTime;
 
 /**
  * Responsible for representing notebook notes.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Note implements \JsonSerializable
 {
@@ -56,7 +52,7 @@ class Note implements \JsonSerializable
      * 
      * @return      int Annotation id
      */
-    public function get_id() : int
+    public function getId() : int
     {
         return $this->id_note;
     }
@@ -86,7 +82,7 @@ class Note implements \JsonSerializable
      *
      * @return      DateTime Creation date
      */
-    public function get_creation_date() : DateTime
+    public function getCreationDate() : DateTime
     {
         return $this->date;
     }
@@ -96,7 +92,7 @@ class Note implements \JsonSerializable
      *
      * @return      Video Class associated with the annotation.
      */
-    public function get_class() : Video
+    public function getClass() : Video
     {
         return $this->class;
     }

@@ -38,7 +38,7 @@ class ChartProgress
 	{
 		$.ajax({
 			type:'POST',
-			url:BASE_URL+"home/weekly_progress",
+			url:BASE_URL+"home/weeklyProgress",
 			datatype:'json',
 			async:false,
 			success:(json) => {

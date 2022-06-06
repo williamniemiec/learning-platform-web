@@ -9,10 +9,6 @@ use repositories\Database;
 
 /**
  * Responsible for managing 'student_historic' table.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class HistoricDAO
 {
@@ -20,7 +16,7 @@ class HistoricDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_student;
+    private $idStudent;
     
     
     //-------------------------------------------------------------------------
@@ -34,13 +30,14 @@ class HistoricDAO
      * @throws      \InvalidArgumentException If student id is empty or less 
      * than or equal to zero
      */
-    public function __construct(Database $db, int $id_student)
+    public function __construct(Database $db, int $idStudent)
     {
-        if (empty($id_student) || $id_student <= 0)
+        if (empty($idStudent) || $idStudent <= 0) {
             throw new \InvalidArgumentException("Student id cannot be empty or ". 
                 "less than or equal to zero");
+        }
         
-        $this->id_student = $id_student;
+        $this->idStudent = $idStudent;
         $this->db = $db->getConnection();
     }
     
@@ -51,18 +48,19 @@ class HistoricDAO
     /**
      * Gets total watched classes by a student in a course.
      * 
-     * @param       int $id_course Course id
+     * @param       int idCourse Course id
      * 
      * @return      int Watched classes
      * 
      * @throws      \InvalidArgumentException If course id is empty or less 
      * than or equal to zero
      */
-    public function count_watched_classes(int $id_course) : int
+    public function countWatchedClasses(int $idCourse) : int
     {
-        if (empty($id_course) || $id_course <= 0)
+        if (empty($idCourse) || $idCourse <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty or ". 
                 "less than or equal to zero");
+        }
         
         // Query construction
         $sql = $this->db->prepare("
@@ -72,9 +70,9 @@ class HistoricDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student, $id_course));
+        $sql->execute(array($this->idStudent, $idCourse));
         
-        return (int)$sql->fetch()['watchedClasses'];
+        return (int) $sql->fetch()['watchedClasses'];
     }
 
     /**
@@ -91,14 +89,14 @@ class HistoricDAO
         ");
 
         // Executes query
-        $sql->execute(array($this->id_student))->rowCount() > 0;
+        $sql->execute(array($this->idStudent))->rowCount() > 0;
     }
     
     /**
      * 
      * Gets all classes classes watched by the student.
      * 
-     * @param       int $id_course Course id
+     * @param       int idCourse Course id
      * 
      * @return      array Classes watched by the student. It will return an 
      * array in the following format:
@@ -107,11 +105,12 @@ class HistoricDAO
      * @throws      \InvalidArgumentException If course id is empty or less 
      * than or equal to zero
      */
-    public function get_watched_classes_from_course(int $id_course)
+    public function getWatchedClassesFromCourse(int $idCourse)
     {
-        if (empty($id_course) || $id_course <= 0)
+        if (empty($idCourse) || $idCourse <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty or ".
                 "less than or equal to zero");
+        }
         
         $response = array();
             
@@ -126,7 +125,7 @@ class HistoricDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student, $id_course));
+        $sql->execute(array($this->idStudent, $idCourse));
         
         
         if ($sql && $sql->rowCount() > 0) {
@@ -149,7 +148,7 @@ class HistoricDAO
      *      student on this date</li>
      *  </ul>
      */
-    public function get_weekly_history() : array
+    public function getWeeklyHistory() : array
     {
         // Query construction
         $sql = $this->db->prepare("
@@ -165,7 +164,7 @@ class HistoricDAO
         $response = array();
         
         // Executes query
-        $sql->execute(array($this->id_student));
+        $sql->execute(array($this->idStudent));
         
         if (!empty($sql) && $sql->rowCount() > 0) {
             $i = 0;
@@ -178,6 +177,6 @@ class HistoricDAO
             }
         }
         
-        return $response;;
+        return $response;
     }
 }

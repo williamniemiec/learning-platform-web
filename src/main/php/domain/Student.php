@@ -12,10 +12,6 @@ use repositories\Database;
 
 /**
  * Responsible for representing student-type users.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Student extends User
 {
@@ -58,7 +54,7 @@ class Student extends User
      *
      * @return      bool If student is logged
      */
-    public static function is_logged() : bool
+    public static function isLogged() : bool
     {
         return !empty($_SESSION['s_login']);
     }
@@ -74,11 +70,12 @@ class Student extends User
      */
     public static function login(Database $db, string $email, string $password) : ?Student
     {
-        $studentsDAO = new StudentsDAO($db);
-        $student = $studentsDAO->login($email, $password);
+        $students_dao = new StudentsDAO($db);
+        $student = $students_dao->login($email, $password);
         
-        if (!empty($student))
-            $_SESSION['s_login'] = $student->get_id();
+        if (!empty($student)) {
+            $_SESSION['s_login'] = $student->getId();
+        }
         
         return $student;
     }
@@ -92,14 +89,15 @@ class Student extends User
      * @return      Student Student logged in or null if there is no student 
      * logged in
      */
-    public static function get_logged_in(Database $db) : ?Student
+    public static function getLoggedIn(Database $db) : ?Student
     {
-        if (empty($_SESSION['s_login']))
+        if (empty($_SESSION['s_login'])) {
             return null;
+        }
         
-        $studentsDAO = new StudentsDAO($db, $_SESSION['s_login']);
+        $students_dao = new StudentsDAO($db, $_SESSION['s_login']);
         
-        return $studentsDAO->get();
+        return $students_dao->get();
     }
     
     /**

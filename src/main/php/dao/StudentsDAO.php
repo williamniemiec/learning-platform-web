@@ -15,10 +15,6 @@ use domain\Purchase;
 
 /**
  * Responsible for managing 'students' table.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class StudentsDAO
 {
@@ -26,7 +22,7 @@ class StudentsDAO
     //        Attributes
     //-------------------------------------------------------------------------
     private $db;
-    private $id_student;
+    private $idStudent;
     
     
     //-------------------------------------------------------------------------
@@ -41,7 +37,7 @@ class StudentsDAO
     public function __construct(Database $db, int $id_student = -1)
     {
         $this->db = $db->getConnection();
-        $this->id_student = $id_student;
+        $this->idStudent = $id_student;
     }
 
 
@@ -61,11 +57,13 @@ class StudentsDAO
      */
     public function login(string $email, string $pass) : ?Student
     {
-        if (empty($email))
+        if (empty($email)) {
             throw new \InvalidArgumentException("Email cannot be empty");
+        }
         
-        if (empty($pass))
+        if (empty($pass)) {
             throw new \InvalidArgumentException("Password cannot be empty");
+        }
         
         $response = null;
             
@@ -83,7 +81,7 @@ class StudentsDAO
         if ($sql && $sql->rowCount() > 0) {
             $student = $sql->fetch();
             $response = new Student(
-                (int)$student['id_student'],
+                (int) $student['id_student'],
                 $student['name'],
                 new GenreEnum($student['genre']),
                 new \DateTime($student['birthdate']),
@@ -98,7 +96,7 @@ class StudentsDAO
     /**
      * Gets information about the logged in student.
      *
-     * @return      Student Informations about the student or null if student 
+     * @return      Student Information about the student or null if student 
      * does not exist
      * 
      * @throws      \InvalidArgumentException If student id provided in the 
@@ -106,9 +104,10 @@ class StudentsDAO
      */
     public function get() : ?Student
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
         
         $response = null;
         
@@ -120,14 +119,14 @@ class StudentsDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student));
+        $sql->execute(array($this->idStudent));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
             $student = $sql->fetch();
             
             $response = new Student(
-                (int)$student['id_student'],
+                (int) $student['id_student'],
                 $student['name'], 
                 new GenreEnum($student['genre']), 
                 new \DateTime($student['birthdate']), 
@@ -142,7 +141,7 @@ class StudentsDAO
     /**
      * Gets last class watched by the student.
      *
-     * @param       int $id_course Course id
+     * @param       int idCourse Course id
      *
      * @return      _Class Last class watched by the student or null if student
      * has never watched one 
@@ -150,15 +149,17 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor or course id is empty, less than or equal to zero
      */
-    public function get_last_class_watched(int $id_course) : ?_Class
+    public function getLastClassWatched(int $idCourse) : ?_Class
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
         
-        if (empty($id_course) || $id_course <= 0)
+        if (empty($idCourse) || $idCourse <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty ".
                 "or less than or equal to zero");
+        }
         
         $response = null;
         
@@ -179,7 +180,7 @@ class StudentsDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student, $id_course));
+        $sql->execute(array($this->idStudent, $idCourse));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
@@ -189,16 +190,16 @@ class StudentsDAO
                 $videos = new VideosDAO($this->db);
                 
                 $response = $videos->get(
-                    (int)$class['id_module'], 
-                    (int)$class['class_order']
+                    (int) $class['id_module'], 
+                    (int) $class['class_order']
                 ); 
             }
             else {
-                $questionnaries = new QuestionnairesDAO($this->db);
+                $questionnaires = new QuestionnairesDAO($this->db);
                 
-                $response = $questionnaries->get(
-                    (int)$class['id_module'],
-                    (int)$class['class_order']
+                $response = $questionnaires->get(
+                    (int) $class['id_module'],
+                    (int) $class['class_order']
                 ); 
             }
         }
@@ -211,20 +212,22 @@ class StudentsDAO
      *
      * @param       Student $student Informations about the student
      * @param       string $password Student password
-     * @param       bool $autologin [Optional] If true, after registration is
+     * @param       bool $autoLogin [Optional] If true, after registration is
      * completed the student will automatically login to the system
      *
      * @return      int Student id or -1 if the student has not been added
      *
      * @throws      \InvalidArgumentException If student or password are empty
      */
-    public function register(Student $student, string $password, bool $autologin = true) : int
+    public function register(Student $student, string $password, bool $autoLogin = true) : int
     {
-        if (empty($student))
+        if (empty($student)) {
             throw new \InvalidArgumentException("Student cannot be empty");
+        }
             
-        if (empty($password))
+        if (empty($password)) {
             throw new \InvalidArgumentException("Password cannot be empty");
+        }
                 
         $response = -1;
         
@@ -237,17 +240,18 @@ class StudentsDAO
                 
         // Executes query
         $sql->execute(array(
-            $student->get_name(),
+            $student->getName(),
             $student->getGenre()->get() == 1,
-            $student->get_birthdate()->format("Y-m-d"),
+            $student->getBirthdate()->format("Y-m-d"),
             $student->getEmail(),
             md5($password)
         ));
         
         // Parses results
         if ($sql && $sql->rowCount() > 0) {
-            if ($autologin)
+            if ($autoLogin) {
                 $_SESSION['s_login'] = $this->db->lastInsertId();
+            }
                 
             $response = $this->db->lastInsertId();
         }
@@ -266,8 +270,9 @@ class StudentsDAO
      */
     public function update(Student $student) : bool
     {
-        if (empty($student))
+        if (empty($student)) {
             throw new \InvalidArgumentException("Student cannot be empty");
+        }
 
         // Query construction
         $sql = $this->db->prepare("
@@ -278,10 +283,10 @@ class StudentsDAO
         
         // Executes query
         $sql->execute(array(
-            $student->get_name(), 
+            $student->getName(), 
             $student->getGenre()->get(), 
-            $student->get_birthdate()->format("Y-m-d"),
-            $student->get_id()
+            $student->getBirthdate()->format("Y-m-d"),
+            $student->getId()
         ));
         
         return $sql && $sql->rowCount() > 0;
@@ -297,9 +302,10 @@ class StudentsDAO
      */
     public function delete() : bool
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
         
         // Query construction
         $sql = $this->db->query("
@@ -308,7 +314,7 @@ class StudentsDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student));
+        $sql->execute(array($this->idStudent));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -330,8 +336,9 @@ class StudentsDAO
         $imageName = $this->getPhoto();
         
         // Deletes photo
-        if (!empty($imageName))
+        if (!empty($imageName)) {
             unlink("assets/img/profile_photos/".$imageName);
+        }
 
         if (!empty($photo)) {
             $filename = FileUtil::storePhoto($photo, "../assets/img/profile_photos/");
@@ -347,7 +354,7 @@ class StudentsDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student));
+        $sql->execute(array($this->idStudent));
         
         return $sql && $sql->rowCount() > 0;
     }
@@ -355,8 +362,8 @@ class StudentsDAO
     /**
      * Updates password from current student.
      * 
-     * @param       string $currentPassword Current student password
-     * @param       string $newPassword New password
+     * @param       string current_password Current student password
+     * @param       string new_password New password
      * 
      * @return      bool If password has been successfully updated
      * 
@@ -364,11 +371,13 @@ class StudentsDAO
      */
     public function updatePassword(string $currentPassword, string $newPassword) : bool
     {
-        if (empty($currentPassword))
+        if (empty($currentPassword)) {
             throw new \InvalidArgumentException("Current password cannot be empty");
+        }
         
-        if (empty($newPassword))
+        if (empty($newPassword)) {
             throw new \InvalidArgumentException("New password cannot be empty");
+        }
         
         $response = false;
         
@@ -380,7 +389,7 @@ class StudentsDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student));
+        $sql->execute(array($this->idStudent));
         
         // Checks if current password is correct
         if ($sql->fetch()['correctPassword'] > 0) {            
@@ -392,7 +401,7 @@ class StudentsDAO
             ");
             
             // Executes query
-            $sql->execute(array($this->id_student));
+            $sql->execute(array($this->idStudent));
             
             $response = $sql && $sql->rowCount() > 0;
         }
@@ -416,11 +425,12 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor is empty, less than or equal to zero
      */
-    public function get_total_watched_classes() : array
+    public function getTotalWatchedClasses() : array
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
         
         // Query construction
         $sql = $this->db->prepare("
@@ -441,7 +451,7 @@ class StudentsDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student, $this->id_student));
+        $sql->execute(array($this->idStudent, $this->idStudent));
         
         return $sql->fetch();
     }
@@ -460,9 +470,10 @@ class StudentsDAO
      */
     public function getPurchases(int $limit = -1, int $offset = -1) : array
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
         
         $response = null;
             
@@ -476,29 +487,31 @@ class StudentsDAO
         ";
         
         if ($limit > 0) {
-            if ($offset > 0)
+            if ($offset > 0) {
                 $query .= " LIMIT ".$offset.",".$limit;
-            else
+            }
+            else {
                 $query .= " LIMIT ".$limit;
+            }
         }
             
         $sql = $this->db->prepare($query);
             
         // Executes query
-        $sql->execute(array($this->id_student));
+        $sql->execute(array($this->idStudent));
         
         if (!empty($sql) && $sql->rowCount() > 0) {
             foreach ($sql->fetchAll() as $purchase) {
                 $response[] = new Purchase(
                     new Bundle(
-                        (int)$purchase['id_bundle'], 
+                        (int) $purchase['id_bundle'], 
                         $purchase['name'], 
-                        (float)$purchase['price_bundle'],
+                        (float) $purchase['price_bundle'],
                         $purchase['logo'],
                         $purchase['description']
                     ),
                     new \DateTime($purchase['date']),
-                    (float)$purchase['price_purchase']
+                    (float) $purchase['price_purchase']
                 );
             }
         }
@@ -513,32 +526,34 @@ class StudentsDAO
      */
     public function countPurchases() : int
     {
-        return (int)$this->db->query("
+        return (int) $this->db->query("
             SELECT  COUNT(*) AS total
             FROM    purchases
-            WHERE   id_student = ".$this->id_student
+            WHERE   id_student = ".$this->idStudent
         )->fetch()['total'];
     }
     
     /**
      * Adds a bundle to current student.
      * 
-     * @param       int $id_bundle Bundle id to be added
+     * @param       int idBundle Bundle id to be added
      * 
      * @return      bool If the bundle has been successfully added
      * 
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor or bundle id is empty, less than or equal to zero
      */
-    public function addBundle(int $id_bundle) : bool
+    public function addBundle(int $idBundle) : bool
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
         
-        if (empty($id_bundle) || $id_bundle <= 0)
+        if (empty($idBundle) || $idBundle <= 0) {
             throw new \InvalidArgumentException("Bundle id cannot be less ".
                 "than or equal to zero");
+        }
             
         // Query construction
         $sql = $this->db->prepare("
@@ -548,7 +563,7 @@ class StudentsDAO
         ");
         
         // Executes query
-        $sql->execute(array($this->id_student, $id_bundle));
+        $sql->execute(array($this->idStudent, $idBundle));
         
         return !empty($sql) && $sql->rowCount() > 0;
     }
@@ -556,7 +571,7 @@ class StudentsDAO
     /**
      * Checks whether student has a bundle.
      * 
-     * @param       int $id_bundle Bundle id
+     * @param       int $idBundle Bundle id
      * 
      * @return      bool If student has the bundle or not
      * 
@@ -564,15 +579,17 @@ class StudentsDAO
      * provided in the constructor or bundle id is empty, less than or equal 
      * to zero
      */
-    public function has_bundle(int $id_bundle) : bool
+    public function hasBundle(int $idBundle) : bool
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
             
-        if (empty($id_bundle) || $id_bundle <= 0)
+        if (empty($idBundle) || $idBundle <= 0) {
             throw new \InvalidArgumentException("Bundle id cannot be less ".
                 "than or equal to zero");
+        }
         
         $sql = $this->db->prepare("
             SELECT  COUNT(*) AS has_bundle
@@ -580,7 +597,7 @@ class StudentsDAO
             WHERE   id_student = ? AND id_bundle = ?
         ");
         
-        $sql->execute(array($this->id_student, $id_bundle));
+        $sql->execute(array($this->idStudent, $idBundle));
         
         return $sql->fetch()['has_bundle'] > 0;
     }
@@ -594,10 +611,11 @@ class StudentsDAO
      * 
      * @throws      \InvalidArgumentException If email is empty
      */
-    public function is_email_in_use(string $email) : bool
+    public function isEmailInUse(string $email) : bool
     {
-        if (empty($email))
+        if (empty($email)) {
             throw new \InvalidArgumentException("Email cannot be empty");
+        }
 
         // Query construction
         $sql = $this->db->prepare("
@@ -620,15 +638,16 @@ class StudentsDAO
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor is empty, less than or equal to zero
      */
-    public function clear_history()
+    public function clearHistory()
     {
-        if (empty($this->id_student) || $this->id_student <= 0)
+        if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".
                 "provided in the constructor");
+        }
             
         $sql = $this->db->query("
             DELETE FROM student_historic
-            WHERE id_student = ".$this->id_student
+            WHERE id_student = ".$this->idStudent
         );
         
         return !empty($sql) && $sql->rowCount() > 0;
@@ -647,11 +666,12 @@ class StudentsDAO
         $sql = $this->db->query("
             SELECT  photo
             FROM    students
-            WHERE   id_student = ".Student::get_logged_in($this->db)->get_id()
+            WHERE   id_student = ".Student::getLoggedIn($this->db)->getId()
         );
         
-        if (!empty($sql) && $sql->rowCount() > 0)
+        if (!empty($sql) && $sql->rowCount() > 0) {
             $response = $sql->fetch()['photo'];
+        }
         
         return $response;
     }

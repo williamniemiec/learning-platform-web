@@ -7,18 +7,14 @@ namespace domain;
 /**
  * Responsible for representing classes. A class can be a Video or a 
  * Questionnaire.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 abstract class _Class implements \JsonSerializable
 {
     //-----------------------------------------------------------------------
     //        Attributes
     //-----------------------------------------------------------------------
-    protected $id_module;
-    protected $class_order;
+    protected $idModule;
+    protected $classOrder;
     
     
     //-----------------------------------------------------------------------
@@ -29,9 +25,9 @@ abstract class _Class implements \JsonSerializable
      * 
      * @return      int Module id
      */
-    public function get_module_id() : int
+    public function getModuleId() : int
     {
-        return $this->id_module;
+        return $this->idModule;
     }
     
     /**
@@ -39,9 +35,9 @@ abstract class _Class implements \JsonSerializable
      *
      * @return      int Module id
      */
-    public function get_class_order() : int
+    public function getClassOrder() : int
     {
-        return $this->class_order;
+        return $this->classOrder;
     }
     
     
@@ -57,8 +53,8 @@ abstract class _Class implements \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'id' => $this->id_module,
-            'class_order' => $this->class_order
+            'id' => $this->idModule,
+            'class_order' => $this->classOrder
         );
     }
 }

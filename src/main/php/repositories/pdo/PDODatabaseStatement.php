@@ -50,10 +50,12 @@ class PDODatabaseStatement extends DatabaseStatement
      */
     public function fetchAll(bool $withTableName = false): array
     {
-        if ($withTableName)
+        if ($withTableName) {
            $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
-        else
+        }
+        else {
             $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, false);
+        }
         
         $result = $this->statement->fetchAll(\PDO::FETCH_ASSOC);
         
@@ -66,10 +68,12 @@ class PDODatabaseStatement extends DatabaseStatement
      */
     public function fetch(bool $withTableName = false) : array
     {
-        if ($withTableName)
+        if ($withTableName) {
             $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, true);
-        else
+        }
+        else {
             $this->db->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES, false);
+        }
         
         $result = $this->statement->fetch(\PDO::FETCH_ASSOC);
         

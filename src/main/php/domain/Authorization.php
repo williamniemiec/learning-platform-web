@@ -6,10 +6,6 @@ namespace domain;
 
 /**
  * Responsible for representing an authorization.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class Authorization
 {
