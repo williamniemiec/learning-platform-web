@@ -33,28 +33,45 @@ class Comment
     /**
      * Creates a representation of a comment.
      *
-     * @param       int $id_comment Comment id
-     * @param       int $id_course Course id to which the comment was made
-     * @param       int $id_module module id of the class for which the comment was made
-     * @param       int $class_order Class order in module of the class for 
+     * @param       int idComment Comment id
+     * @param       int idCourse Course id to which the comment was made
+     * @param       int idModule module id of the class for which the comment was made
+     * @param       int classOrder Class order in module of the class for 
      * which the comment was made
      * @param       Student $student Student who wrote the comment
      * @param       DateTime $date Comment posting date
      * @param       string $text Comment content
      * @param       Message[] $replies [Optional] Comment replies
      */
-    public function __construct(int $id_comment, int $id_course, int $id_module, 
-        int $class_order, ?Student $student, DateTime $date, string $text, 
+    public function __construct(
+        int $idComment, 
+        int $idCourse, 
+        int $idModule, 
+        int $classOrder, 
+        ?Student $student, 
+        DateTime $date, 
+        string $text, 
         ?array $replies = array())
     {
-        $this->idComment = $id_comment;
-        $this->idCourse = $id_course;
-        $this->idModule = $id_module;
-        $this->classOrder = $class_order;
+        $this->idComment = $idComment;
+        $this->idCourse = $idCourse;
+        $this->idModule = $idModule;
+        $this->classOrder = $classOrder;
         $this->student = $student;
         $this->date = $date;
         $this->text = $text;
         $this->replies = empty($replies) ? array() : $replies;
+    }
+
+
+    //-------------------------------------------------------------------------
+    //        Methods
+    //-------------------------------------------------------------------------
+    private function fetchReplies($db)
+    {
+        $commentsDao = new CommentsDAO($db);
+            
+        return $commentsDao->getReplies($this->idComment);
     }
     
     
@@ -142,9 +159,7 @@ class Comment
     public function getReplies(Database $db) : array
     {
         if (empty($this->replies)) {
-            $comments = new CommentsDAO($db);
-            
-            $this->replies = $comments->getReplies($this->idComment);
+            $this->replies = $this->fetchReplies($db);
         }
         
         return $this->replies;

@@ -8,7 +8,7 @@ namespace domain;
  * Responsible for representing classes. A class can be a Video or a 
  * Questionnaire.
  */
-abstract class _Class implements \JsonSerializable
+abstract class ClassType implements \JsonSerializable
 {
     //-----------------------------------------------------------------------
     //        Attributes

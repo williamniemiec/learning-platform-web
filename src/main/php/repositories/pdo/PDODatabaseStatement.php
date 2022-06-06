@@ -11,7 +11,7 @@ use repositories\DatabaseStatement;
 /**
  * Represents a PDO database statement.
  */
-class PDODatabaseStatement extends DatabaseStatement
+class PDODatabaseStatement implements DatabaseStatement
 {
     //-------------------------------------------------------------------------
     //        Attributes

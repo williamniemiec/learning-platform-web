@@ -27,16 +27,21 @@ class Note implements \JsonSerializable
     /**
      * Creates a representation of a notebook note.
      *
-     * @param       int $id_note Note id
+     * @param       int idNote Note id
      * @param       string $title Note title
      * @param       string $content Note content
      * @param       DateTime $date Note date
      * @param       Video $class Class to which the note belongs
      */
-    public function __construct(int $id_note, string $title, string $content, 
-        DateTime $date, Video $class)
+    public function __construct(
+        int $idNote, 
+        string $title, 
+        string $content, 
+        DateTime $date, 
+        Video $class
+    )
     {
-        $this->id_note = $id_note;
+        $this->id_note = $idNote;
         $this->title = $title;
         $this->content = $content;
         $this->date = $date;

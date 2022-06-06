@@ -33,8 +33,14 @@ class Admin extends User
      * @param       DateTime $birthdate Administrator birthdate
      * @param       string $email Administrator email
      */
-    public function __construct(int $id, Authorization $authorization, string $name, 
-        GenreEnum $genre, DateTime $birthdate, string $email)
+    public function __construct(
+        int $id, 
+        Authorization $authorization, 
+        string $name, 
+        GenreEnum $genre, 
+        DateTime $birthdate, 
+        string $email
+    )
     {
         $this->id = $id;
         $this->authorization = $authorization;

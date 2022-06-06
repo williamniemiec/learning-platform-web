@@ -24,7 +24,7 @@ class VideosDAO extends ClassesDAO
      */
     public function __construct(Database $db)
     {
-        $this->db = $db->getConnection();
+        parent::__construct($db);
     }
     
     
@@ -45,43 +45,56 @@ class VideosDAO extends ClassesDAO
      */
     public function get(int $idModule, int $classOrder) : ?Video
     {
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-        }
+        $this->validateModuleId($idModule);
+        $this->validateClassOrder($classOrder);
             
-        if (empty($classOrder) || $classOrder <= 0) {
-            throw new \InvalidArgumentException("Class order cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        $response = null;
+        $sql = $this->buildGetQuery();
+        $this->runQueryWithArguments($sql, $idModule, $classOrder);
         
-        // Query construction
-        $sql = $this->db->prepare("
+        return $this->parseGetQueryResponse($sql);
+    }
+
+    private function buildGetQuery()
+    {
+        return $this->db->prepare("
             SELECT  * 
             FROM    videos 
             WHERE   id_module = ? AND class_order = ?
         ");
-        
-        // Executes query
-        $sql->execute(array($idModule, $classOrder));
-        
-        // Parses results
-        if ($sql->rowCount() > 0) {
-            $class = $sql->fetch();
-            
-            $response = new Video(
-                (int) $class['id_module'],
-                (int) $class['class_order'],
-                $class['title'],
-                $class['videoID'],
-                (int) $class['length'],
-                $class['description']
-            ); 
+    }
+
+    private function parseGetQueryResponse($sql)
+    {
+        if (!$sql || $sql->rowCount() <= 0) {
+            return array();
         }
         
-        return $response; 
+        $rawClass = $sql->fetch();
+        
+        return new Video(
+            (int) $rawClass['id_module'],
+            (int) $rawClass['class_order'],
+            $rawClass['title'],
+            $rawClass['videoID'],
+            (int) $rawClass['length'],
+            $rawClass['description']
+        ); 
+    }
+
+    private function validateModuleId($id)
+    {
+        if (empty($id) || $id <= 0) {
+            throw new \InvalidArgumentException("Module id cannot be empty or ".
+                                                "less than or equal to zero");
+        }
+    }
+
+    private function validateClassOrder($order)
+    {
+        if (empty($order) || $order <= 0) {
+            throw new \InvalidArgumentException("Class order cannot be empty ".
+                                                "or less than or equal to zero");
+        }
     }
     
     /**
@@ -98,37 +111,44 @@ class VideosDAO extends ClassesDAO
      */
     public function getAllFromModule(int $idModule) : array
     {
-        if (empty($idModule) || $idModule <= 0) {
-            throw new \InvalidArgumentException("Module id cannot be empty ".
-                "or less than or equal to zero");
-        }
-            
-        $response = array();
+        $this->validateModuleId($idModule);
+
+        $sql = $this->buildGetAllQuery();
+        $this->runQueryWithArguments($sql, $idModule);
         
-        $sql = $this->db->prepare("
+        return $this->parseGetAllQueryResponse($sql);
+    }
+
+    private function buildGetAllQuery()
+    {
+        return $this->db->prepare("
             SELECT  *
             FROM    videos
             WHERE   id_module = ?
         ");
-        
-        $sql->execute(array($idModule));
-        
-        if ($sql->rowCount() > 0) {
-            $classes =  $sql->fetchAll();
-            
-            foreach ($classes as $class) {
-                $response[] = new Video(
-                    (int) $class['id_module'], 
-                    (int) $class['class_order'], 
-                    $class['title'], 
-                    $class['videoID'], 
-                    (int) $class['length'],
-                    $class['description']
-                );
-            }
+    }
+
+    private function parseGetAllQueryResponse($sql)
+    {
+        if (!$sql || $sql->rowCount() <= 0) {
+            return array();
         }
         
-        return $response;
+        $classes = array();
+        $rawClasses = $sql->fetchAll();
+            
+        foreach ($rawClasses as $class) {
+            $classes[] = new Video(
+                (int) $class['id_module'], 
+                (int) $class['class_order'], 
+                $class['title'], 
+                $class['videoID'], 
+                (int) $class['length'],
+                $class['description']
+            );
+        }
+
+        return $classes;
     }
     
     /**
@@ -149,7 +169,15 @@ class VideosDAO extends ClassesDAO
      */
     public function wasWatched(int $idStudent, int $idModule, int $classOrder) : bool
     {
-        $sql = $this->db->prepare("
+        $sql = $this->buildWasWatchedQuery();
+        $this->runQueryWithArguments($sql, $idStudent, $idModule, $classOrder);
+        
+        return $this->parseWasWatchedQueryResponse($sql);
+    }
+
+    private function buildWasWatchedQuery()
+    {
+        return $this->db->prepare("
             SELECT  COUNT(*) AS was_watched
             FROM    student_historic
             WHERE   class_type = 0 AND 
@@ -157,10 +185,11 @@ class VideosDAO extends ClassesDAO
                     id_module = ? AND 
                     class_order = ?
         ");
-        
-        $sql->execute(array($idStudent, $idModule, $classOrder));
-        
-        return $sql->fetch()['was_watched'] > 0;
+    }
+
+    private function parseWasWatchedQueryResponse($sql)
+    {
+        return ($sql->fetch()['was_watched'] > 0);
     }
     
     /**

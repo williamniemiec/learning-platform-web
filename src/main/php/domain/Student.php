@@ -34,8 +34,14 @@ class Student extends User
      * @param       string $email Student email
      * @param       string $photo [Optional] Name of the student photo file
      */
-    public function __construct(int $id, string $name, GenreEnum $genre, 
-        DateTime $birthdate, string $email, ?string $photo = '')
+    public function __construct(
+        int $id, 
+        string $name, 
+        GenreEnum $genre, 
+        DateTime $birthdate, 
+        string $email, 
+        ?string $photo = ''
+    )
     {
         $this->id = $id;
         $this->name = $name;
@@ -70,8 +76,8 @@ class Student extends User
      */
     public static function login(Database $db, string $email, string $password) : ?Student
     {
-        $students_dao = new StudentsDAO($db);
-        $student = $students_dao->login($email, $password);
+        $studentsDao = new StudentsDAO($db);
+        $student = $studentsDao->login($email, $password);
         
         if (!empty($student)) {
             $_SESSION['s_login'] = $student->getId();
@@ -95,9 +101,9 @@ class Student extends User
             return null;
         }
         
-        $students_dao = new StudentsDAO($db, $_SESSION['s_login']);
+        $studentsDao = new StudentsDAO($db, $_SESSION['s_login']);
         
-        return $students_dao->get();
+        return $studentsDao->get();
     }
     
     /**

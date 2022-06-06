@@ -6,7 +6,7 @@ namespace dao;
 
 use repositories\Database;
 use domain\Course;
-use domain\_Class;
+use domain\ClassType;
 
 
 /**
@@ -280,14 +280,14 @@ class CoursesDAO
      *
      * @param       int idCourse Course id
      *
-     * @return      _Class First class from the first module from a course or
+     * @return      ClassType First class from the first module from a course or
      * null if there are no registered modules - classes in the course with
      * the given id
      *
      * @throws      \InvalidArgumentException If course id or student id is
      * empty or less than or equal to zero
      */
-    public function getFirstClassFromFirstModule(int $idCourse) : ?_Class
+    public function getFirstClassFromFirstModule(int $idCourse) : ?ClassType
     {
         if (empty($idCourse) || $idCourse <= 0) {
             throw new \InvalidArgumentException("Course id cannot be empty ".

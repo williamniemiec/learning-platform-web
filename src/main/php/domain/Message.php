@@ -31,7 +31,12 @@ class Message implements \JsonSerializable
      * @param       string $message Message content
      * @param       int $id [Optional] Message id
      */
-    public function __construct(?User $user, DateTime $date, string $message, int $id = -1)
+    public function __construct(
+        ?User $user, 
+        DateTime $date, 
+        string $message, 
+        int $id = -1
+    )
     {
         $this->user = $user;
         $this->date = $date;

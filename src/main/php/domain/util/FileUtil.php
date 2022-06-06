@@ -9,29 +9,7 @@ class FileUtil
 {
     //-------------------------------------------------------------------------
     //        Methods
-    //-------------------------------------------------------------------------
-    /**
-     * Checks if a submitted photo is really a photo.
-     *
-     * @param       array $photo Submitted photo (from $_FILES)
-     *
-     * @return      boolean If the photo is really a photo
-     *
-     * @throws      \InvalidArgumentException If photo is empty
-     */
-    public static function isPhoto(array $photo) : bool
-    {
-        if (empty($photo)) {
-            throw new \InvalidArgumentException("Photo cannot be empty");
-        }
-            
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $photo['tmp_name']);
-        finfo_close($finfo);
-        
-        return explode("/", $mime)[0] == "image";
-    }
-    
+    //-------------------------------------------------------------------------    
     /**
      * Stores a submitted photo.
      *
@@ -45,28 +23,82 @@ class FileUtil
      */
     public static function storePhoto(array $photo, string $target) : string
     {
+        FileUtil::validateValidPhoto($photo);
+        FileUtil::validateCompatiblePhoto($photo);
+
+        $filename = FileUtil::generateUniquePhotoName();
+        $output = FileUtil::normalizeOutput($target);        
+
+        move_uploaded_file($photo['tmp_name'], $output.$filename);
+        
+        return $filename;
+    }
+
+    private static function validateValidPhoto($photo)
+    {
         if (empty($photo['tmp_name']) || !FileUtil::isPhoto($photo)) {
             throw new \InvalidArgumentException("Invalid photo");
         }
-            
-        $extension = explode("/", $photo['type'])[1];
+    }
+
+    private static function validateCompatiblePhoto($photo)
+    {
+        $extension = FileUtil::extractPhotoExtension($photo);
         
-        // Checks if photo extension has an accepted extension or not
         if ($extension != "jpg" && $extension != "jpeg" && $extension != "png") {
-            throw new \InvalidArgumentException("Invalid photo extension - must be .jpg, .jpeg or .png");
+            throw new \InvalidArgumentException("Invalid photo extension - ".
+                                                "must be .jpg, .jpeg or .png");
         }
-            
-        // Generates photo name
-        $filename = md5(rand(1,9999).time().rand(1,9999));
-        $filename = $filename."."."jpg";
-        
-        // Saves photo
-        if (!$target[count($target)-1] == '/') {
-            $target .= "/";
+    }
+
+    private static function extractPhotoExtension($photo)
+    {
+        return explode("/", $photo['type'])[1];
+    }
+
+    private static function normalizeOutput($path)
+    {
+        $normalizedPath = $path;
+
+        if (!$path[count($path)-1] == '/') {
+            $normalizedPath .= "/";
         }
+
+        return $normalizedPath;
+    }
+
+    private static function generateUniquePhotoName()
+    {
+        $prefix = md5(rand(1,9999).time().rand(1,9999));
+        $suffix = ".jpg";
+
+        return $prefix.$suffix;
+    }
+
+    /**
+     * Checks if a submitted photo is really a photo.
+     *
+     * @param       array $photo Submitted photo (from $_FILES)
+     *
+     * @return      boolean If the photo is really a photo
+     *
+     * @throws      \InvalidArgumentException If photo is empty
+     */
+    public static function isPhoto(array $photo) : bool
+    {
+        FileUtil::validatePhoto($photo);
             
-        move_uploaded_file($photo['tmp_name'], $target.$filename);
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $photo['tmp_name']);
+        finfo_close($finfo);
         
-        return $filename;
+        return explode("/", $mime)[0] == "image";
+    }
+
+    private static function validatePhoto($photo)
+    {
+        if (empty($photo)) {
+            throw new \InvalidArgumentException("Photo cannot be empty");
+        }
     }
 }

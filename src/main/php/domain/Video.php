@@ -7,7 +7,7 @@ namespace domain;
 /**
  * Responsible for representing video-type classes.
  */
-class Video extends _Class
+class Video extends ClassType
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -24,8 +24,8 @@ class Video extends _Class
     /**
      * Creates a representation of a video-type class.
      * 
-     * @param       int $id_module Module id that the class belongs to
-     * @param       int $class_order Class order inside the module to which the
+     * @param       int idModule Module id that the class belongs to
+     * @param       int classOrder Class order inside the module to which the
      * class belongs
      * @param       string $title Class title
      * @param       string video_id Class video URL (must be from YouTube). 
@@ -37,13 +37,19 @@ class Video extends _Class
      * @param       int $length Video length
      * @param       string $description [Optional] Class description
      */
-    public function __construct(int $id_module, int $class_order, string $title,
-        string $video_id, int $length, ?string $description = '')
+    public function __construct(
+        int $idModule, 
+        int $classOrder, 
+        string $title,
+        string $videoId, 
+        int $length, 
+        ?string $description = ''
+    )
     {
-        $this->idModule = $id_module;
-        $this->classOrder = $class_order;
+        $this->idModule = $idModule;
+        $this->classOrder = $classOrder;
         $this->title = $title;
-        $this->videoId = $video_id;
+        $this->videoId = $videoId;
         $this->length = $length;
         $this->description = empty($description) ? '' : $description;
     }

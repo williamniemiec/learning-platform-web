@@ -14,7 +14,7 @@
     		<h4><?php echo $module->getName(); ?></h4>
     		<div class="module_classes">
     			<?php $id = 0; ?>
-    			<?php foreach ($module->get_classes() as $class): ?>
+    			<?php foreach ($module->getClasses() as $class): ?>
     				<div class="module_class" data-class="<?php echo $class->getModuleId()."/".$class->getClassOrder(); ?>">
     					<?php if ($class instanceof Video): ?>
     						<div class="module_title">

@@ -6,7 +6,7 @@ namespace domain;
 
 use repositories\Database;
 use DateTime;
-use domain\dao\SupportTopicDAO;
+use dao\SupportTopicDAO;
 
 
 /**
@@ -42,8 +42,15 @@ class SupportTopic implements \JsonSerializable
      * @param       string $message Initial Support topic message
      * @param       bool $closed Support topic status
      */
-    public function __construct(int $id_topic, Student $student, string $title,
-        SupportTopicCategory $category, DateTime $date, string $message, int $closed)
+    public function __construct(
+        int $id_topic, 
+        Student $student, 
+        string $title,
+        SupportTopicCategory $category, 
+        DateTime $date, 
+        string $message, 
+        int $closed
+    )
     {
         $this->id_topic = $id_topic;
         $this->student = $student;
@@ -152,11 +159,16 @@ class SupportTopic implements \JsonSerializable
         }
             
         if (empty($this->replies)) {
-            $topic = new SupportTopicDAO($db, Student::getLoggedIn($db)->getId());
+            $topic = $this->getTopicOfLoggedUser($db);
             $this->replies = $topic->getReplies($this->id_topic);
         }
         
         return $this->replies;
+    }
+
+    private function getTopicOfLoggedUser($db)
+    {
+        return new SupportTopicDAO($db, Student::getLoggedIn($db)->getId());
     }
     
     /**

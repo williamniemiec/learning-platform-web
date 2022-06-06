@@ -11,12 +11,21 @@ use domain\enum\ClassTypeEnum;
 /**
  * Responsible for representing classes.
  */
-abstract class ClassesDAO
+abstract class ClassesDAO extends DAO
 {
     //-------------------------------------------------------------------------
     //        Attributes
     //-------------------------------------------------------------------------
     protected $db;
+
+
+    //-------------------------------------------------------------------------
+    //        Constructor
+    //-------------------------------------------------------------------------
+    protected function __construct(Database $db)
+    {
+        parent::__construct($db);
+    }
     
     
     //-------------------------------------------------------------------------

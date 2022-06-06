@@ -7,7 +7,7 @@ namespace domain;
 /**
  * Responsible for representing questionnaire-type classes.
  */
-class Questionnaire extends _Class
+class Questionnaire extends ClassType
 {
     //-------------------------------------------------------------------------
     //        Attributes
@@ -26,8 +26,8 @@ class Questionnaire extends _Class
     /**
      * Creates a representation of a questionnaire-type class.
      * 
-     * @param       int $id_module Module id that the class belongs to
-     * @param       int $class_order Class order inside the module to which the
+     * @param       int idModule Module id that the class belongs to
+     * @param       int classOrder Class order inside the module to which the
      * class belongs
      * @param       string $question Questionnaire question
      * @param       string $q1 First response option
@@ -36,11 +36,19 @@ class Questionnaire extends _Class
      * @param       string $q4 Fourth response option
      * @param       int $answer Questionnaire answer (number between [1;4])
      */
-    public function __construct(int $id_module, int $class_order, string $question, 
-        string $q1, string $q2, string $q3, string $q4, int $answer)
+    public function __construct(
+        int $idModule, 
+        int $classOrder, 
+        string $question, 
+        string $q1, 
+        string $q2, 
+        string $q3, 
+        string $q4, 
+        int $answer
+    )
     {
-        $this->idModule = $id_module;
-        $this->classOrder = $class_order;
+        $this->idModule = $idModule;
+        $this->classOrder = $classOrder;
         $this->question = $question;
         $this->q1 = $q1;
         $this->q2 = $q2;

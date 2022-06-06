@@ -7,7 +7,7 @@ namespace repositories;
 /**
  * Represents a prepared statement and a result set.
  */
-abstract class DatabaseStatement
+interface DatabaseStatement
 {
     //-------------------------------------------------------------------------
     //        Methods
@@ -21,7 +21,7 @@ abstract class DatabaseStatement
      *
      * @return      bool True on success or false on failure
      */
-    public abstract function execute(array $bindArguments = null) : bool;
+    function execute(array $bindArguments = null) : bool;
     
     /**
      * Fetches the next row from a result set.
@@ -33,7 +33,7 @@ abstract class DatabaseStatement
      * @return     array Return an array containing the row in the result set 
      * or empty array on failure. 
      */
-    public abstract function fetch(bool $withTableName = false) : array;
+    function fetch(bool $withTableName = false) : array;
     
     /**
      * Returns an array containing all of the result set rows.
@@ -48,12 +48,12 @@ abstract class DatabaseStatement
      * name. An empty array is returned if there are zero results to fetch, or
      * empty array on failure.
      */
-    public abstract function fetchAll(bool $withTableName = false) : array;
+    function fetchAll(bool $withTableName = false) : array;
     
     /**
      * Returns the number of rows affected by the last SQL statement.
      *
      * @return      int The number of rows.
      */
-    public abstract function rowCount() : int;
+    function rowCount() : int;
 }

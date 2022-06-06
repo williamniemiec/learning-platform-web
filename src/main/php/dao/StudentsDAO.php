@@ -6,7 +6,7 @@ namespace dao;
 
 use repositories\Database;
 use domain\Student;
-use domain\_Class;
+use domain\ClassType;
 use domain\enum\GenreEnum;
 use domain\util\FileUtil;
 use domain\Bundle;
@@ -143,13 +143,13 @@ class StudentsDAO
      *
      * @param       int idCourse Course id
      *
-     * @return      _Class Last class watched by the student or null if student
+     * @return      ClassType Last class watched by the student or null if student
      * has never watched one 
      * 
      * @throws      \InvalidArgumentException If student id provided in the 
      * constructor or course id is empty, less than or equal to zero
      */
-    public function getLastClassWatched(int $idCourse) : ?_Class
+    public function getLastClassWatched(int $idCourse) : ?ClassType
     {
         if (empty($this->idStudent) || $this->idStudent <= 0) {
             throw new \InvalidArgumentException("Student id logged in must be ".

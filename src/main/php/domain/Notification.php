@@ -41,8 +41,15 @@ class Notification
      * @param       int $read [Optional] If the notification has not yet been
      * read
      */
-    public function __construct(int $idNotification, int $idStudent, DateTime $date, $reference,
-        NotificationTypeEnum $type, string $message, int $read = 0)
+    public function __construct(
+        int $idNotification, 
+        int $idStudent, 
+        DateTime $date, 
+        $reference, 
+        NotificationTypeEnum $type, 
+        string $message, 
+        int $read = 0
+    )
     {
         $this->idNotification = $idNotification;
         $this->idStudent = $idStudent;

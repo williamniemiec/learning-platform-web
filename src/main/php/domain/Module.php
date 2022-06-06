@@ -29,12 +29,12 @@ class Module implements \JsonSerializable
     /**
      * Creates a representation of a module.
      *
-     * @param       int $id_module Module id
+     * @param       int idModule Module id
      * @param       string $name Module name
      */
-    public function __construct(int $id_module, string $name)
+    public function __construct(int $idModule, string $name)
     {
-        $this->idModule = $id_module;
+        $this->idModule = $idModule;
         $this->name = $name;
     }
     
@@ -80,7 +80,7 @@ class Module implements \JsonSerializable
      * 
      * @implNote    Lazy initialization
      */
-    public function get_classes(?Database $db = null) : array
+    public function getClasses(?Database $db = null) : array
     {
         if (empty($db) && empty($this->db)) {
             throw new IllegalStateException("No database has been set");
@@ -96,14 +96,14 @@ class Module implements \JsonSerializable
             $videos = new VideosDAO($db);
             $questionnaires = new QuestionnairesDAO($db);
             
-            $classes_video = $videos->getAllFromModule($this->idModule);
-            $classes_questionnaire = $questionnaires->getAllFromModule($this->idModule);
+            $classesVideo = $videos->getAllFromModule($this->idModule);
+            $classesQuestionnaire = $questionnaires->getAllFromModule($this->idModule);
             
-            foreach ($classes_video as $class) {
+            foreach ($classesVideo as $class) {
                 $this->classes[$class->getClassOrder()] = $class;
             }
             
-            foreach ($classes_questionnaire as $class) {
+            foreach ($classesQuestionnaire as $class) {
                 $this->classes[$class->getClassOrder()] = $class;
             }
         }
