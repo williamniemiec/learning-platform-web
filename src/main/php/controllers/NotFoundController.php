@@ -21,26 +21,19 @@ class NotFoundController extends Controller
 	 */
 	public function index()
 	{
-	    $dbConnection = new MySqlPDODatabase();
-	    
 	    $header = array(
 	        'title' => 'Page not found - Learning platform',
             'description' => "Page not found",
 	        'robots' => 'noindex'
 	    );
-	    
 	    $viewArgs = array(
 	        'header' => $header
 	    );
 	    
-	    $student = Student::getLoggedIn($dbConnection);
-	    
-	    if (empty($student)) {
-	        $this->loadTemplate('error/404', $viewArgs, false);
-	    }
-        else {
-            $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
-    	        
+	    if ($this->isLogged()) {
+	        $dbConnection = new MySqlPDODatabase();
+			$student = Student::getLoggedIn($dbConnection);
+            $notificationsDao = new NotificationsDAO($dbConnection, $student->getId()); 
             $viewArgs['username'] = $student->getName();
             $viewArgs['notifications'] = array(
                 'notifications' => $notificationsDao->getNotifications(10),
@@ -48,6 +41,17 @@ class NotFoundController extends Controller
             );
             
             $this->loadTemplate('error/404', $viewArgs, true);
+	    }
+        else {
+			$this->loadTemplate('error/404', $viewArgs, false);
         }
+	}
+
+	private function isLogged()
+	{
+		$dbConnection = new MySqlPDODatabase();
+		$student = Student::getLoggedIn($dbConnection);
+
+		return !empty($student);
 	}
 }

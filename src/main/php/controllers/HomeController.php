@@ -31,10 +31,8 @@ class HomeController extends Controller
 	public function index ()
 	{   
 	    $dbConnection = new MySqlPDODatabase();
-	    
 	    $bundlesDao = new BundlesDAO($dbConnection);
 	    $coursesDao = new CoursesDAO($dbConnection);
-	    
 	    $header = array(
 	        'title' => 'Home - Learning Platform',
 	        'styles' => array('gallery', 'searchBar'),
@@ -43,19 +41,17 @@ class HomeController extends Controller
 	        'keywords' => array('learning platform', 'home'),
 	        'robots' => 'index'
 	    );
-	    
 	    $viewArgs = array(
 	        'header' => $header,
 	        'scripts' => array('gallery', 'HomeScript'),
 	        'total_bundles' => $bundlesDao->getTotal(),
 	        'total_courses' => $coursesDao->getTotal(),
-	        'total_length' => number_format(ClassesDAO::getTotal($dbConnection)['total_length'] / 60, 2)
+	        'total_length' => $this->computeTotalLength($dbConnection)
 	    );
 
 	    if (Student::isLogged()) {
 	        $student = Student::getLoggedIn($dbConnection);
 	        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
-	        
 	        $viewArgs['username'] = $student->getName();
 	        $viewArgs['notifications'] = array(
 	            'notifications' => $notificationsDao->getNotifications(10),
@@ -64,17 +60,26 @@ class HomeController extends Controller
 	            $student->getId(), -1, '',
 	            new BundleOrderTypeEnum(BundleOrderTypeEnum::SALES),
 	            new OrderDirectionEnum(OrderDirectionEnum::DESCENDING)
-	            );
+			);
 	    }
 	    else {
 	        $viewArgs['bundles'] = $bundlesDao->getAll(
-	            -1, -1, '',
+	            -1, 
+				-1, 
+				'',
 	            new BundleOrderTypeEnum(BundleOrderTypeEnum::SALES),
 	            new OrderDirectionEnum(OrderDirectionEnum::DESCENDING)
             );
 	    }
 	    
 		$this->loadTemplate("HomeView", $viewArgs, Student::isLogged());
+	}
+
+	private function computeTotalLength($dbConnection)
+	{
+		$total = ClassesDAO::getTotal($dbConnection)['total_length'] / 60;
+		
+		return number_format($total, 2);
 	}
 	
 	/**

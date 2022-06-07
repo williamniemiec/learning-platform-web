@@ -45,15 +45,6 @@ class CoursesController extends Controller
     public function index ()
     { 
         $dbConnection = new MySqlPDODatabase();
-        
-        $header = array(
-            'title' => 'My courses - Learning Platform',
-            'styles' => array('MyCoursesStyle', 'searchBar', 'NotebookStyle'),
-            'description' => "Start learning today",
-            'keywords' => array('learning platform', 'courses'),
-            'robots' => 'noindex'
-        );
-        
         $student = Student::getLoggedIn($dbConnection);
         $coursesDao = new CoursesDAO($dbConnection);
         $notebookDao = new NotebookDAO($dbConnection, $student->getId());
@@ -61,12 +52,18 @@ class CoursesController extends Controller
         $courses = $coursesDao->getMyCourses($student->getId());
         $notes = $notebookDao->getAll(4);
         $total_notes = $notebookDao->count();
-        
+        $header = array(
+            'title' => 'My courses - Learning Platform',
+            'styles' => array('MyCoursesStyle', 'searchBar', 'NotebookStyle'),
+            'description' => "Start learning today",
+            'keywords' => array('learning platform', 'courses'),
+            'robots' => 'noindex'
+        );
 		$viewArgs = array(
+		    'header' => $header,
 		    'username' => $student->getName(),
 		    'courses' => $courses,
 		    'totalCourses' => count($courses),
-		    'header' => $header,
 		    'notifications' => array(
 		        'notifications' => $notificationsDao->getNotifications(10),
 		        'total_unread' => $notificationsDao->countUnreadNotification()),
@@ -76,8 +73,7 @@ class CoursesController extends Controller
 		    'totalPages' => ceil($total_notes / 4)
 		);
 
-		// Checks if it is student's birthdate
-		if ($student->getBirthdate()->format("m-d") == (new \DateTime())->format("m-d")) {
+		if ($this->isStudentBirthday($student)) {
 		    $studentsDao = new StudentsDAO($dbConnection);
 		    $historicInfo = $studentsDao->getTotalWatchedClasses();
 		    $viewArgs['totalWatchedVideos'] = $historicInfo['total_classes_watched'];
@@ -85,6 +81,14 @@ class CoursesController extends Controller
 		}
         
         $this->loadTemplate("MyCoursesView", $viewArgs, Student::isLogged());
+    }
+
+    private function isStudentBirthday($student)
+    {
+        $birthday = $student->getBirthdate()->format("m-d");
+        $today = (new \DateTime())->format("m-d");
+        
+        return $birthday == $today;
     }
     
     /**
@@ -99,17 +103,15 @@ class CoursesController extends Controller
      */
     public function open(int $idCourse, int $idModule = -1, int $classOrder = -1) : void
     {
+        // TODO: Refactor this method
         $dbConnection = new MySqlPDODatabase();
-        
         $student = Student::getLoggedIn($dbConnection);
         $students = new StudentsDAO($dbConnection, $student->getId());
         $courses = new CoursesDAO($dbConnection);
         $historic = new HistoricDAO($dbConnection, $student->getId());
         $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
         
-        
-        // If student is not enrolled in the course, redirects it to home page
-        if (!$courses->hasCourse($idCourse, $student->getId())) {
+        if (!$this->isStudentEnrolledInTheCourse($idCourse, $courses, $student)) {
             $this->redirectToRoot();
         }
         
@@ -125,19 +127,15 @@ class CoursesController extends Controller
         else {
             $class = $students->getLastClassWatched($idCourse);
         }
-            
-        // Gets class to be opened
+        
         if (empty($class)) {
             $class = $courses->getFirstClassFromFirstModule($idCourse);
         }
         
-        // Gets information about current course
         $course = $courses->get($idCourse);
 
-        // Gets class information
         if (empty($class)) {
             $name = 'No classes';
-            //$class['type'] = "noClasses";
             $classContent = array(
                 'message' => 'There are no registered classes'
             );
@@ -148,10 +146,8 @@ class CoursesController extends Controller
                 $commentsDao = new CommentsDAO($dbConnection);
                 $videosDao = new VideosDAO($dbConnection);
                 $notebookDao = new NotebookDAO($dbConnection, $student->getId());
-  
                 $name = $class->getTitle();
                 $limit = 2;
-                
                 $classContent = array(
                     'id_course' => $idCourse,
                     'class' => $class,
@@ -173,14 +169,11 @@ class CoursesController extends Controller
                         $class->getClassOrder()
                     ) / $limit)
                 );
-                
                 $view = "class_video";
             }
             else {
                 $questionnairesDao = new QuestionnairesDAO($dbConnection);
-                
                 $name = "Questionnaire";
-                
                 $classContent = array(
                     'class' => $class,
                     'watched' => $questionnairesDao->wasWatched(
@@ -188,7 +181,6 @@ class CoursesController extends Controller
                         $class->getClassOrder()
                     )
                 );
-                
                 $view = "class_quest";
             }
         }
@@ -199,7 +191,6 @@ class CoursesController extends Controller
             'description' => $name,
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
             'header' => $header,
             'scripts' => array('ClassScript'),
@@ -211,6 +202,11 @@ class CoursesController extends Controller
                 'modules' => $course->getModules($dbConnection, true),
                 'watched_classes' => $historic->getWatchedClassesFromCourse($idCourse),
                 'logo' => $course->getLogo()
+            ),
+            'classContent' => $classContent,
+            'notifications' => array(
+                'notifications' => $notificationsDao->getNotifications(10),
+                'total_unread' => $notificationsDao->countUnreadNotification()
             )
         );
         
@@ -219,7 +215,6 @@ class CoursesController extends Controller
                 'title' => $name,
                 'wasWatched' => $classContent['watched']
             );
-            
             $viewArgs['info_class'] = array(
                 'class' => $class,
                 'total' => $courses->countClasses($idCourse),
@@ -228,13 +223,12 @@ class CoursesController extends Controller
             );
         }
         
-        $viewArgs['classContent'] = $classContent;
-        $viewArgs['notifications'] = array(
-            'notifications' => $notificationsDao->getNotifications(10),
-            'total_unread' => $notificationsDao->countUnreadNotification()
-        );
-        
         $this->loadTemplate("class/course", $viewArgs);
+    }
+
+    private function isStudentEnrolledInTheCourse($idCourse, $courses, $student)
+    {
+        return $courses->hasCourse($idCourse, $student->getId());
     }
     
     
@@ -252,13 +246,11 @@ class CoursesController extends Controller
      */
     public function search()
     {
-        // Checks if it is an ajax request
         if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
         
         $dbConnection = new MySqlPDODatabase();
-            
         $coursesDao = new CoursesDAO($dbConnection);
         
         echo json_encode($coursesDao->getMyCourses(

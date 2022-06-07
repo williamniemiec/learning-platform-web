@@ -39,17 +39,14 @@ class SettingsController extends Controller
     public function index ()
     {
         $dbConnection = new MySqlPDODatabase();
-        
         $student = Student::getLoggedIn($dbConnection);
         $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
-        
         $header = array(
             'title' => 'Settings - Learning platform',
             'styles' => array('SettingsStyle'),
             'description' => "User settings",
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
             'header' => $header,
             'scripts' => array("SettingsScript"),
@@ -73,28 +70,20 @@ class SettingsController extends Controller
      */
     public function edit()
     {
-        $dbConnection = new MySqlPDODatabase();
+        if ($this->hasEditBeenSent()) {
+            $this->updateSettings();
+            $this->redirectTo("settings");
+        }
         
+        $dbConnection = new MySqlPDODatabase();
         $student = Student::getLoggedIn($dbConnection);
         $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
-
         $header = array(
             'title' => 'Settings - Update - Learning platform',
             'styles' => array('SettingsStyle'),
             'description' => "User settings",
             'robots' => 'noindex'
         );
-        
-        // Checks if edition form has been sent
-        if (!empty($_POST['name'])) {
-            $students_dao = new StudentsDAO($dbConnection);
-            $student->setGenre(new GenreEnum($_POST['genre']));
-            $student->setBirthdate(new \DateTime($_POST['birthdate']));
-            
-            $students_dao->update($student);
-            $this->redirectTo("settings");
-        }
-        
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
@@ -107,16 +96,30 @@ class SettingsController extends Controller
         
         $this->loadTemplate("settings/SettingsEditView", $viewArgs);
     }
+
+    private function hasEditBeenSent()
+    {
+        return  !empty($_POST['name']);
+    }
+
+    private function updateSettings()
+    {
+        $dbConnection = new MySqlPDODatabase();
+        $studentsDao = new StudentsDAO($dbConnection);
+        $student = Student::getLoggedIn($dbConnection);
+        
+        $student->setGenre(new GenreEnum($_POST['genre']));
+        $student->setBirthdate(new \DateTime($_POST['birthdate']));
+        $studentsDao->update($student);
+    }
     
     public function clear()
     {
         $dbConnection = new MySqlPDODatabase();
-        
         $studentsDao = new StudentsDAO(
             $dbConnection, 
             Student::getLoggedIn($dbConnection)->getId()
         );
-        
         $_SESSION['cleared'] = $studentsDao->clearHistory();
         
         $this->redirectTo("settings");
@@ -125,7 +128,6 @@ class SettingsController extends Controller
     public function delete()
     {
         $dbConnection = new MySqlPDODatabase();
-        
         $studentsDao = new StudentsDAO(
             $dbConnection,
             Student::getLoggedIn($dbConnection)->getId()
@@ -159,7 +161,6 @@ class SettingsController extends Controller
         }
         
         $dbConnection = new MySqlPDODatabase();
-        
         $studentsDao = new StudentsDAO(
             $dbConnection, 
             Student::getLoggedIn($dbConnection)->getId()
@@ -185,12 +186,14 @@ class SettingsController extends Controller
         }
         
         $dbConnection = new MySqlPDODatabase();
-        
         $studentsDao = new StudentsDAO(
             $dbConnection, 
             Student::getLoggedIn($dbConnection)->getId()
         );
         
-        echo $studentsDao->updatePassword($_POST['current_password'], $_POST['new_password']);
+        echo $studentsDao->updatePassword(
+            $_POST['current_password'], 
+            $_POST['new_password']
+        );
     }
 }

@@ -150,11 +150,11 @@ class SupportTopicDAO extends DAO
         $supportTopics = array();
 
         foreach ($this->getAllResponseQuery() as $topic) {
-            $students_dao = new StudentsDAO($this->db, (int) $topic['id_student']);
+            $studentsDao = new StudentsDAO($this->db, (int) $topic['id_student']);
             
             $supportTopics[] = new SupportTopic(
                 (int) $topic['id_topic'],
-                $students_dao->get(),
+                $studentsDao->get(),
                 $topic['title'],
                 new SupportTopicCategory((int) $topic['id_category'], $topic['name']),
                 new \DateTime($topic['date']),

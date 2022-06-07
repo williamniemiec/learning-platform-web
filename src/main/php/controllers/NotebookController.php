@@ -43,26 +43,21 @@ class NotebookController extends Controller
     
     public function open($idNote)
     {   
-        $db_connection = new MySqlPDODatabase();
-        
-        $student = Student::getLoggedIn($db_connection);
-        $notificationsDao = new NotificationsDAO($db_connection, $student->getId());
-        $notebookDao = new NotebookDAO($db_connection, $student->getId());
-        $note = $notebookDao->get($idNote);
-        
-        // If does not exist an note with the provided id or if it exists but
-        // does not belongs to student logged in, redirects him to courses page
-        if (empty($note)) {
+        if (!$this->doesTheNoteBelongToTheLoggedInStudent($idNote)) {
             $this->redirectTo("courses");
         }
-        
+
+        $dbConnection = new MySqlPDODatabase();
+        $student = Student::getLoggedIn($dbConnection);
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
+        $notebookDao = new NotebookDAO($dbConnection, $student->getId());
+        $note = $notebookDao->get($idNote);
         $header = array(
             'title' => 'Notebook - Learning platform',
             'styles' => array('message'),
             'description' => "Notebook",
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
@@ -74,6 +69,16 @@ class NotebookController extends Controller
         
         $this->loadTemplate("notebook/NotebookContentView", $viewArgs);
     }
+
+    private function doesTheNoteBelongToTheLoggedInStudent($idNote)
+    {
+        $dbConnection = new MySqlPDODatabase();
+        $student = Student::getLoggedIn($dbConnection);
+        $notebookDao = new NotebookDAO($dbConnection, $student->getId());
+        $note = $notebookDao->get($idNote);
+
+        return !empty($note);
+    }
     
     /**
      * Updates a note.
@@ -82,29 +87,12 @@ class NotebookController extends Controller
      */
     public function edit($idNote)
     {
-        $dbConnection = new MySqlPDODatabase();
-        
-        $student = Student::getLoggedIn($dbConnection);
-        $notebookDao = new NotebookDAO($dbConnection, $student->getId());
-        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
-        $note = $notebookDao->get($idNote);
-        
-        // If does not exist an note with the provided id or if it exists but 
-        // does not belongs to student logged in, redirects him to courses page
-        if (empty($note)) {
+        if (!$this->doesTheNoteBelongToTheLoggedInStudent($idNote)) {
             $this->redirectTo("courses");
         }
-        
-        // Checks if form has been sent
-        if (!empty($_POST['note_title']) && !empty($_POST['note_content'])) {
-            $notebookDao->update(new Note(
-                $note->getId(), 
-                $_POST['note_title'], 
-                $_POST['note_content'], 
-                $note->getCreationDate(), 
-                $note->getClass()
-            ));
-            
+
+        if ($this->hasEditBeenSent()) {
+            $this->updateNote($idNote);
             $this->redirectTo("courses");
         }
         
@@ -114,7 +102,11 @@ class NotebookController extends Controller
             'description' => "Notebook",
             'robots' => 'noindex'
         );
-        
+        $dbConnection = new MySqlPDODatabase();
+        $student = Student::getLoggedIn($dbConnection);
+        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
+        $notebookDao = new NotebookDAO($dbConnection, $student->getId());
+        $note = $notebookDao->get($idNote);
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
@@ -126,6 +118,28 @@ class NotebookController extends Controller
         
         $this->loadTemplate("notebook/NotebookEditView", $viewArgs);
     }
+
+    private function hasEditBeenSent()
+    {
+        return  !empty($_POST['note_title']) 
+                && !empty($_POST['note_content']);
+    }
+
+    private function updateNote($idNote)
+    {
+        $dbConnection = new MySqlPDODatabase();
+        $student = Student::getLoggedIn($dbConnection);
+        $notebookDao = new NotebookDAO($dbConnection, $student->getId());
+        $note = $notebookDao->get($idNote);
+        
+        $notebookDao->update(new Note(
+            $note->getId(), 
+            $_POST['note_title'], 
+            $_POST['note_content'], 
+            $note->getCreationDate(), 
+            $note->getClass()
+        ));
+    }
     
     /**
      * Removes a note.
@@ -134,20 +148,15 @@ class NotebookController extends Controller
      */
     public function delete($idNote)
     {
-        $dbConnection = new MySqlPDODatabase();
-        
-        $student = Student::getLoggedIn($dbConnection);
-        $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
-        $note = $notebookDAO->get($idNote);
-        
-        // If does not exist an note with the provided id or if it exists but
-        // does not belongs to student logged in, redirects him to courses page
-        if (empty($note)) {
+        if (!$this->doesTheNoteBelongToTheLoggedInStudent($idNote)) {
             $this->redirectTo("courses");
         }
+
+        $dbConnection = new MySqlPDODatabase();
+        $student = Student::getLoggedIn($dbConnection);
+        $notebookDAO = new NotebookDAO($dbConnection, $student->getId());
         
         $notebookDAO->delete($idNote);
-        
         $this->redirectTo("courses");
     }
     
@@ -168,26 +177,36 @@ class NotebookController extends Controller
      */
     public function new()
     {
-        // Checks if it is a POST request
         if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
             
-        if (empty($_POST['title']) || empty($_POST['content']) || 
-                empty($_POST['id_module']) || empty($_POST['class_order']) || 
-                $_POST['id_module'] <= 0 || $_POST['class_order'] <= 0) {
+        if (!$this->hasNewNoteBeenSent()) {
             return;
         }
         
         $dbConnection = new MySqlPDODatabase();
-        $notebookDao = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $notebookDao = new NotebookDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
         
         echo $notebookDao->new(
-            (int)$_POST['id_module'], 
-            (int)$_POST['class_order'],
+            (int) $_POST['id_module'], 
+            (int) $_POST['class_order'],
             $_POST['title'], 
             $_POST['content']
         );
+    }
+
+    private function hasNewNoteBeenSent()
+    {
+        return  !empty($_POST['title']) 
+                && !empty($_POST['content']) 
+                && !empty($_POST['id_module']) 
+                && !empty($_POST['class_order']) 
+                && $_POST['id_module'] > 0 
+                && $_POST['class_order'] > 0;
     }
     
     /**
@@ -208,7 +227,10 @@ class NotebookController extends Controller
         }
         
         $dbConnection = new MySqlPDODatabase();
-        $notebookDao = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $notebookDao = new NotebookDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
         $offset = $_GET['limit'] * ($_GET['index'] - 1);
         
         echo json_encode(
@@ -231,13 +253,15 @@ class NotebookController extends Controller
      */
     public function getAllFromClass()
     {
-        // Checks if it is a GET request
         if ($this->getHttpRequestMethod() != 'GET') {
             $this->redirectToRoot();
         }
             
         $dbConnection = new MySqlPDODatabase();
-        $notebookDao = new NotebookDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $notebookDao = new NotebookDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
         $offset = $_GET['limit'] * ($_GET['index'] - 1);
         
         echo json_encode(

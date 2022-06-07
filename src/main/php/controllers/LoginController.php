@@ -35,8 +35,6 @@ class LoginController extends Controller
      */
     public function index ()
     {
-        $dbConnection = new MySqlPDODatabase();
-        
         $header = array(
             'title' => 'Login - Learning platform',
             'styles' => array('LoginStyle'),
@@ -44,27 +42,15 @@ class LoginController extends Controller
             'keywords' => array('learning platform', 'login'),
             'robots' => 'index'
         );
-        
         $viewArgs = array(
             'header' => $header,
             'error' => false,
             'msg' => ''
         );
         
-        // Checks if login form has been sent
-        if (!empty($_POST['email'])) {
-            if (!empty(Student::login($dbConnection, $_POST['email'], $_POST['password']))) {
-                // If login was successful, redirects him
-                if (empty($_SESSION['redirect'])) {
-                    header("Location: ".BASE_URL."courses");
-                }
-                else {
-                    $redirect = $_SESSION['redirect'];
-                    unset($_SESSION['redirect']);
-                    header("Location: ".$redirect);
-                }
-                
-                exit;
+        if ($this->hasLoginFormBeenSent()) {
+            if ($this->hasLogged()) {
+                $this->redirectLoggedUser();
             }
             
             $viewArgs['error'] = true;
@@ -72,6 +58,37 @@ class LoginController extends Controller
         }
         
         $this->loadTemplate("LoginView", $viewArgs, false);
+    }
+
+    private function hasLoginFormBeenSent()
+    {
+        return  !empty($_POST['email']);
+    }
+
+    private function hasLogged()
+    {
+        $dbConnection = new MySqlPDODatabase();
+        $loggedStudent = Student::login(
+            $dbConnection, 
+            $_POST['email'], 
+            $_POST['password']
+        );
+        
+        return !empty($loggedStudent);
+    }
+
+    private function redirectLoggedUser()
+    {
+        if (empty($_SESSION['redirect'])) {
+            header("Location: ".BASE_URL."courses");
+        }
+        else {
+            $redirect = $_SESSION['redirect'];
+            unset($_SESSION['redirect']);
+            header("Location: ".$redirect);
+        }
+
+        exit;
     }
     
     /**
@@ -86,7 +103,6 @@ class LoginController extends Controller
             'keywords' => array('learning platform', 'register'),
             'robots' => 'index'
         );
-        
         $viewArgs = array(
             'header' => $header,
             'scripts' => array(),
@@ -94,9 +110,7 @@ class LoginController extends Controller
             'msg' => ''
         );
         
-        // Checks if registration form has been sent
-        if ($this->wasRegistrationFormSent()) {
-            // Checks if all fields are filled
+        if ($this->hasRegistrationFormBeenSent()) {
             if ($this->isAllFieldsFilled()) {
                 $studentsDao = new StudentsDAO(new MySqlPDODatabase());
                 
@@ -110,12 +124,11 @@ class LoginController extends Controller
                         $_POST['genre'],
                         $_POST['birthdate'],
                         $_POST['email'],
-                        $_POST['password']
+                        null
                     );
                     
-                    if ($studentsDao->register($student)) {
+                    if ($studentsDao->register($student, $_POST['password'])) {
                         $this->redirectToRoot();
-                        exit;
                     }
                     
                     $viewArgs['error'] = true;
@@ -160,7 +173,7 @@ class LoginController extends Controller
      * 
      * @return      boolean If registration form was sent
      */
-    private function wasRegistrationFormSent()
+    private function hasRegistrationFormBeenSent()
     {
         return (
             !empty($_POST['name']) ||

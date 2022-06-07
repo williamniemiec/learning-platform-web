@@ -42,23 +42,17 @@ class PurchasesController extends Controller
         $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
         $studentsDao = new StudentsDAO($dbConnection, $student->getId());
         $limit = 10;
-        $index = 1;
-        
-        // Checks whether an index has been sent
-        if (!empty($_GET['index'])) {
-            $index = (int)$_GET['index'];
-        }
-        
+        $index = $this->getIndex();
+        $offset = $limit * ($index - 1);
         $header = array(
             'title' => 'Purchases - Learning Platform',
             'description' => "Student purchases",
             'robots' => 'noindex'
         );
-
         $viewArgs = array(
             'header' => $header,
             'username' => $student->getName(),
-            'purchases' => $studentsDao->getPurchases($limit, $limit * ($index - 1)),
+            'purchases' => $studentsDao->getPurchases($limit, $offset),
             'notifications' => array(
                 'notifications' => $notificationsDao->getNotifications(10),
                 'total_unread' => $notificationsDao->countUnreadNotification()),
@@ -67,5 +61,19 @@ class PurchasesController extends Controller
         );
         
         $this->loadTemplate("PurchasesView", $viewArgs, Student::isLogged());
+    }
+
+    private function getIndex()
+    {
+        if (!$this->hasIndexBeenSent()) {
+            return 1;
+        }
+
+        return ((int) $_GET['index']);
+    }
+
+    private function hasIndexBeenSent()
+    {
+        return  !empty($_POST['index']);
     }
 }

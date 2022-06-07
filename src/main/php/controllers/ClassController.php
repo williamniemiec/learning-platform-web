@@ -50,7 +50,10 @@ class ClassController extends Controller
         $dbConnection = new MySqlPDODatabase();
         $questionnaireDao = new QuestionnairesDAO($dbConnection);
 
-        echo $questionnaireDao->getAnswer($_POST['id_module'], $_POST['class_order']);
+        echo $questionnaireDao->getAnswer(
+            $_POST['id_module'], 
+            $_POST['class_order']
+        );
     }
     
     /**
@@ -69,7 +72,6 @@ class ClassController extends Controller
         }
 
         $dbConnection = new MySqlPDODatabase();
-        
         $class = $_POST['type'] == 0 ? 
                 new VideosDAO($dbConnection) : 
                 new QuestionnairesDAO($dbConnection);
@@ -92,13 +94,11 @@ class ClassController extends Controller
      */
     public function removeWatched()
     {
-        // Checks if it is an ajax request
         if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
 
         $dbConnection = new MySqlPDODatabase();
-        
         $class = $_POST['type'] == 0 ?
                 new VideosDAO($dbConnection) :
                 new QuestionnairesDAO($dbConnection);
@@ -124,14 +124,13 @@ class ClassController extends Controller
      */
     public function newComment()
     {
-        // Checks if it is an ajax request
         if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
             
         $dbConnection = new MySqlPDODatabase();
-        
         $commentsDao = new CommentsDAO($dbConnection);
+        
         echo $commentsDao->newComment(
             Student::getLoggedIn($dbConnection)->getId(), 
             (int) $_POST['id_course'],

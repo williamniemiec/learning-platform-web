@@ -31,10 +31,9 @@ class BundleController extends Controller
 	public function open($idBundle)
 	{
 	    $dbConnection = new MySqlPDODatabase();
-	    
+
 	    $bundlesDao = new BundlesDAO($dbConnection);
 	    $bundle = $bundlesDao->get($idBundle);
-	    
 	    $header = array(
 	        'title' => $bundle->getName().' - Learning Platform',
 	        'styles' => array('BundleStyle', 'gallery'),
@@ -42,7 +41,6 @@ class BundleController extends Controller
 	        'keywords' => array('learning platform', 'bundle', $bundle->getName()),
 	        'robots' => 'index'
 	    );
-	    
 	    $viewArgs = array(
 	        'header' => $header,
 	        'bundle' => $bundle,
@@ -57,12 +55,10 @@ class BundleController extends Controller
 	        $student = Student::getLoggedIn($dbConnection);
 	        $studentsDao = new StudentsDAO($dbConnection, $student->getId());
 	        $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
-	        
 	        $viewArgs['notifications'] = array(
                 'notifications' => $notificationsDao->getNotifications(10),
                 'total_unread' => $notificationsDao->countUnreadNotification()
             );
-	        
 	        $viewArgs['username'] = $student->getName();
 	        $viewArgs['extensionBundles'] = $bundlesDao->extensionBundles(
 	            $idBundle, $student->getId()
@@ -138,21 +134,29 @@ class BundleController extends Controller
 	 */
 	public function buy()
 	{
-	    if ($this->getHttpRequestMethod() != 'POST' || empty($_POST['id_bundle'])) {
+	    if ($this->getHttpRequestMethod() != 'POST') {
 	        return;
+		}
+
+		if (empty($_POST['id_bundle'])) {
+			return;
 		}
 	    
         $link = '';
 	        
         if (!Student::isLogged()) {
-            $_SESSION['redirect'] = BASE_URL."bundle/open/".$_POST['id_bundle'];
             $link = BASE_URL."login";
+            $_SESSION['redirect'] = BASE_URL."bundle/open/".$_POST['id_bundle'];
         }
         else {
+			$link = BASE_URL."bundle/open/".$_POST['id_bundle'];
             $dbConnection = new MySqlPDODatabase();
-            $studentsDao = new StudentsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
-            $studentsDao->addBundle((int)$_POST['id_bundle']);
-            $link = BASE_URL."bundle/open/".$_POST['id_bundle'];
+            $studentsDao = new StudentsDAO(
+				$dbConnection, 
+				Student::getLoggedIn($dbConnection)->getId()
+			);
+
+            $studentsDao->addBundle((int) $_POST['id_bundle']);
         }
         
         echo $link;

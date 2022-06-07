@@ -37,20 +37,26 @@ class NotificationController extends Controller
      */
     public function read()
     {
-        // Checks if it is an ajax request
         if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
             
-        if (empty($_POST['id_notification'])) {
+        if (!$this->hasNotificationIdBeenSent()) {
             return;
         }
         
         $dbConnection = new MySqlPDODatabase();
-        
-        $notificationsDao = new NotificationsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
+        $notificationsDao = new NotificationsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
         
         $notificationsDao->markAsRead((int) $_POST['id_notification']);
+    }
+
+    private function hasNotificationIdBeenSent()
+    {
+        return !empty($_POST['id_notification']);
     }
     
     /**
@@ -62,20 +68,21 @@ class NotificationController extends Controller
      */
     public function unread()
     {
-        // Checks if it is an ajax request
         if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
             
-        if (empty($_POST['id_notification'])) {
+        if (!$this->hasNotificationIdBeenSent()) {
             return;
         }
         
         $dbConnection = new MySqlPDODatabase();
+        $notificationsDao = new NotificationsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
         
-        $notificationsDao = new NotificationsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
-        
-        $notificationsDao->markAsUnread((int)$_POST['id_notification']);
+        $notificationsDao->markAsUnread((int) $_POST['id_notification']);
     }
     
     /**
@@ -87,19 +94,20 @@ class NotificationController extends Controller
      */
     public function delete()
     {
-        // Checks if it is an ajax request
         if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
             
-        if (empty($_POST['id_notification'])) { 
+        if (!$this->hasNotificationIdBeenSent()) {
             return; 
         }
         
         $dbConnection = new MySqlPDODatabase();
+        $notificationsDao = new NotificationsDAO(
+            $dbConnection, 
+            Student::getLoggedIn($dbConnection)->getId()
+        );
         
-        $notificationsDao = new NotificationsDAO($dbConnection, Student::getLoggedIn($dbConnection)->getId());
-        
-        $notificationsDao->delete((int)$_POST['id_notification']);
+        $notificationsDao->delete((int) $_POST['id_notification']);
     }
 }
