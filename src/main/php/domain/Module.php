@@ -6,7 +6,7 @@ namespace domain;
 
 use dao\VideosDAO;
 use dao\QuestionnairesDAO;
-use domain\util\IllegalStateException;
+use util\IllegalStateException;
 use repositories\Database;
 
 

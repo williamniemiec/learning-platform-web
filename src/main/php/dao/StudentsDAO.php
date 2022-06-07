@@ -8,7 +8,7 @@ use repositories\Database;
 use domain\Student;
 use domain\ClassType;
 use domain\enum\GenreEnum;
-use domain\util\FileUtil;
+use util\FileUtil;
 use domain\Bundle;
 use domain\Purchase;
 

@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace domain\enum;
 
 
-use domain\util\Enumeration;
+use util\Enumeration;
 
 
 /**

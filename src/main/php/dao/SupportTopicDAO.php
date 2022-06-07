@@ -8,7 +8,7 @@ use repositories\Database;
 use domain\SupportTopic;
 use domain\Message;
 use domain\SupportTopicCategory;
-use domain\util\IllegalAccessException;
+use util\IllegalAccessException;
 
 
 /**

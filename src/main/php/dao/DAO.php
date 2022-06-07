@@ -40,7 +40,13 @@ abstract class DAO
     protected function runQueryWithArguments(...$bindArguments)
     {
         $this->sql = $this->db->prepare($this->query);
-        $this->sql->execute($bindArguments);
+
+        if (is_array($bindArguments[0])) {
+            $this->sql->execute(...$bindArguments);
+        }
+        else {
+            $this->sql->execute($bindArguments);
+        }
     }
 
     protected function runQueryWithoutArguments()

@@ -302,42 +302,22 @@ class BundlesDAO extends DAO
     public function unrelatedBundles(int $idBundle, int $idStudent = -1) : array
     {
         $this->validateBundleId($idBundle);
-        $this->withQuery($this->buildUnrelatedBundlesQuery($idStudent));
+        $this->withQuery("
+            SELECT  *
+            FROM    bundles b
+            WHERE   id_bundle != ? AND
+                    NOT EXISTS (
+                        SELECT  *
+                        FROM    bundle_courses
+                        WHERE   id_bundle = ? AND
+                                id_course IN (SELECT id_course
+                                            FROM   bundle_courses
+                                            WHERE  id_bundle = b.id_bundle)
+                    )
+        ");
         $this->runQueryWithArguments($this->buildBundlesQueryArguments($idStudent, $idBundle));
         
         return $this->parseBundlesResponseQuery();
-    }
-
-    private function buildUnrelatedBundlesQuery($idStudent)
-    {
-        $query = "";
-
-        if ($idStudent > 0) {
-            $query = "
-                SELECT  *
-                FROM    bundles b
-                WHERE   id_bundle != ? AND
-            ";
-        }
-        else {
-            $query = "
-                SELECT  *
-                FROM    bundles b
-                WHERE   id_bundle != ? AND
-            ";
-        }
-        
-        $query .= "
-                NOT EXISTS (
-                    SELECT  *
-                    FROM    bundle_courses
-                    WHERE   id_bundle = ? AND
-                            id_course IN (SELECT id_course
-                                          FROM   bundle_courses
-                                          WHERE  id_bundle = b.id_bundle)
-               ";
-
-        return $query;
     }
     
     /**

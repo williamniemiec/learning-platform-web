@@ -94,6 +94,7 @@ Details about each version are documented in the [releases section](https://gith
 |        Name        |Type|Description|
 |----------------|-------------------------------|-----------------------------|
 |docs |`Directory`|Documentation files|
+| panel	|	 `Directory`	| Admin system |
 |src  |`Directory`|Application and test files|
 | 	.htaccess 				| `File`	| Redirection for correct MVC performance on Apache servers
 | 	Procfile 				| `File`	| Heroku configuration file
@@ -121,8 +122,8 @@ Details about each version are documented in the [releases section](https://gith
 | 	controllers 		| `Directory`	| Application controller classes
 | 	dao 				| `Directory`	| Data access object classes
 | 	domain 				| `Directory`	| Application domain classes
-| panel	|	 `Directory`	| Admin system |
 | repositories	|	 `Directory`	| Classes that handle with database and storage |
+| 	util 				| `Directory`	| Utility classes
 | 	views 				| `Directory`	| Visual application classes
 | 	config.php 				| `File`	| System variables
 | 	environment.php 				| `File`	| System environment

@@ -91,7 +91,7 @@ class Course implements \JsonSerializable
     }
 
     private function validateTotalClasses($totalClasses) {
-        if ($this->isNonNegativeInteger($totalClasses)) {
+        if (!$this->isNonNegativeInteger($totalClasses)) {
             throw new \InvalidArgumentException("Total classes cannot be less ".
                                                 "than zero");
         }
@@ -104,7 +104,7 @@ class Course implements \JsonSerializable
     }
 
     private function validateTotalLength($totalLength) {
-        if ($this->isNonNegativeInteger($totalLength)) {
+        if (!$this->isNonNegativeInteger($totalLength)) {
             throw new \InvalidArgumentException("Total length cannot be less ".
                                                 "than zero");
         }
