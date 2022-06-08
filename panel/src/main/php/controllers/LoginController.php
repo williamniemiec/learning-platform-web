@@ -3,16 +3,12 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\Admin;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
 
 
 /**
- * Responsible for the behavior of the view {@link login.php}.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the LoginView.
  */
 class LoginController extends Controller
 {      
@@ -29,25 +25,37 @@ class LoginController extends Controller
             'styles' => array('LoginStyle'),
             'robots' => 'index'
         );
-        
         $viewArgs = array(
             'error' => false,
             'msg' => '',
             'header' => $header
         );
         
-        // Checks whether the admin credentials are correct
-        if (!empty($_POST['email'])) {
-            if (!empty(Admin::login(new MySqlPDODatabase(), $_POST['email'], $_POST['password']))) {
-                header("Location: ".BASE_URL);
-                exit;
+        if ($this->hasFormBeenSent()) {
+            if ($this->doLogin()) {
+                $this->redirectToRoot();
             }
             
-            // If an error occurred, display it
             $viewArgs['error'] = true;
             $viewArgs['msg'] = "Email and / or password incorrect";
         }
         
         $this->loadTemplate("LoginView", $viewArgs, false);
+    }
+
+    private function hasFormBeenSent()
+    {
+        return !empty($_POST['email']);
+    }
+
+    private function doLogin()
+    {
+        $admin = Admin::login(
+            new MySqlPDODatabase(), 
+            $_POST['email'], 
+            $_POST['password']
+        );
+
+        return !empty($admin);
     }
 }

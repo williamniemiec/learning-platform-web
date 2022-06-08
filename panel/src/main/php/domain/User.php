@@ -3,7 +3,8 @@ declare (strict_types=1);
 
 namespace panel\domain;
 
-use panel\DateTime;
+
+use \DateTime;
 use panel\domain\enum\GenreEnum;
 
 

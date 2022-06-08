@@ -3,17 +3,11 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\models\Admin;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\dao\BundlesDAO;
+use panel\domain\Admin;
 
 
 /**
  * Main controller. It will be responsible for admin's main page behavior.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class HomeController extends Controller 
 {
@@ -27,8 +21,7 @@ class HomeController extends Controller
     public function __construct()
     {
         if (!Admin::isLogged()) {
-            header("Location: ".BASE_URL."login");
-            exit;
+            $this->redirectTo("login");
         }
     }
     
@@ -41,8 +34,7 @@ class HomeController extends Controller
      */
 	public function index ()
 	{
-	    // Redirects admin to bundles manager
-	    header("Location: ".BASE_URL."bundles");
+        $this->redirectTo("bundles");
 	}
 	
 	/**
@@ -51,6 +43,6 @@ class HomeController extends Controller
 	public function logout()
 	{
 	    Admin::logout();
-	    header("Location: ".BASE_URL."login");
+        $this->redirectTo("login");
 	}
 }

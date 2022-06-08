@@ -3,16 +3,12 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\Admin;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
 
 
 /**
  * It will be responsible for site's page not found behavior.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
  */
 class NotFoundController extends Controller
 {
@@ -24,22 +20,20 @@ class NotFoundController extends Controller
      */
     public function index()
     {
-        $dbConnection = new MySqlPDODatabase();
-        
         $header = array(
             'title' => 'Page not found - Learning platform',
             'description' => "Page not found",
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
             'header' => $header
         );
-        
+        $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
         
-        if (empty($admin))
+        if (empty($admin)) {
             $this->loadTemplate('error/404', $viewArgs, false);
+        }
             
         $viewArgs['username'] = $admin->getName();
         $viewArgs['authorization'] = $admin->getAuthorization();

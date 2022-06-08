@@ -3,19 +3,14 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\models\Student;
-use panel\models\Admin;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\dao\StudentsDAO;
-use panel\models\dao\CoursesDAO;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+use panel\dao\StudentsDAO;
+use panel\dao\CoursesDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link studentsManager/students_manager.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the StudentsManagerView.
  */
 class StudentsController extends Controller
 {
@@ -28,10 +23,8 @@ class StudentsController extends Controller
      */
     public function __construct()
     {
-        if (!Admin::isLogged() || 
-            !(Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() == 0)) {
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Admin::isLogged() || !$this->hasLoggedAdminAuthorization(0)) {
+            $this->redirectTo("login");
         }
     }
     
@@ -46,39 +39,51 @@ class StudentsController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $studentsDAO = new StudentsDAO($dbConnection);
-        $coursesDAO = new CoursesDAO($dbConnection);
-        $selectedCourse = 0;
-        
-        if (!empty($_GET['filter-course'])) {
-            $students = $studentsDAO->getAll($_GET['filter-course']);
-            $selectedCourse = $_GET['filter-course'];
-        }
-        else {
-            $students = $studentsDAO->getAll();
-        }
-        
-        foreach ($students as $student) {
-            $student->setDatabase($dbConnection);
-        }
-        
+        $coursesDao = new CoursesDAO($dbConnection);
         $header = array(
             'title' => 'Students manager - Learning platform',
             'styles' => array('StudentsManagerStyle'),
             'robots' => 'index'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'students' => $students,
-            'header' => $header,
+            'students' => $this->fetchStudents($dbConnection),
             'scripts' => array('StudentsManagerScript'),
-            'courses' => $coursesDAO->getAll(),
-            'selectedCourse' => $selectedCourse
+            'courses' => $coursesDao->getAll(),
+            'selectedCourse' => $this->getSelectedCourse()
         );
         
         $this->loadTemplate("studentsManager/StudentsManagerView", $viewArgs);
+    }
+
+    private function getSelectedCourse()
+    {
+        if (empty($_GET['filter-course'])) {
+            return 0;
+        }
+
+        return $_GET['filter-course'];
+    }
+
+    private function fetchStudents($dbConnection)
+    {
+        $students = array();
+        $studentsDao = new StudentsDAO($dbConnection);
+        
+        if (empty($_GET['filter-course'])) {
+            $students = $studentsDao->getAll();
+        }
+        else {
+            $students = $studentsDao->getAll($_GET['filter-course']);
+        }
+        
+        foreach ($students as $student) {
+            $student->setDatabase($dbConnection);
+        }
+
+        return $students;
     }
     
     
@@ -98,35 +103,41 @@ class StudentsController extends Controller
      */
     public function edit_student()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
-        
-        if (empty($_POST['email'])) { echo false; }
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $this->redirectToRoot();
+        }
+
+        if (empty($_POST['email'])) { 
+            echo false; 
+        }
         
         $dbConnection = new MySqlPDODatabase();
-        $studentsDAO = new StudentsDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        $response = false;
+        $studentsDao = new StudentsDAO(
+            $dbConnection, 
+            Admin::getLoggedIn($dbConnection)
+        );
         
-        if (empty($_POST['passowrd'])) {
-            $response = $studentsDAO->update(
-                (int)$_POST['id_student'],
+        $success = false;
+        
+        if (empty($_POST['password'])) {
+            $success = $studentsDao->update(
+                (int) $_POST['id_student'],
                 $_POST['email']
             );
         }
         else {
-            $response = $studentsDAO->update(
-                (int)$_POST['id_student'],
+            $success = $studentsDao->update(
+                (int) $_POST['id_student'],
                 $_POST['email'],
-                $_POST['passowrd']
+                $_POST['password']
             );
         }
 
-        echo $response;
+        echo $success;
     }
     
     /**
-     * Gets informations about a student
+     * Gets information about a student
      * 
      * @param       int $_POST['id_student'] Student id
      * 
@@ -136,16 +147,21 @@ class StudentsController extends Controller
      */
     public function get_student()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $this->redirectToRoot();
+        }
         
-        if (empty($_POST['id_student'])) { echo json_encode(array()); }
+        if (empty($_POST['id_student'])) { 
+            echo json_encode(array()); 
+        }
         
         $dbConnection = new MySqlPDODatabase();
-        $studentsDAO = new StudentsDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $studentsDao = new StudentsDAO(
+            $dbConnection, 
+            Admin::getLoggedIn($dbConnection)
+        );
         
-        echo json_encode($studentsDAO->get((int)$_POST['id_student']));
+        echo json_encode($studentsDao->get((int) $_POST['id_student']));
     }
     
     /**
@@ -159,16 +175,21 @@ class StudentsController extends Controller
      */
     public function delete_student()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $this->redirectToRoot();
+        }
         
-        if (empty($_POST['id_student'])) { echo false; }
+        if (empty($_POST['id_student'])) { 
+            echo false; 
+        }
         
         $dbConnection = new MySqlPDODatabase();
-        $studentsDAO = new StudentsDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $studentsDao = new StudentsDAO(
+            $dbConnection, 
+            Admin::getLoggedIn($dbConnection)
+        );
         
-        echo $studentsDAO->delete((int)$_POST['id_student']);
+        echo $studentsDao->delete((int) $_POST['id_student']);
     }
     
     /**
@@ -183,16 +204,21 @@ class StudentsController extends Controller
      */
     public function get_bundles()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $this->redirectToRoot();
+        }
         
-        if (empty($_POST['id_student'])) { echo false; }
+        if (empty($_POST['id_student'])) { 
+            echo false; 
+        }
         
         $dbConnection = new MySqlPDODatabase();
-        $studentsDAO = new StudentsDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $studentsDao = new StudentsDAO(
+            $dbConnection, 
+            Admin::getLoggedIn($dbConnection)
+        );
         
-        echo json_encode($studentsDAO->getBundles((int)$_POST['id_student']));
+        echo json_encode($studentsDao->getBundles((int) $_POST['id_student']));
     }
     
     /**
@@ -205,18 +231,23 @@ class StudentsController extends Controller
      */
     public function add_student_bundle()
     {
-        // Checks if it is an ajax request
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $this->redirectToRoot();
+        }
         
-        if (empty($_POST['id_student']) || empty($_POST['id_bundle'])) { echo false; }
+        if (empty($_POST['id_student']) || empty($_POST['id_bundle'])) { 
+            echo false; 
+        }
         
         $dbConnection = new MySqlPDODatabase();
-        $studentsDAO = new StudentsDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $studentsDao = new StudentsDAO(
+            $dbConnection, 
+            Admin::getLoggedIn($dbConnection)
+        );
         
-        $studentsDAO->addBundle(
-            (int)$_POST['id_student'],
-            (int)$_POST['id_bundle']
+        $studentsDao->addBundle(
+            (int) $_POST['id_student'],
+            (int) $_POST['id_bundle']
         );
     }
 }

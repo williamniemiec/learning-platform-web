@@ -3,17 +3,13 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\models\Admin;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\dao\ModulesDAO;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+use panel\dao\ModulesDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link modulesManager/modules_manager.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the ModulesManagerView.
  */
 class ModulesController extends Controller
 {
@@ -26,10 +22,8 @@ class ModulesController extends Controller
      */
     public function __construct()
     {
-        if (!Admin::isLogged() ||
-            !(Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() <= 1)) {
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Admin::isLogged() || !$this->hasLoggedAdminAuthorization(0, 1)) {
+            $this->redirectTo("login");
         }
     }
     
@@ -42,37 +36,41 @@ class ModulesController extends Controller
      */
     public function index ()
     {
+        $limit = 10;
+        $index = $this->getIndex();
+        $offset = $limit * ($index - 1);
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $modulesDAO = new ModulesDAO($dbConnection);
-        $limit = 10;
-        $index = 1;
-        
-        // Checks whether an index has been sent
-        if (!empty($_GET['index'])) {
-            $index = (int)$_GET['index'];
-        }
-        
-        $offset = $limit * ($index - 1);
-        
-        $modules = $modulesDAO->getAll($limit, $offset);
-        
+        $modulesDao = new ModulesDAO($dbConnection);   
         $header = array(
             'title' => 'Modules manager - Learning platform',
             'styles' => array('ManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'modules' => $modules,
-            'header' => $header,
-            'totalPages' => ceil($modulesDAO->count() / $limit),
+            'modules' => $modulesDao->getAll($limit, $offset),
+            'totalPages' => ceil($modulesDao->count() / $limit),
             'currentIndex' => $index
         );
         
         $this->loadTemplate("modulesManager/ModulesManagerView", $viewArgs);
+    }
+
+    private function getIndex()
+    {
+        if (!$this->hasIndexBeenSent()) {
+            return 1;
+        }
+
+        return ((int) $_GET['index']);
+    }
+
+    private function hasIndexBeenSent()
+    {
+        return  !empty($_GET['index']);
     }
     
     /**
@@ -82,58 +80,63 @@ class ModulesController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        
         $header = array(
             'title' => 'Modules manager - New - Learning platform',
             'styles' => array('modulesManager'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'header' => $header,
             'error' => false,
             'msg' => ''
         );
         
-        // Checks if the new course has been successfully added
-        if (!empty($_POST['name'])) {
-            $modulesDAO = new ModulesDAO($dbConnection, $admin);
+        if ($this->hasFormBeenSent()) {
+            $success = $this->createNewModule($dbConnection, $admin);
             
-            if ($modulesDAO->new($_POST['name']) != -1) {
-                header("Location: ".BASE_URL."modules");
-                exit;
+            if ($success) {
+                $this->redirectTo("modules");
             }
             
-            // If an error occurred, display it
             $viewArgs['error'] = true;
             $viewArgs['msg'] = "The module could not be added!";
         }
         
         $this->loadTemplate("modulesManager/ModulesManagerNewView", $viewArgs);
     }
+
+    private function hasFormBeenSent()
+    {
+        return !empty($_POST['name']);
+    }
+
+    private function createNewModule($dbConnection, $admin)
+    {
+        $modulesDao = new ModulesDAO($dbConnection, $admin);
+            
+        return ($modulesDao->new($_POST['name']) != -1);
+    }
     
     /**
      * Edits a module.
      */
-    public function edit($id_module)
+    public function edit($idModule)
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $modulesDAO = new ModulesDAO($dbConnection, $admin);
-        $module = $modulesDAO->get((int)$id_module);
-        
+        $modulesDao = new ModulesDAO($dbConnection, $admin);
+        $module = $modulesDao->get((int) $idModule);
         $header = array(
             'title' => 'Modules manager - New - Learning platform',
             'styles' => array('ModulesManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'header' => $header,
             'module' => $module,
             'classes' => $module->getClasses($dbConnection),
             'error' => false,
@@ -141,36 +144,43 @@ class ModulesController extends Controller
             'scripts' => array('ModulesManagerStyle')
         );
         
-        // Checks if course has been successfully updated
-        if (!empty($_POST['name'])) {
-            $modulesDAO = new ModulesDAO($dbConnection, $admin);
+        if ($this->hasFormBeenSent()) {
+            $success = $this->updateModule($dbConnection, $admin, $idModule);
             
-            if ($modulesDAO->update((int)$id_module, $_POST['name']) != -1) {
-                header("Location: ".BASE_URL."modules");
-                exit;
+            if ($success) {
+                $this->redirectTo("modules");
             }
             
-            // If an error occurred, display it
             $viewArgs['error'] = true;
             $viewArgs['msg'] = "The module could not be added!";
         }
         
         $this->loadTemplate("modulesManager/ModulesManagerEditView", $viewArgs);
     }
+
+    private function updateModule($dbConnection, $admin, $moduleId)
+    {
+        $modulesDao = new ModulesDAO($dbConnection, $admin);
+            
+        return ($modulesDao->update((int) $moduleId, $_POST['name']) != -1);
+    }
     
     /**
      * Removes a module.
      */
-    public function delete($id_module)
+    public function delete($idModule)
     {
         $dbConnection = new MySqlPDODatabase();
+        $modulesDao = new ModulesDAO(
+            $dbConnection, 
+            Admin::getLoggedIn($dbConnection)
+        );
         
-        $modulesDAO = new ModulesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        $modulesDAO->delete((int)$id_module);
-        
-        header("Location: ".BASE_URL."modules");
+        $modulesDao->delete((int)$idModule);
+        $this->redirectTo("modules");
     }
     
+
     //-------------------------------------------------------------------------
     //        Ajax
     //-------------------------------------------------------------------------
@@ -183,18 +193,18 @@ class ModulesController extends Controller
      */
     public function getAll()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             return;
+        }
             
         $dbConnection = new MySqlPDODatabase();
+        $modulesDao = new ModulesDAO($dbConnection);
         
-        $modulesDAO = new ModulesDAO($dbConnection);
-        
-        echo json_encode($modulesDAO->getAll());
+        echo json_encode($modulesDao->getAll());
     }
     
     /**
-     * Gets informations about all classes from a module.
+     * Gets information about all classes from a module.
      * 
      * @param       int $_GET['id_module'] Module id
      * 
@@ -205,14 +215,14 @@ class ModulesController extends Controller
      */
     public function getClasses()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             return;
+        }
         
         $dbConnection = new MySqlPDODatabase();
+        $modulesDao = new ModulesDAO($dbConnection);
         
-        $modulesDAO = new ModulesDAO($dbConnection);
-        
-        echo json_encode($modulesDAO->getClassesFromModule((int)$_GET['id_module']));
+        echo json_encode($modulesDao->getClassesFromModule((int) $_GET['id_module']));
     }
     
     /**
@@ -232,40 +242,30 @@ class ModulesController extends Controller
      */
     public function setClasses()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             return;
-            
-        $dbConnection = new MySqlPDODatabase();
-        
+        }
+
         try {
-            $modulesDAO = new ModulesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-            $modulesDAO->addClasses((int)$_POST['id_module'], $_POST['classes']);
+            $this->addClasses();
         }
         catch (\Exception $e) {
             header("HTTP/1.0 500 ".$e->getMessage());
-            
             echo $e->getMessage();
         }
     }
-    
-//     /**
-//      * Gets highest module order in use.
-//      *
-//      * @param       int $_GET['id_course'] Course id
-//      * @param       int $_GET['id_module'] Module id
-//      * 
-//      * @return      int Highest moddule order
-//      *
-//      * @apiNote     Must be called using GET request method
-//      */
-//     public function getMaxOrderInCourse()
-//     {
-//         if ($_SERVER['REQUEST_METHOD'] != 'GET')
-//             return;
-            
-//         $dbConnection = new MySqlPDODatabase();
-        
-//         $modulesDAO = new ModulesDAO($dbConnection);
-//         echo $modulesDAO->getHighestOrder((int)$_GET['id_course'], (int)$_GET['id_module']);
-//     }
+
+    private function addClasses()
+    {
+        $dbConnection = new MySqlPDODatabase();
+        $modulesDao = new ModulesDAO(
+            $dbConnection, 
+            Admin::getLoggedIn($dbConnection)
+        );
+
+        $modulesDao->addClasses(
+            (int) $_POST['id_module'], 
+            $_POST['classes']
+        );
+    }
 }

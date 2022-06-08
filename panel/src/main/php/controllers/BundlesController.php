@@ -3,23 +3,19 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\models\Admin;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\dao\BundlesDAO;
-use panel\models\Bundle;
-use panel\models\util\FileUtil;
-use panel\models\util\IllegalAccessException;
-use panel\models\dao\CoursesDAO;
-use panel\models\enum\BundleOrderTypeEnum;
-use panel\models\enum\OrderDirectionEnum;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+use panel\domain\Bundle;
+use panel\domain\util\FileUtil;
+use panel\domain\util\IllegalAccessException;
+use panel\domain\enum\BundleOrderTypeEnum;
+use panel\domain\enum\OrderDirectionEnum;
+use panel\dao\BundlesDAO;
+use panel\dao\CoursesDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link bundlesManager/bundles_manager.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the BundlesView.
  */
 class BundlesController extends Controller
 {
@@ -32,10 +28,8 @@ class BundlesController extends Controller
      */
     public function __construct()
     {
-        if (!Admin::isLogged() ||
-            !(Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() <= 1)) {
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Admin::isLogged() || !$this->hasLoggedAdminAuthorization(0, 1)) {
+            $this->redirectTo("login");
         }
     }
     
@@ -169,6 +163,11 @@ class BundlesController extends Controller
         }
         
         $this->loadTemplate("bundlesManager/BundlesManagerNewView", $viewArgs);
+    }
+
+    private function hasFormBeenSent()
+    {
+        return !empty($_POST['name']);
     }
     
     /**

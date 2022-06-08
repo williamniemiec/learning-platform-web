@@ -2,6 +2,10 @@
 namespace panel\config;
 
 
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+
+
 /**
  * Class responsible for opening views.
  */
@@ -57,7 +61,7 @@ abstract class Controller
     /**
      * Redirects the user to BASE_URL.
      */
-    public function redirectToRoot()
+    protected function redirectToRoot()
     {
         $this->redirectTo("");
     }
@@ -67,7 +71,7 @@ abstract class Controller
      *
      * @param       string $location Controller name
      */
-    public function redirectTo($location)
+    protected function redirectTo($location)
     {
         header("Location: ".BASE_URL.$location);
         exit;
@@ -78,7 +82,7 @@ abstract class Controller
      *
      * @return       string request method
      */
-    public function getHttpRequestMethod()
+    protected function getHttpRequestMethod()
     {
         return $_SERVER['REQUEST_METHOD'];
     }
@@ -88,8 +92,15 @@ abstract class Controller
      *
      * @param       int $delay [optional] Delay time 
      */
-    public function reload($delay = 0)
+    protected function reload($delay = 0)
     {
         header("Refresh: ".$delay);
+    }
+
+    protected function hasLoggedAdminAuthorization(...$levels)
+    {
+        $admin = Admin::getLoggedIn(new MySqlPDODatabase());
+
+        return in_array($admin->getAuthorization()->getLevel(), $levels);
     }
 }

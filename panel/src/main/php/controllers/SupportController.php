@@ -3,17 +3,13 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\models\Admin;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\dao\SupportTopicDAO;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+use panel\dao\SupportTopicDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link support/support.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the SupportView.
  */
 class SupportController extends Controller
 {
@@ -26,11 +22,8 @@ class SupportController extends Controller
      */
     public function __construct()
     {
-        if (!Admin::isLogged() ||
-            !((Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() == 0 ||  
-                Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() == 2))) {
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Admin::isLogged() || !$this->hasLoggedAdminAuthorization(0, 2)) {
+            $this->redirectTo("login");
         }
     }
     
@@ -45,64 +38,60 @@ class SupportController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $supportDAO = new SupportTopicDAO($dbConnection, $admin);
+        $supportDao = new SupportTopicDAO($dbConnection, $admin);
+        $index = $this->getIndex();
         $limit = 10;
-        $index = 1;
-        
-        // Checks whether an index has been sent
-        if (!empty($_GET['index'])) {
-            $index = (int)$_GET['index'];
-        }
-        
         $offset = $limit * ($index - 1);
-        $topics = $supportDAO->getAllOpened($limit, $offset);
-        
         $header = array(
             'title' => 'Support - Learning platform',
             'styles' => array('SupportStyle', 'searchBar'),
             'robots' => 'index'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'header' => $header,
-            'topics' => $topics,
-            'categories' => $supportDAO->getCategories(),
+            'topics' => $supportDao->getAllOpened($limit, $offset),
+            'categories' => $supportDao->getCategories(),
             'scripts' => array('SupportScript'),
-            'totalPages' => ceil($supportDAO->count() / $limit),
+            'totalPages' => ceil($supportDao->count() / $limit),
             'currentIndex' => $index
         );
         
         $this->loadTemplate("support/SupportView", $viewArgs);
     }
+
+    private function getIndex()
+    {
+        if (!$this->hasIndexBeenSent()) {
+            return 1;
+        }
+
+        return ((int) $_GET['index']);
+    }
+
+    private function hasIndexBeenSent()
+    {
+        return  !empty($_GET['index']);
+    }
     
     /**
      * Opens a support topic to read.
      */
-    public function open($id_topic)
+    public function open($idTopic)
     {
         $dbConnection = new MySqlPDODatabase();
-        
         $admin = Admin::getLoggedIn($dbConnection);
-        $supportTopicDAO = new SupportTopicDAO($dbConnection, $admin);
-        $topic = $supportTopicDAO->get((int)$id_topic);
+        $supportTopicDao = new SupportTopicDAO($dbConnection, $admin);
+        $topic = $supportTopicDao->get((int) $idTopic);
         
-        // If topic does not exist or it exists but does not belongs to the 
-        // student logged in, redirects him to courses page
         if (empty($topic)) {
-            header("Location: ".BASE_URL."support");
-            exit;
+            $this->redirectTo("support");
         }
-        
-        // Checks whether a reply has been sent
-        if (!empty($_POST['topic_message'])) {
-            $supportTopicDAO->newReply($id_topic, $_POST['topic_message']);
-            
-            unset($_POST['topic_message']);
-            
-            header("Refresh: 0");
-            exit;
+
+        if ($this->hasReplyBeenSent()) {
+            $this->insertReply($idTopic);
+            $this->reload();
         }
         
         $header = array(
@@ -111,64 +100,67 @@ class SupportController extends Controller
             'description' => "Support topic",
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
             'header' => $header,
             'username' => $admin->getName(),
-            'authorization' => $admin->getAuthorization(),
             'authorization' => $admin->getAuthorization(),
             'topic' => $topic->setDatabase($dbConnection),
         );
         
         $this->loadTemplate("support/SupportContentView", $viewArgs);
     }
+
+    private function hasReplyBeenSent()
+    {
+        return  !empty($_POST['topic_message']);
+    }
+
+    private function insertReply($idTopic)
+    {
+        $dbConnection = new MySqlPDODatabase();
+            $admin = Admin::getLoggedIn($dbConnection);
+            $supportTopicDao = new SupportTopicDAO($dbConnection, $admin);
+            
+            $supportTopicDao->newReply(
+                $idTopic, 
+                $_POST['topic_message']
+            );
+            
+            unset($_POST['topic_message']);
+    }
     
     /**
      * Opens a support topic.
      */
-    public function unlock($id_topic)
+    public function unlock($idTopic)
     {
         $dbConnection = new MySqlPDODatabase();
-        
         $admin = Admin::getLoggedIn($dbConnection);
-        $supportTopicDAO = new SupportTopicDAO($dbConnection, $admin);
-        $topic = $supportTopicDAO->get($id_topic);
-        
-        // If topic does not exist or it exists but does not belongs to the
-        // student logged in, redirects him to courses page
-        if (empty($topic)) {
-            header("Location: ".BASE_URL."support");
-            exit;
+        $supportTopicDao = new SupportTopicDAO($dbConnection, $admin);
+        $topic = $supportTopicDao->get($idTopic);
+
+        if (!empty($topic)) {
+            $supportTopicDao->open($idTopic);
         }
         
-        $supportTopicDAO->open($id_topic);
-        
-        header("Location: ".BASE_URL."support");
-        exit;
+        $this->redirectTo("support");
     }
     
     /**
      * Closes a support topic.
      */
-    public function lock($id_topic)
+    public function lock($idTopic)
     {
         $dbConnection = new MySqlPDODatabase();
-        
         $admin = Admin::getLoggedIn($dbConnection);
         $supportTopicDAO = new SupportTopicDAO($dbConnection, $admin);
-        $topic = $supportTopicDAO->get($id_topic);
-        
-        // If topic does not exist or it exists but does not belongs to the
-        // student logged in, redirects him to courses page
-        if (empty($topic)) {
-            header("Location: ".BASE_URL."support");
-            exit;
+        $topic = $supportTopicDAO->get($idTopic);
+
+        if (!empty($topic)) {
+            $supportTopicDAO->close($idTopic);
         }
-        
-        $supportTopicDAO->close($id_topic);
-        
-        header("Location: ".BASE_URL."support");
-        exit;
+
+        $this->redirectTo("support");
     }
     
     
@@ -185,19 +177,20 @@ class SupportController extends Controller
      */
     public function search()
     {
-        if ($_SERVER['REQUEST_METHOD'] != "POST")
+        if ($_SERVER['REQUEST_METHOD'] != "POST") {
             return;
+        }
             
         $dbConnection = new MySqlPDODatabase();
         
-        $supportTopicDAO = new SupportTopicDAO(
+        $supportTopicDao = new SupportTopicDAO(
             $dbConnection,
             Admin::getLoggedIn($dbConnection)
         );
         
-        echo json_encode($supportTopicDAO->search(
+        echo json_encode($supportTopicDao->search(
             $_POST['name'],
-            (int)$_POST['filter']['id_category']
+            (int) $_POST['filter']['id_category']
         ));
     }
 }

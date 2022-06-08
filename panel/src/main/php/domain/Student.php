@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace panel\models;
 
 
-use panel\DateTime;
+use \DateTime;
 use panel\domain\enum\GenreEnum;
 use panel\dao\StudentsDAO;
 use panel\repositories\Database;

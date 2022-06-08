@@ -4,10 +4,10 @@ declare (strict_types=1);
 namespace panel\domain;
 
 
-use panel\database\Database;
-use panel\DateTime;
-use panel\models\enum\GenreEnum;
-use panel\models\dao\AdminsDAO;
+use \DateTime;
+use panel\repositories\Database;
+use panel\domain\enum\GenreEnum;
+use panel\dao\AdminsDAO;
 
 
 /**

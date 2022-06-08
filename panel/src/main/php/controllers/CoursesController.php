@@ -3,23 +3,19 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\models\Admin;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\Course;
-use panel\models\dao\CoursesDAO;
-use panel\models\util\FileUtil;
-use panel\models\util\IllegalAccessException;
-use panel\models\dao\ModulesDAO;
-use panel\models\enum\CourseOrderByEnum;
-use panel\models\enum\OrderDirectionEnum;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+use panel\domain\Course;
+use panel\domain\util\FileUtil;
+use panel\domain\util\IllegalAccessException;
+use panel\domain\enum\CourseOrderByEnum;
+use panel\domain\enum\OrderDirectionEnum;
+use panel\dao\CoursesDAO;
+use panel\dao\ModulesDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link coursesManager/courses_manager.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the CoursesManagerView.
  */
 class CoursesController extends Controller
 {
@@ -32,10 +28,8 @@ class CoursesController extends Controller
      */
     public function __construct()
     {
-        if (!Admin::isLogged() ||
-            !(Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() <= 1)) {
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Admin::isLogged() || !$this->hasLoggedAdminAuthorization(0, 1)) {
+            $this->redirectTo("login");
         }
     }
     
@@ -152,6 +146,11 @@ class CoursesController extends Controller
         }
         
         $this->loadTemplate("coursesManager/CoursesManagerNewView", $viewArgs);
+    }
+
+    private function hasFormBeenSent()
+    {
+        return !empty($_POST['name']);
     }
     
     public function edit($id_course)

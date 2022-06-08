@@ -3,18 +3,14 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\Admin;
-use panel\models\dao\AdminsDAO;
-use panel\models\enum\GenreEnum;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+use panel\dao\AdminsDAO;
+use panel\domain\enum\GenreEnum;
 
 
 /**
- * Responsible for the behavior of the view {@link settings/settings.php}.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the SettingsView.
  */
 class SettingsController extends Controller
 {
@@ -28,8 +24,7 @@ class SettingsController extends Controller
     public function __construct()
     {
         if (!Admin::isLogged()) {
-            header("Location: ".BASE_URL."login");
-            exit;
+            $this->redirectTo("login");
         }
     }
     
@@ -44,14 +39,12 @@ class SettingsController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        
         $header = array(
             'title' => 'Settings - Learning platform',
             'styles' => array('SettingsStyle'),
             'description' => "User settings",
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
             'header' => $header,
             'scripts' => array("SettingsScript"),
@@ -71,23 +64,17 @@ class SettingsController extends Controller
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
         
+        if ($this->hasUpdateBeenSent()) {
+            $this->updateAdmin($dbConnection, $admin);
+            $this->redirectTo("settings");
+        }
+        
         $header = array(
             'title' => 'Settings - Update - Learning platform',
             'styles' => array('SettingsStyle'),
             'description' => "User settings",
             'robots' => 'noindex'
         );
-        
-        // Checks if edition form has been sent
-        if (!empty($_POST['name'])) {
-            $adminsDAO = new AdminsDAO($dbConnection, $admin);
-
-            $adminsDAO->update($_POST['name'], new GenreEnum($_POST['genre']), $_POST['birthdate']);
-            
-            header("Location: ".BASE_URL."settings");
-            exit;
-        }
-        
         $viewArgs = array(
             'header' => $header,
             'username' => $admin->getName(),
@@ -98,6 +85,22 @@ class SettingsController extends Controller
         $this->loadTemplate("settings/SettingsEditView", $viewArgs);
     }
     
+    private function hasUpdateBeenSent()
+    {
+        return !empty($_POST['name']);
+    }
+
+    private function updateAdmin($dbConnection, $admin)
+    {
+        $adminsDao = new AdminsDAO($dbConnection, $admin);
+
+        $adminsDao->update(
+            $_POST['name'], 
+            new GenreEnum($_POST['genre']), 
+            $_POST['birthdate']
+        );
+    }
+
     
     //-------------------------------------------------------------------------
     //        Ajax
@@ -113,16 +116,16 @@ class SettingsController extends Controller
      */
     public function updatePassword()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
-            header("Location: ".BASE_URL);
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $this->redirectToRoot();
+        }
             
         $dbConnection = new MySqlPDODatabase();
-        
-        $adminsDAO = new AdminsDAO(
+        $adminsDao = new AdminsDAO(
             $dbConnection,
             Admin::getLoggedIn($dbConnection)
         );
         
-        echo $adminsDAO->changePassword($_POST['new_password']);
+        echo $adminsDao->changePassword($_POST['new_password']);
     }
 }

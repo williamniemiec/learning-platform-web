@@ -3,19 +3,15 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\models\Admin;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\dao\AdminsDAO;
-use panel\models\dao\AuthorizationDAO;
-use panel\models\enum\GenreEnum;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+use panel\domain\enum\GenreEnum;
+use panel\dao\AdminsDAO;
+use panel\dao\AuthorizationDAO;
 
 
 /**
- * Responsible for the behavior of the view {@link adminsManager/admins_manager.php}.
- * 
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the AdminsManagerView.
  */
 class AdminsController extends Controller
 {
@@ -28,10 +24,8 @@ class AdminsController extends Controller
      */
     public function __construct()
     {
-        if (!Admin::isLogged() || 
-            !(Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() == 0)) {
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Admin::isLogged() || !$this->hasLoggedAdminAuthorization(0)) {
+            $this->redirectTo("login");
         }
     }
     
@@ -169,6 +163,11 @@ class AdminsController extends Controller
         }
         
         $this->loadTemplate("adminsManager/AdminsManagerEditView", $viewArgs);
+    }
+
+    private function hasFormBeenSent()
+    {
+        return !empty($_POST['email']) && !empty($_POST['authorization']);
     }
 
     /**

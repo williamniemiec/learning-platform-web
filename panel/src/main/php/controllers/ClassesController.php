@@ -3,22 +3,18 @@ namespace panel\controllers;
 
 
 use panel\config\Controller;
-use panel\models\Admin;
-use panel\models\_Class;
-use panel\database\pdo\MySqlPDODatabase;
-use panel\models\dao\VideosDAO;
-use panel\models\dao\QuestionnairesDAO;
-use panel\models\Video;
-use panel\models\dao\ModulesDAO;
-use panel\models\Questionnaire;
+use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Admin;
+use panel\domain\ClassType;
+use panel\domain\Video;
+use panel\dao\QuestionnairesDAO;
+use panel\dao\VideosDAO;
+use panel\dao\ModulesDAO;
+use panel\domain\Questionnaire;
 
 
 /**
- * Responsible for the behavior of the view {@link classesManager/classes_manager.php}.
- *
- * @author		William Niemiec &lt; williamniemiec@hotmail.com &gt;
- * @version		1.0.0
- * @since		1.0.0
+ * Responsible for the behavior of the ClassesManagerView.
  */
 class ClassesController extends Controller
 {
@@ -31,10 +27,8 @@ class ClassesController extends Controller
      */
     public function __construct()
     {
-        if (!Admin::isLogged() ||
-            !(Admin::getLoggedIn(new MySqlPDODatabase())->getAuthorization()->getLevel() <= 1)) {
-            header("Location: ".BASE_URL."login");
-            exit;
+        if (!Admin::isLogged() || !$this->hasLoggedAdminAuthorization(0, 1)) {
+            $this->redirectTo("login");
         }
     }
     
@@ -179,6 +173,11 @@ class ClassesController extends Controller
         }
         
         $this->loadTemplate("classesManager/ClassesManagerNewView", $viewArgs);
+    }
+
+    private function hasFormBeenSent()
+    {
+        return !empty($_POST['type']);
     }
     
     /**
