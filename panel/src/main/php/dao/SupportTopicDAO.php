@@ -70,35 +70,14 @@ class SupportTopicDAO extends DAO
     {            
         $this->validateTopicId($idTopic);
         $this->validateAuthorization(0, 2);
-        $response = null;
-        
-        // Query construction
         $this->withQuery("
             SELECT  *
             FROM    support_topic NATURAL JOIN support_topic_category
             WHERE   id_topic = ?
         ");
-            
-        // Executes query
-        $sql->execute(array($idTopic));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $supportTopic = $sql->fetch();
-            $students = new StudentsDAO($this->db);
-            
-            $response = new SupportTopic(
-                (int)$supportTopic['id_topic'],
-                $students->get((int)$supportTopic['id_student']),
-                $supportTopic['title'],
-                new SupportTopicCategory((int)$supportTopic['id_category'], $supportTopic['name']),
-                new \DateTime($supportTopic['date']),
-                $supportTopic['message'],
-                (int)$supportTopic['closed']
-            );
-        }
-        
-        return $response;
+        $this->runQueryWithArguments($idTopic);
+
+        return $this->parseGetResponseQuery();
     }
 
     private function validateTopicId($id)
@@ -107,6 +86,26 @@ class SupportTopicDAO extends DAO
             throw new \InvalidArgumentException("Topic id cannot be empty or ".
                                                 "less than or equal to zero");
         }
+    }
+
+    private function parseGetResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
+        }
+
+        $topic = $this->getResponseQuery();
+        $studentsDao = new StudentsDAO($this->db);
+        
+        return new SupportTopic(
+            (int) $topic['id_topic'],
+            $studentsDao->get((int)$topic['id_student']),
+            $topic['title'],
+            new SupportTopicCategory((int) $topic['id_category'], $topic['name']),
+            new \DateTime($topic['date']),
+            $topic['message'],
+            (int) $topic['closed']
+        );
     }
     
     /**
@@ -120,41 +119,55 @@ class SupportTopicDAO extends DAO
      */
     public function getAllOpened(int $limit = -1, int $offset = -1) : array
     {
-        $response = array();
+        $this->withQuery($this->buildGetAllOpenedQuery($limit, $offset));
+        $this->runQueryWithoutArguments();
         
+        return $this->parseGetAllResponseQuery();
+    }
+
+    private function buildGetAllOpenedQuery($limit, $offset)
+    {
         $query = "
             SELECT  *
             FROM    support_topic NATURAL JOIN support_topic_category
             WHERE   closed = 0
         ";
-        
-        // Limits the results (if a limit was given)
+
         if ($limit > 0) {
-            if ($offset > 0)
+            if ($offset > 0) {
                 $query .= " LIMIT ".$offset.",".$limit;
-            else
+            }
+            else {
                 $query .= " LIMIT ".$limit;
-        }
-        
-        $sql = $this->db->query($query);
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $topic) {
-                $studentsDAO = new StudentsDAO($this->db);
-                
-                $response[] = new SupportTopic(
-                    (int)$topic['id_topic'],
-                    $studentsDAO->get((int)$topic['id_student']),
-                    $topic['title'],
-                    new SupportTopicCategory((int)$topic['id_category'], $topic['name']),
-                    new \DateTime($topic['date']),
-                    $topic['message'],
-                    (int)$topic['closed']
-                );
             }
         }
         
-        return $response;
+        return $query;
+    }
+
+    private function parseGetAllResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $supportTopics = array();
+
+        foreach ($this->getAllResponseQuery() as $topic) {
+            $studentsDao = new StudentsDAO($this->db);
+            
+            $supportTopics[] = new SupportTopic(
+                (int) $topic['id_topic'],
+                $studentsDao->get((int) $topic['id_student']),
+                $topic['title'],
+                new SupportTopicCategory((int) $topic['id_category'], $topic['name']),
+                new \DateTime($topic['date']),
+                $topic['message'],
+                (int) $topic['closed']
+            );
+        }
+
+        return $supportTopics;
     }
     
     /**
@@ -165,74 +178,64 @@ class SupportTopicDAO extends DAO
      */
     public function getCategories() : array
     {
-        $response = array();
-        
-        // Query construction
-        $sql = $this->db->query("
+        $this->withQuery("
             SELECT  *
             FROM    support_topic_category
         ");
+        $this->runQueryWithoutArguments();
         
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $category) {
-                $response[] = new SupportTopicCategory(
-                    (int)$category['id_category'],
-                    $category['name']
-                );
-            }
+        return $this->parseGetAllCategoriesResponseQuery();
+    }
+
+    private function parseGetAllCategoriesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
-        
-        return $response;
+
+        $categories = array();
+
+        foreach ($this->getAllResponseQuery() as $category) {
+            $categories[] = new SupportTopicCategory(
+                (int) $category['id_category'],
+                $category['name']
+            );
+        }
+
+        return $categories;
     }
     
     /**
      * Searches for a topic with a given name that is open.
      *
      * @param       string $name [Optional] Support topic title to be searched
-     * @param       int $id_category [Optional] Searches for topics that belongs to a
+     * @param       int $idCategory [Optional] Searches for topics that belongs to a
      * category
      *
      * @return      SupportTopic[] Support topics that match with the provided
      * name or empty array if there are no matches
      */
-    public function search(string $name = '', int $id_category = 0) : array
+    public function search(string $name = '', int $idCategory = 0) : array
     {
-        $response = array();
+        $this->withQuery($this->buildSearchQuery($idCategory));
+        $this->runQueryWithArguments($name.'%');
         
-        // Query construction
+        return $this->parseGetAllResponseQuery();
+    }
+
+    private function buildSearchQuery($idCategory)
+    {
         $query = "
             SELECT  *
             FROM    support_topic NATURAL JOIN support_topic_category
             WHERE   title LIKE ? AND closed = 0
         ";
         
-        if ($id_category > 0)
-            $query .= " AND id_category = ".$id_category;
-            
-        $this->withQuery($query);
-        
-        // Executes query
-        $sql->execute(array($name.'%'));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $supportTopic) {
-                $students = new StudentsDAO($this->db);
-                
-                $response[] = new SupportTopic(
-                    (int)$supportTopic['id_topic'],
-                    $students->get((int)$supportTopic['id_student']),
-                    $supportTopic['title'],
-                    new SupportTopicCategory((int)$supportTopic['id_category'], $supportTopic['name']),
-                    new \DateTime($supportTopic['date']),
-                    $supportTopic['message'],
-                    (int)$supportTopic['closed']
-                );
-            }
+        if ($idCategory > 0) {
+            $query .= " AND id_category = ".$idCategory;
         }
         
-        return $response;
+        return $query;
     }
     
     /**
@@ -251,27 +254,28 @@ class SupportTopicDAO extends DAO
     {
         $this->validateTopicId($idTopic);
         $this->validateAuthorization(0, 2);
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             UPDATE  support_topic
             SET     closed = 1
             WHERE   id_topic = ?
         ");
+        $this->runQueryWithArguments($idTopic);
         
-        // Executes query
-        $sql->execute(array($idTopic));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->closeTopic($idTopic);
-            $adminsDAO->newAction($action);
+        return $this->parseCloseResponseQuery($idTopic);
+    }
+
+    private function parseCloseResponseQuery($idTopic)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
         }
-        
-        return $response;
+
+        $action = new Action();
+        $action->closeTopic($idTopic);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+
+        return true;
     }
     
     /**
@@ -290,27 +294,28 @@ class SupportTopicDAO extends DAO
     {
         $this->validateTopicId($idTopic);
         $this->validateAuthorization(0, 2);
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             UPDATE  support_topic
             SET     closed = 0
             WHERE   id_topic = ?
         ");
+        $this->runQueryWithArguments($idTopic);
         
-        // Executes query
-        $sql->execute(array($id_topic));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->openTopic($id_topic);
-            $adminsDAO->newAction($action);
+        return $this->parseCloseResponseQuery($idTopic);
+    }
+
+    private function parseOpenResponseQuery($idTopic)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
         }
-        
-        return $response;
+
+        $action = new Action();
+        $action->openTopic($idTopic);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+
+        return true;
     }
     
     /**
@@ -332,28 +337,28 @@ class SupportTopicDAO extends DAO
         $this->validateTopicId($idTopic);
         $this->validateTopicIsOpen($idTopic);
         $this->validateText($text);
-            
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             INSERT INTO support_topic_replies
             (id_topic, id_user, user_type, date, text)
             VALUES (?, ?, 1, NOW(), ?)
         ");
+        $this->runQueryWithArguments($idTopic, $this->admin->getId(), $text);
         
-        // Executes query
-        $sql->execute(array($idTopic, $this->admin->getId(), $text));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->answerTopic($idTopic);
-            $adminsDAO->newAction($action);
+        return $this->parseNewReplyResponseQuery($idTopic);
+    }
+
+    private function parseNewReplyResponseQuery($idTopic)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
         }
-        
-        return $response;
+
+        $action = new Action();
+        $action->answerTopic($idTopic);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+
+        return true;
     }
 
     private function validateText($text)
@@ -387,42 +392,43 @@ class SupportTopicDAO extends DAO
     {
         $this->validateTopicId($idTopic);
         $this->validateAuthorization(0, 2);
-        $response = array();
-        
-        // Query construction
         $this->withQuery("
             SELECT  *
             FROM    support_topic_replies
             WHERE   id_topic = ?
         ");
-        
-        // Executes query
-        $sql->execute(array($idTopic));
-        
-        // Parses result
-        if ($sql && $sql->rowCount() > 0) {
-            $replies = $sql->fetchAll();
+        $this->runQueryWithArguments($idTopic);
             
-            foreach ($replies as $reply) {
-                if ($reply['user_type'] == 0) {
-                    $students = new StudentsDAO($this->db);
-                    $user = $students->get((int)$reply['id_user']);
-                }
-                else {
-                    $admins = new AdminsDAO($this->db);
-                    $user = $admins->get((int)$reply['id_user']);
-                }
-                
-                $response[] = new Message(
-                    $user, 
-                    new \DateTime($reply['date']), 
-                    $reply['text'],
-                    $reply['id_reply']
-                );
-            }
+        return $this->parseGetRepliesResponseQuery();
+    }
+
+    private function parseGetRepliesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
+
+        $replies = array();
+
+        foreach ($this->getAllResponseQuery() as $reply) {
+            if ($reply['user_type'] == 0) {
+                $studentsDao = new StudentsDAO($this->db);
+                $user = $studentsDao->get((int)$reply['id_user']);
+            }
+            else {
+                $admins = new AdminsDAO($this->db);
+                $user = $admins->get((int)$reply['id_user']);
+            }
             
-        return $response;
+            $replies[] = new Message(
+                $user, 
+                new \DateTime($reply['date']), 
+                $reply['text'],
+                $reply['id_reply']
+            );
+        }
+
+        return $replies;
     }
     
     /**
@@ -432,11 +438,14 @@ class SupportTopicDAO extends DAO
      */
     public function count() : int
     {
-        return (int)$this->db->query("
+        $this->withQuery("
             SELECT  COUNT(*) AS total
             FROM    support_topic
             WHERE   closed = 0
-        ")->fetch()['total'];
+        ");
+        $this->runQueryWithoutArguments();
+
+        return ((int) $this->getResponseQuery()['total']);
     }
     
     /**
@@ -449,10 +458,10 @@ class SupportTopicDAO extends DAO
     private function isOpen(int $id_topic) : bool
     {
         $this->withQuery("CALL sp_support_topic_is_open(?, @isOpen)");
-        $sql->execute(array($id_topic));
+        $this->runQueryWithArguments($id_topic);
+        $this->withQuery("SELECT @isOpen AS is_open");
+        $this->runQueryWithoutArguments();
         
-        $sql = $this->db->query("SELECT @isOpen AS is_open");
-        
-        return $sql->fetch()['is_open'] == 1;
+        return ($this->getResponseQuery()['is_open'] == 1);
     }
 }

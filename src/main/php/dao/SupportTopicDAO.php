@@ -92,11 +92,11 @@ class SupportTopicDAO extends DAO
         }
 
         $topic = $this->getResponseQuery();
-        $students = new StudentsDAO($this->db, (int) $topic['id_student']);
+        $studentsDao = new StudentsDAO($this->db, (int) $topic['id_student']);
         
         return new SupportTopic(
             (int) $topic['id_topic'],
-            $students->get(),
+            $studentsDao->get(),
             $topic['title'],
             new SupportTopicCategory((int) $topic['id_category'], $topic['name']),
             new \DateTime($topic['date']), 
