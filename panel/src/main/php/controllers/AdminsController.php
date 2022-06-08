@@ -40,18 +40,16 @@ class AdminsController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $adminsDAO = new AdminsDAO($dbConnection, $admin);
-        
+        $adminsDao = new AdminsDAO($dbConnection, $admin);
         $header = array(
             'title' => 'Admins manager - Learning platform',
             'robots' => 'index'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'header' => $header,
-            'admins' => $adminsDAO->getAll()
+            'admins' => $adminsDao->getAll()
         );
         
         $this->loadTemplate("adminsManager/AdminsManagerView", $viewArgs);
@@ -60,17 +58,14 @@ class AdminsController extends Controller
     public function new()
     {
         $dbConnection = new MySqlPDODatabase();
-        
         $admin = Admin::getLoggedIn($dbConnection);
-        $authorizationsDAO = new AuthorizationDAO($dbConnection);
-        
+        $authorizationsDao = new AuthorizationDAO($dbConnection);
         $header = array(
             'title' => 'New admin - Learning platform',
             'styles' => array(),
             'description' => "New admin",
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
@@ -78,12 +73,10 @@ class AdminsController extends Controller
             'scripts' => array(),
             'error' => false,
             'msg' => '',
-            'authorizations' => $authorizationsDAO->getAll()
+            'authorizations' => $authorizationsDao->getAll()
         );
         
-        // Checks if registration form has been sent
         if ($this->wasRegistrationFormSent()) {
-            // Checks if all fields are filled
             if ($this->isAllFieldsFilled()) {
                 $adminsDAO = new AdminsDAO(
                     new MySqlPDODatabase(), 
@@ -92,7 +85,7 @@ class AdminsController extends Controller
                 
                 $admin = new Admin(
                     -1,
-                    $authorizationsDAO->get((int)$_POST['authorization']),
+                    $authorizationsDao->get((int) $_POST['authorization']),
                     $_POST['name'],
                     new GenreEnum($_POST['genre']),
                     new \DateTime($_POST['birthdate']),
@@ -100,8 +93,7 @@ class AdminsController extends Controller
                 );
                 
                 if ($adminsDAO->new($admin, $_POST['password'])) {
-                    header("Location: ".BASE_URL."admins");
-                    exit;
+                    $this->redirectTo("admins");
                 }
                 
                 $viewArgs['error'] = true;
@@ -120,10 +112,9 @@ class AdminsController extends Controller
     public function edit($id_admin)
     {
         $dbConnection = new MySqlPDODatabase();
-        
         $admin = Admin::getLoggedIn($dbConnection);
-        $authorizationsDAO = new AuthorizationDAO($dbConnection);
-        $adminsDAO = new AdminsDAO($dbConnection, $admin);
+        $authorizationsDao = new AuthorizationDAO($dbConnection);
+        $adminsDao = new AdminsDAO($dbConnection, $admin);
         
         $header = array(
             'title' => 'New admin - Learning platform',
@@ -131,22 +122,21 @@ class AdminsController extends Controller
             'description' => "New admin",
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'header' => $header,
             'scripts' => array(),
             'error' => false,
             'msg' => '',
-            'admin' => $adminsDAO->get((int)$id_admin),
-            'authorizations' => $authorizationsDAO->getAll()
+            'admin' => $adminsDao->get((int) $id_admin),
+            'authorizations' => $authorizationsDao->getAll()
         );
         
         if (!empty($_POST['email']) && !empty($_POST['authorization'])) {            
             $password = empty($_POST['password']) ? "" : $_POST['password'];
             
-            $response = $adminsDAO->updateAdmin(
+            $response = $adminsDao->updateAdmin(
                 (int)$id_admin,
                 (int)$_POST['authorization'],
                 $_POST['email'], 
@@ -154,8 +144,7 @@ class AdminsController extends Controller
             );
             
             if ($response) {
-                header("Location: ".BASE_URL."admins");
-                exit;
+                $this->redirectTo("admins");
             }
             
             $viewArgs['error'] = true;

@@ -135,8 +135,7 @@ class CoursesController extends Controller
                 
                 
                 if ($response) {
-                    header("Location: ".BASE_URL."courses");
-                    exit;
+                    $this->redirectTo("courses");
                 }
                 
                 // If an error occurred, display it
@@ -153,19 +152,17 @@ class CoursesController extends Controller
         return !empty($_POST['name']);
     }
     
-    public function edit($id_course)
+    public function edit($idCourse)
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $coursesDAO = new CoursesDAO($dbConnection, $admin);
-        $course = $coursesDAO->get($id_course);
-        
+        $coursesDao = new CoursesDAO($dbConnection, $admin);
+        $course = $coursesDao->get($idCourse);
         $header = array(
             'title' => 'Edit course - Learning platform',
             'styles' => array('CoursesManagerStyle', 'ManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
@@ -204,7 +201,7 @@ class CoursesController extends Controller
                 // Tries create new bundle. If an error occurs, removes stored
                 // logo
                 try {
-                    $response = $coursesDAO->update(new Course(
+                    $response = $coursesDao->update(new Course(
                         $course->getId(),
                         $_POST['name'],
                         $logo,
@@ -218,8 +215,7 @@ class CoursesController extends Controller
                 
                 
                 if ($response) {
-                    header("Location: ".BASE_URL."courses");
-                    exit;
+                    $this->redirectTo("courses");
                 }
                 
                 // If an error occurred, display it
@@ -247,7 +243,7 @@ class CoursesController extends Controller
         
         $coursesDAO->delete($id_course);
         
-        header("Location: ".BASE_URL."courses");
+        $this->redirectTo("courses");
     }
     
     
@@ -276,14 +272,14 @@ class CoursesController extends Controller
      */
     public function search()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             return;
+        }
             
         $dbConnection = new MySqlPDODatabase();
+        $coursesDao = new CoursesDAO($dbConnection);
         
-        $coursesDAO = new CoursesDAO($dbConnection);
-        
-        echo json_encode($coursesDAO->getAll(
+        echo json_encode($coursesDao->getAll(
             $_POST['name'],
             100,
             new CourseOrderByEnum($_POST['filter']['type']),
@@ -300,13 +296,14 @@ class CoursesController extends Controller
      */
     public function getAll()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             return;
+        }
         
         $dbConnection = new MySqlPDODatabase();
+        $coursesDao = new CoursesDAO($dbConnection);
         
-        $coursesDAO = new CoursesDAO($dbConnection);
-        echo json_encode($coursesDAO->getAll());
+        echo json_encode($coursesDao->getAll());
     }
     
     /**
@@ -320,13 +317,14 @@ class CoursesController extends Controller
      */
     public function getModules()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             return;
+        }
             
         $dbConnection = new MySqlPDODatabase();
+        $modulesDao = new ModulesDAO($dbConnection);
         
-        $modulesDAO = new ModulesDAO($dbConnection);
-        echo json_encode($modulesDAO->getFromCourse((int)$_GET['id_course']));
+        echo json_encode($modulesDao->getFromCourse((int) $_GET['id_course']));
     }
     
     /**
@@ -344,32 +342,33 @@ class CoursesController extends Controller
      */
     public function setModules()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             return;
+        }
             
         $dbConnection = new MySqlPDODatabase();
-        
-        $coursesDAO = new CoursesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        $modulesDAO = new ModulesDAO($dbConnection);
-        $modulesBackup = $modulesDAO->getFromCourse((int)$_POST['id_course']);
+        $coursesDao = new CoursesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $modulesDao = new ModulesDAO($dbConnection);
+        $modulesBackup = $modulesDao->getFromCourse((int) $_POST['id_course']);
 
         try {
-            $coursesDAO->deleteAllModules((int)$_POST['id_course']);
+            $coursesDao->deleteAllModules((int)$_POST['id_course']);
             
             foreach ($_POST['modules'] as $module) {
-                $coursesDAO->addModule((int)$_POST['id_course'], (int)$module['id'], (int)$module['order']);
+                $coursesDao->addModule((int)$_POST['id_course'], (int)$module['id'], (int)$module['order']);
             }
         }
         catch(\Exception $e) {
             foreach ($modulesBackup as $module) {
                 try {
-                    $coursesDAO->addModule((int)$_POST['id_course'], $module->getId(), $module->getOrder());
+                    $coursesDao->addModule((int)$_POST['id_course'], $module->getId(), $module->getOrder());
                 }
-                catch(\Exception $e) {}
+                catch(\Exception $e) {
+
+                }
             }
             
             header("HTTP/1.0 500 Module order is conflicting");
-            
             echo "Module order is conflicting";
         }
         

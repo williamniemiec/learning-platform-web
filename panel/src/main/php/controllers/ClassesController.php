@@ -130,8 +130,7 @@ class ClassesController extends Controller
                             $description
                         ));
                         
-                        header("Location: ".BASE_URL."classes");
-                        exit;
+                        $this->redirectTo("classes");
                     }
                     catch (\Exception $e) {
                         $viewArgs['error'] = true;
@@ -158,8 +157,7 @@ class ClassesController extends Controller
                         (int)$_POST['answer']
                     ));
                     
-                    header("Location: ".BASE_URL."classes");
-                    exit;
+                    $this->redirectTo("classes");
                 }
                 catch (\Exception $e) {
                     $viewArgs['error'] = true;
@@ -183,18 +181,18 @@ class ClassesController extends Controller
     /**
      * Edits a class.
      */
-    public function edit($id_module, $class_order)
+    public function edit($idModule, $classOrder)
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $modulesDAO = new ModulesDAO($dbConnection);
-        $videosDAO = new VideosDAO($dbConnection, $admin);
-        $class = $videosDAO->get((int)$id_module, (int)$class_order);
+        $modulesDao = new ModulesDAO($dbConnection);
+        $videosDao = new VideosDAO($dbConnection, $admin);
+        $class = $videosDao->get((int)$idModule, (int)$classOrder);
         $type = 'v';
         
         if (empty($class)) {
             $questionnairesDAO = new QuestionnairesDAO($dbConnection, $admin);
-            $class = $questionnairesDAO->get((int)$id_module, (int)$class_order);
+            $class = $questionnairesDAO->get((int)$idModule, (int)$classOrder);
             $type = 'q';
         }
         
@@ -208,7 +206,7 @@ class ClassesController extends Controller
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
             'header' => $header,
-            'modules' => $modulesDAO->getAll(),
+            'modules' => $modulesDao->getAll(),
             'class' => $class,
             'error' => false,
             'msg' => '',
@@ -219,11 +217,11 @@ class ClassesController extends Controller
         if (!empty($_POST['type'])) {
             if ($_POST['type'] == 'v') {
                 if (preg_match("/[0-9A-z]{11}/", $_POST['videoID'])) {
-                    $videosDAO = new VideosDAO($dbConnection, $admin);
+                    $videosDao = new VideosDAO($dbConnection, $admin);
                     $description = empty($_POST['description']) ? null : $_POST['description'];
      
                     try {
-                        $videosDAO->update(new Video(
+                        $videosDao->update(new Video(
                             $class->getModule(),
                             $class->getClassOrder(),
                             $_POST['title'],
@@ -235,15 +233,14 @@ class ClassesController extends Controller
                         // If module to which the class belongs has been 
                         // changed, updated it
                         if ($class->getModule()->getId() != (int)$_POST['id_module']) {
-                            $videosDAO->updateModule(
+                            $videosDao->updateModule(
                                 $class, 
                                 (int)$_POST['id_module'],
-                                (int)$modulesDAO->getHighestOrderInModule((int)$_POST['id_module']) + 1
+                                (int)$modulesDao->getHighestOrderInModule((int)$_POST['id_module']) + 1
                             );
                         }
                         
-                        header("Location: ".BASE_URL."classes");
-                        exit;
+                        $this->redirectTo("classes");
                     }
                     catch (\Exception $e) {
                         $viewArgs['error'] = true;
@@ -276,12 +273,11 @@ class ClassesController extends Controller
                         $questionnairesDAO->updateModule(
                             $class,
                             (int)$_POST['id_module'],
-                            (int)$modulesDAO->getHighestOrderInModule((int)$_POST['id_module']) + 1
+                            (int)$modulesDao->getHighestOrderInModule((int)$_POST['id_module']) + 1
                         );
                     }
                     
-                    header("Location: ".BASE_URL."classes");
-                    exit;
+                    $this->redirectTo("classes");
                 }
                 catch (\Exception $e) {
                     $viewArgs['error'] = true;
@@ -315,8 +311,7 @@ class ClassesController extends Controller
             $questionnairesDAO->delete((int)$id_module, (int)$class_order);
         }
         
-        header("Location: ".BASE_URL."classes");
-        exit;
+        $this->redirectTo("classes");
     }
     
     //-------------------------------------------------------------------------
@@ -331,17 +326,17 @@ class ClassesController extends Controller
      */
     public function getAll()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             return;
+        }
             
         $dbConnection = new MySqlPDODatabase();
-        
         $classes = array();
-        $videosDAO = new VideosDAO($dbConnection);
-        $questionnairesDAO = new QuestionnairesDAO($dbConnection);
+        $videosDao = new VideosDAO($dbConnection);
+        $questionnairesDao = new QuestionnairesDAO($dbConnection);
         
-        $classes['videos'] = $videosDAO->getAll();
-        $classes['questionnaires'] = $questionnairesDAO->getAll();
+        $classes['videos'] = $videosDao->getAll();
+        $classes['questionnaires'] = $questionnairesDao->getAll();
         
         echo json_encode($classes);
     }

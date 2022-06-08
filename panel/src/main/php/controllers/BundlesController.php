@@ -152,8 +152,7 @@ class BundlesController extends Controller
                 
                 
                 if ($response) {
-                    header("Location: ".BASE_URL."bundles");
-                    exit;
+                    $this->redirectTo("bundles");
                 }
                 
                 // If an error occurred, display it
@@ -240,8 +239,7 @@ class BundlesController extends Controller
                 }
                 
                 if ($response) {
-                    header("Location: ".BASE_URL."bundles");
-                    exit;
+                    $this->redirectTo("bundles");
                 }
                 
                 // If an error occurred, display it
@@ -269,8 +267,7 @@ class BundlesController extends Controller
         if (!empty($bundle->getLogo()))
             unlink("../assets/img/logos/bundles/".$bundle->getLogo());
         
-        header("Location: ".BASE_URL."bundles");
-        exit;
+        $this->redirectTo("bundles");
     }
     
     /**
@@ -289,9 +286,8 @@ class BundlesController extends Controller
             if (!empty($bundle->getLogo()))
                 unlink("../assets/img/logos/bundles/".$bundle->getLogo());
         }
-        
-        header("Location: ".BASE_URL."bundles/edit/".$bundle->getId());
-        exit;
+
+        $this->redirectTo("bundles/edit/".$bundle->getId());
     }
     
     
@@ -309,14 +305,14 @@ class BundlesController extends Controller
      */
     public function getCourses()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             return;
+        }
         
         $dbConnection = new MySqlPDODatabase();
+        $coursesDao = new CoursesDAO($dbConnection);
         
-        $coursesDAO = new CoursesDAO($dbConnection);
-        
-        echo json_encode($coursesDAO->getFromBundle((int)$_GET['id_bundle']));
+        echo json_encode($coursesDao->getFromBundle((int) $_GET['id_bundle']));
     }
     
     /**
@@ -331,17 +327,19 @@ class BundlesController extends Controller
      */
     public function setCourses()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST')
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             return;
+        }
             
         $dbConnection = new MySqlPDODatabase();
-        
-        $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        
-        $bundlesDAO->deleteAllCourses((int)$_POST['id_bundle']);
+        $bundlesDao = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $bundlesDao->deleteAllCourses((int) $_POST['id_bundle']);
         
         foreach ($_POST['courseIds'] as $id_course) {
-            $bundlesDAO->addCourse((int)$_POST['id_bundle'], (int)$id_course);
+            $bundlesDao->addCourse(
+                (int) $_POST['id_bundle'], 
+                (int) $id_course
+            );
         }
     }
     
@@ -354,13 +352,13 @@ class BundlesController extends Controller
      */
     public function getAll()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET')
+        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
             return;
+        }
             
         $dbConnection = new MySqlPDODatabase();
+        $bundlesDao = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
         
-        $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        
-        echo json_encode($bundlesDAO->getAll());
+        echo json_encode($bundlesDao->getAll());
     }
 }
