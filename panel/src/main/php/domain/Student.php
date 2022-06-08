@@ -1,7 +1,7 @@
 <?php
 declare (strict_types=1);
 
-namespace domain;
+namespace models;
 
 
 use DateTime;
@@ -19,6 +19,8 @@ class Student extends User
     //        Attributes
     //-------------------------------------------------------------------------
     private $photo;
+    private $bundles;
+    private $db;
     
 
     //-------------------------------------------------------------------------
@@ -115,7 +117,7 @@ class Student extends User
     
     
     //-------------------------------------------------------------------------
-    //        Getters
+    //        Getters & Setters
     //-------------------------------------------------------------------------
     /**
      * Gets the name of the student photo file.
@@ -126,6 +128,48 @@ class Student extends User
     public function getPhoto() : string
     {
         return $this->photo;
+    }
+    
+    /**
+     * Gets bundles that the student has.
+     *
+     * @param       Database $db [Optional] Database to get all purchases from
+     * the student
+     *
+     * @return      Bundle[] Bundles that the student has
+     *
+     * @throws      \InvalidArgumentException If bundles has not yet been
+     * set and a database is not provided to obtain this information
+     *
+     * @implNote    Lazy initialization
+     */
+    public function getBundles(?Database $db = null)
+    {
+        if (empty($this->bundles)) {
+            $this->bundles = $this->fetchBundles($db);
+        }
+        
+        return $this->bundles;
+    }
+
+    private function fetchBundles($db)
+    {
+        if (empty($this->db) && empty($db)) {
+            throw new \InvalidArgumentException("Database cannot be empty");
+        }
+        
+        if (empty($db)) {
+            $db = $this->db;       
+        }
+
+        $studentsDao = new StudentsDAO($db);
+        
+        return $studentsDao->getBundles($this->id);
+    }
+    
+    public function setDatabase(Database $db)
+    {
+        $this->db = $db;
     }
     
     

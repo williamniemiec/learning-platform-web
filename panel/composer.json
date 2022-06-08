@@ -6,6 +6,7 @@
 			"dao\\" : "src/main/php/dao/",
 			"domain\\" : "src/main/php/domain/",
 			"repositories\\" : "src/main/php/repositories/",
+			"util\\" : "src/main/php/util/",
 			"views\\" : "src/main/php/views/"
 		}
 	}

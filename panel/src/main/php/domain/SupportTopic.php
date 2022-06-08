@@ -150,15 +150,6 @@ class SupportTopic implements \JsonSerializable
      */
     public function getReplies(?Database $db = null) : array
     {
-        if (empty($this->replies)) {
-            $this->replies = $this->fetchReplies($db);
-        }
-        
-        return $this->replies;
-    }
-
-    private function fetchReplies($db)
-    {
         if (empty($this->db) && empty($db)) {
             throw new \InvalidArgumentException("Database cannot be empty");
         }
@@ -166,15 +157,18 @@ class SupportTopic implements \JsonSerializable
         if (empty($db)) {
             $db = $this->db;       
         }
-
-        $topic = $this->getTopicOfLoggedUser($db);
+            
+        if (empty($this->replies)) {
+            $topic = $this->getTopicOfLoggedUser($db);
+            $this->replies = $topic->getReplies($this->id_topic);
+        }
         
-        return $topic->getReplies($this->id_topic);
+        return $this->replies;
     }
 
     private function getTopicOfLoggedUser($db)
     {
-        return new SupportTopicDAO($db, Student::getLoggedIn($db)->getId());
+        return new SupportTopicDAO($db, Admin::getLoggedIn($db)->getId());
     }
     
     /**

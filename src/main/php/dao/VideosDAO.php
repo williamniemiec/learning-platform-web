@@ -60,7 +60,7 @@ class VideosDAO extends ClassesDAO
     private function parseGetResponseQuery()
     {
         if (!$this->hasResponseQuery()) {
-            return array();
+            return null;
         }
         
         $rawClass = $this->getResponseQuery();

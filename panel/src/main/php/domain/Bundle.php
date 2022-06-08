@@ -189,6 +189,32 @@ class Bundle implements \JsonSerializable
         return $this->totalClasses;
     }
 
+    /**
+     * Gets total students who have this bundle.
+     * 
+     * @return      int Total students
+     */
+    public function getTotalStudents() : int
+    {
+        return $this->totalStudents;
+    }
+    
+    /**
+     * Sets total students who have this bundle.
+     * 
+     * @param       int $totalStudents Total students who have this bundle
+     * 
+     * @return      Bundle Itself to allow chained calls
+     */
+    public function setTotalStudents(int $totalStudents) : Bundle
+    {
+        if ($totalStudents >= 0) {
+            $this->totalStudents = $totalStudents;
+        }
+        
+        return $this;
+    }
+
     
     //-------------------------------------------------------------------------
     //        Serialization
@@ -202,14 +228,15 @@ class Bundle implements \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'id' => $this->idBundle,
+            'id' => $this->id_bundle,
             'name' => $this->name,
             'price' => $this->price,
             'logo' => $this->logo,
             'description' => $this->description,
             'courses' => $this->courses,
             'totalClasses' => $this->totalClasses,
-            'totalLength' => $this->totalLength
+            'totalLength' => $this->totalLength,
+            'totalStudents' => $this->totalStudents
         );
     }
 }
