@@ -1,5 +1,5 @@
 <?php
-namespace util;
+namespace panel\util;
 
 
 /**

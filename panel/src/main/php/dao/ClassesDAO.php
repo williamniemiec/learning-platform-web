@@ -1,10 +1,10 @@
 <?php
 declare (strict_types=1);
 
-namespace dao;
+namespace panel\dao;
 
 
-use repositories\Database;
+use panel\repositories\Database;
 
 
 /**

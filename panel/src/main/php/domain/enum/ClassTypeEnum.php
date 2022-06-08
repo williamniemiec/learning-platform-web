@@ -1,10 +1,10 @@
 <?php
 declare (strict_types=1);
 
-namespace domain\enum;
+namespace panel\domain\enum;
 
 
-use util\Enumeration;
+use panel\util\Enumeration;
 
 
 /**

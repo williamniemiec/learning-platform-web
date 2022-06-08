@@ -1,12 +1,12 @@
 <?php
-namespace controllers;
+namespace panel\controllers;
 
 
-use config\Controller;
-use database\pdo\MySqlPDODatabase;
-use models\Admin;
-use models\dao\AdminsDAO;
-use models\enum\GenreEnum;
+use panel\config\Controller;
+use panel\database\pdo\MySqlPDODatabase;
+use panel\models\Admin;
+use panel\models\dao\AdminsDAO;
+use panel\models\enum\GenreEnum;
 
 
 /**

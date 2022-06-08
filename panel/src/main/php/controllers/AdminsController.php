@@ -1,14 +1,13 @@
 <?php
-namespace controllers;
+namespace panel\controllers;
 
 
-use config\Controller;
-use models\Admin;
-use database\pdo\MySqlPDODatabase;
-use models\dao\AdminsDAO;
-use models\Authorization;
-use models\dao\AuthorizationDAO;
-use models\enum\GenreEnum;
+use panel\config\Controller;
+use panel\models\Admin;
+use panel\database\pdo\MySqlPDODatabase;
+use panel\models\dao\AdminsDAO;
+use panel\models\dao\AuthorizationDAO;
+use panel\models\enum\GenreEnum;
 
 
 /**

@@ -1,12 +1,12 @@
 <?php
 declare (strict_types=1);
 
-namespace domain;
+namespace panel\domain;
 
 
-use repositories\Database;
-use DateTime;
-use dao\SupportTopicDAO;
+use panel\repositories\Database;
+use panel\DateTime;
+use panel\dao\SupportTopicDAO;
 
 
 /**

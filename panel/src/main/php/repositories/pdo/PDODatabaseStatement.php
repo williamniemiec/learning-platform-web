@@ -1,11 +1,11 @@
 <?php
 declare (strict_types=1);
 
-namespace repositories\pdo;
+namespace panel\repositories\pdo;
 
 
-use repositories\Database;
-use repositories\DatabaseStatement;
+use panel\repositories\Database;
+use panel\repositories\DatabaseStatement;
 
 
 /**

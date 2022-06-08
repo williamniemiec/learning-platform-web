@@ -1,17 +1,17 @@
 <?php
-namespace controllers;
+namespace panel\controllers;
 
 
-use config\Controller;
-use models\Admin;
-use database\pdo\MySqlPDODatabase;
-use models\Course;
-use models\dao\CoursesDAO;
-use models\util\FileUtil;
-use models\util\IllegalAccessException;
-use models\dao\ModulesDAO;
-use models\enum\CourseOrderByEnum;
-use models\enum\OrderDirectionEnum;
+use panel\config\Controller;
+use panel\models\Admin;
+use panel\database\pdo\MySqlPDODatabase;
+use panel\models\Course;
+use panel\models\dao\CoursesDAO;
+use panel\models\util\FileUtil;
+use panel\models\util\IllegalAccessException;
+use panel\models\dao\ModulesDAO;
+use panel\models\enum\CourseOrderByEnum;
+use panel\models\enum\OrderDirectionEnum;
 
 
 /**

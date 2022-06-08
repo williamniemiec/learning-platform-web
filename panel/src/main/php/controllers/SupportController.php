@@ -1,11 +1,11 @@
 <?php
-namespace controllers;
+namespace panel\controllers;
 
 
-use config\Controller;
-use models\Admin;
-use database\pdo\MySqlPDODatabase;
-use models\dao\SupportTopicDAO;
+use panel\config\Controller;
+use panel\models\Admin;
+use panel\database\pdo\MySqlPDODatabase;
+use panel\models\dao\SupportTopicDAO;
 
 
 /**

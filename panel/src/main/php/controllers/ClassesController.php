@@ -1,16 +1,16 @@
 <?php
-namespace controllers;
+namespace panel\controllers;
 
 
-use config\Controller;
-use models\Admin;
-use models\_Class;
-use database\pdo\MySqlPDODatabase;
-use models\dao\VideosDAO;
-use models\dao\QuestionnairesDAO;
-use models\Video;
-use models\dao\ModulesDAO;
-use models\Questionnaire;
+use panel\config\Controller;
+use panel\models\Admin;
+use panel\models\_Class;
+use panel\database\pdo\MySqlPDODatabase;
+use panel\models\dao\VideosDAO;
+use panel\models\dao\QuestionnairesDAO;
+use panel\models\Video;
+use panel\models\dao\ModulesDAO;
+use panel\models\Questionnaire;
 
 
 /**

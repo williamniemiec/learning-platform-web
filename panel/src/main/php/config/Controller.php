@@ -1,5 +1,5 @@
 <?php
-namespace config;
+namespace panel\config;
 
 
 /**

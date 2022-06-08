@@ -1,16 +1,16 @@
 <?php
 declare (strict_types=1);
 
-namespace dao;
+namespace panel\dao;
 
 
-use repositories\Database;
-use domain\Admin;
-use domain\Message;
-use domain\SupportTopic;
-use domain\SupportTopicCategory;
-use domain\Action;
-use util\IllegalAccessException;
+use panel\repositories\Database;
+use panel\domain\Admin;
+use panel\domain\Message;
+use panel\domain\SupportTopic;
+use panel\domain\SupportTopicCategory;
+use panel\domain\Action;
+use panel\util\IllegalAccessException;
 
 
 /**

@@ -1,13 +1,13 @@
 <?php 
 declare (strict_types=1);
 
-namespace domain;
+namespace panel\domain;
 
 
-use database\Database;
-use DateTime;
-use models\enum\GenreEnum;
-use models\dao\AdminsDAO;
+use panel\database\Database;
+use panel\DateTime;
+use panel\models\enum\GenreEnum;
+use panel\models\dao\AdminsDAO;
 
 
 /**

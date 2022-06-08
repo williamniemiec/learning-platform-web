@@ -1,14 +1,14 @@
 <?php
 declare (strict_types=1);
 
-namespace dao;
+namespace panel\dao;
 
 
-use repositories\Database;
-use domain\Admin;
-use domain\Module;
-use domain\Action;
-use util\IllegalAccessException;
+use panel\repositories\Database;
+use panel\domain\Admin;
+use panel\domain\Module;
+use panel\domain\Action;
+use panel\util\IllegalAccessException;
 
 
 /**
@@ -654,7 +654,7 @@ class ModulesDAO extends DAO
     }
     
     /**
-     * Gets highest class order in use from a module.
+     * Gets highest class order in use panel\from a module.
      *
      * @param       int idModule Module id
      *

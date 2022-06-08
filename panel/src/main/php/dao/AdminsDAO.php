@@ -1,15 +1,15 @@
 <?php
 declare (strict_types=1);
 
-namespace dao;
+namespace panel\dao;
 
 
-use repositories\Database;
-use domain\Admin;
-use domain\Authorization;
-use domain\Action;
-use domain\enum\GenreEnum;
-use util\IllegalAccessException;
+use panel\repositories\Database;
+use panel\domain\Admin;
+use panel\domain\Authorization;
+use panel\domain\Action;
+use panel\domain\enum\GenreEnum;
+use panel\util\IllegalAccessException;
 
 
 /**

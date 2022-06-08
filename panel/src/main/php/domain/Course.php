@@ -1,12 +1,12 @@
 <?php
 declare (strict_types=1);
 
-namespace domain;
+namespace panel\domain;
 
 
-use repositories\Database;
-use dao\ModulesDAO;
-use dao\CoursesDAO;
+use panel\repositories\Database;
+use panel\dao\ModulesDAO;
+use panel\dao\CoursesDAO;
 
 
 /**

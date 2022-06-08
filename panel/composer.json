@@ -1,13 +1,13 @@
 {
 	"autoload" : {
 		"psr-4" : {
-			"config\\" : "src/main/php/config/",
-			"controllers\\" : "src/main/php/controllers/",
-			"dao\\" : "src/main/php/dao/",
-			"domain\\" : "src/main/php/domain/",
-			"repositories\\" : "src/main/php/repositories/",
-			"util\\" : "src/main/php/util/",
-			"views\\" : "src/main/php/views/"
+			"panel\\config\\" : "src/main/php/config/",
+			"panel\\controllers\\" : "src/main/php/controllers/",
+			"panel\\dao\\" : "src/main/php/dao/",
+			"panel\\domain\\" : "src/main/php/domain/",
+			"panel\\repositories\\" : "src/main/php/repositories/",
+			"panel\\util\\" : "src/main/php/util/",
+			"panel\\views\\" : "src/main/php/views/"
 		}
 	}
 }

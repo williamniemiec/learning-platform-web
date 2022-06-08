@@ -1,9 +1,9 @@
 <?php
 declare (strict_types=1);
 
-namespace domain;
+namespace panel\domain;
 
-use DateTime;
+use panel\DateTime;
 
 
 /**

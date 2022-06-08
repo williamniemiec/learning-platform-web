@@ -1,8 +1,8 @@
 <?php
-namespace config;
+namespace panel\config;
 
 
-use \controllers\NotFoundController;
+use \panel\controllers\NotFoundController;
 
 
 /**

@@ -1,10 +1,10 @@
 <?php
-namespace controllers;
+namespace panel\controllers;
 
 
-use config\Controller;
-use database\pdo\MySqlPDODatabase;
-use models\Admin;
+use panel\config\Controller;
+use panel\database\pdo\MySqlPDODatabase;
+use panel\models\Admin;
 
 
 /**

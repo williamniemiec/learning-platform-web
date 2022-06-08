@@ -1,16 +1,16 @@
 <?php
 declare (strict_types=1);
 
-namespace dao;
+namespace panel\dao;
 
 
-use repositories\Database;
-use domain\Course;
-use domain\Admin;
-use domain\Action;
-use domain\enum\CourseOrderByEnum;
-use domain\enum\OrderDirectionEnum;
-use util\IllegalAccessException;
+use panel\repositories\Database;
+use panel\domain\Course;
+use panel\domain\Admin;
+use panel\domain\Action;
+use panel\domain\enum\CourseOrderByEnum;
+use panel\domain\enum\OrderDirectionEnum;
+use panel\util\IllegalAccessException;
 
 
 /**

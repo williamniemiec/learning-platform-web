@@ -1,15 +1,15 @@
 <?php
 declare (strict_types=1);
 
-namespace dao;
+namespace panel\dao;
 
 
-use repositories\Database;
-use domain\Questionnaire;
-use domain\Module;
-use domain\Admin;
-use domain\Action;
-use util\IllegalAccessException;
+use panel\repositories\Database;
+use panel\domain\Questionnaire;
+use panel\domain\Module;
+use panel\domain\Admin;
+use panel\domain\Action;
+use panel\util\IllegalAccessException;
 
 
 /**

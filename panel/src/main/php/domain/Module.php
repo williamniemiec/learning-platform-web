@@ -1,13 +1,13 @@
 <?php
 declare (strict_types=1);
 
-namespace domain;
+namespace panel\domain;
 
 
-use dao\VideosDAO;
-use dao\QuestionnairesDAO;
-use util\IllegalStateException;
-use repositories\Database;
+use panel\dao\VideosDAO;
+use panel\dao\QuestionnairesDAO;
+use panel\util\IllegalStateException;
+use panel\repositories\Database;
 
 
 /**

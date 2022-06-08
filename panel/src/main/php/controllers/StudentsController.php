@@ -1,13 +1,13 @@
 <?php
-namespace controllers;
+namespace panel\controllers;
 
 
-use config\Controller;
-use models\Student;
-use models\Admin;
-use database\pdo\MySqlPDODatabase;
-use models\dao\StudentsDAO;
-use models\dao\CoursesDAO;
+use panel\config\Controller;
+use panel\models\Student;
+use panel\models\Admin;
+use panel\database\pdo\MySqlPDODatabase;
+use panel\models\dao\StudentsDAO;
+use panel\models\dao\CoursesDAO;
 
 
 /**
