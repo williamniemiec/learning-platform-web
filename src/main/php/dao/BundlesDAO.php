@@ -110,13 +110,19 @@ class BundlesDAO extends DAO
         OrderDirectionEnum $orderType = null
     ) : array
     {
-        $this->withQuery($this->buildGetAllQuery($idStudent, $limit, $name, $orderBy, $orderType));
+        $type = $orderType;
+
+        if (empty($type)) {
+            $type = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
+        }
+
+        $this->withQuery($this->buildGetAllQuery($idStudent, $limit, $name, $orderBy, $type));
         $this->runQueryWithArguments($this->buildGetAllQueryArguments($idStudent, $name));
 
         return $this->parseGetAllResponseQuery($idStudent);
     }
 
-    private function buildGetAllQuery($idStudent, $limit, $name, $orderBy, $orderType)
+    private function buildGetAllQuery($idStudent, $limit, $name, $orderBy, $type)
     {
         $query = "
             SELECT      id_bundle, name, bundles.price, logo, description,
@@ -143,11 +149,8 @@ class BundlesDAO extends DAO
         if (!empty($name)) {
             $query .= " HAVING name LIKE ?";
         }
-        
-        if (empty($orderType)) {
-            $type = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
-            $query .= " ORDER BY ".$orderBy->get()." ".$type->get();
-        }
+
+        $query .= " ORDER BY ".$orderBy->get()." ".$type->get();
 
         if ($limit > 0) {
             $query .= " LIMIT ".$limit;

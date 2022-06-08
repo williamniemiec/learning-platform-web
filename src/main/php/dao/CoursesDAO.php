@@ -90,13 +90,11 @@ class CoursesDAO extends DAO
                 $course['logo'],
                 $course['description']
             );
-            
             $courses[$i]['course']->getModules($this->db);
             $courses[$i]['course']->setTotalLength((int) $course['total_length']);
             $courses[$i]['course']->getTotalClasses($this->db);
             $courses[$i]['total_classes_watched'] = (int) $course['total_classes_watched'];
             $courses[$i]['total_length_watched'] = (int) $course['total_length_watched'];
-
             $i++;
         }
 

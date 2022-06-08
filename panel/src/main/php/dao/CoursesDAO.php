@@ -61,8 +61,6 @@ class CoursesDAO extends DAO
     public function countClasses(int $idCourse) : array
     {
         $this->validateCourseId($idCourse);
-
-        // Query construction
         $this->withQuery("
             SELECT  SUM(total) AS total_classes, 
                     SUM(length) as total_length
@@ -78,11 +76,9 @@ class CoursesDAO extends DAO
                      FROM        videos NATURAL JOIN course_modules
                      WHERE       id_course = ?) AS tmp
         ");
+        $this->runQueryWithArguments($idCourse, $idCourse);
         
-        // Executes query
-        $sql->execute(array($idCourse, $idCourse));
-        
-        return $sql->fetch();
+        return $this->getResponseQuery();
     }
 
     private function validateCourseId($id)
@@ -103,7 +99,7 @@ class CoursesDAO extends DAO
      * @param       OrderDirectionEnum [Optional] $orderType Order that the 
      * elements will be returned. Default is ascending.
      * 
-     * @return      array Informations about all registered courses along with
+     * @return      array Information about all registered courses along with
      * total number of students who have the course or empty array if there are
      * no registered courses. Each position of the returned array has the 
      * following keys:
@@ -112,16 +108,28 @@ class CoursesDAO extends DAO
      *  <li><b>total_students</b>: Total of students who have the course</li>
      * </ul>
      */
-    public function getAll(string $name = '', int $limit = -1, int $offset = -1,
-        CourseOrderByEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
+    public function getAll(
+        string $name = '', 
+        int $limit = -1, 
+        int $offset = -1,
+        CourseOrderByEnum $orderBy = null, 
+        OrderDirectionEnum $orderType = null
+    ) : array
     {
-        $response = array();
-        $bindParams = array();
-        
-        if (empty($orderType))
-            $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
+        $type = $orderType;
 
-        // Query construction
+        if (empty($type)) {
+            $type = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
+        }
+        
+        $this->withQuery($this->buildGetAllQuery($name, $orderBy, $type, $limit, $offset));
+        $this->runQueryWithArguments($this->buildGetAllQueryArguments($name));
+
+        return $this->parseGetAllResponseQuery();
+    }
+
+    private function buildGetAllQuery($name, $orderBy, $orderType, $limit, $offset)
+    {
         $query = "
             SELECT      id_course, name, logo, description, 
                         COUNT(id_student) AS sales
@@ -133,46 +141,59 @@ class CoursesDAO extends DAO
         
         if (!empty($name)) {
             $query .= " HAVING name LIKE ?";
-            $bindParams[] = $name.'%';
         }
         
         if (!empty($orderBy)) {
             $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
         }
         
-        // Limits the results (if a limit was given)
         if ($limit > 0) {
-            if ($offset > 0)
+            if ($offset > 0) {
                 $query .= " LIMIT ".$offset.",".$limit;
-            else
+            }
+            else {
                 $query .= " LIMIT ".$limit;
-        }
-        
-        // Executes query
-
-        $this->withQuery($query);
-        $sql->execute($bindParams);
-        // Parses results
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $i = 0;
-            
-            foreach($sql->fetchAll() as $course) {
-                $response[$i] = new Course(
-                    (int)$course['id_course'],
-                    $course['name'],
-                    $course['logo'],
-                    $course['description']
-                );
-                
-                $total = $this->countClasses((int)$course['id_course']);
-                $response[$i]->setTotalClasses((int)$total['total_classes']);
-                $response[$i]->setTotalLength((int)$total['total_length']);
-                $response[$i]->setTotalStudents((int)$course['sales']);
-                $i++;
             }
         }
 
-        return $response;
+        return $query;
+    }
+
+    private function buildGetAllQueryArguments($name)
+    {
+        $bindParams = array();
+
+        if (!empty($name)) {
+            $bindParams[] = $name.'%';
+        }
+
+        return $bindParams;
+    }
+
+    private function parseGetAllResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $courses = array();
+        $i = 0;
+            
+        foreach ($this->getAllResponseQuery() as $course) {
+            $courses[$i] = new Course(
+                (int)$course['id_course'],
+                $course['name'],
+                $course['logo'],
+                $course['description']
+            );
+            $total = $this->countClasses((int) $course['id_course']);
+            $courses[$i]->setTotalClasses((int) $total['total_classes']);
+            $courses[$i]->setTotalLength((int) $total['total_length']);
+            $courses[$i]->setTotalStudents((int) $course['sales']);
+            $i++;
+        }
+
+        return $courses;
     }
     
     /**
@@ -190,31 +211,31 @@ class CoursesDAO extends DAO
         $this->validateLoggedAdmin();
         $this->validateAuthorization(0, 1);
         $this->validateCourseId($idCourse);
-        
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             DELETE FROM courses
             WHERE id_course = ?
         ");
+        $this->runQueryWithArguments($idCourse);
         
-        // Executes query
-        $sql->execute(array($idCourse));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->deleteCourse($idCourse);
-            $adminsDAO->newAction($action);
+        return $this->parseDeleteResponseQuery($idCourse);
+    }
+
+    private function parseDeleteResponseQuery($courseId)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
         }
+
+        $action = new Action();
+        $action->deleteCourse($courseId);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
         
-        return $response;
+        return true;
     }
     
     /**
-     * Gets informations about a course.
+     * Gets information about a course.
      *
      * @param       int $idCourse Course id
      *
@@ -226,32 +247,30 @@ class CoursesDAO extends DAO
     public function get(int $idCourse) : Course
     {
         $this->validateCourseId($idCourse);
-        
-        $response = null;
-        
-        // Query construction
         $this->withQuery("
             SELECT  *
             FROM    courses
             WHERE   id_course = ?
         ");
+        $this->runQueryWithArguments($idCourse);
         
-        // Executes query
-        $sql->execute(array($idCourse));
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $course = $sql->fetch();
-            
-            $response = new Course(
-                (int)$course['id_course'],
-                $course['name'],
-                $course['logo'],
-                $course['description']
-            );
+        return $this->parseGetResponseQuery();
+    }
+
+    private function parseGetResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
         }
-        
-        return $response;
+
+        $courseRaw = $this->getResponseQuery();
+            
+        return new Course(
+            (int) $courseRaw['id_course'],
+            $courseRaw['name'],
+            $courseRaw['logo'],
+            $courseRaw['description']
+        );
     }
     
     /**
@@ -271,48 +290,10 @@ class CoursesDAO extends DAO
         $this->validateLoggedAdmin();  
         $this->validateAuthorization(0, 1);
         $this->validateCourse($course);
-            
-        $response = false;
-        $data_keys = array();
-        $data_values = array();
-        $data_sql = array();
-        
-        // Query construction
-        $data_keys[] = "name";
-        $data_values[] = $course->getName();
-        $data_sql[] = "?";
-        
-        if (!empty($course->getDescription())) {
-            $data_keys[] = "description";
-            $data_values[] = $course->getDescription();
-            $data_sql[] = "?";
-        }
-        
-        // Parses course logo
-        if (!empty($course->getLogo())) {
-            // Puts image file name in the query
-            $data_values[] = $course->getLogo();
-            $data_sql[] = "?";
-        }
-        
-        $sql = "
-            INSERT INTO courses 
-            (".implode(",",$data_keys).") 
-            VALUES (".implode(",", $data_sql).")";
-        
-        // Executes query
-        $this->withQuery($sql);
-        $sql->execute($data_values);
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->addCourse($course->getId());
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        $this->withQuery($this->buildNewQuery($course));
+        $this->runQueryWithArguments($this->buildNewQueryArguments($course));
+
+        return $this->parseNewResponseQuery();
     }
 
     private function validateCourse($course)
@@ -320,6 +301,55 @@ class CoursesDAO extends DAO
         if (empty($course)) {
             throw new \InvalidArgumentException("Course cannot be empty");
         }
+    }
+
+    private function buildNewQuery($course)
+    {
+        $fields = array("name");
+        $values = array("?");
+        
+        if (!empty($course->getDescription())) {
+            $fields[] = "description";
+            $values[] = "?";
+        }
+
+        if (!empty($course->getLogo())) {
+            $values[] = "?";
+        }
+        
+        return "INSERT INTO courses 
+                (".implode(",", $fields).") 
+                VALUES (".implode(",", $values).")";
+    }
+
+    private function buildNewQueryArguments($course)
+    {
+        $bindParams = array();
+        $bindParams[] = $course->getName();
+        
+        if (!empty($course->getDescription())) {
+            $bindParams[] = $course->getDescription();
+        }
+
+        if (!empty($course->getLogo())) {
+            $bindParams[] = $course->getLogo();
+        }
+
+        return $bindParams;
+    }
+
+    private function parseNewResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
+        }
+
+        $action = new Action();
+        $action->addCourse($this->db->lastInsertId());
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+        
+        return true;
     }
     
     /**
@@ -334,52 +364,63 @@ class CoursesDAO extends DAO
      * @throws      \InvalidArgumentException If course or admin provided in 
      * the constructor is empty
      */
-    public function edit(Course $course) : bool
+    public function update(Course $course) : bool
     {
         $this->validateLoggedAdmin();
         $this->validateAuthorization(0, 1);
         $this->validateCourse($course);
+        $this->withQuery($this->buildUpdateQuery($course));
+        $this->runQueryWithArguments($this->buildUpdateQueryArguments($course));
         
-        $response = false;
-        $data_values = array();
-        $data_sql = array();
-        
-        // Query construction
-        $data_values[] = $course->getName();
-        $data_sql[] = "name = ?";
+        return $this->parseUpdateResponseQuery($course->getId());
+    }
+
+    private function buildUpdateQuery($course)
+    {
+        $fields = array("name = ?");
         
         if (!empty($course->getDescription())) {
-            $data_values[] = $course->getDescription();
-            $data_sql[] = "description = ?";
-        }
-        
-        // Parses course logo
-        if (!empty($course->getLogo())) {
-            $data_values[] = $course->getLogo();
-            $data_sql[] = "logo = ?";
+            $fields[] = "description = ?";
         }
 
-        $data_values[] = $course->getId();
+        if (!empty($course->getLogo())) {
+            $fields[] = "logo = ?";
+        };
+
+        return "UPDATE  courses 
+                SET     ".implode(",", $fields)."  
+                WHERE   id_course = ?";
+    }
+
+    private function buildUpdateQueryArguments($course)
+    {
+        $bindParams = array($course->getName());
         
-        $sql = "
-            UPDATE  courses 
-            SET     ".implode(",", $data_sql)." 
-            WHERE   id_course = ?
-        ";
-        
-        // Executes query
-        $this->withQuery($sql);
-        $sql->execute($data_values);
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateCourse($course->getId());
-            $adminsDAO->newAction($action);
+        if (!empty($course->getDescription())) {
+            $bindParams[] = $course->getDescription();
         }
         
-        return $response;
+        if (!empty($course->getLogo())) {
+            $bindParams[] = $course->getLogo();
+        }
+
+        $bindParams[] = $course->getId();
+
+        return $bindParams;
+    }
+
+    private function parseUpdateResponseQuery($courseId)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
+        }
+
+        $action = new Action();
+        $action->updateCourse($courseId);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+        
+        return true;
     }
     
     /**
@@ -404,28 +445,14 @@ class CoursesDAO extends DAO
         $this->validateCourseId($idCourse);
         $this->validateModuleId($idModule);
         $this->validateOrder($order);
-
-        $response = false;
-        
-        // Query construction
         $this->withQuery("
             INSERT INTO course_modules
             (id_course, id_module, module_order)
             VALUES (?, ?, ?)
         ");
+        $this->runQueryWithArguments($idCourse, $idModule, $order);
         
-        // Executes query
-        $sql->execute(array($idCourse, $idModule, $order));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateCourse($idCourse);
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idCourse);
     }
 
     private function validateModuleId($id)
@@ -464,27 +491,13 @@ class CoursesDAO extends DAO
         $this->validateAuthorization(0, 1);
         $this->validateCourseId($idCourse);
         $this->validateModuleId($idModule);
-
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             DELETE FROM course_modules
             WHERE id_course = ? AND id_module = ?
         ");
-        
-        // Executes query
-        $sql->execute(array($idCourse, $idModule));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateCourse($idCourse);
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        $this->runQueryWithArguments($idCourse, $idModule);
+
+        return $this->parseUpdateResponseQuery($idCourse);
     }
     
     /**
@@ -500,23 +513,13 @@ class CoursesDAO extends DAO
     public function deleteAllModules(int $idCourse) : bool
     {
         $this->validateCourseId($idCourse);
-            
-        $response = false;
-        
-        $sql = $this->db->query("
+        $this->withQuery("
             DELETE FROM course_modules
             WHERE id_course = ".$idCourse
         );
+        $this->runQueryWithoutArguments();
         
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateCourse($idCourse);
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idCourse);
     }
     
     /**
@@ -532,10 +535,6 @@ class CoursesDAO extends DAO
     public function getFromBundle(int $idBundle) : array
     {
         $this->validateBundleId($idBundle);
-            
-        $response = array();
-
-        // Query construction
         $this->withQuery("
             SELECT      id_course, name, logo, description,
                         COUNT(id_student) AS total_students
@@ -545,29 +544,9 @@ class CoursesDAO extends DAO
             WHERE       id_bundle = ?
             GROUP BY    id_course, name, logo, description
         ");
-            
-        // Executes query
-        $sql->execute(array($idBundle));
+        $this->runQueryWithArguments($idBundle);
         
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $courses = $sql->fetchAll();
-            $i = 0;
-            
-            foreach ($courses as $course) {
-                $response[$i] = new Course(
-                    (int)$course['id_course'],
-                    $course['name'],
-                    $course['logo'],
-                    $course['description']
-                );
-                
-                $response[$i]->setTotalStudents((int)$course['total_students']);
-                $i++;
-            }
-        }
-        
-        return $response;
+        return $this->parseGetAllFromBundleResponseQuery();
     }
 
     private function validateBundleId($id)
@@ -576,6 +555,29 @@ class CoursesDAO extends DAO
             throw new \InvalidArgumentException("Bundle id cannot be empty or ".
                                                 "less than or equal to zero");
         }
+    }
+
+    private function parseGetAllFromBundleResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $courses = array();
+        $i = 0;
+            
+        foreach ($this->getAllResponseQuery() as $course) {
+            $courses[$i] = new Course(
+                (int)$course['id_course'],
+                $course['name'],
+                $course['logo'],
+                $course['description']
+            );
+            $courses[$i]->setTotalStudents((int) $course['total_students']);
+            $i++;
+        }
+
+        return $courses;
     }
     
     /**
@@ -592,22 +594,24 @@ class CoursesDAO extends DAO
     public function getImage(int $idCourse) : string
     {
         $this->validateCourseId($idCourse);
-        $response = "";
-        
         $this->withQuery("
             SELECT  logo
             FROM    courses
             WHERE   id_course = ".$idCourse
         );
-
-        if ($sql->rowCount() > 0) {
-            $response = $sql->fetch()['logo'];
-            
-            if (empty($response))
-                $response = "";
-        }
         
-        return $response;
+        return $this->parseGetImageResponseQuery();
+    }
+
+    private function parseGetImageResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return "";
+        }
+
+        $image = $this->getResponseQuery()['logo'];
+        
+        return empty($image) ? "" : $image;
     }
     
     /**
@@ -617,9 +621,12 @@ class CoursesDAO extends DAO
      */
     public function count() : int
     {
-        return (int)$this->db->query("
+        $this->withQuery("
             SELECT  COUNT(*) AS total
             FROM    courses
-        ")->fetch()['total'];
+        ");
+        $this->runQueryWithoutArguments();
+
+        return ((int) $this->getResponseQuery()['total']);
     }
 }

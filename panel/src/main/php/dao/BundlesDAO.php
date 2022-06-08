@@ -57,32 +57,14 @@ class BundlesDAO extends DAO
     public function get(int $idBundle) : Bundle
     {
         $this->validateBundleId($idBundle);
-        
-        $response = null;
-        
-        // Query construction
         $this->withQuery("
             SELECT  *
             FROM    bundles
             WHERE   id_bundle = ?
         ");
-            
-        // Executes query
-        $sql->execute(array($idBundle));
+        $this->runQueryWithArguments($idBundle);
         
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $bundle = $sql->fetch();
-            $response = new Bundle(
-                (int)$bundle['id_bundle'],
-                $bundle['name'],
-                (float)$bundle['price'],
-                $bundle['logo'],
-                $bundle['description']
-            );
-        }
-        
-        return $response;
+        return $this->parseGetResponseQuery();
     }
 
     private function validateBundleId($id)
@@ -91,6 +73,23 @@ class BundlesDAO extends DAO
             throw new \InvalidArgumentException("Bundle id cannot be empty or ".
                                                 "less than or equal to zero");
         }
+    }
+
+    private function parseGetResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
+        }
+
+        $bundleRaw = $this->getResponseQuery();
+        
+        return new Bundle(
+            (int) $bundleRaw['id_bundle'], 
+            $bundleRaw['name'], 
+            (float) $bundleRaw['price'],
+            $bundleRaw['logo'],
+            $bundleRaw['description']
+        );
     }
     
     /**
@@ -107,16 +106,28 @@ class BundlesDAO extends DAO
      * @return      Bundle[] Bundles with the provided filters or empty array if
      * no bundles are found.
      */
-    public function getAll(int $limit = -1, int $offset = -1, string $name = '', 
-        BundleOrderTypeEnum $orderBy = null, OrderDirectionEnum $orderType = null) : array
+    public function getAll(
+        int $limit = -1, 
+        int $offset = -1, 
+        string $name = '', 
+        BundleOrderTypeEnum $orderBy = null, 
+        OrderDirectionEnum $orderType = null
+    ) : array
     {
-        $response = array();
-        $bindParams = array();
+        $type = $orderType;
 
-        if (empty($orderType))
-            $orderType = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
-        
-        // Query construction
+        if (empty($orderType)) {
+            $type = new OrderDirectionEnum(OrderDirectionEnum::ASCENDING);
+        }
+
+        $this->withQuery($this->buildGetAllQuery($name, $orderBy, $type, $limit, $offset));
+        $this->runQueryWithArguments($this->buildGetAllQueryArguments($name));
+
+        return $this->parseGetAllResponseQuery();
+    }
+
+    private function buildGetAllQuery($name, $orderBy, $type, $limit, $offset)
+    {
         $query = "
             SELECT      id_bundle, name, bundles.price, logo, description,
                         COUNT(id_course) AS courses,
@@ -127,51 +138,57 @@ class BundlesDAO extends DAO
             GROUP BY    id_bundle, name, bundles.price, description
         ";
         
-        // Limits the search to a specified name (if a name was specified)
         if (!empty($name)) {
-            $query .= empty($orderBy) ? " HAVING name LIKE ?" : " HAVING name LIKE ?";
-            $bindParams[] = $name.'%';
+            $query .= " HAVING name LIKE ?";
         }
         
-        // Sets order by criteria (if any)
-        if (!empty($orderBy)) {
-            $query .= " ORDER BY ".$orderBy->get()." ".$orderType->get();
-        }
+        $query .= " ORDER BY ".$orderBy->get()." ".$type->get();
 
-        // Limits the results (if a limit was given)
         if ($limit > 0) {
-            if ($offset > 0)    
+            if ($offset > 0) {
                 $query .= " LIMIT ".$offset.",".$limit;
-            else
+            }
+            else {
                 $query .= " LIMIT ".$limit;
-        }
-        
-        // Prepares query
-        $this->withQuery($query);
-
-        // Executes query
-        $sql->execute($bindParams);
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            $bundles = $sql->fetchAll();
-            $i = 0;
-            
-            foreach ($bundles as $bundle) {
-                $response[$i] = new Bundle(
-                    (int)$bundle['id_bundle'],
-                    $bundle['name'],
-                    (float)$bundle['price'],
-                    $bundle['logo'],
-                    $bundle['description']
-                );
-                
-                $response[$i]->setTotalStudents((int)$bundle['sales']);
-                $i++;
             }
         }
 
-        return $response;
+        return $query;
+    }
+
+    private function buildGetAllQueryArguments($name)
+    {
+        $bindParams = array();
+        
+        if (!empty($name)) {
+            $bindParams[] = $name.'%';
+        }
+
+        return $bindParams;
+    }
+
+    private function parseGetAllResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
+        }
+
+        $bundles = array();
+        $i = 0;
+            
+        foreach ($this->getAllResponseQuery() as $bundle) {
+            $bundles[$i]['bundle'] = new Bundle(
+                (int) $bundle['id_bundle'],
+                $bundle['name'],
+                (float) $bundle['price'],
+                $bundle['logo'],
+                $bundle['description']
+            );
+            $bundles[$i]->setTotalStudents((int) $bundle['sales']);
+            $i++;
+        }
+
+        return $bundles;
     }
     
     /**
@@ -191,45 +208,10 @@ class BundlesDAO extends DAO
         $this->validateLoggedAdmin();
         $this->validateAuthorization(0, 1);
         $this->validateBundle($bundle);
-        
-        
-        $response = false;
-        $bindParams = array(
-            $bundle->getName(),
-            $bundle->getPrice()
-        );
-            
-        // Query construction
-        $query = "
-            INSERT INTO bundles
-            SET name = ?, price = ?
-        ";
-        
-        if (!empty($bundle->getDescription())) {
-            $query .= ", description = ?";
-            $bindParams[] = $bundle->getDescription();
-        }
-        
-        if (!empty($bundle->getLogo())) {
-            $query .= ", logo = ?";
-            $bindParams[] = $bundle->getLogo();
-        }
+        $this->withQuery($this->buildNewQuery($bundle));
+        $this->runQueryWithArguments($this->buildChangeQueryArguments($bundle));
 
-        // Prepares query
-        $this->withQuery($query);
-        
-        // Executes query
-        $sql->execute($bindParams);
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->addBundle((int)$this->db->lastInsertId());
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        return $this->parseNewResponseQuery();
     }
 
     private function validateBundle($bundle)
@@ -237,6 +219,56 @@ class BundlesDAO extends DAO
         if (empty($bundle)) {
             throw new \InvalidArgumentException("Bundle cannot be empty");
         }
+    }
+
+    private function buildNewQuery($bundle)
+    {
+        $query = "
+            INSERT INTO bundles
+            SET name = ?, price = ?
+        ";
+        
+        if (!empty($bundle->getDescription())) {
+            $query .= ", description = ?";
+        }
+        
+        if (!empty($bundle->getLogo())) {
+            $query .= ", logo = ?";
+        }
+
+        return $query;
+    }
+
+    private function buildChangeQueryArguments($bundle)
+    {
+        $bindParams = array(
+            $bundle->getName(),
+            $bundle->getPrice()
+        );
+        
+        if (!empty($bundle->getDescription())) {
+            $bindParams[] = $bundle->getDescription();
+        }
+        
+        if (!empty($bundle->getLogo())) {
+            $bindParams[] = $bundle->getLogo();
+        }
+
+        return $bindParams;
+    }
+
+    private function parseNewResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
+        }
+
+        $action = new Action();
+        $action->addBundle($this->db->lastInsertId());
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+        
+        return true;
     }
     
     /**
@@ -256,15 +288,14 @@ class BundlesDAO extends DAO
         $this->validateLoggedAdmin(); 
         $this->validateAuthorization(0, 1);
         $this->validateBundle($bundle);
+        $this->withQuery($this->buildUpdateQuery($bundle));
+        $this->runQueryWithArguments($this->buildChangeQueryArguments($bundle));
         
+        return $this->parseUpdateResponseQuery($bundle->getId());
+    }
 
-        $response = false;
-        $bindParams = array(
-            $bundle->getName(),
-            $bundle->getPrice()
-        );
-            
-        // Query construction
+    private function buildUpdateQuery($bundle)
+    {
         $query = "
             UPDATE bundles
             SET name = ?, price = ?
@@ -272,33 +303,31 @@ class BundlesDAO extends DAO
         
         if (!empty($bundle->getDescription())) {
             $query .= ", description = ?";
-            $bindParams[] = $bundle->getDescription();
         }
         
         if (!empty($bundle->getLogo())) {
             $query .= ", logo = ?";
-            $bindParams[] = $bundle->getLogo();
         }
 
         $query .= " WHERE id_bundle = ".$bundle->getId();
-        
-        // Prepares query
-        $this->withQuery($query);
-        
-        // Executes query
-        $sql->execute($bindParams);
 
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateBundle($bundle->getId());
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        return $query;
     }
     
+    private function parseUpdateResponseQuery($bundleId)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
+        }
+
+        $action = new Action();
+        $action->updateBundle($bundleId);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+        
+        return true;
+    }
+
     /**
      * Removes a bundle.
      * 
@@ -316,26 +345,27 @@ class BundlesDAO extends DAO
         $this->validateLoggedAdmin(); 
         $this->validateAuthorization(0, 1);
         $this->validateBundleId($idBundle);
-        $response = false;
-        
-        // Query construction
         $this->withQuery("
             DELETE FROM bundles
             WHERE id_bundle = ?
         ");
+        $this->runQueryWithArguments($idBundle);
         
-        // Executes query
-        $sql->execute(array($idBundle));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->deleteBundle($idBundle);
-            $adminsDAO->newAction($action);
+        return $this->parseDeleteResponseQuery($idBundle);
+    }
+
+    private function parseDeleteResponseQuery($bundleId)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
         }
+
+        $action = new Action();
+        $action->deleteBundle($bundleId);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
         
-        return $response;
+        return true;
     }
     
     /**
@@ -355,25 +385,13 @@ class BundlesDAO extends DAO
         $this->validateLoggedAdmin(); 
         $this->validateAuthorization(0, 1);
         $this->validateBundleId($idBundle);
-        
-        $response = false;
-            
-        // Query construction
-        $sql = $this->db->query("
+        $this->withQuery("
             UPDATE  bundles
             SET     logo = NULL
             WHERE   id_bundle = ".$idBundle
         );
         
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateBundle($idBundle);
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idBundle);
     }
     
     /**
@@ -396,27 +414,14 @@ class BundlesDAO extends DAO
         $this->validateAuthorization(0, 1);
         $this->validateBundleId($idBundle);
         $this->validateCourseId($idCourse);
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             INSERT INTO bundle_courses
             (id_bundle, id_course)
             VALUES (?, ?)
         ");
+        $this->runQueryWithArguments($idBundle, $idCourse);
         
-        // Executes query
-        $sql->execute(array($idBundle, $idCourse));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateBundle($idBundle);
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idBundle);
     }
 
     private function validateCourseId($id)
@@ -446,27 +451,13 @@ class BundlesDAO extends DAO
         $this->validateAuthorization(0, 1);
         $this->validateBundleId($idBundle);
         $this->validateCourseId($idCourse);
-        
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             DELETE FROM bundle_courses
             WHERE id_bundle = ? AND id_course = ?
         ");
+        $this->runQueryWithArguments($idBundle, $idCourse);
         
-        // Executes query
-        $sql->execute(array($idBundle, $idCourse));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateBundle($idBundle);
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idBundle);
     }
     
     /**
@@ -487,23 +478,12 @@ class BundlesDAO extends DAO
         $this->validateLoggedAdmin();
         $this->validateAuthorization(0, 1);
         $this->validateBundleId($idBundle);
-                
-        $response = false;
-            
-        $sql = $this->db->query("
+        $this->withQuery("
             DELETE FROM bundle_courses
             WHERE id_bundle = ".$idBundle
         );
         
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $response = true;
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateBundle($idBundle);
-            $adminsDAO->newAction($action);
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idBundle);
     }
     
     /**
@@ -513,9 +493,12 @@ class BundlesDAO extends DAO
      */
     public function count() : int
     {
-        return (int)$this->db->query("
+        $this->withQuery("
             SELECT  COUNT(*) AS total
             FROM    bundles
-        ")->fetch()['total'];
+        ");
+        $this->runQueryWithoutArguments();
+
+        return ((int) $this->getResponseQuery()['total']);
     }
 }

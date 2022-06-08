@@ -43,20 +43,14 @@ class AuthorizationDAO extends DAO
     public function get(int $idAdmin) : Authorization
     {
         $this->validateAdminId($idAdmin);
-        
-        $sql = $this->db->query("
+        $this->withQuery("
             SELECT  id_authorization, authorization.name, level
             FROM    authorization JOIN admins USING (id_authorization)
             WHERE   id_admin = ".$idAdmin
         );
+        $this->runQueryWithoutArguments();
         
-        $authorization = $sql->fetch();
-        
-        return new Authorization(
-            (int)$authorization['id_authorization'], 
-            $authorization['name'], 
-            (int)$authorization['level']
-        );
+        return $this->parseGetResponseQuery();
     }
 
     private function validateAdminId($id)
@@ -65,6 +59,21 @@ class AuthorizationDAO extends DAO
             throw new \InvalidArgumentException("Admin id cannot be empty or ".
                                                 "less than or equal to zero");
         }
+    }
+
+    private function parseGetResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
+        }
+
+        $authorizationRaw = $this->getResponseQuery();
+        
+        return new Authorization(
+            (int) $authorizationRaw['id_authorization'], 
+            $authorizationRaw['name'], 
+            (int) $authorizationRaw['level']
+        );
     }
     
     /**
@@ -75,23 +84,31 @@ class AuthorizationDAO extends DAO
      */
     public function getAll() : array
     {
-        $response = array();
-        
-        $sql = $this->db->query("
+        $this->withQuery("
             SELECT  *
             FROM    authorization
         ");
+        $this->runQueryWithoutArguments();
         
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $authorization) {
-                $response[] = new Authorization(
-                    $authorization['id_authorization'],
-                    $authorization['name'], 
-                    (int)$authorization['level']
-                );
-            }
+        return $this->parseGetAllResponseQuery();
+    }
+
+    private function parseGetAllResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
-        
-        return $response;
+
+        $authorizations = array();
+            
+        foreach ($this->getAllResponseQuery() as $authorization) {
+            $authorizations[] = new Authorization(
+                $authorization['id_authorization'],
+                $authorization['name'], 
+                (int) $authorization['level']
+            );
+        }
+
+        return $authorizations;
     }
 }
