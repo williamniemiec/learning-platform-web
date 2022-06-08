@@ -66,11 +66,9 @@ class StudentsDAO extends DAO
                                     FROM    course_modules
                                     WHERE   id_course = ?)
         ");
+        $this->runQueryWithArguments($idStudent, $idCourse);
         
-        // Executes query
-        $sql->execute(array($idStudent, $idCourse));
-        
-        return $sql && $sql->fetch()['hasCourse'];
+        return $this->parseHasCourseResponseQuery();
     }
 
     private function validateStudentId($id)
@@ -88,97 +86,115 @@ class StudentsDAO extends DAO
                                                 "less than or equal to zero");
         }
     }
+
+    private function parseHasCourseResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
+        }
+
+        return ($this->getResponseQuery()['hasCourse'] > 0);
+    }
     
     /**
      * Gets information about the logged in student.
      *
-     * @param       int $id_student Student id
+     * @param       int idStudent Student id
      *
-     * @return      Student Informations about the student or null if student 
+     * @return      Student Information about the student or null if student 
      * does not exist
      * 
      * @throws      \InvalidArgumentException If student id is empty, less than
      * or equal to zero
      */
-    public function get(int $id_student) : ?Student
+    public function get(int $idStudent) : ?Student
     {
         $this->validateStudentId($idStudent);
-        $response = null;
-        
-        // Query construction
         $this->withQuery("
             SELECT  * 
             FROM    students
             WHERE   id_student = ?
         ");
-        
-        // Executes query
-        $sql->execute(array($id_student));
-        
-        // Parses results
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $student = $sql->fetch();
-            
-            $response = new Student(
-                (int)$student['id_student'],
-                $student['name'], 
-                new GenreEnum($student['genre']), 
-                new \DateTime($student['birthdate']), 
-                $student['email'],
-                $student['photo'] 
-            );
+        $this->runQueryWithArguments($idStudent);
+
+        return $this->parseGetResponseQuery();
+    }
+
+    private function parseGetResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return null;
         }
+
+        $studentRaw = $this->getResponseQuery();
         
-        return $response;
+        return new Student(
+            (int) $studentRaw['id_student'],
+            $studentRaw['name'], 
+            new GenreEnum($studentRaw['genre']), 
+            new \DateTime($studentRaw['birthdate']), 
+            $studentRaw['email'],
+            $studentRaw['photo'] 
+        );
     }
     
     /**
      * Gets all registered students.
      * 
-     * @param       int $id_course [Optional] Filters students who have a 
+     * @param       int $idCourse [Optional] Filters students who have a 
      * course with the provided id
      * @param       int $limit [Optional] Maximum results that will be returned
      * 
      * @return      \models\Student[] All registered students or empty 
      * array if there are no registered students
      */
-    public function getAll(int $id_course = -1, int $limit = -1) : array
+    public function getAll(int $idCourse = -1, int $limit = -1) : array
     {
-        $response = array();
+        $this->withQuery($this->buildGetAllQuery($idCourse));
+        $this->runQueryWithoutArguments();
+        
+        return $this->parseGetAllResponseQuery();
+    }
 
-        // Query construction
+    private function buildGetAllQuery($idCourse)
+    {
         $query = "
             SELECT  * 
             FROM    students
         ";
         
-        if ($id_course > 0) {
+        if ($idCourse > 0) {
             $query .= " 
                 WHERE id_student IN (SELECT id_student
                                      FROM   purchases 
                                             NATURAL JOIN bundle_courses
                                             NATURAL JOIN courses
-                                     WHERE  id_course = ".$id_course.")
+                                     WHERE  id_course = ".$idCourse.")
             ";
         }
-        
-        // Executes query
-        $sql = $this->db->query($query);
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $student) {
-                $response[] = new Student(
-                    (int)$student['id_student'],
-                    $student['name'], 
-                    new GenreEnum($student['genre']), 
-                    new \DateTime($student['birthdate']), 
-                    $student['email']
-                );
-            }
+
+        return $query;
+    }
+
+    private function parseGetAllResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
 
-        return $response;
+        $students = array();
+
+        foreach ($this->getAllResponseQuery() as $student) {
+            $students[] = new Student(
+                (int) $student['id_student'],
+                $student['name'], 
+                new GenreEnum($student['genre']), 
+                new \DateTime($student['birthdate']), 
+                $student['email']
+            );
+        }
+
+        return $students;
     }
     
     /**
@@ -194,11 +210,7 @@ class StudentsDAO extends DAO
     public function getBundles(int $idStudent) : array
     {
         $this->validateStudentId($idStudent);
-            
-        $response = array();
-        
-        // Query construction
-        $sql = $this->db->query("
+        $this->withQuery("
             SELECT      bundles.id_bundle, bundles.name, 
                         bundles.price, bundles.logo, bundles.description
             FROM        bundles
@@ -208,21 +220,30 @@ class StudentsDAO extends DAO
             GROUP BY    bundles.id_bundle, bundles.name, 
                         bundles.price, bundles.logo, bundles.description
         ");
-        
-        // Parses results
-        if ($sql && $sql->rowCount() > 0) {
-            foreach ($sql->fetchAll() as $bundle) {
-                $response[] = new Bundle(
-                    (int)$bundle['id_bundle'],
-                    $bundle['name'],
-                    (float)$bundle['price'],
-                    $bundle['logo'],
-                    $bundle['description']
-                );
-            }
+        $this->runQueryWithoutArguments();
+
+        return $this->parseGetAllBundlesResponseQuery();
+    }
+
+    private function parseGetAllBundlesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array();
         }
-        
-        return $response;
+
+        $bundles = array();
+
+        foreach ($this->getAllResponseQuery() as $bundle) {
+            $bundles[] = new Bundle(
+                (int) $bundle['id_bundle'],
+                $bundle['name'],
+                (float) $bundle['price'],
+                $bundle['logo'],
+                $bundle['description']
+            );
+        }
+
+        return $bundles;
     }
     
     /**
@@ -233,35 +254,35 @@ class StudentsDAO extends DAO
      * @return      bool If student has been successfully removed 
      * 
      * @throws      \InvalidArgumentException If student id is empty, less than
-     * or equal to zerois empty, less than or equal to zero or if admin provided
-     * in the constructor is empty
+     * or equal to zero is empty, less than or equal to zero or if admin 
+     * provided in the constructor is empty
      */
     public function delete(int $idStudent) : bool
     {
         $this->validateLoggedAdmin();
         $this->validateAuthorization(0); 
         $this->validateStudentId($idStudent);
-
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             DELETE FROM students 
             WHERE id_student = ?
         ");
+        $this->runQueryWithArguments($idStudent);
         
-        // Executes query
-        $sql->execute(array($idStudent));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->deleteStudent($idStudent);
-            $adminsDAO->newAction($action);
-            $response = true;
+        return $this->parseDeleteResponseQuery($idStudent);
+    }
+
+    private function parseDeleteResponseQuery($studentId)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
         }
-        
-        return $response;
+
+        $action = new Action();
+        $action->deleteStudent($studentId);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+
+        return true;
     }
     
     /**
@@ -287,28 +308,15 @@ class StudentsDAO extends DAO
         if (!empty($newPassword)) {
             $this->updatePassword($idStudent, $newPassword);
         }
-
-        $response = false;
-            
-        // Query construction
+        
         $this->withQuery("
             UPDATE  students 
             SET     email = ?
             WHERE   id_student = ?
         ");
-        
-        // Executes query
-        $sql->execute(array($newEmail, $idStudent));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateStudent($idStudent);
-            $adminsDAO->newAction($action);
-            $response = true;
-        }
-        
-        return $response;
+        $this->runQueryWithArguments($newEmail, $idStudent);
+
+        return $this->parseUpdateResponseQuery($idStudent);
     }
 
     private function validateEmail($email)
@@ -316,6 +324,20 @@ class StudentsDAO extends DAO
         if (empty($email)) {
             throw new \InvalidArgumentException("New email cannot be empty");
         }
+    }
+
+    private function parseUpdateResponseQuery($studentId)
+    {
+        if (!$this->hasResponseQuery()) {
+            return false;
+        }
+
+        $action = new Action();
+        $action->updateStudent($studentId);
+        $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
+        $adminsDao->newAction($action);
+
+        return true;
     }
     
     /**
@@ -336,28 +358,14 @@ class StudentsDAO extends DAO
         $this->validateAuthorization(0);   
         $this->validateStudentId($idStudent);
         $this->validatePassword($newPassword);
-
-        $response = false;
-            
-        // Query construction
-        $sql = $this->db->query("
+        $this->withQuery("
             UPDATE students
             SET password = MD5(".$newPassword.")
             WHERE id_student = ?
         ");
+        $this->runQueryWithArguments($idStudent);
         
-        // Executes query
-        $sql->execute(array($idStudent));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateStudent($idStudent);
-            $adminsDAO->newAction($action);
-            $response = true;
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idStudent);
     }
 
     private function validatePassword($password)
@@ -384,28 +392,14 @@ class StudentsDAO extends DAO
         $this->validateAuthorization(0); 
         $this->validateStudentId($idStudent);
         $this->validateBundleId($idBundle);
-        
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             INSERT INTO purchases 
             (id_student, id_bundle, date)
             VALUES (?, ?, NOW())
         ");
+        $this->runQueryWithArguments($idStudent, $idBundle);
         
-        // Executes query
-        $sql->execute(array($idStudent, $idBundle));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateStudent($idStudent);
-            $adminsDAO->newAction($action);
-            $response = true;
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idStudent);
     }
 
     private function validateBundleId($id)
@@ -434,26 +428,12 @@ class StudentsDAO extends DAO
         $this->validateAuthorization(0); 
         $this->validateStudentId($idStudent);
         $this->validateBundleId($idBundle);
-            
-        $response = false;
-            
-        // Query construction
         $this->withQuery("
             DELETE FROM purchases
             WHERE   id_student = ? AND id_bundle = ?
         ");
+        $this->runQueryWithArguments($idStudent, $idBundle);
         
-        // Executes query
-        $sql->execute(array($idStudent, $idBundle));
-        
-        if (!empty($sql) && $sql->rowCount() > 0) {
-            $action = new Action();
-            $adminsDAO = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
-            $action->updateStudent($idStudent);
-            $adminsDAO->newAction($action);
-            $response = true;
-        }
-        
-        return $response;
+        return $this->parseUpdateResponseQuery($idStudent);
     }
 }
