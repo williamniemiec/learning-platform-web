@@ -6,12 +6,12 @@ use panel\config\Controller;
 use panel\repositories\pdo\MySqlPDODatabase;
 use panel\domain\Admin;
 use panel\domain\Bundle;
-use panel\domain\util\FileUtil;
-use panel\domain\util\IllegalAccessException;
 use panel\domain\enum\BundleOrderTypeEnum;
 use panel\domain\enum\OrderDirectionEnum;
 use panel\dao\BundlesDAO;
 use panel\dao\CoursesDAO;
+use panel\util\FileUtil;
+use panel\util\IllegalAccessException;
 
 
 /**
@@ -19,6 +19,12 @@ use panel\dao\CoursesDAO;
  */
 class BundlesController extends Controller
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private const IMAGES_LOCATION = "../../../../../src/main/webapp/images/logos/bundles/";
+
+
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
@@ -44,21 +50,15 @@ class BundlesController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $bundlesDAO = new BundlesDAO($dbConnection);
+        $bundlesDao = new BundlesDAO($dbConnection);
         $selectedOrderBy = 'courses';
         $selectedOrderByDirection = 'asc';
+        $index = $this->getIndex();
         $limit = 10;
-        $index = 1;
-        
-        // Checks whether an index has been sent
-        if (!empty($_GET['index'])) {
-            $index = (int)$_GET['index'];
-        }
-        
         $offset = $limit * ($index - 1);
         
-        if (isset($_GET['order-by']) && isset($_GET['order-by-direction'])) {
-            $bundles = $bundlesDAO->getAll(
+        if ($this->hasFilterBeenSent()) {
+            $bundles = $bundlesDao->getAll(
                 $limit, $offset, '', 
                 new BundleOrderTypeEnum($_GET['order-by']), 
                 new OrderDirectionEnum($_GET['order-by-direction'])
@@ -67,7 +67,7 @@ class BundlesController extends Controller
             $selectedOrderByDirection = $_GET['order-by-direction'];
         }
         else {
-            $bundles = $bundlesDAO->getAll($limit, $offset);
+            $bundles = $bundlesDao->getAll($limit, $offset);
         }
         
         $header = array(
@@ -75,19 +75,23 @@ class BundlesController extends Controller
             'styles' => array('CoursesManagerStyle', 'ManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
             'bundles' => $bundles,
-            'header' => $header,
             'selectedOrderBy' => $selectedOrderBy,
             'selectedOrderByDirection' => $selectedOrderByDirection,
-            'totalPages' => ceil($bundlesDAO->count() / $limit),
+            'totalPages' => ceil($bundlesDao->count() / $limit),
             'currentIndex' => $index
         );
         
         $this->loadTemplate("bundlesManager/BundlesManagerView", $viewArgs);
+    }
+
+    private function hasFilterBeenSent()
+    {
+        return isset($_GET['order-by']) && isset($_GET['order-by-direction']);
     }
 
     private function getIndex()
@@ -112,64 +116,36 @@ class BundlesController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        
+        $bundlesDao = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
         $header = array(
             'title' => 'New bundle - Learning platform',
             'styles' => array('CoursesManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'header' => $header,
             'error' => false,
             'msg' => '',
             'scripts' => array('BundlesManagerScript')
         );
         
-        // Checks if the new bundle has been successfully added
-        if (!empty($_POST['name'])) {
-            $description = empty($_POST['description']) ? null : $_POST['description'];
-            $logo = null;
+        if ($this->hasFormBeenSent()) {
+            if ($this->hasPhotoBeenSent()) {
+                $logo = $this->storePhoto();
 
-            // Parses logo
-            if (!empty($_FILES['logo']['tmp_name'])) {
-                try {
-                    $logo = FileUtil::storePhoto($_FILES['logo'], "../assets/img/logos/bundles/");
-                }
-                catch (\InvalidArgumentException $e) {
+                if ($logo == null) {
                     $viewArgs['error'] = true;
                     $viewArgs['msg'] = 'Invalid photo';
                 }
             }
             
             if (!$viewArgs['error']) {
-                $response = false;
-                
-                // Tries create new bundle. If an error occurs, removes stored
-                // logo
-                try {
-                    $response = $bundlesDAO->new(new Bundle(
-                        -1,
-                        $_POST['name'],
-                        (float)preg_replace("/,/", "", $_POST['price']),
-                        $logo,
-                        $description
-                    ));
-                }
-                catch (\InvalidArgumentException | IllegalAccessException $e) {
-                    if (!empty($logo))
-                        unlink("../assets/img/logos/bundles/".$logo);
-                }
-                
-                
-                if ($response) {
+                if ($this->storeNewBundle($bundlesDao, $logo)) {
                     $this->redirectTo("bundles");
                 }
                 
-                // If an error occurred, display it
                 $viewArgs['error'] = true;
                 $viewArgs['msg'] = "The bundle could not be added!";
             }
@@ -182,81 +158,100 @@ class BundlesController extends Controller
     {
         return !empty($_POST['name']);
     }
+
+    private function hasPhotoBeenSent()
+    {
+        return !empty($_FILES['logo']['tmp_name']);
+    }
+
+    private function storePhoto()
+    {
+        try {
+            return FileUtil::storePhoto(
+                $_FILES['logo'], 
+                CoursesController::IMAGES_LOCATION
+            );
+        }
+        catch (\InvalidArgumentException $e) {
+            return null;
+        }
+    }
+
+    private function storeNewBundle($bundlesDao, $logo)
+    {
+        $success = false;
+
+        try {
+            $success = $bundlesDao->new(new Bundle(
+                -1,
+                $_POST['name'],
+                $this->normalizePrice($_POST['price']),
+                $logo,
+                empty($_POST['description']) ? null : $_POST['description']
+            ));
+        }
+        catch (\InvalidArgumentException | IllegalAccessException $e) {
+            if (!empty($logo)) {
+                unlink(BundlesController::IMAGES_LOCATION.$logo);
+            }
+        }
+
+        return $success;
+    }
+
+    private function normalizePrice($value)
+    {
+        return (float) preg_replace("/,/", "", $value);
+    }
     
     /**
      * Updates a bundle.
      * 
-     * @param       int $id_bundle Bundle id to be updated
+     * @param       int idBundle Bundle id to be updated
      */
-    public function edit($id_bundle)
+    public function edit($idBundle)
     {
         $dbConnection = new MySqlPDODatabase();
         
         $admin = Admin::getLoggedIn($dbConnection);
-        $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        $bundle = $bundlesDAO->get((int)$id_bundle);
-        
+        $bundlesDao = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $bundle = $bundlesDao->get((int)$idBundle);
         $header = array(
             'title' => 'Edit bundle - Learning platform',
             'styles' => array('bundlesManager', 'ManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
             'bundle' => $bundle,
             'courses' => $bundle->getCourses($dbConnection),
-            'header' => $header,
             'scripts' => array('BundlesManagerScript'),
             'error' => false,
             'msg' => ''
         );
         
-        // Checks if the new bundle has been successfully updated
-        if (!empty($_POST['name'])) {
-            $description = empty($_POST['description']) ? null : $_POST['description'];
+        if ($this->hasFormBeenSent()) {
             $logo = null;
             
-            // Parses logo
-            if (!empty($_FILES['logo']['tmp_name'])) {
-                try {
-                    $logo = FileUtil::storePhoto($_FILES['logo'], "../assets/img/logos/bundles/");
-                    
-                    // Removes old logo
-                    if (!empty($bundle->getLogo()))
-                        unlink("../assets/img/logos/bundles/".$bundle->getLogo());
-                }
-                catch (\InvalidArgumentException $e) {
+            if ($this->hasPhotoBeenSent()) {
+                $logo = $this->storePhoto();
+
+                if ($logo == null) {
                     $viewArgs['error'] = true;
                     $viewArgs['msg'] = 'Invalid photo';
+                }
+                else {
+                    $this->removeCurrentBundleLogo($bundle);
                 }
             }
             
             if (!$viewArgs['error']) {
-                $response = false;
-                
-                // Tries update the bundle. If an error occurs, removes stored
-                // logo
-                try {
-                    $response = $bundlesDAO->update(new Bundle(
-                        (int)$id_bundle,
-                        $_POST['name'],
-                        (float)preg_replace("/,/", "", $_POST['price']),
-                        $logo,
-                        $description
-                    ));
-                }
-                catch (\InvalidArgumentException | IllegalAccessException $e) {
-                    if (!empty($logo))
-                        unlink("../assets/img/logos/bundles/".$logo);
-                }
-                
-                if ($response) {
+                if ($this->updateBundle($bundlesDao, $logo, $idBundle)) {
                     $this->redirectTo("bundles");
                 }
                 
-                // If an error occurred, display it
                 $viewArgs['error'] = true;
                 $viewArgs['msg'] = "The bundle could not be updated!";
             }
@@ -264,41 +259,67 @@ class BundlesController extends Controller
         
         $this->loadTemplate("bundlesManager/BundlesManagerEditView", $viewArgs);
     }
+
+    private function removeCurrentBundleLogo($bundle)
+    {
+        if (empty($bundle->getLogo())) {
+            return;
+        }
+        
+        unlink(BundlesController::IMAGES_LOCATION.$bundle->getLogo());
+    }
+
+    private function updateBundle($bundlesDao, $logo, $bundleId)
+    {
+        $success = false;
+
+        try {
+            $success = $bundlesDao->update(new Bundle(
+                (int) $bundleId,
+                $_POST['name'],
+                $this->normalizePrice($_POST['price']),
+                $logo,
+                empty($_POST['description']) ? null : $_POST['description']
+            ));
+        }
+        catch (\InvalidArgumentException | IllegalAccessException $e) {
+            if (!empty($logo)) {
+                unlink(BundlesController::IMAGES_LOCATION.$logo);
+            }
+        }
+
+        return $success;
+    }
     
     /**
      * Removes a bundle.
      * 
-     * @param       int $id_bundle Bundle id to be removed
+     * @param       int $idBundle Bundle id to be removed
      */
-    public function delete($id_bundle)
+    public function delete($idBundle)
     {
         $dbConnection = new MySqlPDODatabase();
+        $bundlesDao = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $bundle = $bundlesDao->get((int) $idBundle);
         
-        $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        $bundle = $bundlesDAO->get((int)$id_bundle);
-        $bundlesDAO->remove((int)$id_bundle);
-        
-        if (!empty($bundle->getLogo()))
-            unlink("../assets/img/logos/bundles/".$bundle->getLogo());
-        
+        $bundlesDao->remove((int) $idBundle);
+        $this->removeCurrentBundleLogo($bundle);
         $this->redirectTo("bundles");
     }
     
     /**
      * Removes logo from a bundle.
      *
-     * @param       int $id_bundle Bundle id
+     * @param       int idBundle Bundle id
      */
-    public function deleteLogo($id_bundle)
+    public function deleteLogo($idBundle)
     {
         $dbConnection = new MySqlPDODatabase();
+        $bundlesDao = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
+        $bundle = $bundlesDao->get((int) $idBundle);
         
-        $bundlesDAO = new BundlesDAO($dbConnection, Admin::getLoggedIn($dbConnection));
-        $bundle = $bundlesDAO->get((int)$id_bundle);
-        
-        if ($bundlesDAO->removeLogo((int)$id_bundle)) {    
-            if (!empty($bundle->getLogo()))
-                unlink("../assets/img/logos/bundles/".$bundle->getLogo());
+        if ($bundlesDao->removeLogo((int) $idBundle)) {  
+            $this->removeCurrentBundleLogo($bundle);
         }
 
         $this->redirectTo("bundles/edit/".$bundle->getId());

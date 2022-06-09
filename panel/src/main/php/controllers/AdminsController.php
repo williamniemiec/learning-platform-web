@@ -76,23 +76,9 @@ class AdminsController extends Controller
             'authorizations' => $authorizationsDao->getAll()
         );
         
-        if ($this->wasRegistrationFormSent()) {
+        if ($this->hasRegistrationFormBeenSent()) {
             if ($this->isAllFieldsFilled()) {
-                $adminsDAO = new AdminsDAO(
-                    new MySqlPDODatabase(), 
-                    $admin
-                );
-                
-                $admin = new Admin(
-                    -1,
-                    $authorizationsDao->get((int) $_POST['authorization']),
-                    $_POST['name'],
-                    new GenreEnum($_POST['genre']),
-                    new \DateTime($_POST['birthdate']),
-                    $_POST['email']
-                );
-                
-                if ($adminsDAO->new($admin, $_POST['password'])) {
+                if ($this->storeNewAdmin($admin, $authorizationsDao)) {
                     $this->redirectTo("admins");
                 }
                 
@@ -108,58 +94,24 @@ class AdminsController extends Controller
         
         $this->loadTemplate("adminsManager/AdminsManagerNewView", $viewArgs);
     }
-    
-    public function edit($id_admin)
-    {
-        $dbConnection = new MySqlPDODatabase();
-        $admin = Admin::getLoggedIn($dbConnection);
-        $authorizationsDao = new AuthorizationDAO($dbConnection);
-        $adminsDao = new AdminsDAO($dbConnection, $admin);
-        
-        $header = array(
-            'title' => 'New admin - Learning platform',
-            'styles' => array(),
-            'description' => "New admin",
-            'robots' => 'noindex'
-        );
-        $viewArgs = array(
-            'header' => $header,
-            'username' => $admin->getName(),
-            'authorization' => $admin->getAuthorization(),
-            'scripts' => array(),
-            'error' => false,
-            'msg' => '',
-            'admin' => $adminsDao->get((int) $id_admin),
-            'authorizations' => $authorizationsDao->getAll()
-        );
-        
-        if (!empty($_POST['email']) && !empty($_POST['authorization'])) {            
-            $password = empty($_POST['password']) ? "" : $_POST['password'];
-            
-            $response = $adminsDao->updateAdmin(
-                (int)$id_admin,
-                (int)$_POST['authorization'],
-                $_POST['email'], 
-                $password
-            );
-            
-            if ($response) {
-                $this->redirectTo("admins");
-            }
-            
-            $viewArgs['error'] = true;
-            $viewArgs['msg'] = "Error while updating";
-        }
-        
-        $this->loadTemplate("adminsManager/AdminsManagerEditView", $viewArgs);
-    }
-
-    private function hasFormBeenSent()
-    {
-        return !empty($_POST['email']) && !empty($_POST['authorization']);
-    }
 
     /**
+     * Checks if registration form was sent.
+     *
+     * @return      boolean If registration form was sent
+     */
+    private function hasRegistrationFormBeenSent()
+    {
+        return (
+            !empty($_POST['name']) ||
+            !empty($_POST['genre']) ||
+            !empty($_POST['birthdate']) ||
+            !empty($_POST['email']) ||
+            !empty($_POST['password'])
+            );
+    }
+
+     /**
      * Checks if all required fields are filled. The required fields are:
      * <ul>
      *  <li>Name</li>
@@ -181,20 +133,72 @@ class AdminsController extends Controller
             isset($_POST['password'])
             );
     }
-    
-    /**
-     * Checks if registration form was sent.
-     *
-     * @return      boolean If registration form was sent
-     */
-    private function wasRegistrationFormSent()
+
+    private function storeNewAdmin($admin, $authorizationsDao)
     {
-        return (
-            !empty($_POST['name']) ||
-            !empty($_POST['genre']) ||
-            !empty($_POST['birthdate']) ||
-            !empty($_POST['email']) ||
-            !empty($_POST['password'])
-            );
+        $adminsDao = new AdminsDAO(
+            new MySqlPDODatabase(), 
+            $admin
+        );
+        $admin = new Admin(
+            -1,
+            $authorizationsDao->get((int) $_POST['authorization']),
+            $_POST['name'],
+            new GenreEnum($_POST['genre']),
+            new \DateTime($_POST['birthdate']),
+            $_POST['email']
+        );
+        
+        return $adminsDao->new($admin, $_POST['password']);
+    }
+    
+    public function edit($idAdmin)
+    {
+        $dbConnection = new MySqlPDODatabase();
+        $admin = Admin::getLoggedIn($dbConnection);
+        $authorizationsDao = new AuthorizationDAO($dbConnection);
+        $adminsDao = new AdminsDAO($dbConnection, $admin);
+        $header = array(
+            'title' => 'New admin - Learning platform',
+            'styles' => array(),
+            'description' => "New admin",
+            'robots' => 'noindex'
+        );
+        $viewArgs = array(
+            'header' => $header,
+            'username' => $admin->getName(),
+            'authorization' => $admin->getAuthorization(),
+            'scripts' => array(),
+            'error' => false,
+            'msg' => '',
+            'admin' => $adminsDao->get((int) $idAdmin),
+            'authorizations' => $authorizationsDao->getAll()
+        );
+        
+        if ($this->hasFormBeenSent()) {
+            if ($this->updateAdmin($idAdmin, $adminsDao)) {
+                $this->redirectTo("admins");
+            }
+            
+            $viewArgs['error'] = true;
+            $viewArgs['msg'] = "Error while updating";
+        }
+        
+        $this->loadTemplate("adminsManager/AdminsManagerEditView", $viewArgs);
+    }
+
+    private function hasFormBeenSent()
+    {
+        return !empty($_POST['email']) && !empty($_POST['authorization']);
+    }
+
+    private function updateAdmin($adminId, $adminsDao)
+    {
+        return $adminsDao->updateAdmin(
+            (int) $adminId,
+            (int) $_POST['authorization'],
+            $_POST['email'], 
+            empty($_POST['password']) ? "" : $_POST['password']
+        );
     }
 }

@@ -17,7 +17,7 @@ function show_editStudent(id_student)
 	// Gets student info
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"students/get_student",
+		url:BASE_URL+"students/getStudent",
 		data:{id_student: current_id_student},
 		dataType:'json',
 		success: function(student) {
@@ -50,7 +50,7 @@ function show_editStudent(id_student)
 	// Gets bundles that a student has
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"students/get_bundles",
+		url:BASE_URL+"students/getBundles",
 		data: {id_student: id_student},
 		async:false,
 		success: function(studentBundles) {
@@ -84,7 +84,7 @@ function editStudent(obj)
 	if (pass == "") {
 		$.ajax({
 			type:'POST',
-			url:BASE_URL+"students/edit_student",
+			url:BASE_URL+"students/editStudent",
 			data: {
 				id_student:current_id_student,
 				name: name,
@@ -100,7 +100,7 @@ function editStudent(obj)
 	else {
 		$.ajax({
 			type:'POST',
-			url:BASE_URL+"students/edit_student",
+			url:BASE_URL+"students/editStudent",
 			data: {
 				name: name,
 				genre: $(".modal-body").closest("input[name='genre']:selected").val(),
@@ -131,7 +131,7 @@ function edit_student_success(obj)
 		// Add bundle in student purchases
 		$.ajax({
 			type:'POST',
-			url:BASE_URL+"students/add_student_bundle",
+			url:BASE_URL+"students/addStudentBundle",
 			data:{
 				id_student:current_id_student,
 				id_bundle:bundle.value
@@ -156,7 +156,7 @@ function deleteStudent(obj, id)
 {	
 	$.ajax({
 		type:'POST',
-		url:BASE_URL+"students/delete_student",
+		url:BASE_URL+"students/deleteStudent",
 		data:{id_student:id},
 		success: function() {
 			$(obj).closest("tr").fadeOut("fast");

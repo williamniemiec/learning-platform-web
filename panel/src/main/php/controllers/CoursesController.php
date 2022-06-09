@@ -260,17 +260,17 @@ class CoursesController extends Controller
     /**
      * Deletes a course and redirects admin to home page.
      *
-     * @param       int $id_course Course id to be deleted
+     * @param       int $idCourse Course id to be deleted
      */
-    public function delete($id_course)
+    public function delete($idCourse)
     {
         $dbConnection = new MySqlPDODatabase();
         $coursesDao = new CoursesDAO(
             $dbConnection,
             Admin::getLoggedIn($dbConnection)
         );
-        $coursesDao->delete($id_course);
         
+        $coursesDao->delete($idCourse);
         $this->redirectTo("courses");
     }
     

@@ -101,7 +101,7 @@ class StudentsController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function edit_student()
+    public function editStudent()
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             $this->redirectToRoot();
@@ -145,7 +145,7 @@ class StudentsController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function get_student()
+    public function getStudent()
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             $this->redirectToRoot();
@@ -173,7 +173,7 @@ class StudentsController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function delete_student()
+    public function deleteStudent()
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             $this->redirectToRoot();
@@ -193,16 +193,16 @@ class StudentsController extends Controller
     }
     
     /**
-     * Gets informations about all bundles that a student has.
+     * Gets information about all bundles that a student has.
      * 
      * @param       int $_POST['id_student'] Student id
      * 
-     * @return      string JSON with informations about all bundles that a
+     * @return      string JSON with information about all bundles that a
      * student has
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function get_bundles()
+    public function getBundles()
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             $this->redirectToRoot();
@@ -229,7 +229,7 @@ class StudentsController extends Controller
      * 
      * @apiNote     Must be called using POST request method
      */
-    public function add_student_bundle()
+    public function addStudentBundle()
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             $this->redirectToRoot();
