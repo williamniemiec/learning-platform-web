@@ -89,6 +89,20 @@ class BundlesController extends Controller
         
         $this->loadTemplate("bundlesManager/BundlesManagerView", $viewArgs);
     }
+
+    private function getIndex()
+    {
+        if (!$this->hasIndexBeenSent()) {
+            return 1;
+        }
+
+        return ((int) $_GET['index']);
+    }
+
+    private function hasIndexBeenSent()
+    {
+        return  !empty($_GET['index']);
+    }
     
     
     /**

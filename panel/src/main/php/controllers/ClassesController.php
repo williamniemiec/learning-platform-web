@@ -4,13 +4,13 @@ namespace panel\controllers;
 
 use panel\config\Controller;
 use panel\repositories\pdo\MySqlPDODatabase;
+use panel\domain\Questionnaire;
 use panel\domain\Admin;
-use panel\domain\ClassType;
 use panel\domain\Video;
 use panel\dao\QuestionnairesDAO;
 use panel\dao\VideosDAO;
 use panel\dao\ModulesDAO;
-use panel\domain\Questionnaire;
+use panel\util\IllegalAccessException;
 
 
 /**
@@ -43,48 +43,72 @@ class ClassesController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $classes = array();
-        $videosDAO = new VideosDAO($dbConnection);
-        $questionnairesDAO = new QuestionnairesDAO($dbConnection);
+        $index = $this->getIndex();
         $limit = 10;
-        $limitVideos = $limit/2;
-        $limitQuestionnaires = $limit/2;
-        $index = 1;
-        $totalClasses = $videosDAO->getTotal($dbConnection)['total_classes'];
-        
-        // Checks whether an index has been sent
-        if (!empty($_GET['index'])) {
-            $index = (int)$_GET['index'];
-        }
-        
-        foreach ($videosDAO->getAll($limitVideos, $limitVideos * ($index - 1)) as $class) {
-            $classes[$class->getTitle()] = $class;
-        }
-        
-        foreach ($questionnairesDAO->getAll($limitQuestionnaires, $limitQuestionnaires * ($index - 1)) as $class) {
-            $classes[$class->getQuestion()] = $class;
-        }
-        
-        usort($classes, function($c1, $c2) {
-            return $c1->getModule()->getName() > $c2->getModule()->getName();
-        });
-        
         $header = array(
             'title' => 'Classes manager - Learning platform',
             'styles' => array('ManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'classes' => $classes,
-            'header' => $header,
-            'totalPages' => ceil($totalClasses / $limit),
+            'classes' => $this->fetchClasses($dbConnection, $limit, $index),
+            'totalPages' => ceil($this->getTotalClasses($dbConnection) / $limit),
             'currentIndex' => $index
         );
         
         $this->loadTemplate("classesManager/ClassesManagerView", $viewArgs);
+    }
+
+    private function getIndex()
+    {
+        if (!$this->hasIndexBeenSent()) {
+            return 1;
+        }
+
+        return ((int) $_GET['index']);
+    }
+
+    private function hasIndexBeenSent()
+    {
+        return  !empty($_GET['index']);
+    }
+
+    private function fetchClasses($dbConnection, $limit, $index)
+    {
+        $classes = array();
+        $videosDao = new VideosDAO($dbConnection);
+        $questionnairesDao = new QuestionnairesDAO($dbConnection);
+        $limitClasses = $limit/2;
+        $classOffset = $limitClasses * ($index - 1);
+
+        foreach ($videosDao->getAll($limitClasses, $classOffset) as $class) {
+            $classes[$class->getTitle()] = $class;
+        }
+        
+        foreach ($questionnairesDao->getAll($limitClasses, $classOffset) as $class) {
+            $classes[$class->getQuestion()] = $class;
+        }
+
+        $this->sortClassesByNameAscending($classes);
+
+        return $classes;
+    }
+
+    private function sortClassesByNameAscending($classes)
+    {
+        usort($classes, function($c1, $c2) {
+            return $c1->getModule()->getName() > $c2->getModule()->getName();
+        });
+    }
+
+    private function getTotalClasses($dbConnection)
+    {
+        $videosDao = new VideosDAO($dbConnection);
+
+        return $videosDao->getTotal($dbConnection)['total_classes'];
     }
     
     /**
@@ -94,75 +118,42 @@ class ClassesController extends Controller
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $modulesDAO = new ModulesDAO($dbConnection);
-            
+        $modulesDao = new ModulesDAO($dbConnection);
         $header = array(
             'title' => 'New class - Learning platform',
             'styles' => array('ManagerStyle', 'ClassesManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'header' => $header,
-            'modules' => $modulesDAO->getAll(),
+            'modules' => $modulesDao->getAll(),
             'error' => false,
             'msg' => '',
             'scripts' => array('ClassesManagerScript')
         );
         
-        // Checks if form has been sent
-        if (!empty($_POST['type'])) {
-            
-            if ($_POST['type'] == 'v') {
-                if (preg_match("/[0-9A-z]{11}/", $_POST['videoID'])) {
-                    $videosDAO = new VideosDAO($dbConnection, $admin);
-                    $description = empty($_POST['description']) ? null : $_POST['description'];
-                    
-                    try {
-                        $videosDAO->add(new Video(
-                            $modulesDAO->get((int)$_POST['id_module']),
-                            $modulesDAO->getHighestOrderInModule((int)$_POST['id_module']) + 1,
-                            $_POST['title'],
-                            $_POST['videoID'],
-                            $_POST['length'],
-                            $description
-                        ));
-                        
-                        $this->redirectTo("classes");
-                    }
-                    catch (\Exception $e) {
-                        $viewArgs['error'] = true;
-                        $viewArgs['msg'] = $e->getMessage();
-                    }
-                }
-                else {
-                    $viewArgs['error'] = true;
-                    $viewArgs['msg'] = "Invalid video id";
-                }
-            }
-            else if ($_POST['type'] == 'q') {
-                $questionnairesDAO = new QuestionnairesDAO($dbConnection, $admin);
-                
-                try {
-                    $questionnairesDAO->add(new Questionnaire(
-                        $modulesDAO->get((int)$_POST['id_module']),
-                        $modulesDAO->getHighestOrderInModule((int)$_POST['id_module']) + 1,
-                        $_POST['question'],
-                        $_POST['q1'],
-                        $_POST['q2'],
-                        $_POST['q3'],
-                        $_POST['q4'],
-                        (int)$_POST['answer']
-                    ));
-                    
+        if ($this->hasFormBeenSent()) {
+            if ($this->hasVideoBeenSent()) {
+                $message = $this->storeNewVideo($modulesDao, $dbConnection, $admin);
+
+                if (empty($message)) {
                     $this->redirectTo("classes");
                 }
-                catch (\Exception $e) {
-                    $viewArgs['error'] = true;
-                    $viewArgs['msg'] = $e->getMessage();
+
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = $message;
+            }
+            else if ($this->hasQuestionnaireBeenSent()) {
+                $message = $this->storeNewQuestionnaire($modulesDao, $dbConnection, $admin);
+
+                if (empty($message)) {
+                    $this->redirectTo("classes");
                 }
+
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = $message;
             }
             else {
                 $viewArgs['error'] = true;
@@ -177,6 +168,66 @@ class ClassesController extends Controller
     {
         return !empty($_POST['type']);
     }
+
+    private function hasVideoBeenSent()
+    {
+        return ($_POST['type'] == 'v');
+    }
+
+    private function storeNewVideo($modulesDao, $dbConnection, $admin)
+    {
+        if (!preg_match("/[0-9A-z]{11}/", $_POST['videoID'])) {
+            return "Invalid video id";
+        }
+
+        $message = null;
+        $videosDao = new VideosDAO($dbConnection, $admin);
+
+        try {
+            $videosDao->add(new Video(
+                $modulesDao->get((int) $_POST['id_module']),
+                $modulesDao->getHighestOrderInModule((int) $_POST['id_module']) + 1,
+                $_POST['title'],
+                $_POST['videoID'],
+                $_POST['length'],
+                empty($_POST['description']) ? null : $_POST['description']
+            ));
+        }
+        catch (\InvalidArgumentException | IllegalAccessException $e) {
+            $message = $e->getMessage();
+        }
+
+        return $message;
+    }
+
+    private function hasQuestionnaireBeenSent()
+    {
+        return ($_POST['type'] == 'q');
+    }
+
+    private function storeNewQuestionnaire($modulesDao, $dbConnection, $admin)
+    {
+        $message = null;
+        $questionnairesDao = new QuestionnairesDAO($dbConnection, $admin);
+
+        try {
+            $questionnairesDao->add(new Questionnaire(
+                $modulesDao->get((int) $_POST['id_module']),
+                $modulesDao->getHighestOrderInModule((int) $_POST['id_module']) + 1,
+                $_POST['question'],
+                $_POST['q1'],
+                $_POST['q2'],
+                $_POST['q3'],
+                $_POST['q4'],
+                (int) $_POST['answer']
+            ));
+        }
+        catch (\InvalidArgumentException | IllegalAccessException $e) {
+            $message = $e->getMessage();
+        }
+
+        return $message;
+    }
     
     /**
      * Edits a class.
@@ -187,12 +238,12 @@ class ClassesController extends Controller
         $admin = Admin::getLoggedIn($dbConnection);
         $modulesDao = new ModulesDAO($dbConnection);
         $videosDao = new VideosDAO($dbConnection, $admin);
-        $class = $videosDao->get((int)$idModule, (int)$classOrder);
+        $class = $videosDao->get((int) $idModule, (int) $classOrder);
         $type = 'v';
         
         if (empty($class)) {
-            $questionnairesDAO = new QuestionnairesDAO($dbConnection, $admin);
-            $class = $questionnairesDAO->get((int)$idModule, (int)$classOrder);
+            $questionnairesDao = new QuestionnairesDAO($dbConnection, $admin);
+            $class = $questionnairesDao->get((int) $idModule, (int) $classOrder);
             $type = 'q';
         }
         
@@ -213,76 +264,36 @@ class ClassesController extends Controller
             'scripts' => array('ClassesManagerScript')
         );
         
-        // Checks if form has been sent
-        if (!empty($_POST['type'])) {
-            if ($_POST['type'] == 'v') {
-                if (preg_match("/[0-9A-z]{11}/", $_POST['videoID'])) {
-                    $videosDao = new VideosDAO($dbConnection, $admin);
-                    $description = empty($_POST['description']) ? null : $_POST['description'];
-     
-                    try {
-                        $videosDao->update(new Video(
-                            $class->getModule(),
-                            $class->getClassOrder(),
-                            $_POST['title'],
-                            $_POST['videoID'],
-                            $_POST['length'],
-                            $description
-                        ));
-                        
-                        // If module to which the class belongs has been 
-                        // changed, updated it
-                        if ($class->getModule()->getId() != (int)$_POST['id_module']) {
-                            $videosDao->updateModule(
-                                $class, 
-                                (int)$_POST['id_module'],
-                                (int)$modulesDao->getHighestOrderInModule((int)$_POST['id_module']) + 1
-                            );
-                        }
-                        
-                        $this->redirectTo("classes");
-                    }
-                    catch (\Exception $e) {
-                        $viewArgs['error'] = true;
-                        $viewArgs['msg'] = $e->getMessage();
-                    }
-                }
-                else {
-                    $viewArgs['error'] = true;
-                    $viewArgs['msg'] = "Invalid video id";
-                }
-            }
-            else if ($_POST['type'] == 'q') {
-                $questionnairesDAO = new QuestionnairesDAO($dbConnection, $admin);
+        if ($this->hasFormBeenSent()) {
+            if ($this->hasVideoBeenSent()) {
+                $message = $this->updateVideo(
+                    $modulesDao, 
+                    $dbConnection, 
+                    $admin, 
+                    $class
+                );
 
-                try {
-                    $questionnairesDAO->update(new Questionnaire(
-                        $class->getModule(),
-                        $class->getClassOrder(),
-                        $_POST['question'],
-                        $_POST['q1'],
-                        $_POST['q2'],
-                        $_POST['q3'],
-                        $_POST['q4'],
-                        (int)$_POST['answer']
-                    ));
-                    
-                    // If module to which the class belongs has been
-                    // changed, updated it
-                    if ($class->getModule()->getId() != (int)$_POST['id_module']) {
-                        $questionnairesDAO->updateModule(
-                            $class,
-                            (int)$_POST['id_module'],
-                            (int)$modulesDao->getHighestOrderInModule((int)$_POST['id_module']) + 1
-                        );
-                    }
-                    
+                if (empty($message)) {
                     $this->redirectTo("classes");
                 }
-                catch (\Exception $e) {
-                    $viewArgs['error'] = true;
-                    $viewArgs['msg'] = $e->getMessage();
+
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = $message;
+            }
+            else if ($this->hasQuestionnaireBeenSent()) {
+                $message = $this->updateQuestionnaire(
+                    $modulesDao, 
+                    $dbConnection, 
+                    $admin, 
+                    $class
+                );
+
+                if (empty($message)) {
+                    $this->redirectTo("classes");
                 }
+
+                $viewArgs['error'] = true;
+                $viewArgs['msg'] = $message;
             }
             else {
                 $viewArgs['error'] = true;
@@ -290,25 +301,97 @@ class ClassesController extends Controller
             }
         }
         
-        if ($type == 'v')
+        if ($type == 'v') {
             $this->loadTemplate("classesManager/ClassesManagerEditVideoView", $viewArgs);
-        else
+        }
+        else {
             $this->loadTemplate("classesManager/ClassesManagerEditQuestionnaireView", $viewArgs);
+        }
     }
-    
+
+    private function updateVideo($modulesDao, $dbConnection, $admin, $class)
+    {
+        if (!preg_match("/[0-9A-z]{11}/", $_POST['videoID'])) {
+            return "Invalid video id";
+        }
+
+        $message = null;
+        $videosDao = new VideosDAO($dbConnection, $admin);
+
+        try {
+            $videosDao->update(new Video(
+                $class->getModule(),
+                $class->getClassOrder(),
+                $_POST['title'],
+                $_POST['videoID'],
+                $_POST['length'],
+                empty($_POST['description']) ? null : $_POST['description']
+            ));
+            
+            if ($this->hasClassModuleChanged($class)) {
+                $videosDao->updateModule(
+                    $class, 
+                    (int) $_POST['id_module'],
+                    (int) $modulesDao->getHighestOrderInModule((int) $_POST['id_module']) + 1
+                );
+            }
+        }
+        catch (\InvalidArgumentException | IllegalAccessException $e) {
+            $message = $e->getMessage();
+        }
+
+        return $message;
+    }
+
+    private function hasClassModuleChanged($class)
+    {
+        return ($class->getModule()->getId() != (int) $_POST['id_module']);
+    }
+
+    private function updateQuestionnaire($modulesDao, $dbConnection, $admin, $class)
+    {
+        $message = null;
+        $questionnairesDao = new QuestionnairesDAO($dbConnection, $admin);
+
+        try {
+            $questionnairesDao->update(new Questionnaire(
+                $class->getModule(),
+                $class->getClassOrder(),
+                $_POST['question'],
+                $_POST['q1'],
+                $_POST['q2'],
+                $_POST['q3'],
+                $_POST['q4'],
+                (int) $_POST['answer']
+            ));
+            
+            if ($this->hasClassModuleChanged($class)) {
+                $questionnairesDao->updateModule(
+                    $class,
+                    (int)$_POST['id_module'],
+                    (int) $modulesDao->getHighestOrderInModule((int) $_POST['id_module']) + 1
+                );
+            }
+        }
+        catch (\InvalidArgumentException | IllegalAccessException $e) {
+            $message = $e->getMessage();
+        }
+
+        return $message;
+    }
+
     /**
      * Removes a class.
      */
-    public function delete($id_module, $class_order)
+    public function delete($idModule, $classOrder)
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
+        $videosDao = new VideosDAO($dbConnection, $admin);
         
-        $videosDAO = new VideosDAO($dbConnection, $admin);
-        
-        if (!$videosDAO->delete((int)$id_module, (int)$class_order)) {
-            $questionnairesDAO = new QuestionnairesDAO($dbConnection, $admin);
-            $questionnairesDAO->delete((int)$id_module, (int)$class_order);
+        if (!$videosDao->delete((int) $idModule, (int) $classOrder)) {
+            $questionnairesDao = new QuestionnairesDAO($dbConnection, $admin);
+            $questionnairesDao->delete((int) $idModule, (int) $classOrder);
         }
         
         $this->redirectTo("classes");
@@ -330,11 +413,10 @@ class ClassesController extends Controller
             return;
         }
             
-        $dbConnection = new MySqlPDODatabase();
         $classes = array();
+        $dbConnection = new MySqlPDODatabase();
         $videosDao = new VideosDAO($dbConnection);
         $questionnairesDao = new QuestionnairesDAO($dbConnection);
-        
         $classes['videos'] = $videosDao->getAll();
         $classes['questionnaires'] = $questionnairesDao->getAll();
         

@@ -6,8 +6,8 @@ use panel\config\Controller;
 use panel\repositories\pdo\MySqlPDODatabase;
 use panel\domain\Admin;
 use panel\domain\Course;
-use panel\domain\util\FileUtil;
-use panel\domain\util\IllegalAccessException;
+use panel\util\FileUtil;
+use panel\util\IllegalAccessException;
 use panel\domain\enum\CourseOrderByEnum;
 use panel\domain\enum\OrderDirectionEnum;
 use panel\dao\CoursesDAO;
@@ -19,6 +19,12 @@ use panel\dao\ModulesDAO;
  */
 class CoursesController extends Controller
 {
+    //-------------------------------------------------------------------------
+    //        Attributes
+    //-------------------------------------------------------------------------
+    private const IMAGES_LOCATION = "../../../../../src/main/webapp/images/logos/courses/";
+
+
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
@@ -45,30 +51,21 @@ class CoursesController extends Controller
         $dbConnection = new MySqlPDODatabase();
         
         $admin = Admin::getLoggedIn($dbConnection);
-        $coursesDAO = new CoursesDAO($dbConnection);
         $limit = 10;
-        $index = 1;
-        
-        // Checks whether an index has been sent
-        if (!empty($_GET['index'])) {
-            $index = (int)$_GET['index'];
-        }
-        
+        $index = $this->getIndex();
         $offset = $limit * ($index - 1);
-        
+        $coursesDAO = new CoursesDAO($dbConnection);
         $courses = $coursesDAO->getAll('', $limit, $offset);
-        
         $header = array(
             'title' => 'Courses - Learning platform',
             'styles' => array('CoursesManagerStyle', 'ManagerStyle', 'searchBar'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
             'courses' => $courses,
-            'header' => $header,
             'scripts' => array('CoursesHomeScript'),
             'totalPages' => ceil($coursesDAO->count() / $limit),
             'currentIndex' => $index
@@ -76,69 +73,58 @@ class CoursesController extends Controller
         
         $this->loadTemplate("coursesManager/CoursesManagerView", $viewArgs);
     }
+
+    private function getIndex()
+    {
+        if (!$this->hasIndexBeenSent()) {
+            return 1;
+        }
+
+        return ((int) $_GET['index']);
+    }
+
+    private function hasIndexBeenSent()
+    {
+        return  !empty($_GET['index']);
+    }
     
     public function new()
     {
         $dbConnection = new MySqlPDODatabase();
         $admin = Admin::getLoggedIn($dbConnection);
-        $coursesDAO = new CoursesDAO($dbConnection, $admin);
-        
+        $coursesDao = new CoursesDAO($dbConnection, $admin);
         $header = array(
             'title' => 'New course - Learning platform',
             'styles' => array('CoursesManagerStyle', 'ManagerStyle'),
             'robots' => 'noindex'
         );
-        
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
-            'courses' => $coursesDAO->getAll('', 100),
-            'header' => $header,
+            'courses' => $coursesDao->getAll('', 100),
             'error' => false,
             'msg' => '',
             'scripts' => array('CoursesManagerScript')
         );
         
-        // Checks if the new course has been successfully added
-        if (!empty($_POST['name'])) {
-            $description = empty($_POST['description']) ? null : $_POST['description'];
+        if ($this->hasFormBeenSent()) {
             $logo = null;
             
-            // Parses logo
-            if (!empty($_FILES['logo']['tmp_name'])) {
-                try {
-                    $logo = FileUtil::storePhoto($_FILES['logo'], "../assets/img/logos/courses/");
-                }
-                catch (\InvalidArgumentException $e) {
+            if ($this->hasPhotoBeenSent()) {
+                $logo = $this->storePhoto();
+
+                if ($logo == null) {
                     $viewArgs['error'] = true;
                     $viewArgs['msg'] = 'Invalid photo';
                 }
             }
             
             if (!$viewArgs['error']) {
-                $response = false;
-                
-                // Tries create new bundle. If an error occurs, removes stored
-                // logo
-                try {
-                    $response = $coursesDAO->new(new Course(
-                        -1,
-                        $_POST['name'],
-                        $logo,
-                        $description
-                    ));
-                }
-                catch (\InvalidArgumentException | IllegalAccessException $e) {
-                    if (!empty($logo))
-                        unlink("../assets/img/logos/courses/".$logo);
-                }
-                
-                
-                if ($response) {
+                if ($this->storeNewCourse($coursesDao, $logo)) {
                     $this->redirectTo("courses");
                 }
                 
-                // If an error occurred, display it
                 $viewArgs['error'] = true;
                 $viewArgs['msg'] = "The course could not be added!";
             }
@@ -150,6 +136,45 @@ class CoursesController extends Controller
     private function hasFormBeenSent()
     {
         return !empty($_POST['name']);
+    }
+
+    private function hasPhotoBeenSent()
+    {
+        return !empty($_FILES['logo']['tmp_name']);
+    }
+
+    private function storePhoto()
+    {
+        try {
+            return FileUtil::storePhoto(
+                $_FILES['logo'], 
+                CoursesController::IMAGES_LOCATION
+            );
+        }
+        catch (\InvalidArgumentException $e) {
+            return null;
+        }
+    }
+
+    private function storeNewCourse($coursesDao, $logo)
+    {
+        $success = false;
+
+        try {
+            $success = $coursesDao->new(new Course(
+                -1,
+                $_POST['name'],
+                $logo,
+                empty($_POST['description']) ? null : $_POST['description']
+            ));
+        }
+        catch (\InvalidArgumentException | IllegalAccessException $e) {
+            if (!empty($logo)) {
+                unlink(CoursesController::IMAGES_LOCATION.$logo);
+            }
+        }
+
+        return $success;
     }
     
     public function edit($idCourse)
@@ -164,67 +189,72 @@ class CoursesController extends Controller
             'robots' => 'noindex'
         );
         $viewArgs = array(
+            'header' => $header,
             'username' => $admin->getName(),
             'authorization' => $admin->getAuthorization(),
             'course' => $course,
             'modules' => $course->getModules($dbConnection),
-            'header' => $header,
             'error' => false,
             'msg' => '',
             'scripts' => array('CoursesManagerScript')
         );
         
-        // Checks if the course has been successfully updated
-        if (!empty($_POST['name'])) {
-            $description = empty($_POST['description']) ? null : $_POST['description'];
+        if ($this->hasFormBeenSent()) {
             $logo = null;
             
-            // Parses logo
-            if (!empty($_FILES['logo']['tmp_name'])) {
-                try {
-                    $logo = FileUtil::storePhoto($_FILES['logo'], "../assets/img/logos/courses/");
-                    
-                    if (!empty($course->getLogo())) {
-                        unlink("../assets/img/logos/courses/".$course->getLogo());
-                    }
-                        
-                }
-                catch (\InvalidArgumentException $e) {
+            if ($this->hasPhotoBeenSent()) {
+                $logo = $this->storePhoto();
+
+                if ($logo == null) {
                     $viewArgs['error'] = true;
                     $viewArgs['msg'] = 'Invalid photo';
+                }
+                else {
+                    $this->removeCurrentCourseLogo($course);
                 }
             }
             
             if (!$viewArgs['error']) {
-                $response = false;
-                
-                // Tries create new bundle. If an error occurs, removes stored
-                // logo
-                try {
-                    $response = $coursesDao->update(new Course(
-                        $course->getId(),
-                        $_POST['name'],
-                        $logo,
-                        $description
-                    ));
-                }
-                catch (\InvalidArgumentException | IllegalAccessException $e) {
-                    if (!empty($logo))
-                        unlink("../assets/img/logos/courses/".$logo);
-                }
-                
-                
-                if ($response) {
+                if ($this->updateCourse($coursesDao, $logo, $course)) {
                     $this->redirectTo("courses");
                 }
-                
-                // If an error occurred, display it
+
                 $viewArgs['error'] = true;
                 $viewArgs['msg'] = "The course could not be added!";
             }
         }
         
         $this->loadTemplate("coursesManager/CoursesManagerEditView", $viewArgs);
+    }
+
+    private function removeCurrentCourseLogo($course)
+    {
+        if (empty($course->getLogo())) {
+            return;
+        }
+        
+        unlink(CoursesController::IMAGES_LOCATION.$course->getLogo());
+    }
+
+    private function updateCourse($coursesDao, $logo, $course)
+    {
+        $success = false;
+
+        try {
+            $success = $coursesDao->update(new Course(
+                $course->getId(),
+                $_POST['name'],
+                $logo,
+                empty($_POST['description']) ? null : $_POST['description']
+            ));
+        }
+        catch (\InvalidArgumentException | IllegalAccessException $e) {
+            if (!empty($logo)) {
+                unlink(CoursesController::IMAGES_LOCATION.$logo);
+            }
+        }
+
+        return $success;
     }
     
     /**
@@ -235,13 +265,11 @@ class CoursesController extends Controller
     public function delete($id_course)
     {
         $dbConnection = new MySqlPDODatabase();
-        
-        $coursesDAO = new CoursesDAO(
+        $coursesDao = new CoursesDAO(
             $dbConnection,
             Admin::getLoggedIn($dbConnection)
         );
-        
-        $coursesDAO->delete($id_course);
+        $coursesDao->delete($id_course);
         
         $this->redirectTo("courses");
     }
@@ -352,25 +380,40 @@ class CoursesController extends Controller
         $modulesBackup = $modulesDao->getFromCourse((int) $_POST['id_course']);
 
         try {
-            $coursesDao->deleteAllModules((int)$_POST['id_course']);
-            
-            foreach ($_POST['modules'] as $module) {
-                $coursesDao->addModule((int)$_POST['id_course'], (int)$module['id'], (int)$module['order']);
-            }
+            $coursesDao->deleteAllModules((int) $_POST['id_course']);
+            $this->insertModules($coursesDao, $_POST['modules']);
         }
         catch(\Exception $e) {
-            foreach ($modulesBackup as $module) {
-                try {
-                    $coursesDao->addModule((int)$_POST['id_course'], $module->getId(), $module->getOrder());
-                }
-                catch(\Exception $e) {
-
-                }
-            }
-            
+            $this->restoreModules($coursesDao, $modulesBackup);
             header("HTTP/1.0 500 Module order is conflicting");
             echo "Module order is conflicting";
+        }   
+    }
+
+    private function insertModules($coursesDao, $modules)
+    {
+        foreach ($modules as $module) {
+            $coursesDao->addModule(
+                (int) $_POST['id_course'], 
+                (int) $module['id'], 
+                (int) $module['order']
+            );
         }
-        
+    }
+
+    private function restoreModules($coursesDao, $modulesBackup)
+    {
+        foreach ($modulesBackup as $module) {
+            try {
+                $coursesDao->addModule(
+                    (int) $_POST['id_course'], 
+                    $module->getId(), 
+                    $module->getOrder()
+                );
+            }
+            catch(\Exception $e) {
+                // If a backup module fails, there is nothing to do.
+            }
+        }
     }
 }
