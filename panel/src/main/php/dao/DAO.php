@@ -82,7 +82,8 @@ abstract class DAO
     {
         if (!in_array($this->admin->getAuthorization()->getLevel(), $levels)) {
             throw new IllegalAccessException("Current admin does not have ".
-                "authorization to perform this action");
+                                             "authorization to perform this ".
+                                             "action");
         }
     }
 }
