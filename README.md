@@ -38,34 +38,34 @@ The hosting service Heroku may have a certain delay (~ 1 min) for uploading the 
 ## 🖼 Gallery
 
 #### Home
-![home](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/home.png?raw=true)
+![home](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/images/app/home.png?raw=true)
 
 #### Bundle information
-![bundle](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/gif/bundle.gif?raw=true)
+![bundle](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/gif/bundle.gif?raw=true)
 
 #### My courses
-![bundle-edit](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/gif/my-courses.gif?raw=true)
+![bundle-edit](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/gif/my-courses.gif?raw=true)
 
 #### Video class
-![video-class](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/gif/video-class.gif?raw=true)
+![video-class](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/gif/video-class.gif?raw=true)
 
 #### Settings
-![settings](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/settings.png?raw=true)
+![settings](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/images/app/settings.png?raw=true)
 
 #### Support
-![support](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/support.png?raw=true)
+![support](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/images/app/support.png?raw=true)
 
 #### Support - content
-![support-content](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/support-content.png?raw=true)
+![support-content](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/images/app/support-content.png?raw=true)
 
 #### Admin area - courses manager
-![courses-manager](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/courses-manager.png?raw=true)
+![courses-manager](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/images/app/courses-manager.png?raw=true)
 
 #### Admin area - bundles manager
-![bundles-manager](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/images/app/bundles-manager.png?raw=true)
+![bundles-manager](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/images/app/bundles-manager.png?raw=true)
 
 #### Admin area - bundles manager - edit
-![bundles-manager-edit](https://github.com/williamniemiec/platform-learning-web/blob/master/docs/gif/bundle-edit.gif?raw=true)
+![bundles-manager-edit](https://github.com/williamniemiec/learning-platform-web/blob/master/docs/gif/bundle-edit.gif?raw=true)
 
 ## 🚩 Changelog
 Details about each version are documented in the [releases section](https://github.com/williamniemiec/learning-platform-web/releases).
