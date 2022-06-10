@@ -47,7 +47,7 @@ class Module implements \JsonSerializable
      *
      * @return      int Module id
      */
-    public function getCourseId() : int
+    public function getId() : int
     {
         return $this->idModule;
     }

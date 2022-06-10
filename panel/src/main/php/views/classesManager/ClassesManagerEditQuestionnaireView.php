@@ -33,7 +33,7 @@
                         <?php foreach ($modules as $k => $module): ?>
                             <option 
                                 value='<?php echo $module->getId(); ?>' 
-                                <?php echo $module->getId() == $class->getModule()->getId() ? "selected" : "" ?>
+                                <?php echo $module->getId() == $class->getModuleId()->getId() ? "selected" : "" ?>
                             >
                                 <?php echo $module->getName(); ?>
                             </option>

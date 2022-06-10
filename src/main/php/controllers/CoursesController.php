@@ -106,12 +106,12 @@ class CoursesController extends Controller
         // TODO: Refactor this method
         $dbConnection = new MySqlPDODatabase();
         $student = Student::getLoggedIn($dbConnection);
-        $students = new StudentsDAO($dbConnection, $student->getId());
-        $courses = new CoursesDAO($dbConnection);
-        $historic = new HistoricDAO($dbConnection, $student->getId());
+        $studentsDao = new StudentsDAO($dbConnection, $student->getId());
+        $coursesDao = new CoursesDAO($dbConnection);
+        $historicDao = new HistoricDAO($dbConnection, $student->getId());
         $notificationsDao = new NotificationsDAO($dbConnection, $student->getId());
         
-        if (!$this->isStudentEnrolledInTheCourse($idCourse, $courses, $student)) {
+        if (!$this->isStudentEnrolledInTheCourse($idCourse, $coursesDao, $student)) {
             $this->redirectToRoot();
         }
         
@@ -125,14 +125,14 @@ class CoursesController extends Controller
             }
         }
         else {
-            $class = $students->getLastClassWatched($idCourse);
+            $class = $studentsDao->getLastClassWatched($idCourse);
         }
         
         if (empty($class)) {
-            $class = $courses->getFirstClassFromFirstModule($idCourse);
+            $class = $coursesDao->getFirstClassFromFirstModule($idCourse);
         }
         
-        $course = $courses->get($idCourse);
+        $course = $coursesDao->get($idCourse);
 
         if (empty($class)) {
             $name = 'No classes';
@@ -184,6 +184,8 @@ class CoursesController extends Controller
                 $view = "class_quest";
             }
         }
+
+        
         
         $header = array(
             'title' => $course->getName().' - Learning platform',
@@ -200,7 +202,7 @@ class CoursesController extends Controller
             'info_menu' => array(
                 'id_course' => $idCourse,
                 'modules' => $course->getModules($dbConnection, true),
-                'watched_classes' => $historic->getWatchedClassesFromCourse($idCourse),
+                'watched_classes' => $historicDao->getWatchedClassesFromCourse($idCourse),
                 'logo' => $course->getLogo()
             ),
             'classContent' => $classContent,
@@ -217,12 +219,12 @@ class CoursesController extends Controller
             );
             $viewArgs['info_class'] = array(
                 'class' => $class,
-                'total' => $courses->countClasses($idCourse),
-                'totalWatchedClasses' => $historic->countWatchedClasses($idCourse),
+                'total' => $coursesDao->countClasses($idCourse),
+                'totalWatchedClasses' => $historicDao->countWatchedClasses($idCourse),
                 'wasWatched' => $classContent['watched']
             );
         }
-        
+
         $this->loadTemplate("class/course", $viewArgs);
     }
 

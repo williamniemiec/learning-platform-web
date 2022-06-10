@@ -53,7 +53,7 @@ abstract class ClassType implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return array(
-            'module' => $this->idModule,
+            'id' => $this->idModule,
             'class_order' => $this->classOrder
         );
     }

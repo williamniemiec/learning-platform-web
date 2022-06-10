@@ -218,7 +218,7 @@ class VideosDAO extends ClassesDAO
     private function buildNewQueryArguments($video)
     {
         $bindArguments = array(
-            $video->getModule(), 
+            $video->getModuleId(), 
             $video->getClassOrder(), 
             $video->getTitle(), 
             $video->getVideoId(), 
@@ -239,7 +239,7 @@ class VideosDAO extends ClassesDAO
         }
 
         $action = new Action();
-        $action->addClass($video->getModule(), $video->getClassOrder());
+        $action->addClass($video->getModuleId(), $video->getClassOrder());
         $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
         $adminsDao->newAction($action);
         
@@ -303,7 +303,7 @@ class VideosDAO extends ClassesDAO
             $bindArguments[] = $video->getDescription();
         }
 
-        $bindArguments[] = $video->getModule();
+        $bindArguments[] = $video->getModuleId();
         $bindArguments[] = $video->getClassOrder();
 
         return $bindArguments;
@@ -316,7 +316,7 @@ class VideosDAO extends ClassesDAO
         }
 
         $action = new Action();
-        $action->updateClass($video->getModule(), $video->getClassOrder());
+        $action->updateClass($video->getModuleId(), $video->getClassOrder());
         $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
         $adminsDao->newAction($action);
         
@@ -395,7 +395,7 @@ class VideosDAO extends ClassesDAO
             SET     class_order = 0
             WHERE   id_module = ? AND class_order = ?
         ");
-        $this->runQueryWithArguments($video->getModule(), $video->getClassOrder());
+        $this->runQueryWithArguments($video->getModuleId(), $video->getClassOrder());
         
         // Moves class to new module
         $this->withQuery("
@@ -403,7 +403,7 @@ class VideosDAO extends ClassesDAO
             SET     id_module = ?
             WHERE   id_module = ? AND class_order = 0
         ");
-        $this->runQueryWithArguments($newIdModule, $video->getModule());
+        $this->runQueryWithArguments($newIdModule, $video->getModuleId());
         
         // Sets class order
         $this->withQuery("

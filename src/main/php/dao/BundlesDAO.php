@@ -318,7 +318,7 @@ class BundlesDAO extends DAO
                                             WHERE  id_bundle = b.id_bundle)
                     )
         ");
-        $this->runQueryWithArguments($this->buildBundlesQueryArguments($idStudent, $idBundle));
+        $this->runQueryWithArguments($idBundle, $idBundle);
         
         return $this->parseBundlesResponseQuery();
     }

@@ -39,7 +39,7 @@ use panel\domain\Video;
                         <?php foreach($classes as $class): ?>
                             <tr>
                                 <td>
-                                    <a href="<?php echo BASE_URL."classes/edit/".$class->getModule()->getId()."/".$class->getClassOrder(); ?>">
+                                    <a href="<?php echo BASE_URL."classes/edit/".$class->getModuleId()->getId()."/".$class->getClassOrder(); ?>">
                                         <?php echo $class instanceof Video ? $class->getTitle() : $class->getQuestion(); ?>
                                     </a>
                                 </td>
@@ -47,7 +47,7 @@ use panel\domain\Video;
                                     <?php echo $class instanceof Video ? "Video" : "Questionnaire"; ?>
                                 </td>
                                 <td>
-                                    <?php echo $class->getModule()->getName(); ?>
+                                    <?php echo $class->getModuleId()->getName(); ?>
                                 </td>
                                 <td>
                                     <?php echo $class->getClassOrder(); ?>
@@ -55,13 +55,13 @@ use panel\domain\Video;
                                 <td class="actions">
                                     <a 
                                         class="btn_theme" 
-                                        href="<?php echo BASE_URL."classes/edit/".$class->getModule()->getId()."/".$class->getClassOrder(); ?>"
+                                        href="<?php echo BASE_URL."classes/edit/".$class->getModuleId()->getId()."/".$class->getClassOrder(); ?>"
                                     >
                                         Edit
                                     </a>
                                     <a 
                                         class="btn_theme btn_theme_danger" 
-                                        href="<?php echo BASE_URL."classes/delete/".$class->getModule()->getId()."/".$class->getClassOrder(); ?>"
+                                        href="<?php echo BASE_URL."classes/delete/".$class->getModuleId()->getId()."/".$class->getClassOrder(); ?>"
                                     >
                                         Delete
                                     </a>

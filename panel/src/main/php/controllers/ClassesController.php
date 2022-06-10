@@ -100,7 +100,7 @@ class ClassesController extends Controller
     private function sortClassesByNameAscending($classes)
     {
         usort($classes, function($c1, $c2) {
-            return $c1->getModule()->getName() > $c2->getModule()->getName() 
+            return $c1->getModuleId()->getName() > $c2->getModuleId()->getName() 
                 ? 1 : 
                 -1;
         });
@@ -322,7 +322,7 @@ class ClassesController extends Controller
 
         try {
             $videosDao->update(new Video(
-                $class->getModule(),
+                $class->getModuleId(),
                 $class->getClassOrder(),
                 $_POST['title'],
                 $_POST['videoID'],
@@ -347,7 +347,7 @@ class ClassesController extends Controller
 
     private function hasClassModuleChanged($class)
     {
-        return ($class->getModule()->getId() != (int) $_POST['id_module']);
+        return ($class->getModuleId()->getId() != (int) $_POST['id_module']);
     }
 
     private function updateQuestionnaire($modulesDao, $dbConnection, $admin, $class)
@@ -357,7 +357,7 @@ class ClassesController extends Controller
 
         try {
             $questionnairesDao->update(new Questionnaire(
-                $class->getModule(),
+                $class->getModuleId(),
                 $class->getClassOrder(),
                 $_POST['question'],
                 $_POST['q1'],

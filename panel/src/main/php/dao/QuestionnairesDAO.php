@@ -191,7 +191,7 @@ class QuestionnairesDAO extends ClassesDAO
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $this->runQueryWithArguments(
-            $questionnaire->getModule(), 
+            $questionnaire->getModuleId(), 
             $questionnaire->getClassOrder(), 
             $questionnaire->getQuestion(), 
             $questionnaire->getQ1(), 
@@ -218,7 +218,7 @@ class QuestionnairesDAO extends ClassesDAO
         }
 
         $action = new Action();
-        $action->addClass($questionnaire->getModule(), $questionnaire->getClassOrder());
+        $action->addClass($questionnaire->getModuleId(), $questionnaire->getClassOrder());
         $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
         $adminsDao->newAction($action);
         
@@ -265,7 +265,7 @@ class QuestionnairesDAO extends ClassesDAO
             $questionnaire->getQ3(),
             $questionnaire->getQ4(),
             pack('n', $questionnaire->getAnswer()),
-            $questionnaire->getModule(),
+            $questionnaire->getModuleId(),
             $questionnaire->getClassOrder(),
         );
         
@@ -279,7 +279,7 @@ class QuestionnairesDAO extends ClassesDAO
         }
 
         $action = new Action();
-        $action->updateClass($questionnaire->getModule(), $questionnaire->getClassOrder());
+        $action->updateClass($questionnaire->getModuleId(), $questionnaire->getClassOrder());
         $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
         $adminsDao->newAction($action);
         
@@ -359,7 +359,7 @@ class QuestionnairesDAO extends ClassesDAO
             WHERE   id_module = ? AND class_order = ?
         ");
         $this->runQueryWithArguments(
-            $questionnaire->getModule(), 
+            $questionnaire->getModuleId(), 
             $questionnaire->getClassOrder()
         );
                             
@@ -371,7 +371,7 @@ class QuestionnairesDAO extends ClassesDAO
         ");
         $this->runQueryWithArguments(
             $newIdModule, 
-            $questionnaire->getModule()
+            $questionnaire->getModuleId()
         );
                             
         // Sets class order

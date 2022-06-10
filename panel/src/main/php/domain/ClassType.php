@@ -25,7 +25,7 @@ abstract class ClassType implements \JsonSerializable
      * 
      * @return      Module Module to which the class belongs
      */
-    public function getModule() : Module
+    public function getModuleId() : Module
     {
         return $this->module;
     }

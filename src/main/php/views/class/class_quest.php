@@ -4,7 +4,7 @@
     </h3>
     <div 
         class="questions" 
-        data-id-module="<?php echo $class->getModule(); ?>" 
+        data-id-module="<?php echo $class->getModuleId(); ?>" 
         data-class-order="<?php echo $class->getClassOrder(); ?>"
     >
         <div class="question" data-index="1">

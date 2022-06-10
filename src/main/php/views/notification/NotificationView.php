@@ -57,8 +57,8 @@ use domain\enum\NotificationTypeEnum;
                 <a
                     class="notification_msg"
                     href="<?php if ($notification->getReferenceType()->get() == NotificationTypeEnum::COMMENT): ?>
-                          <?php echo BASE_URL."courses/open/".$notification->getReference()->getCourseId()
-                                     ."/".$notification->getReference()->getModule()
+                          <?php echo BASE_URL."courses/open/".$notification->getReference()->getId()
+                                     ."/".$notification->getReference()->getModuleId()
                                      ."/".$notification->getReference()->getClassOrder(); ?>"
                           <?php else: ?> 
                           <?php echo BASE_URL."support/open/".$notification->getReference()->getId(); ?>"
