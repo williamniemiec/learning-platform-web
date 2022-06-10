@@ -22,16 +22,5 @@ jobs:
       run: |
         rm -rf vendor
         composer install
-    - name: Generate key
-      run: php artisan key:generate
-    - name: Link Storage
-      run: php artisan storage:link
-    - name: Create Database
-      run: |
-        mkdir -p database
-        touch database/database.sqlite
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
-      env:
-        DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
+    - name: Execute tests via PHPUnit
       run: vendor/bin/phpunit --stop-on-failure

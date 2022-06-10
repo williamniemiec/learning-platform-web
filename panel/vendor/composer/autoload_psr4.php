@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/reflection-docblock/src', $vendorDir . '/phpdocumentor/type-resolver/src'),
     'panel\\views\\' => array($baseDir . '/src/main/php/views'),
     'panel\\util\\' => array($baseDir . '/src/main/php/util'),
     'panel\\repositories\\' => array($baseDir . '/src/main/php/repositories'),
@@ -13,4 +14,8 @@ return array(
     'panel\\dao\\' => array($baseDir . '/src/main/php/dao'),
     'panel\\controllers\\' => array($baseDir . '/src/main/php/controllers'),
     'panel\\config\\' => array($baseDir . '/src/main/php/config'),
+    'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
+    'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src/Prophecy'),
+    'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
+    'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
 );

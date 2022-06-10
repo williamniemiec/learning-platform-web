@@ -11,6 +11,7 @@
 		}
 	},
 	"require-dev": {
-    	"heroku/heroku-buildpack-php": "*"
+    	"heroku/heroku-buildpack-php": "*",
+		"phpunit/phpunit": "6.4.*"
   	}
 }

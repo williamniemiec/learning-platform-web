@@ -9,5 +9,8 @@
 			"panel\\util\\" : "src/main/php/util/",
 			"panel\\views\\" : "src/main/php/views/"
 		}
-	}
+	},
+	"require-dev": {
+		"phpunit/phpunit": "6.4.*"
+  	}
 }

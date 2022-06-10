@@ -9,8 +9,13 @@ return array(
     'views\\' => array($baseDir . '/src/main/php/views'),
     'util\\' => array($baseDir . '/src/main/php/util'),
     'repositories\\' => array($baseDir . '/src/main/php/repositories'),
+    'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/reflection-docblock/src', $vendorDir . '/phpdocumentor/type-resolver/src'),
     'domain\\' => array($baseDir . '/src/main/php/domain'),
     'dao\\' => array($baseDir . '/src/main/php/dao'),
     'controllers\\' => array($baseDir . '/src/main/php/controllers'),
     'config\\' => array($baseDir . '/src/main/php/config'),
+    'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
+    'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src/Prophecy'),
+    'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
+    'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
 );
