@@ -1,0 +1,8 @@
+{
+    "require": {
+        "php": "*"
+    },
+    "scripts": {
+        "test": "@php test.php"
+    }
+}

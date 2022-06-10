@@ -1,0 +1,8 @@
+{
+    "require": {
+        "php": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.2"
+    }
+}
