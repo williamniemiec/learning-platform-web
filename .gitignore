@@ -1,6 +1,5 @@
 .settings/
 .buildpath
 .classpath
-./vendor/
 composer.lock
 .vscode

@@ -96,6 +96,7 @@ Details about each version are documented in the [releases section](https://gith
 |docs |`Directory`|Documentation files|
 | panel	|	 `Directory`	| Admin system |
 |src  |`Directory`|Application and test files|
+|vendor  |`Directory`|Composer files|
 | 	.htaccess 				| `File`	| Redirection for correct MVC performance on Apache servers
 | 	Procfile 				| `File`	| Heroku configuration file
 | 	index.php 				| `File`	| Application entry point
