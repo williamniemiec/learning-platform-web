@@ -23,13 +23,13 @@ AS (
 -- ----------------------------------------------------------------------------
 -- Total minutes of classes watched by students.
 -- ----------------------------------------------------------------------------
-CREATE VIEW vw_student_historic_watched_length (id_student, id_module, length) 
+CREATE VIEW vw_student_historic_watched_length (id_student, id_module, `length`) 
 AS (
-	SELECT	id_student, id_module, length
-	FROM	(SELECT	id_module, class_order, length
+	SELECT	id_student, id_module, `length`
+	FROM	(SELECT	id_module, class_order, `length`
 	 		 FROM		videos
 	 	 	 UNION ALL
-	  		 SELECT		id_module, class_order, 5 AS length
+	  		 SELECT		id_module, class_order, 5 AS `length`
 	  		 FROM		questionnaires) AS classes
 	JOIN student_historic USING (id_module, class_order)
 );
