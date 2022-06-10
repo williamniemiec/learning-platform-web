@@ -20,7 +20,7 @@ jobs:
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
     - name: Install Dependencies
       run: |
-        rm -rf vendor
+        rd /s /q "vendor"
         composer install
     - name: Execute tests via PHPUnit
       run: |
