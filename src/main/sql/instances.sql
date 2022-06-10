@@ -102,6 +102,13 @@ VALUES ('Web', 19.99, 'Learn the most used languages for web programming, such a
 INSERT INTO bundles (name,price,description) 
 VALUES ('Low level', 39.99, 'Learn low-level languages like C, C ++ and Assembly');							-- id_bundle = 2
 
+/**
+ * Copyright (c) William Niemiec.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 INSERT INTO bundles (name,price,logo, description) 
 VALUES ('Desktop programming', 29.99, 'dp.jpg', 
 	'Learn the most used languages for desktop programming, such as Java, C ++, Python,among others');		-- id_bundle = 3
