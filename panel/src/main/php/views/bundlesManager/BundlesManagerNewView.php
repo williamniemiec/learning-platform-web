@@ -57,8 +57,7 @@
                         name="description" 
                         placeholder="Description" 
                         class="form-control"
-                    >
-                    </textarea>
+                    ></textarea>
                 </div>
                 <div class="form-group">
                     <label for="logo">

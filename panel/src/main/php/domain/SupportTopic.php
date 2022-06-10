@@ -168,7 +168,7 @@ class SupportTopic implements \JsonSerializable
 
     private function getTopicOfLoggedUser($db)
     {
-        return new SupportTopicDAO($db, Admin::getLoggedIn($db)->getId());
+        return new SupportTopicDAO($db, Admin::getLoggedIn($db));
     }
     
     /**
@@ -201,7 +201,7 @@ class SupportTopic implements \JsonSerializable
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id' => $this->id_topic,

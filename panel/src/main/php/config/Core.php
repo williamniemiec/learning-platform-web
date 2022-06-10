@@ -25,14 +25,14 @@ class Core
         $params = $this->extractParamsFrom($url);
 
         if(!$this->hasControllerWithNameAndAction($controller, $action)) {
-            $controller_instance = new NotFoundController();    
+            $controllerInstance = new NotFoundController();    
             $action = 'index';
         } 
         else {
-            $controller_instance = $this->buildControllerInstance($controller);
+            $controllerInstance = $this->buildControllerInstance($controller);
         }
 
-        call_user_func_array(array($controller_instance, $action), $params);
+        call_user_func_array(array($controllerInstance, $action), $params);
     }
 
     private function getCurrentUrl()
@@ -52,17 +52,18 @@ class Core
             return 'HomeController';
         }
 
-        $url_terms = $this->extractUrlTerms($url);
-        
-        return $url_terms[0]."Controller";
+        $urlTerms = $this->extractUrlTerms($url);
+        $controllerName = $urlTerms[0];
+
+        return $controllerName."Controller";
     }
 
     private function extractUrlTerms($url) 
     {
-        $url_terms = explode("/", $url);
-        array_shift($url_terms); // Removes first item from array (it is null)
+        $urlTerms = explode("/", $url);
+        array_shift($urlTerms); // Removes first item from array (it is null)
 
-        return $url_terms;
+        return $urlTerms;
     }
 
     private function extractActionFrom($url)
@@ -72,11 +73,11 @@ class Core
         }
 
         $action = 'index';
-        $url_terms = $this->extractUrlTerms($url);
-        array_shift($url_terms);
+        $urlTerms = $this->extractUrlTerms($url);
+        array_shift($urlTerms);
 
-        if (isset($url_terms[0]) && !$this->isEmptyUrl($url_terms[0])) {
-            $action = $url_terms[0];
+        if (isset($urlTerms[0]) && !$this->isEmptyUrl($urlTerms[0])) {
+            $action = $urlTerms[0];
         }
 
         return $action;
@@ -96,15 +97,15 @@ class Core
         }
 
         $params = array();
-        $url_terms = $this->extractUrlTerms($url);
-        array_shift($url_terms);
+        $urlTerms = $this->extractUrlTerms($url);
+        array_shift($urlTerms);
 
-        if (isset($url_terms[0]) && !$this->isEmptyUrl($url_terms[0])) {
-            array_shift($url_terms);
+        if (isset($urlTerms[0]) && !$this->isEmptyUrl($urlTerms[0])) {
+            array_shift($urlTerms);
         }
 
-        if (isset($url_terms[0]) && !$this->isEmptyUrl($url_terms[0])) {
-            $params = $url_terms;
+        if (isset($urlTerms[0]) && !$this->isEmptyUrl($urlTerms[0])) {
+            $params = $urlTerms;
         }
 
         return $params;
@@ -118,29 +119,29 @@ class Core
 
     private function hasControllerWithName($name)
     {
-        $normalized_name = ucfirst($name);
+        $normalizedName = ucfirst($name);
         
-        return file_exists('src/main/php/controllers/'.$normalized_name.'.php');
+        return file_exists('src/main/php/controllers/'.$normalizedName.'.php');
     }
 
     private function hasControllerAnActionWithName($name, $controller)
     {
-        $controller_name = $this->buildControllerClassPath($controller);
+        $controllerName = $this->buildControllerClassPath($controller);
         
-        return method_exists($controller_name, $name);
+        return method_exists($controllerName, $name);
     }
 
     private function buildControllerClassPath($name)
     {
-        $normalized_name = ucfirst($name);
+        $normalizedName = ucfirst($name);
 
-        return '\\controllers\\'.$normalized_name;
+        return '\\panel\\controllers\\'.$normalizedName;
     }
 
     private function buildControllerInstance($name)
     {
-        $controller_class_path = $this->buildControllerClassPath($name);
+        $controllerClassPath = $this->buildControllerClassPath($name);
         
-        return new $controller_class_path;
+        return new $controllerClassPath;
     }
 }

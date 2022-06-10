@@ -21,6 +21,8 @@ class Module implements \JsonSerializable
     private $idModule;
     private $name;
     private $db;
+    private $order;
+    private $totalClasses;
     
     
     //-------------------------------------------------------------------------
@@ -122,6 +124,58 @@ class Module implements \JsonSerializable
         $this->db = $db;
     }
 
+    /**
+     * Gets module order in a course.
+     * 
+     * @return      int Module order
+     */
+    public function getOrder() : int
+    {
+        return $this->order;
+    }
+    
+    /**
+     * Sets module order in a course.
+     * 
+     * @param       int $order Module order
+     * 
+     * @return      Module Itself to allow chained calls
+     */
+    public function setOrder(int $order) : Module
+    {
+        if ($order > 0) {
+            $this->order = $order;
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Gets total classes that the module has.
+     * 
+     * @return      int Total classes
+     */
+    public function getTotalClasses() : int
+    {
+        return $this->totalClasses;
+    }
+    
+    /**
+     * Sets total classes.
+     * 
+     * @param       int $totalClasses Total classes
+     * 
+     * @return      Module Itself to allow chained calls
+     */
+    public function setTotalClasses(int $totalClasses) : Module
+    {
+        if ($totalClasses >= 0) {
+            $this->totalClasses = $totalClasses;
+        }
+        
+        return $this;
+    }
+
     
     //-------------------------------------------------------------------------
     //        Serialization
@@ -132,11 +186,13 @@ class Module implements \JsonSerializable
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id_module' => $this->idModule,
-            'name' => $this->name
+            'name' => $this->name,
+            'courseOrder' => $this->order,
+            'totalClasses' => $this->totalClasses
         );
     }
 }

@@ -91,7 +91,7 @@ class NotificationsDAO extends DAO
         if (!$this->hasResponseQuery()) {
             return array();
         }
-
+        
         $notifications = array();
         
         foreach ($this->getAllResponseQuery() as $notification) {
@@ -118,6 +118,8 @@ class NotificationsDAO extends DAO
                 (int) $notification['read']
             );
         }
+
+        
 
         return $notifications;
     }

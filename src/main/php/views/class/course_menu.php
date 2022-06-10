@@ -7,7 +7,7 @@
         <img	
             class="img imr-responsive course_banner" 
             src="<?php echo empty($logo) ? 
-                BASE_URL."src/main/webapp/images/default/noImage" : 
+                BASE_URL."src/main/webapp/images/default/noImage.png" : 
                 BASE_URL."src/main/webapp/images/logos/courses/".$logo; ?>" 
         />
     </div>

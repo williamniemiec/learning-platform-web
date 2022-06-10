@@ -22,6 +22,7 @@ class Course implements \JsonSerializable
     private $logo;
     private $description;
     private $modules;
+    private $totalStudents;
     private $totalClasses;
     private $totalLength;
     
@@ -248,6 +249,32 @@ class Course implements \JsonSerializable
         $this->validateTotalLength($totalLength);
         $this->totalLength = $totalLength;
     }
+
+    /**
+     * Gets total students who have this course.
+     *
+     * @return      int Total students
+     */
+    public function getTotalStudents() : int
+    {
+        return $this->totalStudents;
+    }
+    
+    /**
+     * Sets total students who have this course.
+     *
+     * @param       int $totalStudents Total students who have this course
+     *
+     * @return      Course Itself to allow chained calls
+     */
+    public function setTotalStudents(int $totalStudents) : Course
+    {
+        if ($totalStudents >= 0) {
+            $this->totalStudents = $totalStudents;
+        }
+            
+        return $this;
+    }
     
     
     //-------------------------------------------------------------------------
@@ -259,7 +286,7 @@ class Course implements \JsonSerializable
      *  
      * @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id' => $this->idCourse,
@@ -267,8 +294,9 @@ class Course implements \JsonSerializable
             'logo' => $this->logo,
             'description' => $this->description,
             'modules' => $this->modules,
-            'total_classes' => $this->totalClasses,
-            'total_length' => $this->totalLength
+            'totalStudents' => $this->totalStudents,
+            'totalClasses' => $this->totalClasses,
+            'totalLength' => $this->totalLength
         );
     }
 }

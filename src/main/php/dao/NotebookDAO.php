@@ -192,7 +192,7 @@ class NotebookDAO extends DAO
             return array();
         }
 
-        $notebooks = $this->getResponseQuery();
+        $notebooks = array();
         
         foreach ($this->getAllResponseQuery() as $note) {
             $notebooks[] = new Note(

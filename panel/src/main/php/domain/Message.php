@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace panel\domain;
 
+
 use \DateTime;
 
 
@@ -98,7 +99,7 @@ class Message implements \JsonSerializable
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id' => $this->id,

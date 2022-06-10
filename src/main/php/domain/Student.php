@@ -138,7 +138,7 @@ class Student extends User
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $json = parent::jsonSerialize();
         $json['photo'] = $this->photo;

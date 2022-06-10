@@ -77,7 +77,7 @@ class VideosDAO extends ClassesDAO
         $rawClass = $this->getResponseQuery();
         
         return new Video(
-            new Module((int) $rawClass['id_module'], $rawClass['name']),
+            (int) $rawClass['id_module'],
             (int) $rawClass['class_order'],
             $rawClass['title'],
             $rawClass['videoID'],
@@ -133,7 +133,7 @@ class VideosDAO extends ClassesDAO
         
         foreach ($this->getAllResponseQuery() as $class) {
             $classes[] = new Video(
-                new Module((int) $class['id_module'], $class['name']),
+                (int) $class['id_module'],
                 (int) $class['class_order'],
                 $class['title'],
                 $class['videoID'],

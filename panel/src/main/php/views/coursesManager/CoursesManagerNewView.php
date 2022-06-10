@@ -41,8 +41,7 @@
                         id="description" 
                         name="description" 
                         class="form-control"
-                    >
-                    </textarea>
+                    ></textarea>
                 </div>
                 
                 <div class="form-group">

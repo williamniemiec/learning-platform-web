@@ -222,7 +222,7 @@ class StudentsDAO extends DAO
         ");
         $this->runQueryWithArguments(
             $student->getName(),
-            $student->getGenre()->get() == 1,
+            (int) $student->getGenre()->get(), 
             $student->getBirthdate()->format("Y-m-d"),
             $student->getEmail(),
             md5($password)
@@ -270,7 +270,7 @@ class StudentsDAO extends DAO
         ");
         $this->runQueryWithArguments(
             $student->getName(), 
-            $student->getGenre()->get(), 
+            (int) $student->getGenre()->get(), 
             $student->getBirthdate()->format("Y-m-d"),
             $student->getId()
         );

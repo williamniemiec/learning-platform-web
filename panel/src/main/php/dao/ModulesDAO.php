@@ -81,6 +81,7 @@ class ModulesDAO extends DAO
         $i = 0;
         
         foreach ($this->getAllResponseQuery() as $module) {
+            
             $modules[$i] = new Module(
                 (int) $module['id_module'], 
                 $module['name']

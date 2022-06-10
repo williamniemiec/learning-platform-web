@@ -62,9 +62,7 @@
                         name="description" 
                         placeholder="Description" 
                         class="form-control"
-                    >
-                        <?php echo $bundle->getDescription(); ?>
-                    </textarea>
+                    ><?php echo $bundle->getDescription(); ?></textarea>
                 </div>
                 
                 <div class="form-group">

@@ -225,8 +225,8 @@ function newComment(id_course, id_module, class_order)
 				<div class="comment">
     				<img	class="img img-thumbnail" 
     						src="${creator.photo == "" ? 
-								BASE_URL + "src/main/web/images/default/noImage.png" : 
-								BASE_URL + "src/main/web/images/profile_photos/" + creator.photo}" 
+								BASE_URL + "src/main/webapp/images/default/noImage.png" : 
+								BASE_URL + "src/main/webapp/images/profile_photos/" + creator.photo}" 
 					/>
     				<div class="comment_content">
     					<div class="comment_info">
@@ -328,8 +328,8 @@ function new_reply(obj, id_comment)
 				<div class="comment comment_reply_content">
 					<img 	class="img img-thumbnail" 
 							src="${creator.photo == "" ? 
-								BASE_URL + "src/main/web/images/default/noImage.png" : 
-								BASE_URL + "src/main/web/images/profile_photos/" + creator.photo}" 
+								BASE_URL + "src/main/webapp/images/default/noImage.png" : 
+								BASE_URL + "src/main/webapp/images/profile_photos/" + creator.photo}" 
 					/>
 					<div class="comment_content">
     					<div class="comment_info">

@@ -7,5 +7,5 @@ require 'vendor/autoload.php';
 error_reporting(E_ALL);
 ini_set("display_errors", "On");
 
-$core = new config\Core();
+$core = new panel\config\Core();
 $core->run();

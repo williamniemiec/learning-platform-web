@@ -67,9 +67,7 @@
                         name="description" 
                         placeholder="Description" 
                         class="form-control"
-                    >
-                        <?php echo $class->getDescription(); ?>
-                    </textarea>
+                    ><?php echo $class->getDescription(); ?></textarea>
                 </div>
                 <div class="form-group">
                     <label for="videoID">

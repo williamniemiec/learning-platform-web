@@ -18,7 +18,7 @@ USE learning_platform;
 CREATE TABLE students (
 	id_student	INT 			NOT NULL	AUTO_INCREMENT,
 	name		VARCHAR(100)	NOT NULL 	,
-	genre		BIT(1)			NOT NULL,
+	genre		INT				NOT NULL,
 	birthdate	DATE			NOT NULL,
 	email		VARCHAR(100)	NOT NULL	UNIQUE,
 	password	VARCHAR(32)		NOT NULL 	,
@@ -32,9 +32,9 @@ CREATE TABLE notifications (
 	id_student		INT				NOT NULL,
 	date 			DATETIME		NOT NULL,
 	id_reference	INT 			NOT NULL 	,
-	type 			BIT(1)			NOT NULL,
+	type 			INT				NOT NULL,
 	message			TEXT			NOT NULL 	,
-	`read`			BIT(1)			DEFAULT		0,
+	`read`			INT				DEFAULT		0,
 
 	PRIMARY KEY (id_notification),
 	FOREIGN KEY (id_student) REFERENCES students(id_student)
@@ -145,7 +145,7 @@ CREATE TABLE student_historic (
 	id_student		INT 		NOT NULL,
 	id_module		INT 		NOT NULL,
 	class_order		INT 		NOT NULL,
-	class_type		BIT(1)		NOT NULL,
+	class_type		INT			NOT NULL,
 	date 			DATE		NOT NULL,
 
 	PRIMARY KEY (id_student, id_module, class_order),
@@ -223,7 +223,7 @@ CREATE TABLE support_topic (
 	title			VARCHAR(100)	NOT NULL 	,
 	date 			DATETIME 		NOT NULL,
 	message 	 	TEXT 			NOT NULL 	,
-	closed 			BIT(1) 			DEFAULT 	0,
+	closed 			INT 			DEFAULT 	0,
 
 	PRIMARY KEY (id_topic),
 	FOREIGN KEY (id_category) REFERENCES support_topic_category(id_category)
@@ -238,7 +238,7 @@ CREATE TABLE support_topic_replies (
 	id_topic 		INT 			NOT NULL,
 	id_user 		INT 			NOT NULL,
 	date 			DATETIME 		NOT NULL,
-	user_type 		BIT(1)			NOT NULL,
+	user_type 		INT				NOT NULL,
 	text 			TEXT 			NOT NULL 	,
 
 	PRIMARY KEY (id_reply),
@@ -263,7 +263,7 @@ CREATE TABLE admins (
 	id_admin 			INT 			NOT NULL	AUTO_INCREMENT,
 	id_authorization	INT 			NOT NULL,
 	name				VARCHAR(100)	NOT NULL 	,
-	genre				BIT(1)			NOT NULL,
+	genre				INT				NOT NULL,
 	birthdate			DATE			NOT NULL,
 	email				VARCHAR(100)	NOT NULL	UNIQUE,
 	password			VARCHAR(32)		NOT NULL 	,

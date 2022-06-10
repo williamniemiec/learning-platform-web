@@ -23,6 +23,7 @@ class Bundle implements \JsonSerializable
     private $logo;
     private $description;
     private $courses;
+    private $totalStudents;
     private $totalClasses;
     private $totalLength;
     
@@ -54,24 +55,6 @@ class Bundle implements \JsonSerializable
         $this->description = empty($description) ? '' : $description;
     }
 
-
-    //-------------------------------------------------------------------------
-    //        Methods
-    //-------------------------------------------------------------------------
-    private function fetchCourses($db)
-    {
-        $coursesDao = new CoursesDAO($db);
-            
-        return $coursesDao->getFromBundle($this->idBundle);
-    }
-
-    private function fetchTotal($db)
-    {
-        $bundlesDao = new BundlesDAO($db);
-        
-        return $bundlesDao->countTotalClasses($this->idBundle);
-    }
-    
     
     //-------------------------------------------------------------------------
     //        Getters
@@ -127,67 +110,6 @@ class Bundle implements \JsonSerializable
     {
         return $this->description;
     }
-    
-    /**
-     * Gets courses that belongs to the bundle.
-     * 
-     * @param       Database $db Database
-     * 
-     * @return      Course[] Courses that belongs to the bundle or
-     * empty array if there are no courses in the bundle
-     * 
-     * @implNote    Lazy initialization
-     */
-    public function getCourses(Database $db) : array
-    {
-        if (empty($this->courses)) {
-            $this->courses = $this->fetchCourses($db);
-        }
-        
-        return $this->courses;
-    }
-    
-    /**
-     * Gets the total length of the bundle.
-     * 
-     * @param       Database $db Database
-     * 
-     * @return      int Total length of the bundle
-     * 
-     * @implNote    Lazy initialization
-     */
-    public function getTotalLength(Database $db) : int
-    {
-        if (empty($this->totalLength)) {
-            $total = $this->fetchTotal($db);
-            
-            $this->totalLength = $total['total_length'];
-            $this->totalClasses = $total['total_classes'];
-        }
-        
-        return $this->totalLength;
-    }
-    
-    /**
-     * Gets the total classes of the bundle.
-     * 
-     * @param       Database $db Database
-     * 
-     * @return      int Total classes of the bundle
-     *
-     * @implNote    Lazy initialization
-     */
-    public function getTotalClasses(Database $db) : int
-    {
-        if (empty($this->totalClasses)) {
-            $total = $this->fetchTotal($db);
-            
-            $this->totalLength = $total['total_length'];
-            $this->totalClasses = $total['total_classes'];
-        }
-        
-        return $this->totalClasses;
-    }
 
     /**
      * Gets total students who have this bundle.
@@ -215,6 +137,69 @@ class Bundle implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * Gets courses that belongs to the bundle.
+     * 
+     * @param       Database $db Database
+     * 
+     * @return      Course[] Courses that belongs to the bundle or
+     * empty array if there are no courses in the bundle
+     * 
+     * @implNote    Lazy initialization
+     */
+    public function getCourses(Database $db) : array
+    {
+        if (empty($this->courses)) {
+            $coursesDao = new CoursesDAO($db);
+            $this->courses = $coursesDao->getFromBundle($this->idBundle);
+        }
+        
+        return $this->courses;
+    }
+    
+    /**
+     * Gets the total length of the bundle.
+     * 
+     * @param       Database $db Database
+     * 
+     * @return      int Total length of the bundle
+     * 
+     * @implNote    Lazy initialization
+     */
+    public function getTotalLength(Database $db) : int
+    {
+        if (empty($this->totalLength)) {
+            $bundlesDao = new BundlesDAO($db);
+            $total = $bundlesDao->countTotalClasses($this->idBundle);
+            $this->totalLength = $total['total_length'];
+            $this->totalClasses = $total['total_classes'];
+        }
+        
+        return $this->totalLength;
+    }
+    
+    /**
+     * Gets the total classes of the bundle.
+     * 
+     * @param       Database $db Database
+     * 
+     * @return      int Total classes of the bundle
+     *
+     * @implNote    Lazy initialization
+     */
+    public function getTotalClasses(Database $db) : int
+    {
+        if (empty($this->totalClasses)) {
+            $bundlesDao = new BundlesDAO($db);
+            $total = $bundlesDao->countTotalClasses($this->idBundle);
+            
+            $this->totalLength = $total['total_length'];
+            $this->totalClasses = $total['total_classes'];
+        }
+        
+        return $this->totalClasses;
+    }
+
     
     //-------------------------------------------------------------------------
     //        Serialization
@@ -225,10 +210,10 @@ class Bundle implements \JsonSerializable
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
-            'id' => $this->id_bundle,
+            'id' => $this->idBundle,
             'name' => $this->name,
             'price' => $this->price,
             'logo' => $this->logo,

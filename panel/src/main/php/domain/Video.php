@@ -109,7 +109,7 @@ class Video extends ClassType
      *
      * @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $json = parent::jsonSerialize();
         $json['type'] = 'video';

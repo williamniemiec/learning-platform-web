@@ -145,7 +145,7 @@ class StudentsDAO extends DAO
      * course with the provided id
      * @param       int $limit [Optional] Maximum results that will be returned
      * 
-     * @return      \models\Student[] All registered students or empty 
+     * @return      Student[] All registered students or empty 
      * array if there are no registered students
      */
     public function getAll(int $idCourse = -1, int $limit = -1) : array

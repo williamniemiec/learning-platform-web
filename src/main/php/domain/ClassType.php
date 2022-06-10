@@ -50,7 +50,7 @@ abstract class ClassType implements \JsonSerializable
      *
      * @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'module' => $this->idModule,

@@ -132,7 +132,7 @@ class Module implements \JsonSerializable
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id_module' => $this->idModule,

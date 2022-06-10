@@ -71,8 +71,7 @@
                     <textarea 
                         name="topic_message" 
                         class="form-control" <?php if ($topic->isClosed()) echo "disabled"; ?>
-                    >
-                    </textarea>
+                    ></textarea>
                 </div>
                 <div class="form-group">
                     <input 

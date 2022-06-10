@@ -142,7 +142,9 @@ class BundlesDAO extends DAO
             $query .= " HAVING name LIKE ?";
         }
         
-        $query .= " ORDER BY ".$orderBy->get()." ".$type->get();
+        if (!empty($orderBy)) {
+            $query .= " ORDER BY ".$orderBy->get()." ".$type->get();
+        }
 
         if ($limit > 0) {
             if ($offset > 0) {
@@ -177,7 +179,7 @@ class BundlesDAO extends DAO
         $i = 0;
             
         foreach ($this->getAllResponseQuery() as $bundle) {
-            $bundles[$i]['bundle'] = new Bundle(
+            $bundles[$i] = new Bundle(
                 (int) $bundle['id_bundle'],
                 $bundle['name'],
                 (float) $bundle['price'],
@@ -500,5 +502,68 @@ class BundlesDAO extends DAO
         $this->runQueryWithoutArguments();
 
         return ((int) $this->getResponseQuery()['total']);
+    }
+
+    /**
+     * Gets the total number of classes that a bundle has along with its 
+     * duration (in minutes).
+     * 
+     * @param       int idBundle Bundle id
+     * 
+     * @return      array Total of classes that the bundle has along with its 
+     * duration (in minutes). The returned array has the following keys:
+     * <ul>
+     *  <li><b>total_classes</b>: Total of classes that the bundle has</li>
+     *  <li><b>total_length</b>: Total duration of the classes that the bundle
+     *  has</li>
+     * </ul>
+     * 
+     * @throws      \InvalidArgumentException If bundle id is empty or less 
+     * than or equal to zero
+     * 
+     * @implSpec    It will always return an array with the two keys informed
+     * above, even if both have zero value
+     */
+    public function countTotalClasses(int $idBundle) : array
+    {
+        $this->validateBundleId($idBundle);
+        $this->withQuery("
+            SELECT      COUNT(id_module) AS total_classes, 
+                        SUM(length) AS total_length
+            FROM        (SELECT      id_module, 5 AS length
+                         FROM        questionnaires
+                         UNION ALL
+                         SELECT      id_module, length
+                         FROM        videos) AS tmp
+            GROUP BY    id_module
+            HAVING      id_module IN (SELECT    id_module
+                                      FROM      course_modules NATURAL JOIN bundle_courses
+                                      WHERE     id_bundle = ?)
+        ");
+        $this->runQueryWithArguments($idBundle);
+
+        return $this->parseTotalClassesResponseQuery();
+    }
+
+    private function parseTotalClassesResponseQuery()
+    {
+        if (!$this->hasResponseQuery()) {
+            return array(
+                "total_classes" => 0,
+                "total_length" => 0
+            );
+        }
+
+        $total = array(
+            "total_classes" => 0,
+            "total_length" => 0
+        );
+            
+        foreach ($this->getAllResponseQuery() as $result) {
+            $total["total_classes"] += $result["total_classes"];
+            $total["total_length"] += $result["total_length"];
+        }
+
+        return $total;
     }
 }

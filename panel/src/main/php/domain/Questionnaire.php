@@ -131,7 +131,7 @@ class Questionnaire extends ClassType
      *
      * @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $json = parent::jsonSerialize();
         $json['type'] = 'questionnaire';

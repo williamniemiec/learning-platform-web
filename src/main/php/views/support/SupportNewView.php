@@ -36,8 +36,7 @@
                         id="topic_message" 
                         name="topic_message" 
                         class="form-control"
-                    >
-                    </textarea>
+                    ></textarea>
                 </div>
                 <div class="form-group">
                     <input 

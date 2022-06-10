@@ -1,7 +1,7 @@
 <?php
 declare (strict_types=1);
 
-namespace panel\models;
+namespace panel\domain;
 
 
 use \DateTime;
@@ -66,55 +66,7 @@ class Student extends User
     {
         return !empty($_SESSION['s_login']);
     }
-    
-    /**
-     * Checks if login has been successfully or failed.
-     *
-     * @param       string $email Student's email
-     * @param       string $password Student's password
-     *
-     * @return      Student Information about student logged in or null if 
-     * login failed
-     */
-    public static function login(Database $db, string $email, string $password) : ?Student
-    {
-        $studentsDao = new StudentsDAO($db);
-        $student = $studentsDao->login($email, $password);
-        
-        if (!empty($student)) {
-            $_SESSION['s_login'] = $student->getId();
-        }
-        
-        return $student;
-    }
-    
-    /**
-     * Gets logged in student.
-     * 
-     * @param       Database $db Database
-     * 
-     * @return      Student Student logged in or null if there is no student 
-     * logged in
-     */
-    public static function getLoggedIn(Database $db) : ?Student
-    {
-        if (empty($_SESSION['s_login'])) {
-            return null;
-        }
-        
-        $studentsDao = new StudentsDAO($db, $_SESSION['s_login']);
-        
-        return $studentsDao->get();
-    }
-    
-    /**
-     * Logout current student.
-     */
-    public static function logout() : void
-    {
-        unset($_SESSION['s_login']);
-    }
-    
+
     
     //-------------------------------------------------------------------------
     //        Getters & Setters
@@ -182,7 +134,7 @@ class Student extends User
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $json = parent::jsonSerialize();
         $json['photo'] = $this->photo;

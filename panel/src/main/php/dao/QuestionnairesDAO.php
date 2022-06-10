@@ -78,7 +78,7 @@ class QuestionnairesDAO extends ClassesDAO
         $class = $this->getResponseQuery();
         
         return new Questionnaire(
-            new Module((int) $class['id_module'], $class['name']),
+            (int) $class['id_module'],
             (int) $class['class_order'],
             $class['question'],
             $class['q1'],
@@ -136,7 +136,7 @@ class QuestionnairesDAO extends ClassesDAO
         
         foreach ($this->getAllResponseQuery() as $class) {
             $classes[] = new Questionnaire(
-                new Module((int) $class['id_module'], $class['name']),
+                (int) $class['id_module'],
                 (int) $class['class_order'],
                 $class['question'],
                 $class['q1'],
@@ -198,7 +198,7 @@ class QuestionnairesDAO extends ClassesDAO
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $this->runQueryWithArguments(
-            $questionnaire->getModule()->getId(), 
+            $questionnaire->getModuleId(), 
             $questionnaire->getClassOrder(), 
             $questionnaire->getQuestion(), 
             $questionnaire->getQ1(), 
@@ -272,7 +272,7 @@ class QuestionnairesDAO extends ClassesDAO
             $questionnaire->getQ3(),
             $questionnaire->getQ4(),
             pack('n', $questionnaire->getAnswer()),
-            $questionnaire->getModule()->getId(),
+            $questionnaire->getModuleId(),
             $questionnaire->getClassOrder(),
         );
         
@@ -378,7 +378,7 @@ class QuestionnairesDAO extends ClassesDAO
         ");
         $this->runQueryWithArguments(
             $newIdModule, 
-            $questionnaire->getModule()->getId()
+            $questionnaire->getModuleId()
         );
                             
         // Sets class order

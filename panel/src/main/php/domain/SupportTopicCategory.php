@@ -65,7 +65,7 @@ class SupportTopicCategory implements \JsonSerializable
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id' => $this->idCategory,

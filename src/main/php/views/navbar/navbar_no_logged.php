@@ -13,7 +13,7 @@
         <div id="navbarMenu" class="navbar-collapse collapse">
             <div class="navbar-nav  ml-auto">
                 <a 
-                    href="<?php echo BASE_URL; ?>login" 
+                    href="<?php echo BASE_URL; ?>login/" 
                     class="nav-item nav-link active"
                 >
                     Login

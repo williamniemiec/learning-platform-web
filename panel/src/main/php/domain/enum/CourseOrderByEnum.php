@@ -8,13 +8,13 @@ use panel\util\Enumeration;
 
 
 /**
- * Contains reference types of notifications.
+ * Contains course 'order by' options.
  */
-class NotificationTypeEnum extends Enumeration 
+class CourseOrderByEnum extends Enumeration 
 {
     //-------------------------------------------------------------------------
     //        Enumerations
     //-------------------------------------------------------------------------
-    public const COMMENT = 0;
-    public const SUPPORT_TOPIC = 1;
+    public const NAME = 'name';
+    public const TOTAL_STUDENTS = 'total_students';
 }

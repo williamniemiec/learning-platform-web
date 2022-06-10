@@ -44,9 +44,7 @@
                         id="description" 
                         name="description" 
                         class="form-control"
-                    >
-                        <?php echo $course->getDescription(); ?>
-                    </textarea>
+                    ><?php echo $course->getDescription(); ?></textarea>
                 </div>
                 <div class="form-group">
                     <label for="logo">

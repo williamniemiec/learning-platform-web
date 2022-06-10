@@ -214,14 +214,6 @@ class AdminsDAO extends DAO
         }
     }
 
-    private function validateAuthorization($value)
-    {
-        if (empty($value) || $value <= 0) {
-            throw new \InvalidArgumentException("Authorization cannot be empty ".
-                                                "or less than or equal to zero");
-        }
-    }
-
     private function buildUpdateAdminQuery($adminId, $newEmail)
     {
         $query = "";

@@ -5,7 +5,9 @@
 <script type="text/javascript" src='<?php echo BASE_URL; ?>src/main/webapp/lib/password_strength/ps_script.js'></script>
 <script type="text/javascript" src='<?php echo BASE_URL; ?>src/main/webapp/lib/chartjs/Chart.min.js'></script>
 <script type="text/javascript" src='<?php echo BASE_URL; ?>src/main/webapp/scripts/global.js'></script>
-<script>var BASE_URL = "<?php echo BASE_URL; ?>"</script>
+<script>
+	var BASE_URL = "<?php echo BASE_URL; ?>";
+</script>
 <script type="text/javascript" src='<?php echo BASE_URL; ?>src/main/webapp/scripts/NotificationScript.js'></script>
 
 <?php if (!empty($scripts)) foreach ($scripts as $script): ?>

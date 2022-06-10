@@ -90,7 +90,7 @@ class CoursesDAO extends DAO
     }
     
     /**
-     * Gets informations about all registered courses.
+     * Gets information about all registered courses.
      * 
      * @param       string $name [Optional] Course name
      * @param       int $limit [Optional] Maximum courses returned
@@ -181,7 +181,7 @@ class CoursesDAO extends DAO
             
         foreach ($this->getAllResponseQuery() as $course) {
             $courses[$i] = new Course(
-                (int)$course['id_course'],
+                (int) $course['id_course'],
                 $course['name'],
                 $course['logo'],
                 $course['description']

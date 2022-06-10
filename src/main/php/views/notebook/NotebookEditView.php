@@ -29,9 +29,7 @@
                         name="note_content" 
                         class="form-control" 
                         required
-                    >
-                        <?php echo $note->getContent(); ?>
-                    </textarea>
+                    ><?php echo $note->getContent(); ?></textarea>
                 </div>
                 <div class="form-group">
                     <input 

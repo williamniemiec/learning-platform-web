@@ -27,8 +27,8 @@ function search(obj)
             			<!-- Course information -->
         				<img	class="img img-responsive" 
         						src="${courses[index].course.logo == "" ? 
-									BASE_URL + "src/main/web/images/default/noImage.png" : 
-									BASE_URL + "src/main/web/images/logos/courses/" + courses[index].course.logo}" 
+									BASE_URL + "src/main/webapp/images/default/noImage.png" : 
+									BASE_URL + "src/main/webapp/images/logos/courses/" + courses[index].course.logo}" 
         				/>
             			<h2>${courses[index].course.name}</h2>
             			<p>${courses[index].course.description}</p>                			

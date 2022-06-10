@@ -99,7 +99,7 @@ abstract class User implements \JsonSerializable
      *
      * @return      User Itself to allow chained calls
      */
-    public function setBirthdate(\DateTime $birthdate) : User
+    public function setBirthdate(DateTime $birthdate) : User
     {
         $this->birthdate = $birthdate;
         return $this;
@@ -125,7 +125,7 @@ abstract class User implements \JsonSerializable
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id' => $this->id,

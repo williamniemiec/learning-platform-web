@@ -207,7 +207,7 @@ class SupportTopic implements \JsonSerializable
      *
      *  @Override
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array(
             'id' => $this->id_topic,
