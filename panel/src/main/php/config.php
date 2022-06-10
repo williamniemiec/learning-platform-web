@@ -17,8 +17,8 @@ else {
     define("DB", array(
         'host' => "eyw6324oty5fsovx.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
         'charset' => "utf8",
-        'username' => "dcudisias8jnnqed",
-        'password' => "lalcf6ef9d9z73dr",
-        'database' => "wxfxzloo0agsgsxj"
+        'username' => "e4ekv8xyd22dpe9s",
+        'password' => "lhodhggafvjy91ay",
+        'database' => "xaatb3brfcbdfisn"
     ));
 }
