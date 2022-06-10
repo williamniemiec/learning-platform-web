@@ -13,7 +13,7 @@ abstract class ClassType implements \JsonSerializable
     //-----------------------------------------------------------------------
     //        Attributes
     //-----------------------------------------------------------------------
-    protected $idModule;
+    protected $module;
     protected $classOrder;
     
     
@@ -21,19 +21,19 @@ abstract class ClassType implements \JsonSerializable
     //        Getters
     //-----------------------------------------------------------------------
     /**
-     * Gets module id to which the class belongs.
+     * Gets module to which the class belongs.
      * 
-     * @return      int Module id
+     * @return      Module Module to which the class belongs
      */
-    public function getModuleId() : int
+    public function getModule() : Module
     {
-        return $this->idModule;
+        return $this->module;
     }
     
     /**
      * Gets class order inside the module to which the class belongs.
      *
-     * @return      int Module id
+     * @return      int Order
      */
     public function getClassOrder() : int
     {
@@ -53,7 +53,7 @@ abstract class ClassType implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return array(
-            'module' => $this->idModule,
+            'module' => $this->module,
             'class_order' => $this->classOrder
         );
     }

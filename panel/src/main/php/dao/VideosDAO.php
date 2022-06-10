@@ -18,12 +18,6 @@ use panel\util\IllegalAccessException;
 class VideosDAO extends ClassesDAO
 {
     //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $admin;
-    
-    
-    //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
@@ -34,8 +28,7 @@ class VideosDAO extends ClassesDAO
      */
     public function __construct(Database $db, Admin $admin = null)
     {
-        parent::__construct($db);
-        $this->admin = $admin;
+        parent::__construct($db, $admin);
     }
     
     
@@ -77,7 +70,7 @@ class VideosDAO extends ClassesDAO
         $rawClass = $this->getResponseQuery();
         
         return new Video(
-            (int) $rawClass['id_module'],
+            new Module((int) $rawClass['id_module']),
             (int) $rawClass['class_order'],
             $rawClass['title'],
             $rawClass['videoID'],
@@ -133,7 +126,7 @@ class VideosDAO extends ClassesDAO
         
         foreach ($this->getAllResponseQuery() as $class) {
             $classes[] = new Video(
-                (int) $class['id_module'],
+                new Module((int) $class['id_module'], $class['name']),
                 (int) $class['class_order'],
                 $class['title'],
                 $class['videoID'],
@@ -225,7 +218,7 @@ class VideosDAO extends ClassesDAO
     private function buildNewQueryArguments($video)
     {
         $bindArguments = array(
-            $video->getModuleId(), 
+            $video->getModule(), 
             $video->getClassOrder(), 
             $video->getTitle(), 
             $video->getVideoId(), 
@@ -246,7 +239,7 @@ class VideosDAO extends ClassesDAO
         }
 
         $action = new Action();
-        $action->addClass($video->getModuleId(), $video->getClassOrder());
+        $action->addClass($video->getModule(), $video->getClassOrder());
         $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
         $adminsDao->newAction($action);
         
@@ -310,7 +303,7 @@ class VideosDAO extends ClassesDAO
             $bindArguments[] = $video->getDescription();
         }
 
-        $bindArguments[] = $video->getModuleId();
+        $bindArguments[] = $video->getModule();
         $bindArguments[] = $video->getClassOrder();
 
         return $bindArguments;
@@ -323,7 +316,7 @@ class VideosDAO extends ClassesDAO
         }
 
         $action = new Action();
-        $action->updateClass($video->getModuleId(), $video->getClassOrder());
+        $action->updateClass($video->getModule(), $video->getClassOrder());
         $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
         $adminsDao->newAction($action);
         
@@ -402,7 +395,7 @@ class VideosDAO extends ClassesDAO
             SET     class_order = 0
             WHERE   id_module = ? AND class_order = ?
         ");
-        $this->runQueryWithArguments($video->getModuleId(), $video->getClassOrder());
+        $this->runQueryWithArguments($video->getModule(), $video->getClassOrder());
         
         // Moves class to new module
         $this->withQuery("
@@ -410,7 +403,7 @@ class VideosDAO extends ClassesDAO
             SET     id_module = ?
             WHERE   id_module = ? AND class_order = 0
         ");
-        $this->runQueryWithArguments($newIdModule, $video->getModuleId());
+        $this->runQueryWithArguments($newIdModule, $video->getModule());
         
         // Sets class order
         $this->withQuery("

@@ -141,7 +141,7 @@ class ModulesController extends Controller
             'classes' => $module->getClasses($dbConnection),
             'error' => false,
             'msg' => '',
-            'scripts' => array('ModulesManagerStyle')
+            'scripts' => array('ModulesManagerScript')
         );
         
         if ($this->hasFormBeenSent()) {
@@ -193,7 +193,7 @@ class ModulesController extends Controller
      */
     public function getAll()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+        if ($this->getHttpRequestMethod() != 'GET') {
             return;
         }
             
@@ -215,7 +215,7 @@ class ModulesController extends Controller
      */
     public function getClasses()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+        if ($this->getHttpRequestMethod() != 'GET') {
             return;
         }
         
@@ -242,7 +242,7 @@ class ModulesController extends Controller
      */
     public function setClasses()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             return;
         }
 

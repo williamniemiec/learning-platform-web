@@ -177,7 +177,7 @@ class SupportController extends Controller
      */
     public function search()
     {
-        if ($_SERVER['REQUEST_METHOD'] != "POST") {
+        if ($this->getHttpRequestMethod() != "POST") {
             return;
         }
             

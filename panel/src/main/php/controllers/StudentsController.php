@@ -103,7 +103,7 @@ class StudentsController extends Controller
      */
     public function editStudent()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
 
@@ -147,7 +147,7 @@ class StudentsController extends Controller
      */
     public function getStudent()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
         
@@ -175,7 +175,7 @@ class StudentsController extends Controller
      */
     public function deleteStudent()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
         
@@ -204,7 +204,7 @@ class StudentsController extends Controller
      */
     public function getBundles()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
         
@@ -231,7 +231,7 @@ class StudentsController extends Controller
      */
     public function addStudentBundle()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
         

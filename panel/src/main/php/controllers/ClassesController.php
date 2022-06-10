@@ -85,11 +85,11 @@ class ClassesController extends Controller
         $classOffset = $limitClasses * ($index - 1);
 
         foreach ($videosDao->getAll($limitClasses, $classOffset) as $class) {
-            $classes[$class->getTitle()] = $class;
+            $classes[] = $class;
         }
         
         foreach ($questionnairesDao->getAll($limitClasses, $classOffset) as $class) {
-            $classes[$class->getQuestion()] = $class;
+            $classes[] = $class;
         }
 
         $this->sortClassesByNameAscending($classes);
@@ -100,7 +100,9 @@ class ClassesController extends Controller
     private function sortClassesByNameAscending($classes)
     {
         usort($classes, function($c1, $c2) {
-            return $c1->getModule()->getName() > $c2->getModule()->getName();
+            return $c1->getModule()->getName() > $c2->getModule()->getName() 
+                ? 1 : 
+                -1;
         });
     }
 
@@ -409,7 +411,7 @@ class ClassesController extends Controller
      */
     public function getAll()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+        if ($this->getHttpRequestMethod() != 'GET') {
             return;
         }
             

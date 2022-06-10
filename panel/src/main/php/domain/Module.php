@@ -34,7 +34,7 @@ class Module implements \JsonSerializable
      * @param       int idModule Module id
      * @param       string $name Module name
      */
-    public function __construct(int $idModule, string $name)
+    public function __construct(int $idModule, string $name = null)
     {
         $this->idModule = $idModule;
         $this->name = $name;
@@ -49,7 +49,7 @@ class Module implements \JsonSerializable
      *
      * @return      int Module id
      */
-    public function getCourseId() : int
+    public function getId() : int
     {
         return $this->idModule;
     }

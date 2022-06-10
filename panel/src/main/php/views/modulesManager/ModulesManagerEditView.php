@@ -1,5 +1,5 @@
 <?php 
-use models\Video; 
+use panel\domain\Video; 
 ?>
 
 <div class="container">

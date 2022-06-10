@@ -19,12 +19,6 @@ use panel\util\IllegalAccessException;
 class CoursesDAO extends DAO
 {
     //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $admin;
-    
-    
-    //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
@@ -35,8 +29,7 @@ class CoursesDAO extends DAO
      */
     public function __construct(Database $db, Admin $admin = null)
     {
-        parent::__construct($db);
-        $this->admin = $admin;
+        parent::__construct($db, $admin);
     }
     
     

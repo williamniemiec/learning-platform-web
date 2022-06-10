@@ -18,15 +18,17 @@ abstract class DAO
     //-------------------------------------------------------------------------
     protected $db;
     protected $sql;
+    protected $admin;
     private $query;
 
 
     //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
-    protected function __construct(Database $db)
+    protected function __construct(Database $db, $admin = null)
     {
         $this->db = $db->getConnection();
+        $this->admin = $admin;
     }
 
 

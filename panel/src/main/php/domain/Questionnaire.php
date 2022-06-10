@@ -26,7 +26,7 @@ class Questionnaire extends ClassType
     /**
      * Creates a representation of a questionnaire-type class.
      * 
-     * @param       int idModule Module id that the class belongs to
+     * @param       Module $module Module that the class belongs to
      * @param       int classOrder Class order inside the module to which the
      * class belongs
      * @param       string $question Questionnaire question
@@ -37,7 +37,7 @@ class Questionnaire extends ClassType
      * @param       int $answer Questionnaire answer (number between [1;4])
      */
     public function __construct(
-        int $idModule, 
+        Module $module, 
         int $classOrder, 
         string $question, 
         string $q1, 
@@ -47,7 +47,7 @@ class Questionnaire extends ClassType
         int $answer
     )
     {
-        $this->idModule = $idModule;
+        $this->module = $module;
         $this->classOrder = $classOrder;
         $this->question = $question;
         $this->q1 = $q1;

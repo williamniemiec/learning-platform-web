@@ -22,7 +22,7 @@
                 <?php foreach ($module->getClasses() as $class): ?>
                     <div 
                         class="module_class" 
-                        data-class="<?php echo $class->getModuleId()."/".$class->getClassOrder(); ?>"
+                        data-class="<?php echo $class->getModule()."/".$class->getClassOrder(); ?>"
                     >
                         <?php if ($class instanceof Video): ?>
                             <div class="module_title">
@@ -36,10 +36,10 @@
                                 </small>
                             <?php endif; ?>
                         <?php else: ?>
-                            <a href="<?php echo BASE_URL."courses/open/".$id_course."/".$class->getModuleId()."/".$class->getClassOrder(); ?>">
+                            <a href="<?php echo BASE_URL."courses/open/".$id_course."/".$class->getModule()."/".$class->getClassOrder(); ?>">
                                 <?php echo ++$id.". Questionnaire"; ?>
                             </a>
-                            <?php if (!empty($watched_classes[$class->getModuleId()][$class->getClassOrder()])): ?>
+                            <?php if (!empty($watched_classes[$class->getModule()][$class->getClassOrder()])): ?>
                                 <small class="class_watched">
                                     Watched
                                 </small>

@@ -300,7 +300,7 @@ class CoursesController extends Controller
      */
     public function search()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             return;
         }
             
@@ -324,7 +324,7 @@ class CoursesController extends Controller
      */
     public function getAll()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+        if ($this->getHttpRequestMethod() != 'GET') {
             return;
         }
         
@@ -345,7 +345,7 @@ class CoursesController extends Controller
      */
     public function getModules()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+        if ($this->getHttpRequestMethod() != 'GET') {
             return;
         }
             
@@ -370,7 +370,7 @@ class CoursesController extends Controller
      */
     public function setModules()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             return;
         }
             

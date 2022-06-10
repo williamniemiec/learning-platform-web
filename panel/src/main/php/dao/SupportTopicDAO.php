@@ -19,12 +19,6 @@ use panel\util\IllegalAccessException;
 class SupportTopicDAO extends DAO
 {
     //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $admin;
-    
-    
-    //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
@@ -37,9 +31,8 @@ class SupportTopicDAO extends DAO
      */
     public function __construct(Database $db, Admin $admin)
     {
-        parent::__construct($db);
+        parent::__construct($db, $admin);
         $this->validateAdmin($admin);
-        $this->admin = $admin;
     }
     
     

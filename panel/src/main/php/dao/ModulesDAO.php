@@ -17,12 +17,6 @@ use panel\util\IllegalAccessException;
 class ModulesDAO extends DAO
 {
     //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $admin;
-    
-    
-    //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
@@ -33,8 +27,7 @@ class ModulesDAO extends DAO
      */
     public function __construct(Database $db, Admin $admin = null)
     {
-        parent::__construct($db);
-        $this->admin = $admin;
+        parent::__construct($db, $admin);
     }
     
     
@@ -593,7 +586,7 @@ class ModulesDAO extends DAO
                     (SELECT COUNT(*) 
                      FROM questionnaires 
                      WHERE questionnaires.id_module = modules.id_module) AS total_questionnaires
-            FROM    modules
+            FROM    modules  NATURAL JOIN course_modules
         ";
         
         if ($limit > 0) {

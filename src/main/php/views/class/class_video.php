@@ -45,7 +45,7 @@
         </div>
         <div class="form-group">
             <button 
-                onClick="newNote(this, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" 
+                onClick="newNote(this, <?php echo $class->getModule(); ?>, <?php echo $class->getClassOrder(); ?>)" 
                 class="btn btn-outline-primary"
             >
                 Save
@@ -76,14 +76,14 @@
             <li class="page-item disabled">
                 <button 
                     class="page-link" 
-                    onClick="navigate('bef', -1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)"
+                    onClick="navigate('bef', -1, <?php echo $class->getModule(); ?>, <?php echo $class->getClassOrder(); ?>)"
                 >
                     Before
                 </button>
             </li>
             <li class="page-item active" data-index="1">
                 <button 
-                    onClick="navigate('go', 1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" 
+                    onClick="navigate('go', 1, <?php echo $class->getModule(); ?>, <?php echo $class->getClassOrder(); ?>)" 
                     class="page-link"
                 >
                     1
@@ -92,7 +92,7 @@
             <?php for ($i=2; $i<=$totalPages; $i++): ?>
                 <li class="page-item" data-index="<?php echo $i; ?>">
                     <button 
-                        onClick="navigate('go', <?php echo $i; ?>, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)" 
+                        onClick="navigate('go', <?php echo $i; ?>, <?php echo $class->getModule(); ?>, <?php echo $class->getClassOrder(); ?>)" 
                         class="page-link"
                     >
                         <?php echo $i; ?>
@@ -102,7 +102,7 @@
             <li class="page-item <?php echo $totalPages == 1 ? "disabled" : "" ?>">
                 <button 
                     class="page-link" 
-                    onClick="navigate('af', -1, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)"
+                    onClick="navigate('af', -1, <?php echo $class->getModule(); ?>, <?php echo $class->getClassOrder(); ?>)"
                 >
                     After
                 </button>
@@ -129,7 +129,7 @@
         <div class="form-group">
             <button	
                 class="btn btn-outline-primary" 
-                onClick="newComment(<?php echo $id_course; ?>, <?php echo $class->getModuleId(); ?>, <?php echo $class->getClassOrder(); ?>)"
+                onClick="newComment(<?php echo $id_course; ?>, <?php echo $class->getModule(); ?>, <?php echo $class->getClassOrder(); ?>)"
             >
                 Send
             </button>

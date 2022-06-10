@@ -9,7 +9,7 @@
                 <input 
                     type="text" 
                     class="search-bar-big" 
-                    placeholder="Search bundle" 
+                    placeholder="Search topic" 
                 />
                 <button 
                     class="search-bar-btn" 

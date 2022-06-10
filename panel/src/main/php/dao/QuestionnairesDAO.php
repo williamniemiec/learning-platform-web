@@ -18,12 +18,6 @@ use panel\util\IllegalAccessException;
 class QuestionnairesDAO extends ClassesDAO
 {
     //-------------------------------------------------------------------------
-    //        Attributes
-    //-------------------------------------------------------------------------
-    private $admin;
-    
-    
-    //-------------------------------------------------------------------------
     //        Constructor
     //-------------------------------------------------------------------------
     /**
@@ -34,8 +28,7 @@ class QuestionnairesDAO extends ClassesDAO
      */
     public function __construct(Database $db, Admin $admin = null)
     {
-        parent::__construct($db);
-        $this->admin = $admin;
+        parent::__construct($db, $admin);
     }
     
     
@@ -78,7 +71,7 @@ class QuestionnairesDAO extends ClassesDAO
         $class = $this->getResponseQuery();
         
         return new Questionnaire(
-            (int) $class['id_module'],
+            new Module((int) $class['id_module'], $class['name']),
             (int) $class['class_order'],
             $class['question'],
             $class['q1'],
@@ -136,7 +129,7 @@ class QuestionnairesDAO extends ClassesDAO
         
         foreach ($this->getAllResponseQuery() as $class) {
             $classes[] = new Questionnaire(
-                (int) $class['id_module'],
+                new Module((int) $class['id_module'], $class['name']),
                 (int) $class['class_order'],
                 $class['question'],
                 $class['q1'],
@@ -198,7 +191,7 @@ class QuestionnairesDAO extends ClassesDAO
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $this->runQueryWithArguments(
-            $questionnaire->getModuleId(), 
+            $questionnaire->getModule(), 
             $questionnaire->getClassOrder(), 
             $questionnaire->getQuestion(), 
             $questionnaire->getQ1(), 
@@ -225,7 +218,7 @@ class QuestionnairesDAO extends ClassesDAO
         }
 
         $action = new Action();
-        $action->addClass($questionnaire->getModuleId(), $questionnaire->getClassOrder());
+        $action->addClass($questionnaire->getModule(), $questionnaire->getClassOrder());
         $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
         $adminsDao->newAction($action);
         
@@ -272,7 +265,7 @@ class QuestionnairesDAO extends ClassesDAO
             $questionnaire->getQ3(),
             $questionnaire->getQ4(),
             pack('n', $questionnaire->getAnswer()),
-            $questionnaire->getModuleId(),
+            $questionnaire->getModule(),
             $questionnaire->getClassOrder(),
         );
         
@@ -286,7 +279,7 @@ class QuestionnairesDAO extends ClassesDAO
         }
 
         $action = new Action();
-        $action->updateClass($questionnaire->getModuleId(), $questionnaire->getClassOrder());
+        $action->updateClass($questionnaire->getModule(), $questionnaire->getClassOrder());
         $adminsDao = new AdminsDAO($this->db, Admin::getLoggedIn($this->db));
         $adminsDao->newAction($action);
         
@@ -366,7 +359,7 @@ class QuestionnairesDAO extends ClassesDAO
             WHERE   id_module = ? AND class_order = ?
         ");
         $this->runQueryWithArguments(
-            $questionnaire->getModuleId(), 
+            $questionnaire->getModule(), 
             $questionnaire->getClassOrder()
         );
                             
@@ -378,7 +371,7 @@ class QuestionnairesDAO extends ClassesDAO
         ");
         $this->runQueryWithArguments(
             $newIdModule, 
-            $questionnaire->getModuleId()
+            $questionnaire->getModule()
         );
                             
         // Sets class order

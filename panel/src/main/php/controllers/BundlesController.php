@@ -340,7 +340,7 @@ class BundlesController extends Controller
      */
     public function getCourses()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+        if ($this->getHttpRequestMethod() != 'GET') {
             return;
         }
         
@@ -362,7 +362,7 @@ class BundlesController extends Controller
      */
     public function setCourses()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             return;
         }
             
@@ -387,7 +387,7 @@ class BundlesController extends Controller
      */
     public function getAll()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+        if ($this->getHttpRequestMethod() != 'GET') {
             return;
         }
             

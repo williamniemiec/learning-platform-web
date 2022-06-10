@@ -116,7 +116,7 @@ class SettingsController extends Controller
      */
     public function updatePassword()
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+        if ($this->getHttpRequestMethod() != 'POST') {
             $this->redirectToRoot();
         }
             
