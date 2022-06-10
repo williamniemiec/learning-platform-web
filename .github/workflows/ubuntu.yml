@@ -23,4 +23,6 @@ jobs:
         rm -rf vendor
         composer install
     - name: Execute tests via PHPUnit
-      run: vendor/bin/phpunit --stop-on-failure
+      run: |
+        vendor/bin/phpunit --stop-on-failure src/test
+        vendor/bin/phpunit --stop-on-failure panel/src/test
