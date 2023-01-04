@@ -12,7 +12,7 @@
 	<a href="https://github.com/williamniemiec/learning-platform-web/blob/master/LICENSE"><img src="https://img.shields.io/github/license/williamniemiec/learning-platform-web" alt="License"></a>
 </p>
 <p align="center">
-	<a href='https://wniemiec-web-learningplatform.herokuapp.com/'><img alt='Deploy' src='https://www.herokucdn.com/deploy/button.svg' width=200/></a>
+	<a href='https://wniemiec-learning-platform.000webhostapp.com/'><img alt='Deploy' src='https://raw.githubusercontent.com/williamniemiec/williamniemiec/main/assets/images/badges/deploy-to-000webhost-button.png' width=200/></a>
 </p>
 
 <hr />
