@@ -18,7 +18,7 @@
 <hr />
 
 ## ❇ Introduction
-Website project about a learning platform built with PHP along with [Selenium framework](https://www.selenium.dev/) for testing. It also uses <a href="https://github.com/williamniemiec/MVC-in-PHP">MVC design pattern</a>. This application was made for learning purposes only, not for profit. You can interact with the project through the Heroku platform ([click here to access](https://wniemiec-web-learningplatform.herokuapp.com/)) and access the administration area [here](https://wniemiec-web-learningplatform.herokuapp.com/panel/).
+Website project about a learning platform built with PHP along with [Selenium framework](https://www.selenium.dev/) for testing. It also uses <a href="https://github.com/williamniemiec/MVC-in-PHP">MVC design pattern</a>. This application was made for learning purposes only, not for profit. You can interact with the project through the Heroku platform ([click here to access](https://wniemiec-learning-platform.000webhostapp.com/)) and access the administration area [here](https://wniemiec-learning-platform.000webhostapp.com/panel/).
 
 
 ### Login information
