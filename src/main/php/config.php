@@ -13,12 +13,12 @@ if (ENVIRONMENT == 'development') {
     ));
 }
 else {
-    define("BASE_URL", "https://wniemiec-web-learningplatform.herokuapp.com/");
+    define("BASE_URL", "https://wniemiec-learning-platform.000webhostapp.com/");
     define("DB", array(
-        'host' => "eyw6324oty5fsovx.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
+        'host' => "localhost",
         'charset' => "utf8",
-        'username' => "e4ekv8xyd22dpe9s",
-        'password' => "lhodhggafvjy91ay",
-        'database' => "xaatb3brfcbdfisn"
+        'username' => "id20101994_root",
+        'password' => "%pq1bG7EA8|>c{3^",
+        'database' => "id20101994_learning_platform"
     ));
 }
