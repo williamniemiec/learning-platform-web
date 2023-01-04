@@ -1,8 +1,0 @@
-{
-    "require": {
-        "php": "*"
-    },
-    "require-dev": {
-        "behat/behat": "^3.8"
-    }
-}

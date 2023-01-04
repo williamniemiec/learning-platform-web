@@ -3,3 +3,4 @@
 .classpath
 composer.lock
 .vscode
+vendor

@@ -1,2 +1,0 @@
---format progress
---format ParallelTests::RSpec::RuntimeLogger --out parallel_runtime_rspec.log
