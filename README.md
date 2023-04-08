@@ -33,7 +33,23 @@ The hosting service Heroku may have a certain delay (~ 1 min) for uploading the 
 ## ✔ Requirements
 - [PHP 7+](https://www.php.net);
 - [MySQL 5.7.26+](https://www.mysql.com);
-- [Composer](https://getcomposer.org);
+- [Composer](https://getcomposer.org).
+
+## ℹ How to run
+
+1. Install MySQL v5.7 or greater and to create a database named `learning_platform`.
+2. Run the SQL files located at [`src/main/sql`](https://github.com/williamniemiec/learning-platform-web/tree/master/src/main/sql) in the following order:
+
+```
+1 - tables.sql
+2 - views.sql
+3 - procedures.sql
+4 - triggers.sql
+5 - instances.sql
+```
+
+3. Open [`src/main/php/environment.php`](https://github.com/williamniemiec/learning-platform-web/blob/master/src/main/php/environment.php) and to comment the line 3 and uncomment the line 2;
+4. Copy all the files to your server application (for example, if you're using Apache, you've to move the files to a folder called 'www').
 
 ## 🖼 Gallery
 
