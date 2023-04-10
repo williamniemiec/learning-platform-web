@@ -28,7 +28,7 @@ Website project about a learning platform built with PHP along with [Selenium fr
 | Administration | admin@lp.com |	teste12345@A |
 
 ## ⚠ Warnings
-The hosting service Heroku may have a certain delay (~ 1 min) for uploading the application so the loading of the website may have a certain delay. 
+The hosting service may have a certain delay (~ 1 min) for uploading the application so the loading of the website may have a certain delay. 
 
 ## ✔ Requirements
 - [PHP 7+](https://www.php.net);
@@ -49,7 +49,9 @@ The hosting service Heroku may have a certain delay (~ 1 min) for uploading the 
 ```
 
 3. Open [`src/main/php/environment.php`](https://github.com/williamniemiec/learning-platform-web/blob/master/src/main/php/environment.php) and to comment the line 3 and uncomment the line 2;
-4. Copy all the files to your server application (for example, if you're using Apache, you've to move the files to a folder called 'www').
+4. Copy all the files to your server application (for example, if you're using Apache, you've to move the files to a folder called 'www');
+5. Install the project dependencies using composer:
+> composer install
 
 ## 🖼 Gallery
 
